@@ -82,6 +82,9 @@ export interface Artist {
   name_local?: string;
   name_en?: string;
   display_name?: string;
+  bio_short_en?: string;
+  bio_short_zh?: string;
+  bio_short_ja?: string;
   description_zh?: string;
   description_en?: string;
   description_ja?: string;
@@ -110,6 +113,10 @@ export interface Event {
   title_local?: string;     // override
   description_en?: string;
   description_zh?: string;
+  description_ja?: string;
+  description_short_en?: string;
+  description_short_zh?: string;
+  description_short_ja?: string;
   start_at?: string;
   end_at?: string;
   timezone?: string;        // e.g. "Asia/Taipei"

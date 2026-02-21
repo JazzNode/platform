@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -78,8 +78,18 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="text-sm text-muted-foreground space-y-1">
+                    {localized(event.fields as Record<string, unknown>, 'description_short', locale) && (
+                      <p className="text-xs italic">{localized(event.fields as Record<string, unknown>, 'description_short', locale)}</p>
+                    )}
                     {venue && <p>📍 {displayName(venue.fields)}</p>}
-                    {artist && <p>🎤 {displayName(artist.fields)}</p>}
+                    {artist && (
+                      <div>
+                        <p>🎤 {displayName(artist.fields)}</p>
+                        {localized(artist.fields as Record<string, unknown>, 'bio_short', locale) && (
+                          <p className="text-xs text-muted-foreground/70 mt-0.5">{localized(artist.fields as Record<string, unknown>, 'bio_short', locale)}</p>
+                        )}
+                      </div>
+                    )}
                     {event.fields.ticket_url && (
                       <a
                         href={event.fields.ticket_url}

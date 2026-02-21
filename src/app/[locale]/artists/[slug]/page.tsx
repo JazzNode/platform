@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, photoUrl } from '@/lib/helpers';
+import { displayName, formatDate, photoUrl, localized } from '@/lib/helpers';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -25,6 +25,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   }
 
   const f = artist.fields;
+  const bioShort = localized(f as Record<string, unknown>, 'bio_short', locale);
+  const bioFull = localized(f as Record<string, unknown>, 'bio', locale);
   const desc = locale === 'zh' ? f.description_zh : locale === 'ja' ? f.description_ja : f.description_en;
   const artistEvents = resolveLinks(f.event_list, events)
     .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''));
@@ -70,7 +72,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               {f.genres.map((g) => <Badge key={g} variant="outline" className="text-xs">{g}</Badge>)}
             </div>
           )}
-          {desc && <p className="text-muted-foreground leading-relaxed">{desc}</p>}
+          {bioShort && <p className="text-muted-foreground font-medium">{bioShort}</p>}
+          {bioFull && <p className="text-muted-foreground leading-relaxed text-sm">{bioFull}</p>}
+          {!bioFull && desc && <p className="text-muted-foreground leading-relaxed">{desc}</p>}
 
           <div className="flex gap-3 text-sm">
             {f.website_url && <a href={f.website_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">🌐 Website</a>}

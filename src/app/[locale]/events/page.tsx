@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { getEvents, getVenues, getArtists, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 export async function generateMetadata() {
@@ -62,6 +62,9 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="text-xs text-muted-foreground space-y-1">
+                    {localized(event.fields as Record<string, unknown>, 'description_short', locale) && (
+                      <p className="italic">{localized(event.fields as Record<string, unknown>, 'description_short', locale)}</p>
+                    )}
                     {venue && <p>📍 {displayName(venue.fields)}</p>}
                     {artist && <p>🎤 {displayName(artist.fields)}</p>}
                     {event.fields.ticket_url && (

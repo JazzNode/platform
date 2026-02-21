@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getArtists } from '@/lib/airtable';
-import { displayName, photoUrl } from '@/lib/helpers';
+import { displayName, photoUrl, localized } from '@/lib/helpers';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
@@ -54,6 +54,9 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
                   )}
                   <CardHeader className="py-3">
                     <CardTitle className="text-sm">{displayName(artist.fields)}</CardTitle>
+                    {localized(artist.fields as Record<string, unknown>, 'bio_short', locale) && (
+                      <p className="text-xs text-muted-foreground line-clamp-2">{localized(artist.fields as Record<string, unknown>, 'bio_short', locale)}</p>
+                    )}
                     <div className="flex gap-1 flex-wrap">
                       {artist.fields.is_master && <Badge className="text-xs">🌟 Master</Badge>}
                       {artist.fields.verification_status === 'Verified' && (

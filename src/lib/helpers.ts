@@ -42,6 +42,24 @@ export function photoUrl(urlField: string | undefined, attachments?: { url: stri
   return urlField || attachments?.[0]?.url || null;
 }
 
+/** Pick a localized field value. Falls back: locale → en → zh → ja → undefined. */
+export function localized(
+  fields: Record<string, unknown>,
+  prefix: string,
+  locale: string,
+): string | undefined {
+  const suffixMap: Record<string, string[]> = {
+    en: ['_en', '_zh', '_ja'],
+    zh: ['_zh', '_en', '_ja'],
+    ja: ['_ja', '_en', '_zh'],
+  };
+  for (const suffix of (suffixMap[locale] || suffixMap.en)) {
+    const val = fields[`${prefix}${suffix}`];
+    if (val && typeof val === 'string') return val;
+  }
+  return undefined;
+}
+
 /** Supported locales. */
 export const locales = ['en', 'zh', 'ja'] as const;
 export type Locale = (typeof locales)[number];
