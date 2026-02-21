@@ -99,10 +99,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {featured.map((venue) => (
             <Link key={venue.id} href={`/${locale}/venues/${venue.id}`}>
               <Card className="hover:shadow-md transition-shadow h-full">
-                {photoUrl(venue.fields.photo_file) && (
+                {photoUrl(venue.fields.photo_url, venue.fields.photo_file) && (
                   <div className="h-40 overflow-hidden rounded-t-lg">
                     <img
-                      src={photoUrl(venue.fields.photo_file)!}
+                      src={photoUrl(venue.fields.photo_url, venue.fields.photo_file)!}
                       alt={displayName(venue.fields)}
                       className="w-full h-full object-cover"
                     />

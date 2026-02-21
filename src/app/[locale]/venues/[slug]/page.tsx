@@ -38,9 +38,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       {/* Hero */}
       <div className="flex flex-col md:flex-row gap-6">
-        {photoUrl(f.photo_file) && (
+        {photoUrl(f.photo_url, f.photo_file) && (
           <div className="w-full md:w-80 h-52 rounded-lg overflow-hidden shrink-0">
-            <img src={photoUrl(f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
+            <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
           </div>
         )}
         <div className="space-y-3">

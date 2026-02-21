@@ -37,9 +37,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       </Link>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {photoUrl(f.photo_file) ? (
+        {photoUrl(f.photo_url, f.photo_file) ? (
           <div className="w-48 h-48 rounded-full overflow-hidden shrink-0">
-            <img src={photoUrl(f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
+            <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
           </div>
         ) : (
           <div className="w-48 h-48 rounded-full bg-muted flex items-center justify-center text-5xl shrink-0">🎵</div>

@@ -39,10 +39,10 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
             {instArtists.map((artist) => (
               <Link key={artist.id} href={`/${locale}/artists/${artist.id}`}>
                 <Card className="hover:shadow-md transition-shadow h-full">
-                  {photoUrl(artist.fields.photo_file) ? (
+                  {photoUrl(artist.fields.photo_url, artist.fields.photo_file) ? (
                     <div className="h-36 overflow-hidden rounded-t-lg">
                       <img
-                        src={photoUrl(artist.fields.photo_file)!}
+                        src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!}
                         alt={displayName(artist.fields)}
                         className="w-full h-full object-cover"
                       />

@@ -36,9 +36,9 @@ export function formatTime(iso: string | undefined): string {
   return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
 }
 
-/** Get photo URL from Airtable attachment field. */
-export function photoUrl(photos: { url: string }[] | undefined): string | null {
-  return photos?.[0]?.url || null;
+/** Get photo/poster URL — prefers stable _url field, falls back to attachment. */
+export function photoUrl(urlField: string | undefined, attachments?: { url: string }[]): string | null {
+  return urlField || attachments?.[0]?.url || null;
 }
 
 /** Supported locales. */

@@ -68,7 +68,8 @@ export interface Venue {
   website_url?: string;
   instagram?: string;
   facebook_url?: string;
-  photo_file?: { url: string; filename: string }[];
+  photo_url?: string;
+  photo_file?: { url: string; filename: string }[];  // legacy, use photo_url
   jazz_frequency?: string;
   capacity?: number;
   event_list?: string[];
@@ -88,7 +89,8 @@ export interface Artist {
   primary_instrument?: string;
   instrument_list?: string[];
   genres?: string[];
-  photo_file?: { url: string; filename: string }[];
+  photo_url?: string;
+  photo_file?: { url: string; filename: string }[];  // legacy, use photo_url
   website_url?: string;
   instagram?: string;
   facebook_url?: string;
@@ -115,7 +117,8 @@ export interface Event {
   tag_list?: string[];
   ticket_url?: string;
   price_info?: string;
-  photo_file?: { url: string; filename: string }[];
+  poster_url?: string;
+  photo_file?: { url: string; filename: string }[];  // legacy
   source_list?: string[];
   slug?: string;
 }
