@@ -119,7 +119,7 @@ export interface Event {
   tag_list?: string[];
   ticket_url?: string;
   price_info?: string;
-  poster_url?: string;
+  poster_url?: string;  // Wix mainImage URL (high-res event poster)
   photo_file?: { url: string; filename: string }[];  // legacy
   source_list?: string[];
   slug?: string;

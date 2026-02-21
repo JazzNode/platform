@@ -88,7 +88,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               const tz = event.fields.timezone || 'Asia/Taipei';
               const artist = resolveLinks(event.fields.primary_artist, artists)[0];
               return (
-                <Card key={event.id} className="hover:shadow-sm transition-shadow">
+                <Card key={event.id} className="hover:shadow-sm transition-shadow overflow-hidden">
+                  {event.fields.poster_url && (
+                    <div className="h-36 overflow-hidden">
+                      <img src={event.fields.poster_url} alt={event.fields.title || ''} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                  )}
                   <CardHeader className="pb-2">
                     <div className="text-xs text-muted-foreground">
                       {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
