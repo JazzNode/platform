@@ -85,15 +85,16 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {venueEvents.slice(0, 20).map((event) => {
+              const tz = event.fields.timezone || 'Asia/Taipei';
               const artist = resolveLinks(event.fields.primary_artist, artists)[0];
               return (
                 <Card key={event.id} className="hover:shadow-sm transition-shadow">
                   <CardHeader className="pb-2">
                     <div className="text-xs text-muted-foreground">
-                      {formatDate(event.fields.start_at, locale)} · {formatTime(event.fields.start_at)}
+                      {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                     </div>
                     <CardTitle className="text-sm">
-                      {event.fields.title_local || event.fields.title_en || 'Event'}
+                      {event.fields.title || event.fields.title_local || event.fields.title_en || 'Event'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="text-xs text-muted-foreground">

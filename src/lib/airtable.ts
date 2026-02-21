@@ -105,13 +105,15 @@ export interface Artist {
 }
 
 export interface Event {
-  title_en?: string;
-  title_local?: string;
+  title?: string;           // main title from scraper
+  title_en?: string;        // override
+  title_local?: string;     // override
   description_en?: string;
   description_zh?: string;
   start_at?: string;
   end_at?: string;
-  venue_list?: string[];
+  timezone?: string;        // e.g. "Asia/Taipei"
+  venue_id?: string[];      // linked Venues records
   lineup_list?: string[];
   primary_artist?: string[];
   tag_list?: string[];

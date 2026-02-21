@@ -90,12 +90,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         ) : (
           <div className="grid gap-3 sm:grid-cols-2">
             {artistEvents.slice(0, 20).map((event) => {
-              const venue = resolveLinks(event.fields.venue_list, venues)[0];
+              const tz = event.fields.timezone || 'Asia/Taipei';
+              const venue = resolveLinks(event.fields.venue_id, venues)[0];
               return (
                 <Card key={event.id} className="hover:shadow-sm transition-shadow">
                   <CardHeader className="pb-2">
-                    <div className="text-xs text-muted-foreground">{formatDate(event.fields.start_at, locale)}</div>
-                    <CardTitle className="text-sm">{event.fields.title_local || event.fields.title_en}</CardTitle>
+                    <div className="text-xs text-muted-foreground">{formatDate(event.fields.start_at, locale, tz)}</div>
+                    <CardTitle className="text-sm">{event.fields.title || event.fields.title_local || event.fields.title_en}</CardTitle>
                   </CardHeader>
                   <CardContent className="text-xs text-muted-foreground">
                     {venue && <p>📍 {displayName(venue.fields)}</p>}

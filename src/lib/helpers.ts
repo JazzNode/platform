@@ -19,7 +19,7 @@ export function displayName(fields: { display_name?: string; name_local?: string
 }
 
 /** Format a date string for display. */
-export function formatDate(iso: string | undefined, locale: string = 'en'): string {
+export function formatDate(iso: string | undefined, locale: string = 'en', timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';
   const d = new Date(iso);
   return d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : 'en-US', {
@@ -27,13 +27,14 @@ export function formatDate(iso: string | undefined, locale: string = 'en'): stri
     month: 'short',
     day: 'numeric',
     weekday: 'short',
+    timeZone: timezone,
   });
 }
 
-export function formatTime(iso: string | undefined): string {
+export function formatTime(iso: string | undefined, timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  return d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: timezone });
 }
 
 /** Get photo/poster URL — prefers stable _url field, falls back to attachment. */

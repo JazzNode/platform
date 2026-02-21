@@ -38,16 +38,17 @@ export default async function EventsPage({ params }: { params: Promise<{ locale:
           <h2 className="text-xl font-semibold mb-4">{month}</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {monthEvents.map((event) => {
-              const venue = resolveLinks(event.fields.venue_list, venues)[0];
+              const tz = event.fields.timezone || 'Asia/Taipei';
+              const venue = resolveLinks(event.fields.venue_id, venues)[0];
               const artist = resolveLinks(event.fields.primary_artist, artists)[0];
               return (
                 <Card key={event.id} className="hover:shadow-sm transition-shadow">
                   <CardHeader className="pb-2">
                     <div className="text-xs text-muted-foreground">
-                      {formatDate(event.fields.start_at, locale)} · {formatTime(event.fields.start_at)}
+                      {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                     </div>
                     <CardTitle className="text-sm">
-                      {event.fields.title_local || event.fields.title_en || 'Event'}
+                      {event.fields.title || event.fields.title_local || event.fields.title_en || 'Event'}
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="text-xs text-muted-foreground space-y-1">
