@@ -1,0 +1,22 @@
+{
+  "common": {
+    "siteName": "JazzNode",
+    "tagline": "ジャズシーンを、つなぐ。",
+    "venues": "会場",
+    "artists": "アーティスト",
+    "events": "イベント",
+    "search": "検索...",
+    "viewAll": "すべて見る",
+    "upcomingEvents": "近日のイベント",
+    "featuredVenues": "おすすめの会場",
+    "noEvents": "近日のイベントはありません。",
+    "verified": "認証済み",
+    "official": "公式",
+    "learnMore": "詳しく見る",
+    "ticketLink": "チケット",
+    "allCities": "すべての都市",
+    "allInstruments": "すべての楽器",
+    "language": "言語",
+    "backToList": "← 戻る"
+  }
+}

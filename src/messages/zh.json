@@ -1,0 +1,22 @@
+{
+  "common": {
+    "siteName": "JazzNode",
+    "tagline": "爵士場景，盡在連結。",
+    "venues": "場地",
+    "artists": "藝人",
+    "events": "活動",
+    "search": "搜尋...",
+    "viewAll": "查看全部",
+    "upcomingEvents": "近期活動",
+    "featuredVenues": "精選場地",
+    "noEvents": "目前沒有近期活動。",
+    "verified": "已驗證",
+    "official": "官方認證",
+    "learnMore": "了解更多",
+    "ticketLink": "購票",
+    "allCities": "所有城市",
+    "allInstruments": "所有樂器",
+    "language": "語言",
+    "backToList": "← 返回列表"
+  }
+}

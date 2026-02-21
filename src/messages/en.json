@@ -1,0 +1,22 @@
+{
+  "common": {
+    "siteName": "JazzNode",
+    "tagline": "The Jazz Scene, Connected.",
+    "venues": "Venues",
+    "artists": "Artists",
+    "events": "Events",
+    "search": "Search...",
+    "viewAll": "View All",
+    "upcomingEvents": "Upcoming Events",
+    "featuredVenues": "Featured Venues",
+    "noEvents": "No upcoming events.",
+    "verified": "Verified",
+    "official": "Official",
+    "learnMore": "Learn More",
+    "ticketLink": "Get Tickets",
+    "allCities": "All Cities",
+    "allInstruments": "All Instruments",
+    "language": "Language",
+    "backToList": "← Back"
+  }
+}
