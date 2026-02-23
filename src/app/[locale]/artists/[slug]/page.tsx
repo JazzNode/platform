@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, photoUrl, localized } from '@/lib/helpers';
+import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -41,6 +42,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       </Link>
 
       {/* Profile */}
+      <FadeUp>
       <div className="flex flex-col md:flex-row gap-10 items-start">
         {/* Photo */}
         {photoUrl(f.photo_url, f.photo_file) ? (
@@ -127,7 +129,10 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         </div>
       </div>
 
+      </FadeUp>
+
       {/* Events */}
+      <FadeUp stagger={0.12}>
       <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
         <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({artistEvents.length})</h2>
         {artistEvents.length === 0 ? (
@@ -152,6 +157,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </div>
         )}
       </section>
+      </FadeUp>
     </div>
   );
 }

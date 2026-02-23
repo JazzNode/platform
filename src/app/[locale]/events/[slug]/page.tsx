@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
+import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -42,6 +43,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       </Link>
 
       {/* Hero section */}
+      <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
         {/* Poster */}
         {f.poster_url && (
@@ -126,8 +128,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         </div>
       </div>
 
+      </FadeUp>
+
       {/* Related: More from this venue */}
       {venue && (
+        <FadeUp>
         <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
           <h2 className="font-serif text-2xl font-bold mb-8">
             More at {displayName(venue.fields)}
@@ -157,6 +162,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               })}
           </div>
         </section>
+        </FadeUp>
       )}
     </div>
   );
