@@ -1,3 +1,4 @@
+export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, resolveLinks } from '@/lib/airtable';
@@ -23,8 +24,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     .slice(0, 6);
 
   return (
-    <div className="space-y-32">
-      {/* ─── Hero ─── */}
+    <div className="space-y-24">
+      {/* ─── Hero + Stats ─── */}
       <section className="pt-24 pb-16">
         <HeroReveal>
           <h1 className="hero-title text-6xl sm:text-8xl lg:text-[10rem] text-[#F0EDE6]">
@@ -35,26 +36,24 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <p className="hero-tagline mt-8 max-w-lg text-lg text-[#8A8578] leading-relaxed">
             {t('tagline')}
           </p>
+
+          {/* Stats — flows directly after tagline, animated as part of hero sequence */}
+          <div className="hero-stats grid grid-cols-3 gap-8 border-t border-[rgba(240,237,230,0.06)] pt-10 mt-12">
+            <div className="hero-stat-item">
+              <CountUp end={venues.length} className="stat-number text-5xl sm:text-7xl lg:text-8xl text-gold" />
+              <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('venues')}</p>
+            </div>
+            <div className="hero-stat-item">
+              <CountUp end={artists.length} className="stat-number text-5xl sm:text-7xl lg:text-8xl text-[#F0EDE6]" />
+              <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('artists')}</p>
+            </div>
+            <div className="hero-stat-item">
+              <CountUp end={events.length} className="stat-number text-5xl sm:text-7xl lg:text-8xl text-[#F0EDE6]" />
+              <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('events')}</p>
+            </div>
+          </div>
         </HeroReveal>
       </section>
-
-      {/* ─── Stats ─── */}
-      <FadeUp>
-        <section className="grid grid-cols-3 gap-8 border-t border-[rgba(240,237,230,0.06)] pt-16">
-          <div className="fade-up-item">
-            <CountUp end={venues.length} className="stat-number text-6xl sm:text-8xl text-gold" />
-            <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('venues')}</p>
-          </div>
-          <div className="fade-up-item">
-            <CountUp end={artists.length} className="stat-number text-6xl sm:text-8xl text-[#F0EDE6]" />
-            <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('artists')}</p>
-          </div>
-          <div className="fade-up-item">
-            <CountUp end={events.length} className="stat-number text-6xl sm:text-8xl text-[#F0EDE6]" />
-            <p className="mt-3 text-sm uppercase tracking-widest text-[#8A8578]">{t('events')}</p>
-          </div>
-        </section>
-      </FadeUp>
 
       {/* ─── Upcoming Events ─── */}
       <section>

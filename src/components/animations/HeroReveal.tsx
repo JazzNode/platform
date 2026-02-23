@@ -33,6 +33,33 @@ export default function HeroReveal({ children }: { children: React.ReactNode }) 
           delay: 0.8,
         });
       }
+
+      // Stats — fade in after tagline
+      const statsContainer = ref.current?.querySelector('.hero-stats');
+      if (statsContainer) {
+        gsap.set(statsContainer, { y: 30, opacity: 0 });
+        gsap.to(statsContainer, {
+          y: 0,
+          opacity: 1,
+          duration: 1,
+          ease: 'power3.out',
+          delay: 1.2,
+        });
+        
+        // Stagger individual stat items
+        const statItems = statsContainer.querySelectorAll('.hero-stat-item');
+        if (statItems.length) {
+          gsap.set(statItems, { y: 20, opacity: 0 });
+          gsap.to(statItems, {
+            y: 0,
+            opacity: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            stagger: 0.15,
+            delay: 1.3,
+          });
+        }
+      }
     }, ref);
 
     return () => ctx.revert();

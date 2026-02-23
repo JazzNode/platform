@@ -78,16 +78,33 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden flex flex-col justify-center items-center w-10 h-10 gap-1.5"
-            aria-label="Toggle menu"
-          >
-            <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-1' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
-            <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-1' : ''}`} />
-          </button>
+          {/* Mobile: locale switcher + hamburger */}
+          <div className="md:hidden flex items-center gap-2">
+            <div className="flex items-center gap-0.5">
+              {localeList.map((l) => (
+                <button
+                  key={l}
+                  onClick={() => switchLocale(l)}
+                  className={`px-2 py-1 text-xs tracking-wider rounded-lg transition-all duration-300 ${
+                    locale === l
+                      ? 'bg-gold text-[#0A0A0A] font-bold'
+                      : 'text-[#8A8578] hover:text-[#F0EDE6]'
+                  }`}
+                >
+                  {localeLabels[l]}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="flex flex-col justify-center items-center w-10 h-10 gap-1.5"
+              aria-label="Toggle menu"
+            >
+              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-1' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-1' : ''}`} />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -106,22 +123,6 @@ export default function Header() {
         <Link href={`/${locale}/artists`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
           {t('artists')}
         </Link>
-
-        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-[rgba(240,237,230,0.1)]">
-          {localeList.map((l) => (
-            <button
-              key={l}
-              onClick={() => switchLocale(l)}
-              className={`px-4 py-2 text-sm tracking-wider rounded-xl transition-all duration-300 ${
-                locale === l
-                  ? 'bg-gold text-[#0A0A0A] font-bold'
-                  : 'text-[#8A8578] hover:text-[#F0EDE6]'
-              }`}
-            >
-              {localeLabels[l]}
-            </button>
-          ))}
-        </div>
       </div>
     </>
   );

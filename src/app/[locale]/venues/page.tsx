@@ -1,3 +1,4 @@
+export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues } from '@/lib/airtable';
