@@ -45,9 +45,11 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
                     <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                       {displayName(f)}
                     </h3>
-                    {f.primary_instrument && (
+                    {f.type && f.type !== 'person' ? (
+                      <p className="text-xs uppercase tracking-widest text-gold capitalize">{f.type}</p>
+                    ) : f.primary_instrument ? (
                       <p className="text-xs uppercase tracking-widest text-gold capitalize">{f.primary_instrument}</p>
-                    )}
+                    ) : null}
                   </div>
                 </div>
                 {bio && <p className="text-xs text-[#8A8578] line-clamp-2 leading-relaxed">{bio}</p>}
