@@ -87,7 +87,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Price badge */}
           {(f.min_price != null || f.price_info) && (
-            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)] mt-2">
+            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)] ml-4">
               {formatPriceBadge(f.currency, f.min_price, f.max_price, f.price_info)}
             </span>
           )}
