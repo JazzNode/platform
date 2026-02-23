@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -86,14 +86,21 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           )}
 
           {/* Price badge */}
-          {f.price_info && (
-            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)]">
-              {f.price_info}
+          {(f.min_price != null || f.price_info) && (
+            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)] mt-2">
+              {formatPriceBadge(f.currency, f.min_price, f.max_price, f.price_info)}
             </span>
           )}
 
           {/* ─── Event Details Block ─── */}
-          <div className="bg-[#111111] rounded-2xl p-5 border border-[rgba(240,237,230,0.06)] space-y-3 text-sm">
+          <div className="bg-[#111111] rounded-2xl p-5 border border-[rgba(240,237,230,0.06)] space-y-3 text-sm mt-4">
+            {/* City */}
+            {venue && deriveCity(venue.fields.address_local || venue.fields.address_en) && (
+              <div className="flex gap-3">
+                <span className="text-[#8A8578] w-20 shrink-0">{t('eventCity')}</span>
+                <span className="text-[#F0EDE6]">{deriveCity(venue.fields.address_local || venue.fields.address_en)}</span>
+              </div>
+            )}
             <div className="flex gap-3">
               <span className="text-[#8A8578] w-20 shrink-0">{t('eventDate')}</span>
               <span className="text-[#F0EDE6]">{formatDate(f.start_at, locale, tz)}</span>

@@ -23,9 +23,10 @@
     "pastCount": "已結束",
     "lineup": "演出陣容",
     "moreAtVenue": "更多同場地演出",
-    "eventDate": "演出日期",
+    "eventCity": "演出城市",
+    "eventDate": "活動日期",
     "eventTime": "開演時刻",
-    "eventVenue": "演出場館",
+    "eventVenue": "爵士場館",
     "eventAddress": "場館地址"
   }
 }

@@ -23,9 +23,10 @@
     "pastCount": "past",
     "lineup": "Lineup",
     "moreAtVenue": "More at this venue",
+    "eventCity": "City",
     "eventDate": "Date",
     "eventTime": "Time",
-    "eventVenue": "Venue",
+    "eventVenue": "Jazz Venue",
     "eventAddress": "Address"
   }
 }

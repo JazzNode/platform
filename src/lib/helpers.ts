@@ -60,6 +60,35 @@ export function localized(
   return undefined;
 }
 
+/** Derive city name from address (e.g. "台北市大安區..." → "台北", "香港灣仔..." → "香港"). */
+export function deriveCity(address: string | undefined): string | undefined {
+  if (!address) return undefined;
+  // Match "X市" or "X縣" patterns (Chinese addresses)
+  const twMatch = address.match(/^(.{2,3})[市縣]/);
+  if (twMatch) return twMatch[1];
+  // Hong Kong
+  if (address.startsWith('香港')) return '香港';
+  // Fallback: try first 2-3 chars for known cities
+  return undefined;
+}
+
+/** Format price badge from currency + min/max price. Falls back to price_info. */
+export function formatPriceBadge(currency?: string, minPrice?: number, maxPrice?: number, priceInfo?: string): string | undefined {
+  if (minPrice != null) {
+    const sym = currency === 'HKD' ? 'HK$' : currency === 'TWD' ? 'NT$' : '$';
+    if (maxPrice != null && maxPrice !== minPrice) {
+      return `${sym}${minPrice} – ${sym}${maxPrice}`;
+    }
+    return `${sym}${minPrice}`;
+  }
+  if (!priceInfo) return undefined;
+  // Fix bare "$" to "NT$" when we know it's TWD
+  if (currency === 'TWD') {
+    return priceInfo.replace(/^\$(?!NT)/, 'NT$');
+  }
+  return priceInfo;
+}
+
 /** Supported locales. */
 export const locales = ['en', 'zh', 'ja'] as const;
 export type Locale = (typeof locales)[number];

@@ -23,9 +23,10 @@
     "pastCount": "終了",
     "lineup": "出演者",
     "moreAtVenue": "この会場の他のイベント",
-    "eventDate": "日程",
+    "eventCity": "開催都市",
+    "eventDate": "開催日",
     "eventTime": "開演",
-    "eventVenue": "会場",
+    "eventVenue": "ジャズ会場",
     "eventAddress": "住所"
   }
 }
