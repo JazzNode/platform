@@ -71,7 +71,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
             )}
             {f.type && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                {f.type === 'person' ? '👤 Solo' : f.type === 'big band' ? '🎺 Big Band' : '👥 Group'}
+                {f.type === 'person' ? '👤 Musician' : f.type === 'big band' ? '🎺 Big Band' : '👥 Group'}
               </span>
             )}
             {f.country_code && (
