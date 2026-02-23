@@ -14,39 +14,38 @@ export default function Header() {
   const router = useRouter();
 
   function switchLocale(newLocale: string) {
-    // Replace the locale segment in the path
     const segments = pathname.split('/');
     segments[1] = newLocale;
     router.push(segments.join('/'));
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link href={`/${locale}`} className="text-xl font-bold tracking-tight">
-          🎵 {t('siteName')}
+    <header className="sticky top-0 z-50 border-b border-[rgba(240,237,230,0.06)] bg-[#0A0A0A]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0A0A0A]/80">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+        <Link href={`/${locale}`} className="font-serif text-2xl font-bold tracking-tight text-gold">
+          JazzNode
         </Link>
 
-        <nav className="flex items-center gap-6">
-          <Link href={`/${locale}/venues`} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            {t('venues')}
-          </Link>
-          <Link href={`/${locale}/artists`} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            {t('artists')}
-          </Link>
-          <Link href={`/${locale}/events`} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+        <nav className="flex items-center gap-8">
+          <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
             {t('events')}
           </Link>
+          <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
+            {t('venues')}
+          </Link>
+          <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
+            {t('artists')}
+          </Link>
 
-          <div className="flex items-center gap-1 ml-4">
+          <div className="flex items-center gap-1 ml-6 border-l border-[rgba(240,237,230,0.1)] pl-6">
             {localeList.map((l) => (
               <button
                 key={l}
                 onClick={() => switchLocale(l)}
-                className={`px-2 py-1 text-xs rounded transition-colors ${
+                className={`px-2.5 py-1 text-xs tracking-wider rounded transition-all duration-300 ${
                   locale === l
-                    ? 'bg-foreground text-background font-bold'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'bg-gold text-[#0A0A0A] font-bold'
+                    : 'text-[#8A8578] hover:text-[#F0EDE6]'
                 }`}
               >
                 {localeLabels[l]}

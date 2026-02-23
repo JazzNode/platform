@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: '%s | JazzNode',
     default: 'JazzNode — The Jazz Scene, Connected.',
   },
-  description: 'Discover jazz venues, artists, and events worldwide. The IMDb of the jazz scene.',
+  description: 'Discover jazz venues, artists, and events worldwide.',
 };
 
 export default async function LocaleLayout({
@@ -28,10 +28,10 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-background text-foreground antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-[#0A0A0A] text-[#F0EDE6] antialiased`}>
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main className="mx-auto max-w-6xl px-4 py-8">{children}</main>
+          <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
           <Footer />
         </NextIntlClientProvider>
       </body>
