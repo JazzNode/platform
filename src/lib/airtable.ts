@@ -62,7 +62,9 @@ export interface Venue {
   description_ja?: string;
   city?: string;
   country_code?: string;
-  address?: string;
+  address?: string;           // legacy
+  address_local?: string;
+  address_en?: string;
   latitude?: number;
   longitude?: number;
   website_url?: string;

@@ -113,10 +113,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 </Link>
               </div>
             )}
-            {venue?.fields.address && (
+            {(venue?.fields.address_local || venue?.fields.address_en) && (
               <div className="flex gap-3">
                 <span className="text-[#8A8578] w-20 shrink-0">{t('eventAddress')}</span>
-                <span className="text-[#C4BFB3]">{venue.fields.address}</span>
+                <span className="text-[#C4BFB3]">{venue.fields.address_local || venue.fields.address_en}</span>
               </div>
             )}
           </div>
