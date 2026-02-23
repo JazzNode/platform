@@ -15,16 +15,10 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
   const t = await getTranslations('common');
   const showPast = view === 'past';
 
-  let events, venues, artists, lineups, cities, tags;
-  try {
-    [events, venues, artists, lineups, cities, tags] = await Promise.all([
-      getEvents(), getVenues(), getArtists(), getLineups(), getCities(), getTags(),
-    ]);
-    console.log('[events] fetched OK — events:', events.length, 'tags:', tags.length);
-  } catch (err) {
-    console.error('[events] fetch error:', err);
-    throw err;
-  }
+  const [events, venues, artists, lineups, cities, tagsResult] = await Promise.all([
+    getEvents(), getVenues(), getArtists(), getLineups(), getCities(), getTags().catch(() => []),
+  ]);
+  const tags = tagsResult;
 
   const now = new Date().toISOString();
   const upcoming = events
@@ -50,7 +44,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       .filter((a) => a.id !== primaryArtist?.id);
 
     const eventTags = resolveLinks(event.fields.tag_list, tags)
-      .map((t) => t.fields.name)
+      .map((tag) => tag.fields.name)
       .filter(Boolean) as string[];
 
     return {
