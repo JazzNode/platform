@@ -79,11 +79,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           {primaryArtist && (
             <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
               <span className="text-gold">♪</span> {displayName(primaryArtist.fields)}
-              {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' ? (
+              {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' && (
                 <span className="text-sm capitalize">· {primaryArtist.fields.type}</span>
-              ) : primaryArtist.fields.primary_instrument ? (
-                <span className="text-sm capitalize">· {primaryArtist.fields.primary_instrument}</span>
-              ) : null}
+              )}
             </Link>
           )}
 

@@ -96,11 +96,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
                       )}
                       {venue && <p>↗ {displayName(venue.fields)}</p>}
                       {primaryArtist && (
-                        <p>♪ {displayName(primaryArtist.fields)}
-                          {primaryArtist.fields.primary_instrument && (
-                            <span className="capitalize"> · {primaryArtist.fields.primary_instrument}</span>
-                          )}
-                        </p>
+                        <p>♪ {displayName(primaryArtist.fields)}</p>
                       )}
                       {lineupArtists.length > 0 && (
                         <p className="text-[#6A6560]">
