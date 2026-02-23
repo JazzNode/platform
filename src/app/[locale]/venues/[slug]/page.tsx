@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getBadges, resolveLinks } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getBadges, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -16,7 +16,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   const { locale, slug } = await params;
   const t = await getTranslations('common');
 
-  const [venues, events, artists, badges] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges()]);
+  const [venues, events, artists, badges, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities()]);
+  const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venue = venues.find((v) => v.id === slug);
 
   if (!venue) {
@@ -57,9 +58,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
-            {f.city && (
+            {f.city_id?.[0] && cityMap.get(f.city_id[0]) && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                📍 {f.city}
+                📍 {locale === 'en' ? cityMap.get(f.city_id[0])!.name_en : cityMap.get(f.city_id[0])!.name_local}
               </span>
             )}
             {f.jazz_frequency && (

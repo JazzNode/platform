@@ -14,6 +14,7 @@ export const TABLE_IDS = {
   Badges: 'tblUw23zLyqU8BYpF',
   Tags: 'tblJ1hlwVdHLv2Z2s',
   Lineups: 'tblDd2gI9smwyoCI1',
+  Cities: 'tblV4kFurFNHYKEhh',
   Sources: '',    // TODO: fill in
 } as const;
 
@@ -60,7 +61,7 @@ export interface Venue {
   description_zh?: string;
   description_en?: string;
   description_ja?: string;
-  city?: string;
+  city_id?: string[];       // linked Cities records
   country_code?: string;
   address?: string;           // legacy
   address_local?: string;
@@ -148,6 +149,14 @@ export interface BadgeDef {
   icon?: string;
 }
 
+export interface City {
+  city_id?: string;
+  name_local?: string;
+  name_en?: string;
+  country_code?: string;
+  timezone?: string;
+}
+
 export interface Lineup {
   lineup_id?: string;
   event_id?: string[];
@@ -156,6 +165,10 @@ export interface Lineup {
   role?: string;
   order?: number;
   artist_name?: string[];   // lookup
+}
+
+export async function getCities() {
+  return fetchTable<City>(TABLE_IDS.Cities);
 }
 
 export async function getLineups() {

@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues } from '@/lib/airtable';
+import { getVenues, getCities } from '@/lib/airtable';
 import { displayName, photoUrl, localized } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -14,7 +14,8 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
   const { locale } = await params;
   const t = await getTranslations('common');
 
-  const venues = await getVenues();
+  const [venues, cities] = await Promise.all([getVenues(), getCities()]);
+  const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const sorted = [...venues].sort((a, b) => (b.fields.event_list?.length || 0) - (a.fields.event_list?.length || 0));
 
   return (
@@ -42,7 +43,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
                   {displayName(f)}
                 </h3>
                 <div className="flex gap-3 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {f.city && <span>📍 {f.city}</span>}
+                  {f.city_id?.[0] && cityMap.get(f.city_id[0]) && <span>📍 {locale === 'en' ? cityMap.get(f.city_id[0])!.name_en : cityMap.get(f.city_id[0])!.name_local}</span>}
                   <span>{f.event_list?.length || 0} events</span>
                   {f.jazz_frequency && <span>🎵 {f.jazz_frequency}</span>}
                 </div>

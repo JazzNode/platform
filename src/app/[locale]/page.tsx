@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, resolveLinks } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
@@ -11,7 +11,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const t = await getTranslations('common');
 
-  const [venues, events, artists] = await Promise.all([getVenues(), getEvents(), getArtists()]);
+  const [venues, events, artists, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getCities()]);
+  const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
 
   const now = new Date().toISOString();
   const upcoming = events
@@ -118,7 +119,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   {displayName(venue.fields)}
                 </h3>
                 <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {venue.fields.city} · {venue.fields.event_list?.length || 0} events
+                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? (locale === 'en' ? c.name_en : c.name_local) || '' : ''; })()} · {venue.fields.event_list?.length || 0} events
                 </p>
                 {venue.fields.jazz_frequency && (
                   <p className="mt-1 text-xs text-[#6A6560] capitalize">{venue.fields.jazz_frequency}</p>
