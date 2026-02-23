@@ -28,6 +28,8 @@
     "eventDate": "開催日",
     "eventTime": "開演",
     "eventVenue": "ジャズ会場",
-    "eventAddress": "住所"
+    "eventAddress": "住所",
+    "prevEvent": "前のイベント",
+    "nextEvent": "次のイベント"
   }
 }

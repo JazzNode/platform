@@ -28,6 +28,8 @@
     "eventDate": "活動日期",
     "eventTime": "開演時刻",
     "eventVenue": "爵士場館",
-    "eventAddress": "場館地址"
+    "eventAddress": "場館地址",
+    "prevEvent": "上一場",
+    "nextEvent": "下一場"
   }
 }

@@ -28,6 +28,8 @@
     "eventDate": "Date",
     "eventTime": "Time",
     "eventVenue": "Jazz Venue",
-    "eventAddress": "Address"
+    "eventAddress": "Address",
+    "prevEvent": "Previous",
+    "nextEvent": "Next"
   }
 }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import EventNav from '@/components/EventNav';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -30,6 +31,14 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       </div>
     );
   }
+
+  // Compute prev/next events (chronological order, all events)
+  const allSorted = [...events]
+    .filter((e) => e.fields.start_at)
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+  const currentIdx = allSorted.findIndex((e) => e.id === event.id);
+  const prevEvent = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
+  const nextEvent = currentIdx >= 0 && currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
 
   const f = event.fields;
   const tz = f.timezone || 'Asia/Taipei';
@@ -180,6 +189,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         </section>
         </FadeUp>
       )}
+
+      {/* ─── Prev / Next Navigation ─── */}
+      <EventNav
+        prevHref={prevEvent ? `/${locale}/events/${prevEvent.id}` : null}
+        prevTitle={prevEvent ? (prevEvent.fields.title || prevEvent.fields.title_local || 'Event') : null}
+        nextHref={nextEvent ? `/${locale}/events/${nextEvent.id}` : null}
+        nextTitle={nextEvent ? (nextEvent.fields.title || nextEvent.fields.title_local || 'Event') : null}
+        prevLabel={t('prevEvent')}
+        nextLabel={t('nextEvent')}
+      />
 
       {/* ─── More at this venue ─── */}
       {venue && (
