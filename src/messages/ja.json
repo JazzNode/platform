@@ -17,6 +17,11 @@
     "allCities": "すべての都市",
     "allInstruments": "すべての楽器",
     "language": "言語",
-    "backToList": "← 戻る"
+    "backToList": "← 戻る",
+    "pastEvents": "過去のイベント",
+    "upcomingCount": "公演予定",
+    "pastCount": "終了",
+    "lineup": "出演者",
+    "moreAtVenue": "この会場の他のイベント"
   }
 }

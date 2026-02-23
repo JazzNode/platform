@@ -17,6 +17,11 @@
     "allCities": "All Cities",
     "allInstruments": "All Instruments",
     "language": "Language",
-    "backToList": "← Back"
+    "backToList": "← Back",
+    "pastEvents": "Past Events",
+    "upcomingCount": "upcoming",
+    "pastCount": "past",
+    "lineup": "Lineup",
+    "moreAtVenue": "More at this venue"
   }
 }

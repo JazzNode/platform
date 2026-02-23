@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
@@ -77,16 +77,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 const artist = resolveLinks(event.fields.primary_artist, artists)[0];
                 return (
                   <Link key={event.id} href={`/${locale}/events/${event.id}`} className="fade-up-item block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
-                    {event.fields.poster_url && (
-                      <div className="h-52 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-[1.25rem]">
-                        <img
-                          src={event.fields.poster_url}
-                          alt={event.fields.title || ''}
-                          className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500"
-                          loading="lazy"
-                        />
-                      </div>
-                    )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-3">
                       {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                     </div>
@@ -102,16 +92,6 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                       {venue && <p>↗ {displayName(venue.fields)}</p>}
                       {artist && <p>♪ {displayName(artist.fields)}</p>}
                     </div>
-                    {event.fields.ticket_url && (
-                      <a
-                        href={event.fields.ticket_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-4 text-xs uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift"
-                      >
-                        {t('ticketLink')} ↗
-                      </a>
-                    )}
                   </Link>
                 );
               })}
@@ -134,21 +114,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((venue) => (
               <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
-                {photoUrl(venue.fields.photo_url, venue.fields.photo_file) && (
-                  <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-[1.25rem]">
-                    <img
-                      src={photoUrl(venue.fields.photo_url, venue.fields.photo_file)!}
-                      alt={displayName(venue.fields)}
-                      className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
-                    />
-                  </div>
-                )}
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                   {displayName(venue.fields)}
                 </h3>
                 <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
                   {venue.fields.city} · {venue.fields.event_list?.length || 0} events
                 </p>
+                {venue.fields.jazz_frequency && (
+                  <p className="mt-1 text-xs text-[#6A6560] capitalize">{venue.fields.jazz_frequency}</p>
+                )}
               </Link>
             ))}
           </div>

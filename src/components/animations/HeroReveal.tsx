@@ -34,7 +34,7 @@ export default function HeroReveal({ children }: { children: React.ReactNode }) 
         });
       }
 
-      // Stats — fade in after tagline
+      // Stats container — fade in after tagline
       const statsContainer = ref.current?.querySelector('.hero-stats');
       if (statsContainer) {
         gsap.set(statsContainer, { y: 30, opacity: 0 });
@@ -46,7 +46,7 @@ export default function HeroReveal({ children }: { children: React.ReactNode }) 
           delay: 1.2,
         });
         
-        // Stagger individual stat items
+        // Stagger individual stat items — appear first, THEN trigger countup
         const statItems = statsContainer.querySelectorAll('.hero-stat-item');
         if (statItems.length) {
           gsap.set(statItems, { y: 20, opacity: 0 });
@@ -57,6 +57,10 @@ export default function HeroReveal({ children }: { children: React.ReactNode }) 
             ease: 'power3.out',
             stagger: 0.15,
             delay: 1.3,
+            onComplete: () => {
+              // Dispatch custom event to start CountUp animations
+              window.dispatchEvent(new CustomEvent('hero-stats-visible'));
+            },
           });
         }
       }

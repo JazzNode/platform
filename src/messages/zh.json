@@ -17,6 +17,11 @@
     "allCities": "所有城市",
     "allInstruments": "所有樂器",
     "language": "語言",
-    "backToList": "← 返回列表"
+    "backToList": "← 返回列表",
+    "pastEvents": "過往演出",
+    "upcomingCount": "即將演出",
+    "pastCount": "已結束",
+    "lineup": "演出陣容",
+    "moreAtVenue": "更多同場地演出"
   }
 }

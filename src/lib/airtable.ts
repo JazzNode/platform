@@ -12,8 +12,8 @@ export const TABLE_IDS = {
   Artists: 'tblNEPMBzkcJhdf6l',
   Events: 'tblRgZo5YRDkkOn4N',
   Badges: 'tblUw23zLyqU8BYpF',
-  Tags: '',       // TODO: fill in
-  Lineups: '',    // TODO: fill in
+  Tags: 'tblJ1hlwVdHLv2Z2s',
+  Lineups: 'tblDd2gI9smwyoCI1',
   Sources: '',    // TODO: fill in
 } as const;
 
@@ -141,6 +141,20 @@ export interface BadgeDef {
   description_zh?: string;
   description_ja?: string;
   icon?: string;
+}
+
+export interface Lineup {
+  lineup_id?: string;
+  event_id?: string[];
+  artist_id?: string[];
+  instrument_list?: string[];
+  role?: string;
+  order?: number;
+  artist_name?: string[];   // lookup
+}
+
+export async function getLineups() {
+  return fetchTable<Lineup>(TABLE_IDS.Lineups);
 }
 
 export async function getVenues() {

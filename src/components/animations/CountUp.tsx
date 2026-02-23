@@ -2,9 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function CountUp({
   end,
@@ -20,22 +17,30 @@ export default function CountUp({
     const el = ref.current;
     if (!el) return;
 
-    const ctx = gsap.context(() => {
+    function startCount() {
       const obj = { val: 0 };
       gsap.to(obj, {
         val: end,
         duration: 2,
         ease: 'power2.out',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top 85%',
-          once: true,
-        },
         onUpdate: () => setDisplayed(Math.round(obj.val)),
       });
-    });
+    }
 
-    return () => ctx.revert();
+    // Listen for hero stats visible event (fired after fade-in completes)
+    const handler = () => startCount();
+    window.addEventListener('hero-stats-visible', handler, { once: true });
+
+    // Fallback: if event never fires (e.g. navigated directly), start after 2.5s
+    const fallback = setTimeout(() => {
+      window.removeEventListener('hero-stats-visible', handler);
+      startCount();
+    }, 2500);
+
+    return () => {
+      window.removeEventListener('hero-stats-visible', handler);
+      clearTimeout(fallback);
+    };
   }, [end]);
 
   return (

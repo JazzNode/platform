@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getEvents, getVenues, getArtists, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -17,7 +17,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const { locale, slug } = await params;
   const t = await getTranslations('common');
 
-  const [events, venues, artists, badges] = await Promise.all([getEvents(), getVenues(), getArtists(), getBadges()]);
+  const [events, venues, artists, lineups, badges] = await Promise.all([
+    getEvents(), getVenues(), getArtists(), getLineups(), getBadges(),
+  ]);
   const event = events.find((e) => e.id === slug);
 
   if (!event) {
@@ -36,48 +38,49 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const desc = localized(f as Record<string, unknown>, 'description', locale);
   const descShort = localized(f as Record<string, unknown>, 'description_short', locale);
 
+  // Get lineup for this event
+  const eventLineups = lineups
+    .filter((l) => l.fields.event_id?.some((eid) => eid === event.id))
+    .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+  const lineupArtists = eventLineups
+    .map((l) => {
+      const artist = resolveLinks(l.fields.artist_id, artists)[0];
+      return artist ? { artist, instruments: l.fields.instrument_list || [], role: l.fields.role } : null;
+    })
+    .filter(Boolean) as { artist: { id: string; fields: Artist }; instruments: string[]; role?: string }[];
+
   return (
     <div className="space-y-12">
       {/* Back link */}
       <Link href={`/${locale}/events`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
-        ← {t('backToList')}
+        {t('backToList')}
       </Link>
 
       {/* Hero section */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* Poster */}
+        {/* Poster — only on detail page */}
         {f.poster_url && (
           <div className="w-full lg:w-[400px] shrink-0">
             <div className="overflow-hidden rounded-2xl">
-              <img
-                src={f.poster_url}
-                alt={f.title || ''}
-                className="w-full h-auto object-cover"
-              />
+              <img src={f.poster_url} alt={f.title || ''} className="w-full h-auto object-cover" />
             </div>
           </div>
         )}
 
         {/* Info */}
         <div className="flex-1 space-y-6">
-          {/* Date & time */}
           <div className="text-sm uppercase tracking-widest text-gold">
             {formatDate(f.start_at, locale, tz)} · {formatTime(f.start_at, tz)}
             {f.end_at && ` — ${formatTime(f.end_at, tz)}`}
           </div>
 
-          {/* Title */}
           <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
             {f.title || f.title_local || f.title_en || 'Untitled Event'}
           </h1>
 
-          {/* Venue */}
           {venue && (
-            <Link
-              href={`/${locale}/venues/${venue.id}`}
-              className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift"
-            >
+            <Link href={`/${locale}/venues/${venue.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
               <span className="text-gold">↗</span> {displayName(venue.fields)}
               {venue.fields.city && <span className="text-sm">· {venue.fields.city}</span>}
             </Link>
@@ -85,10 +88,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Primary artist */}
           {primaryArtist && (
-            <Link
-              href={`/${locale}/artists/${primaryArtist.id}`}
-              className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift"
-            >
+            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
               <span className="text-gold">♪</span> {displayName(primaryArtist.fields)}
               {primaryArtist.fields.primary_instrument && (
                 <span className="text-sm capitalize">· {primaryArtist.fields.primary_instrument}</span>
@@ -104,54 +104,74 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               </span>
             )}
             {f.ticket_url && (
-              <a
-                href={f.ticket_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest"
-              >
+              <a href={f.ticket_url} target="_blank" rel="noopener noreferrer"
+                className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest">
                 <span>{t('ticketLink')} ↗</span>
               </a>
             )}
           </div>
 
-          {/* Description */}
-          {desc && (
+          {/* Description (short or full) */}
+          {(descShort || desc) && (
             <div className="border-t border-[rgba(240,237,230,0.06)] pt-6">
-              <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">{desc}</p>
-            </div>
-          )}
-          {!desc && descShort && (
-            <div className="border-t border-[rgba(240,237,230,0.06)] pt-6">
-              <p className="text-[#C4BFB3] leading-relaxed">{descShort}</p>
+              <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">
+                {descShort || desc}
+              </p>
             </div>
           )}
         </div>
       </div>
-
       </FadeUp>
 
-      {/* Related: More from this venue */}
+      {/* ─── Lineup ─── */}
+      {lineupArtists.length > 0 && (
+        <FadeUp>
+        <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+          <h2 className="font-serif text-2xl font-bold mb-8">{t('lineup')}</h2>
+          <div className="space-y-6">
+            {lineupArtists.map(({ artist, instruments, role }) => {
+              const bioShort = localized(artist.fields as Record<string, unknown>, 'bio_short', locale);
+              return (
+                <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300">
+                        {displayName(artist.fields)}
+                      </h3>
+                      <p className="text-xs uppercase tracking-widest text-gold mt-1">
+                        {instruments.length > 0 ? instruments.join(', ') : role || artist.fields.primary_instrument || ''}
+                      </p>
+                      {bioShort && (
+                        <p className="text-xs text-[#8A8578] mt-3 leading-relaxed line-clamp-3">
+                          {bioShort}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+        </FadeUp>
+      )}
+
+      {/* ─── More at this venue ─── */}
       {venue && (
         <FadeUp>
         <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
           <h2 className="font-serif text-2xl font-bold mb-8">
-            More at {displayName(venue.fields)}
+            {t('moreAtVenue')}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {resolveLinks(venue.fields.event_list, events)
               .filter((e) => e.id !== event.id)
-              .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''))
+              .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
               .slice(0, 3)
               .map((related) => {
                 const rtz = related.fields.timezone || 'Asia/Taipei';
                 return (
                   <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
-                    {related.fields.poster_url && (
-                      <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl">
-                        <img src={related.fields.poster_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
-                      </div>
-                    )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {formatDate(related.fields.start_at, locale, rtz)}
                     </div>
