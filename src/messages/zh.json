@@ -22,6 +22,10 @@
     "upcomingCount": "即將演出",
     "pastCount": "已結束",
     "lineup": "演出陣容",
-    "moreAtVenue": "更多同場地演出"
+    "moreAtVenue": "更多同場地演出",
+    "eventDate": "演出日期",
+    "eventTime": "開演時刻",
+    "eventVenue": "演出場館",
+    "eventAddress": "場館地址"
   }
 }

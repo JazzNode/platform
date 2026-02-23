@@ -70,21 +70,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
         {/* Info */}
         <div className="flex-1 space-y-6">
-          <div className="text-sm uppercase tracking-widest text-gold">
-            {formatDate(f.start_at, locale, tz)} · {formatTime(f.start_at, tz)}
-            {f.end_at && ` — ${formatTime(f.end_at, tz)}`}
-          </div>
-
+          {/* Title */}
           <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
             {f.title || f.title_local || f.title_en || 'Untitled Event'}
           </h1>
-
-          {venue && (
-            <Link href={`/${locale}/venues/${venue.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
-              <span className="text-gold">↗</span> {displayName(venue.fields)}
-              {venue.fields.city && <span className="text-sm">· {venue.fields.city}</span>}
-            </Link>
-          )}
 
           {/* Primary artist */}
           {primaryArtist && (
@@ -96,28 +85,57 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             </Link>
           )}
 
-          {/* Price & ticket */}
-          <div className="flex flex-wrap gap-4 items-center">
-            {f.price_info && (
-              <span className="text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)]">
-                {f.price_info}
+          {/* Price badge */}
+          {f.price_info && (
+            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)]">
+              {f.price_info}
+            </span>
+          )}
+
+          {/* ─── Event Details Block ─── */}
+          <div className="bg-[#111111] rounded-2xl p-5 border border-[rgba(240,237,230,0.06)] space-y-3 text-sm">
+            <div className="flex gap-3">
+              <span className="text-[#8A8578] w-20 shrink-0">{t('eventDate')}</span>
+              <span className="text-[#F0EDE6]">{formatDate(f.start_at, locale, tz)}</span>
+            </div>
+            <div className="flex gap-3">
+              <span className="text-[#8A8578] w-20 shrink-0">{t('eventTime')}</span>
+              <span className="text-[#F0EDE6]">
+                {formatTime(f.start_at, tz)}
+                {f.end_at && ` — ${formatTime(f.end_at, tz)}`}
               </span>
+            </div>
+            {venue && (
+              <div className="flex gap-3">
+                <span className="text-[#8A8578] w-20 shrink-0">{t('eventVenue')}</span>
+                <Link href={`/${locale}/venues/${venue.id}`} className="text-gold hover:text-[#E8C868] transition-colors link-lift">
+                  {displayName(venue.fields)}
+                </Link>
+              </div>
             )}
-            {f.ticket_url && (
-              <a href={f.ticket_url} target="_blank" rel="noopener noreferrer"
-                className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest">
-                <span>{t('ticketLink')} ↗</span>
-              </a>
+            {venue?.fields.address && (
+              <div className="flex gap-3">
+                <span className="text-[#8A8578] w-20 shrink-0">{t('eventAddress')}</span>
+                <span className="text-[#C4BFB3]">{venue.fields.address}</span>
+              </div>
             )}
           </div>
 
-          {/* Description (short or full) */}
+          {/* Description */}
           {(descShort || desc) && (
             <div className="border-t border-[rgba(240,237,230,0.06)] pt-6">
               <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">
                 {descShort || desc}
               </p>
             </div>
+          )}
+
+          {/* Ticket button — below description */}
+          {f.ticket_url && (
+            <a href={f.ticket_url} target="_blank" rel="noopener noreferrer"
+              className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest">
+              <span>{t('ticketLink')} ↗</span>
+            </a>
           )}
         </div>
       </div>

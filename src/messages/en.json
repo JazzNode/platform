@@ -22,6 +22,10 @@
     "upcomingCount": "upcoming",
     "pastCount": "past",
     "lineup": "Lineup",
-    "moreAtVenue": "More at this venue"
+    "moreAtVenue": "More at this venue",
+    "eventDate": "Date",
+    "eventTime": "Time",
+    "eventVenue": "Venue",
+    "eventAddress": "Address"
   }
 }

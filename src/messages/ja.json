@@ -22,6 +22,10 @@
     "upcomingCount": "公演予定",
     "pastCount": "終了",
     "lineup": "出演者",
-    "moreAtVenue": "この会場の他のイベント"
+    "moreAtVenue": "この会場の他のイベント",
+    "eventDate": "日程",
+    "eventTime": "開演",
+    "eventVenue": "会場",
+    "eventAddress": "住所"
   }
 }
