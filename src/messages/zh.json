@@ -30,6 +30,7 @@
     "eventVenue": "爵士場館",
     "eventAddress": "場館地址",
     "prevEvent": "上一場",
-    "nextEvent": "下一場"
+    "nextEvent": "下一場",
+    "sameCityEvents": "同城市其他場地演出"
   }
 }

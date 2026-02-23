@@ -32,17 +32,18 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     );
   }
 
-  // Compute prev/next events (chronological order, all events)
-  const allSorted = [...events]
-    .filter((e) => e.fields.start_at)
-    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
-  const currentIdx = allSorted.findIndex((e) => e.id === event.id);
-  const prevEvent = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
-  const nextEvent = currentIdx >= 0 && currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
-
   const f = event.fields;
   const tz = f.timezone || 'Asia/Taipei';
   const venue = resolveLinks(f.venue_id, venues)[0];
+
+  // Compute prev/next events — same venue only, chronological
+  const venueEventIds = new Set(venue?.fields.event_list || []);
+  const venueSorted = [...events]
+    .filter((e) => e.fields.start_at && venueEventIds.has(e.id))
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+  const currentIdx = venueSorted.findIndex((e) => e.id === event.id);
+  const prevEvent = currentIdx > 0 ? venueSorted[currentIdx - 1] : null;
+  const nextEvent = currentIdx >= 0 && currentIdx < venueSorted.length - 1 ? venueSorted[currentIdx + 1] : null;
   const primaryArtist = resolveLinks(f.primary_artist, artists)[0];
   const desc = localized(f as Record<string, unknown>, 'description', locale);
   const descShort = localized(f as Record<string, unknown>, 'description_short', locale);
@@ -200,35 +201,55 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         nextLabel={t('nextEvent')}
       />
 
-      {/* ─── More at this venue ─── */}
-      {venue && (
-        <FadeUp>
-        <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
-          <h2 className="font-serif text-2xl font-bold mb-8">
-            {t('moreAtVenue')}
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {resolveLinks(venue.fields.event_list, events)
-              .filter((e) => e.id !== event.id)
-              .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-              .slice(0, 3)
-              .map((related) => {
+      {/* ─── Same city, other venues ─── */}
+      {venue && (() => {
+        const currentCityId = venue.fields.city_id?.[0];
+        if (!currentCityId) return null;
+        // Find other venues in same city
+        const otherVenueIds = new Set(
+          venues
+            .filter((v) => v.id !== venue.id && v.fields.city_id?.[0] === currentCityId)
+            .map((v) => v.id)
+        );
+        if (otherVenueIds.size === 0) return null;
+        const now = new Date().toISOString();
+        const sameCityEvents = events
+          .filter((e) => {
+            const eVenue = resolveLinks(e.fields.venue_id, venues)[0];
+            return eVenue && otherVenueIds.has(eVenue.id) && e.fields.start_at && e.fields.start_at >= now;
+          })
+          .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
+          .slice(0, 6);
+        if (sameCityEvents.length === 0) return null;
+        return (
+          <FadeUp>
+          <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+            <h2 className="font-serif text-2xl font-bold mb-8">
+              {t('sameCityEvents')}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sameCityEvents.map((related) => {
                 const rtz = related.fields.timezone || 'Asia/Taipei';
+                const rVenue = resolveLinks(related.fields.venue_id, venues)[0];
                 return (
                   <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                      {formatDate(related.fields.start_at, locale, rtz)}
+                      {formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
                     </div>
-                    <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
+                    <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
                       {related.fields.title || related.fields.title_local || 'Event'}
                     </h3>
+                    {rVenue && (
+                      <p className="text-xs text-[#8A8578] mt-2">↗ {displayName(rVenue.fields)}</p>
+                    )}
                   </Link>
                 );
               })}
-          </div>
-        </section>
-        </FadeUp>
-      )}
+            </div>
+          </section>
+          </FadeUp>
+        );
+      })()}
     </div>
   );
 }

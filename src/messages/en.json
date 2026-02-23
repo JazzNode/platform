@@ -30,6 +30,7 @@
     "eventVenue": "Jazz Venue",
     "eventAddress": "Address",
     "prevEvent": "Previous",
-    "nextEvent": "Next"
+    "nextEvent": "Next",
+    "sameCityEvents": "More in this city"
   }
 }
