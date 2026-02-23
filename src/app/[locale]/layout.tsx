@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { NextIntlClientProvider, useMessages } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Inter } from 'next/font/google';
@@ -14,6 +14,19 @@ export const metadata: Metadata = {
     default: 'JazzNode — The Jazz Scene, Connected.',
   },
   description: 'Discover jazz venues, artists, and events worldwide.',
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'black-translucent',
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: 'cover' as const,
+  themeColor: '#0A0A0A',
 };
 
 export default async function LocaleLayout({
@@ -31,7 +44,7 @@ export default async function LocaleLayout({
       <body className={`${inter.className} min-h-screen bg-[#0A0A0A] text-[#F0EDE6] antialiased noise-overlay`}>
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+          <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">{children}</main>
           <Footer />
         </NextIntlClientProvider>
       </body>
