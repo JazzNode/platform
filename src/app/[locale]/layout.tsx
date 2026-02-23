@@ -28,7 +28,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-[#0A0A0A] text-[#F0EDE6] antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-[#0A0A0A] text-[#F0EDE6] antialiased noise-overlay`}>
         <NextIntlClientProvider messages={messages}>
           <Header />
           <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>

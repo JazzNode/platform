@@ -63,15 +63,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         {upcoming.length === 0 ? (
           <p className="text-[#8A8578]">{t('noEvents')}</p>
         ) : (
-          <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3 bg-[rgba(240,237,230,0.04)]">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.map((event) => {
               const tz = event.fields.timezone || 'Asia/Taipei';
               const venue = resolveLinks(event.fields.venue_id, venues)[0];
               const artist = resolveLinks(event.fields.primary_artist, artists)[0];
               return (
-                <article key={event.id} className="bg-[#0A0A0A] p-6 card-hover group">
+                <article key={event.id} className="bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
                   {event.fields.poster_url && (
-                    <div className="h-52 overflow-hidden mb-5 -mx-6 -mt-6">
+                    <div className="h-52 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-[1.25rem]">
                       <img
                         src={event.fields.poster_url}
                         alt={event.fields.title || ''}
@@ -120,11 +120,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {t('viewAll')} →
           </Link>
         </div>
-        <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-3 bg-[rgba(240,237,230,0.04)]">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((venue) => (
-            <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="block bg-[#0A0A0A] p-6 card-hover group">
+            <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
               {photoUrl(venue.fields.photo_url, venue.fields.photo_file) && (
-                <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6">
+                <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-[1.25rem]">
                   <img
                     src={photoUrl(venue.fields.photo_url, venue.fields.photo_file)!}
                     alt={displayName(venue.fields)}

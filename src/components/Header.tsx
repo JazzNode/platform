@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日' };
 const localeList = ['en', 'zh', 'ja'] as const;
@@ -12,6 +13,13 @@ export default function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
@@ -20,20 +28,26 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgba(240,237,230,0.06)] bg-[#0A0A0A]/95 backdrop-blur supports-[backdrop-filter]:bg-[#0A0A0A]/80">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-500 ease-out ${
+        scrolled
+          ? 'bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[rgba(200,168,78,0.12)] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
+          : 'bg-transparent border-b border-transparent'
+      }`}
+    >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href={`/${locale}`} className="font-serif text-2xl font-bold tracking-tight text-gold">
+        <Link href={`/${locale}`} className="font-serif text-2xl font-bold tracking-tight text-gold link-lift">
           JazzNode
         </Link>
 
         <nav className="flex items-center gap-8">
-          <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
+          <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
             {t('events')}
           </Link>
-          <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
+          <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
             {t('venues')}
           </Link>
-          <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300">
+          <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
             {t('artists')}
           </Link>
 
@@ -42,7 +56,7 @@ export default function Header() {
               <button
                 key={l}
                 onClick={() => switchLocale(l)}
-                className={`px-2.5 py-1 text-xs tracking-wider rounded transition-all duration-300 ${
+                className={`px-2.5 py-1 text-xs tracking-wider rounded-lg transition-all duration-300 ${
                   locale === l
                     ? 'bg-gold text-[#0A0A0A] font-bold'
                     : 'text-[#8A8578] hover:text-[#F0EDE6]'

@@ -1,11 +1,24 @@
 export default function Footer() {
   return (
-    <footer className="border-t border-[rgba(240,237,230,0.06)] py-12 mt-24">
+    <footer className="bg-[#111111] rounded-t-[2.5rem] py-14 mt-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-serif text-lg text-gold">JazzNode</p>
-          <p className="text-xs uppercase tracking-widest text-[#8A8578]">
-            © {new Date().getFullYear()} — The Jazz Scene, Connected.
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="font-serif text-xl text-gold font-bold">JazzNode</p>
+            <p className="mt-1 text-xs uppercase tracking-widest text-[#8A8578]">
+              The Jazz Scene, Connected.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="pulse-dot" />
+            <span className="text-xs font-mono uppercase tracking-widest text-[#8A8578]">
+              Live Data
+            </span>
+          </div>
+
+          <p className="text-xs text-[#8A8578]">
+            © {new Date().getFullYear()} JazzNode
           </p>
         </div>
       </div>
