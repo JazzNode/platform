@@ -1,11 +1,9 @@
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues } from '@/lib/airtable';
-import { displayName, photoUrl } from '@/lib/helpers';
-import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { displayName, photoUrl, localized } from '@/lib/helpers';
 
-export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+export async function generateMetadata() {
   const t = await getTranslations('common');
   return { title: t('venues') };
 }
@@ -13,58 +11,41 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function VenuesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
+
   const venues = await getVenues();
-
-  // Group by city
-  const byCity = new Map<string, typeof venues>();
-  for (const v of venues) {
-    const city = v.fields.city || 'Other';
-    if (!byCity.has(city)) byCity.set(city, []);
-    byCity.get(city)!.push(v);
-  }
-
-  // Sort cities by venue count
-  const cities = [...byCity.entries()].sort((a, b) => b[1].length - a[1].length);
+  const sorted = [...venues].sort((a, b) => (b.fields.event_list?.length || 0) - (a.fields.event_list?.length || 0));
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <div>
-        <h1 className="text-3xl font-bold">{t('venues')}</h1>
-        <p className="text-muted-foreground mt-1">{venues.length} venues worldwide</p>
+        <h1 className="font-serif text-4xl sm:text-5xl font-bold">{t('venues')}</h1>
+        <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">{venues.length} venues</p>
       </div>
 
-      {cities.map(([city, cityVenues]) => (
-        <section key={city}>
-          <h2 className="text-xl font-semibold mb-4">{city}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {cityVenues.map((venue) => (
-              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`}>
-                <Card className="hover:shadow-md transition-shadow h-full">
-                  {photoUrl(venue.fields.photo_url, venue.fields.photo_file) && (
-                    <div className="h-36 overflow-hidden rounded-t-lg">
-                      <img
-                        src={photoUrl(venue.fields.photo_url, venue.fields.photo_file)!}
-                        alt={displayName(venue.fields)}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <CardHeader>
-                    <CardTitle className="text-base">{displayName(venue.fields)}</CardTitle>
-                    <p className="text-xs text-muted-foreground">
-                      {venue.fields.jazz_frequency && `${venue.fields.jazz_frequency} · `}
-                      {venue.fields.event_list?.length || 0} events
-                    </p>
-                    {venue.fields.verification_status === 'Verified' && (
-                      <Badge variant="secondary" className="w-fit text-xs">{t('verified')} ✓</Badge>
-                    )}
-                  </CardHeader>
-                </Card>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ))}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {sorted.map((venue) => {
+          const f = venue.fields;
+          const desc = localized(f as Record<string, unknown>, 'description', locale);
+          return (
+            <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="block bg-[#111111] p-6 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+              {photoUrl(f.photo_url, f.photo_file) && (
+                <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl">
+                  <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
+                </div>
+              )}
+              <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
+                {displayName(f)}
+              </h3>
+              <div className="flex gap-3 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
+                {f.city && <span>📍 {f.city}</span>}
+                <span>{f.event_list?.length || 0} events</span>
+                {f.jazz_frequency && <span>🎵 {f.jazz_frequency}</span>}
+              </div>
+              {desc && <p className="text-xs text-[#8A8578] mt-3 line-clamp-2 leading-relaxed">{desc}</p>}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -77,7 +77,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 const venue = resolveLinks(event.fields.venue_id, venues)[0];
                 const artist = resolveLinks(event.fields.primary_artist, artists)[0];
                 return (
-                  <article key={event.id} className="fade-up-item bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
+                  <Link key={event.id} href={`/${locale}/events/${event.id}`} className="fade-up-item block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
                     {event.fields.poster_url && (
                       <div className="h-52 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-[1.25rem]">
                         <img
@@ -113,7 +113,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                         {t('ticketLink')} ↗
                       </a>
                     )}
-                  </article>
+                  </Link>
                 );
               })}
             </div>

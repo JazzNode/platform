@@ -2,9 +2,6 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, photoUrl, localized } from '@/lib/helpers';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -21,91 +18,135 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const artist = artists.find((a) => a.id === slug);
 
   if (!artist) {
-    return <p>Artist not found.</p>;
+    return (
+      <div className="py-24 text-center">
+        <p className="text-[#8A8578]">Artist not found.</p>
+        <Link href={`/${locale}/artists`} className="text-gold mt-4 inline-block link-lift">← Back to artists</Link>
+      </div>
+    );
   }
 
   const f = artist.fields;
   const bioShort = localized(f as Record<string, unknown>, 'bio_short', locale);
   const bioFull = localized(f as Record<string, unknown>, 'bio', locale);
-  const desc = locale === 'zh' ? f.description_zh : locale === 'ja' ? f.description_ja : f.description_en;
+  const desc = localized(f as Record<string, unknown>, 'description', locale);
   const artistEvents = resolveLinks(f.event_list, events)
     .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''));
   const artistBadges = resolveLinks(f.badge_list, badges);
 
   return (
-    <div className="space-y-8">
-      <Link href={`/${locale}/artists`} className="text-sm text-muted-foreground hover:text-foreground">
-        {t('backToList')}
+    <div className="space-y-12">
+      <Link href={`/${locale}/artists`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+        ← {t('backToList')}
       </Link>
 
-      <div className="flex flex-col md:flex-row gap-6">
+      {/* Profile */}
+      <div className="flex flex-col md:flex-row gap-10 items-start">
+        {/* Photo */}
         {photoUrl(f.photo_url, f.photo_file) ? (
-          <div className="w-48 h-48 rounded-full overflow-hidden shrink-0">
+          <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[rgba(240,237,230,0.08)]">
             <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-48 h-48 rounded-full bg-muted flex items-center justify-center text-5xl shrink-0">🎵</div>
-        )}
-        <div className="space-y-3">
-          <h1 className="text-3xl font-bold">{displayName(f)}</h1>
-          {f.name_en && f.name_local && f.name_en !== f.name_local && (
-            <p className="text-lg text-muted-foreground">{f.name_en}</p>
-          )}
-          <div className="flex flex-wrap gap-2">
-            {f.primary_instrument && <Badge variant="outline" className="capitalize">🎵 {f.primary_instrument}</Badge>}
-            {f.type && <Badge variant="outline">{f.type === 'group' ? '👥 Group' : '👤 Solo'}</Badge>}
-            {f.country_code && <Badge variant="outline">🌍 {f.country_code}</Badge>}
-            {f.is_master && <Badge>🌟 Master</Badge>}
-            {f.verification_status === 'Verified' && <Badge variant="secondary">{t('verified')} ✓</Badge>}
+          <div className="w-48 h-48 rounded-2xl bg-[#111111] flex items-center justify-center text-6xl shrink-0 border border-[rgba(240,237,230,0.08)]">
+            ♪
           </div>
+        )}
+
+        <div className="flex-1 space-y-5">
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
+          {f.name_en && f.name_local && f.name_en !== f.name_local && (
+            <p className="text-xl text-[#8A8578]">{f.name_en}</p>
+          )}
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2">
+            {f.primary_instrument && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-gold/30 text-gold capitalize">
+                🎵 {f.primary_instrument}
+              </span>
+            )}
+            {f.type && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                {f.type === 'group' ? '👥 Group' : '👤 Solo'}
+              </span>
+            )}
+            {f.country_code && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                🌍 {f.country_code}
+              </span>
+            )}
+            {f.is_master && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
+                🌟 Master
+              </span>
+            )}
+          </div>
+
+          {/* Badges */}
           {artistBadges.length > 0 && (
             <div className="flex gap-2">
               {artistBadges.map((b) => (
-                <Badge key={b.id} className="text-xs">
+                <span key={b.id} className="text-xs px-3 py-1.5 rounded-xl bg-[#1A1A1A] text-gold border border-gold/20">
                   {locale === 'zh' ? b.fields.name_zh : locale === 'ja' ? b.fields.name_ja : b.fields.name_en}
-                </Badge>
+                </span>
               ))}
             </div>
           )}
+
+          {/* Genres */}
           {f.genres && f.genres.length > 0 && (
-            <div className="flex gap-1 flex-wrap">
-              {f.genres.map((g) => <Badge key={g} variant="outline" className="text-xs">{g}</Badge>)}
+            <div className="flex gap-2 flex-wrap">
+              {f.genres.map((g) => (
+                <span key={g} className="text-xs px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.08)] text-[#8A8578]">{g}</span>
+              ))}
             </div>
           )}
-          {bioShort && <p className="text-muted-foreground font-medium">{bioShort}</p>}
-          {bioFull && <p className="text-muted-foreground leading-relaxed text-sm">{bioFull}</p>}
-          {!bioFull && desc && <p className="text-muted-foreground leading-relaxed">{desc}</p>}
 
-          <div className="flex gap-3 text-sm">
-            {f.website_url && <a href={f.website_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">🌐 Website</a>}
-            {f.spotify_url && <a href={f.spotify_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">🎧 Spotify</a>}
-            {f.youtube_url && <a href={f.youtube_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">▶️ YouTube</a>}
-            {f.instagram && <a href={`https://instagram.com/${f.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">📸 Instagram</a>}
+          {/* Bio */}
+          {bioShort && <p className="text-[#F0EDE6] font-medium text-lg leading-relaxed">{bioShort}</p>}
+          {bioFull && (
+            <div className="border-t border-[rgba(240,237,230,0.06)] pt-5">
+              <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">{bioFull}</p>
+            </div>
+          )}
+          {!bioFull && desc && (
+            <div className="border-t border-[rgba(240,237,230,0.06)] pt-5">
+              <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>
+            </div>
+          )}
+
+          {/* Social links */}
+          <div className="flex gap-4 text-sm">
+            {f.website_url && <a href={f.website_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">🌐 Website</a>}
+            {f.spotify_url && <a href={f.spotify_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">🎧 Spotify</a>}
+            {f.youtube_url && <a href={f.youtube_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">▶️ YouTube</a>}
+            {f.instagram && <a href={`https://instagram.com/${f.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">📸 Instagram</a>}
+            {f.facebook_url && <a href={f.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">👤 Facebook</a>}
           </div>
         </div>
       </div>
 
-      <Separator />
-
-      <section>
-        <h2 className="text-xl font-semibold mb-4">{t('events')} ({artistEvents.length})</h2>
+      {/* Events */}
+      <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+        <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({artistEvents.length})</h2>
         {artistEvents.length === 0 ? (
-          <p className="text-muted-foreground">{t('noEvents')}</p>
+          <p className="text-[#8A8578]">{t('noEvents')}</p>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2">
-            {artistEvents.slice(0, 20).map((event) => {
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {artistEvents.slice(0, 12).map((event) => {
               const tz = event.fields.timezone || 'Asia/Taipei';
               const venue = resolveLinks(event.fields.venue_id, venues)[0];
               return (
-                <Card key={event.id} className="hover:shadow-sm transition-shadow">
-                  <CardHeader className="pb-2">
-                    <div className="text-xs text-muted-foreground">{formatDate(event.fields.start_at, locale, tz)}</div>
-                    <CardTitle className="text-sm">{event.fields.title || event.fields.title_local || event.fields.title_en}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-xs text-muted-foreground">
-                    {venue && <p>📍 {displayName(venue.fields)}</p>}
-                  </CardContent>
-                </Card>
+                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                    {formatDate(event.fields.start_at, locale, tz)}
+                  </div>
+                  <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
+                    {event.fields.title || event.fields.title_local || 'Event'}
+                  </h3>
+                  {venue && <p className="text-xs text-[#8A8578] mt-1">↗ {displayName(venue.fields)}</p>}
+                </Link>
               );
             })}
           </div>
