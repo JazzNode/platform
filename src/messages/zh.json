@@ -31,6 +31,9 @@
     "eventAddress": "場館地址",
     "prevEvent": "上一場",
     "nextEvent": "下一場",
-    "sameCityEvents": "同城市其他場地演出"
+    "sameCityEvents": "同城市其他場地演出",
+    "allCategories": "所有分類",
+    "jamSession": "Jam Session",
+    "withVocal": "with Vocal"
   }
 }

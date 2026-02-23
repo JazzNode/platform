@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getEvents, getVenues, getArtists, getLineups, getCities, resolveLinks } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
@@ -15,8 +15,8 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
   const t = await getTranslations('common');
   const showPast = view === 'past';
 
-  const [events, venues, artists, lineups, cities] = await Promise.all([
-    getEvents(), getVenues(), getArtists(), getLineups(), getCities(),
+  const [events, venues, artists, lineups, cities, tags] = await Promise.all([
+    getEvents(), getVenues(), getArtists(), getLineups(), getCities(), getTags(),
   ]);
 
   const now = new Date().toISOString();
@@ -42,6 +42,10 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       .filter(Boolean)
       .filter((a) => a.id !== primaryArtist?.id);
 
+    const eventTags = resolveLinks(event.fields.tag_list, tags)
+      .map((t) => t.fields.name)
+      .filter(Boolean) as string[];
+
     return {
       id: event.id,
       title: event.fields.title || event.fields.title_local || event.fields.title_en || 'Event',
@@ -55,6 +59,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       description_short: localized(event.fields as Record<string, unknown>, 'description_short', locale) || null,
       date_display: formatDate(event.fields.start_at, locale, tz),
       time_display: formatTime(event.fields.start_at, tz),
+      tags: eventTags,
     };
   });
 
@@ -90,6 +95,9 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       labels={{
         allCities: t('allCities'),
         allVenues: t('allVenues'),
+        allCategories: t('allCategories'),
+        jamSession: t('jamSession'),
+        withVocal: t('withVocal'),
         events: t('events'),
         pastEvents: t('pastEvents'),
         upcomingCount: t('upcomingCount'),

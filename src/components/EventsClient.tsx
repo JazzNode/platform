@@ -17,6 +17,7 @@ interface SerializedEvent {
   description_short: string | null;
   date_display: string;
   time_display: string;
+  tags: string[];
 }
 
 interface CityOption {
@@ -39,6 +40,9 @@ interface Props {
   labels: {
     allCities: string;
     allVenues: string;
+    allCategories: string;
+    jamSession: string;
+    withVocal: string;
     events: string;
     pastEvents: string;
     upcomingCount: string;
@@ -50,6 +54,8 @@ interface Props {
 
 export default function EventsClient({ events, cities, venues, locale, showPast, labels }: Props) {
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
 
   const toggleCity = useCallback((recordId: string) => {
@@ -81,15 +87,22 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   // Filter events
   const filteredEvents = useMemo(() => {
     return events.filter((e) => {
+      // Location filter
       if (selectedVenues.size > 0) {
-        return e.venue_id != null && selectedVenues.has(e.venue_id);
+        if (e.venue_id == null || !selectedVenues.has(e.venue_id)) return false;
+      } else if (selectedCities.size > 0) {
+        if (e.city_record_id == null || !selectedCities.has(e.city_record_id)) return false;
       }
-      if (selectedCities.size > 0) {
-        return e.city_record_id != null && selectedCities.has(e.city_record_id);
+      // Category filter
+      if (selectedCategory === 'jam') {
+        return e.tags.includes('jam');
+      }
+      if (selectedCategory === 'vocal') {
+        return e.tags.includes('vocal') || e.tags.includes('vocals');
       }
       return true;
     });
-  }, [events, selectedCities, selectedVenues]);
+  }, [events, selectedCities, selectedVenues, selectedCategory]);
 
   // Group by month
   const byMonth = useMemo(() => {
@@ -181,6 +194,27 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             ))}
           </div>
         )}
+
+        {/* Category pills */}
+        <div className="flex flex-wrap gap-2">
+          {([
+            { key: 'all', label: labels.allCategories },
+            { key: 'jam', label: labels.jamSession },
+            { key: 'vocal', label: labels.withVocal },
+          ] as const).map(({ key, label }) => (
+            <button
+              key={key}
+              onClick={() => setSelectedCategory(key)}
+              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                selectedCategory === key
+                  ? 'bg-gold/10 border-gold/60 text-gold'
+                  : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {filteredEvents.length === 0 && (

@@ -31,6 +31,9 @@
     "eventAddress": "Address",
     "prevEvent": "Previous",
     "nextEvent": "Next",
-    "sameCityEvents": "More in this city"
+    "sameCityEvents": "More in this city",
+    "allCategories": "All Categories",
+    "jamSession": "Jam Session",
+    "withVocal": "with Vocal"
   }
 }

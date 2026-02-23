@@ -31,6 +31,9 @@
     "eventAddress": "住所",
     "prevEvent": "前のイベント",
     "nextEvent": "次のイベント",
-    "sameCityEvents": "同じ都市の他会場イベント"
+    "sameCityEvents": "同じ都市の他会場イベント",
+    "allCategories": "すべてのカテゴリ",
+    "jamSession": "ジャムセッション",
+    "withVocal": "ボーカルあり"
   }
 }

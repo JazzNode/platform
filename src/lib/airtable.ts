@@ -171,6 +171,14 @@ export async function getCities() {
   return fetchTable<City>(TABLE_IDS.Cities);
 }
 
+export interface Tag {
+  name?: string;
+}
+
+export async function getTags() {
+  return fetchTable<Tag>(TABLE_IDS.Tags);
+}
+
 export async function getLineups() {
   return fetchTable<Lineup>(TABLE_IDS.Lineups);
 }
