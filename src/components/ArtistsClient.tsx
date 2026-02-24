@@ -75,6 +75,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
       {/* Filter Bar */}
       <div className="space-y-3">
         {/* Type pills */}
+        <FadeUpItem delay={100}>
         <div className="flex flex-wrap gap-2">
           {([
             { key: 'all', label: labels.allTypes },
@@ -94,8 +95,10 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
             </button>
           ))}
         </div>
+        </FadeUpItem>
 
         {/* Instrument pills */}
+        <FadeUpItem delay={220}>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedInstruments(new Set())}
@@ -121,6 +124,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
             </button>
           ))}
         </div>
+        </FadeUpItem>
       </div>
 
       {filteredArtists.length === 0 && (
