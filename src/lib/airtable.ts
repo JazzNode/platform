@@ -83,6 +83,7 @@ export interface Venue {
   capacity?: number;
   event_list?: string[];
   badge_list?: string[];
+  most_frequent_performers?: string[];
   verification_status?: string;
   slug?: string;
 }

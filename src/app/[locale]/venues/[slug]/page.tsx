@@ -106,6 +106,35 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       </FadeUp>
 
+      {/* Most Frequent Performers */}
+      {(() => {
+        const topPerformers = resolveLinks(f.most_frequent_performers, artists);
+        if (topPerformers.length === 0) return null;
+        return (
+          <FadeUp stagger={0.08}>
+            <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+              <h2 className="font-serif text-2xl font-bold mb-8">{t('topPerformers') || '常駐樂手'}</h2>
+              <div className="flex flex-wrap gap-3">
+                {topPerformers.map((a) => (
+                  <Link key={a.id} href={`/${locale}/artists/${a.id}`}
+                    className="flex items-center gap-3 bg-[#111111] px-4 py-3 rounded-xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                    {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
+                      <img src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" className="w-8 h-8 rounded-full object-cover" loading="lazy" />
+                    )}
+                    <div>
+                      <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
+                      {a.fields.primary_instrument && (
+                        <span className="text-xs text-[#8A8578] ml-2">{a.fields.primary_instrument}</span>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </FadeUp>
+        );
+      })()}
+
       {/* Events */}
       <FadeUp stagger={0.12}>
       <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
