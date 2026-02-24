@@ -37,7 +37,7 @@ async function fetchTable<T = Record<string, unknown>>(
 
     const res = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${API_KEY}` },
-      next: { revalidate: 3600 }, // ISR: revalidate every hour
+      cache: 'no-store', // page-level revalidate handles ISR; per-fetch caching breaks Airtable pagination (offset tokens expire in ~5min)
     });
 
     if (!res.ok) {
