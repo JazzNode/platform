@@ -84,7 +84,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
           ] as const).map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => setSelectedType(key)}
+              onClick={() => { setSelectedType(key); if (key === 'groups') setSelectedInstruments(new Set()); }}
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
@@ -97,7 +97,15 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
         </div>
         </FadeUpItem>
 
-        {/* Instrument pills */}
+        {/* Instrument pills — hidden when filtering groups */}
+        <div
+          className="overflow-hidden"
+          style={{
+            maxHeight: selectedType === 'groups' ? 0 : 200,
+            opacity: selectedType === 'groups' ? 0 : 1,
+            transition: 'max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease',
+          }}
+        >
         <FadeUpItem delay={220}>
         <div className="flex flex-wrap gap-2">
           <button
@@ -125,6 +133,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
           ))}
         </div>
         </FadeUpItem>
+        </div>
       </div>
 
       {filteredArtists.length === 0 && (
