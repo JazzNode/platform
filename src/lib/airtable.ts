@@ -1,7 +1,13 @@
 /**
  * Airtable REST client for build-time data fetching (SSG/ISR).
  * No SDK — raw fetch per JazzNode SOP.
+ *
+ * All public fetchers are wrapped with React.cache() to deduplicate
+ * identical calls within the same server request (e.g. generateMetadata
+ * + page component both calling getArtists()).
  */
+
+import { cache } from 'react';
 
 const API_KEY = process.env.AIRTABLE_API_KEY!;
 const BASE_ID = process.env.AIRTABLE_BASE_ID!;
@@ -167,37 +173,37 @@ export interface Lineup {
   artist_name?: string[];   // lookup
 }
 
-export async function getCities() {
+export const getCities = cache(async () => {
   return fetchTable<City>(TABLE_IDS.Cities);
-}
+});
 
 export interface Tag {
   name?: string;
 }
 
-export async function getTags() {
+export const getTags = cache(async () => {
   return fetchTable<Tag>(TABLE_IDS.Tags);
-}
+});
 
-export async function getLineups() {
+export const getLineups = cache(async () => {
   return fetchTable<Lineup>(TABLE_IDS.Lineups);
-}
+});
 
-export async function getVenues() {
+export const getVenues = cache(async () => {
   return fetchTable<Venue>(TABLE_IDS.Venues);
-}
+});
 
-export async function getArtists() {
+export const getArtists = cache(async () => {
   return fetchTable<Artist>(TABLE_IDS.Artists);
-}
+});
 
-export async function getEvents() {
+export const getEvents = cache(async () => {
   return fetchTable<Event>(TABLE_IDS.Events);
-}
+});
 
-export async function getBadges() {
+export const getBadges = cache(async () => {
   return fetchTable<BadgeDef>(TABLE_IDS.Badges);
-}
+});
 
 // Resolve linked record IDs to objects (for build-time denormalization)
 export function resolveLinks<T>(
