@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
+import FadeUpItem from '@/components/animations/FadeUpItem';
 
 interface SerializedArtist {
   id: string;
@@ -126,13 +127,12 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
         <p className="text-[#8A8578]">{labels.noArtists}</p>
       )}
 
-      <FadeUp>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredArtists.map((artist) => (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filteredArtists.map((artist, i) => (
+            <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link
-              key={artist.id}
               href={`/${locale}/artists/${artist.id}`}
-              className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group"
+              className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group h-full"
             >
               <div className="flex items-center gap-4 mb-3">
                 {artist.photoUrl ? (
@@ -159,9 +159,9 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
                 {artist.eventCount > 0 && <span className="text-[10px] uppercase tracking-widest text-[#8A8578]">{artist.eventCount} events</span>}
               </div>
             </Link>
+            </FadeUpItem>
           ))}
         </div>
-      </FadeUp>
     </div>
   );
 }
