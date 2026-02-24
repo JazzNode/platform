@@ -40,5 +40,33 @@
     "allCategories": "所有分類",
     "jamSession": "Jam Session",
     "withVocal": "with Vocal"
+  },
+  "instruments": {
+    "piano": "鋼琴",
+    "drums": "鼓",
+    "bass": "貝斯",
+    "guitar": "吉他",
+    "saxophone": "薩克斯風",
+    "trumpet": "小號",
+    "trombone": "長號",
+    "vocals": "人聲",
+    "flute": "長笛",
+    "vibraphone": "顫音琴",
+    "violin": "小提琴",
+    "cello": "大提琴",
+    "viola": "中提琴",
+    "keyboards": "鍵盤",
+    "synthesizer": "合成器",
+    "percussion": "打擊樂",
+    "tuba": "低音號",
+    "clarinet": "豎笛",
+    "harmonica": "口琴",
+    "accordion": "手風琴",
+    "sheng": "笙",
+    "erhu": "二胡",
+    "organ": "風琴",
+    "dj": "DJ",
+    "tap dance": "踢踏舞",
+    "others": "其他"
   }
 }

@@ -15,6 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function VenueDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   const t = await getTranslations('common');
+  const tInst = await getTranslations('instruments');
+  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
 
   const [venues, events, artists, badges, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
@@ -124,7 +126,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     <div>
                       <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
                       {a.fields.primary_instrument && (
-                        <span className="text-xs text-[#8A8578] ml-2">{a.fields.primary_instrument}</span>
+                        <span className="text-xs text-[#8A8578] ml-2">{instLabel(a.fields.primary_instrument)}</span>
                       )}
                     </div>
                   </Link>

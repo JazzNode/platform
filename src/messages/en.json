@@ -40,5 +40,33 @@
     "allCategories": "All Categories",
     "jamSession": "Jam Session",
     "withVocal": "with Vocal"
+  },
+  "instruments": {
+    "piano": "Piano",
+    "drums": "Drums",
+    "bass": "Bass",
+    "guitar": "Guitar",
+    "saxophone": "Saxophone",
+    "trumpet": "Trumpet",
+    "trombone": "Trombone",
+    "vocals": "Vocals",
+    "flute": "Flute",
+    "vibraphone": "Vibraphone",
+    "violin": "Violin",
+    "cello": "Cello",
+    "viola": "Viola",
+    "keyboards": "Keyboards",
+    "synthesizer": "Synthesizer",
+    "percussion": "Percussion",
+    "tuba": "Tuba",
+    "clarinet": "Clarinet",
+    "harmonica": "Harmonica",
+    "accordion": "Accordion",
+    "sheng": "Sheng",
+    "erhu": "Erhu",
+    "organ": "Organ",
+    "dj": "DJ",
+    "tap dance": "Tap Dance",
+    "others": "Others"
   }
 }

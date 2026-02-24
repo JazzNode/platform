@@ -40,5 +40,33 @@
     "allCategories": "すべてのカテゴリ",
     "jamSession": "ジャムセッション",
     "withVocal": "ボーカルあり"
+  },
+  "instruments": {
+    "piano": "ピアノ",
+    "drums": "ドラム",
+    "bass": "ベース",
+    "guitar": "ギター",
+    "saxophone": "サクソフォン",
+    "trumpet": "トランペット",
+    "trombone": "トロンボーン",
+    "vocals": "ボーカル",
+    "flute": "フルート",
+    "vibraphone": "ヴィブラフォン",
+    "violin": "ヴァイオリン",
+    "cello": "チェロ",
+    "viola": "ヴィオラ",
+    "keyboards": "キーボード",
+    "synthesizer": "シンセサイザー",
+    "percussion": "パーカッション",
+    "tuba": "テューバ",
+    "clarinet": "クラリネット",
+    "harmonica": "ハーモニカ",
+    "accordion": "アコーディオン",
+    "sheng": "笙",
+    "erhu": "二胡",
+    "organ": "オルガン",
+    "dj": "DJ",
+    "tap dance": "タップダンス",
+    "others": "その他"
   }
 }

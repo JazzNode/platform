@@ -15,6 +15,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function ArtistDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   const t = await getTranslations('common');
+  const tInst = await getTranslations('instruments');
+  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
 
   const [artists, events, venues, badges] = await Promise.all([getArtists(), getEvents(), getVenues(), getBadges()]);
   const artist = artists.find((a) => a.id === slug);
@@ -66,7 +68,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           <div className="flex flex-wrap gap-2">
             {f.primary_instrument && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-gold/30 text-gold capitalize">
-                🎵 {f.primary_instrument}
+                🎵 {instLabel(f.primary_instrument)}
               </span>
             )}
             {f.type && (

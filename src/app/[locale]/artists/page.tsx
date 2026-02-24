@@ -12,6 +12,7 @@ export async function generateMetadata() {
 export default async function ArtistsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
+  const tInst = await getTranslations('instruments');
 
   const artists = await getArtists();
 
@@ -23,6 +24,12 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     }
   }
   const instruments = [...instrumentSet].sort();
+
+  // Build instrument translation map for client component
+  const instrumentNames: Record<string, string> = {};
+  for (const inst of instruments) {
+    try { instrumentNames[inst] = tInst(inst as never); } catch { instrumentNames[inst] = inst; }
+  }
 
   // Serialize for client component
   const sorted = [...artists].sort((a, b) => displayName(a.fields).localeCompare(displayName(b.fields)));
@@ -46,6 +53,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       artists={serialized}
       instruments={instruments}
       locale={locale}
+      instrumentNames={instrumentNames}
       labels={{
         artists: t('artists'),
         allInstruments: t('allInstruments'),

@@ -20,6 +20,7 @@ interface SerializedArtist {
 interface Props {
   artists: SerializedArtist[];
   instruments: string[];       // sorted unique instrument list
+  instrumentNames?: Record<string, string>; // i18n translated instrument names
   locale: string;
   labels: {
     artists: string;
@@ -31,7 +32,8 @@ interface Props {
   };
 }
 
-export default function ArtistsClient({ artists, instruments, locale, labels }: Props) {
+export default function ArtistsClient({ artists, instruments, instrumentNames = {}, locale, labels }: Props) {
+  const instLabel = (key: string) => instrumentNames[key] || key;
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
 
@@ -128,7 +130,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
                   : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
               }`}
             >
-              {inst}
+              {instLabel(inst)}
             </button>
           ))}
         </div>
@@ -162,7 +164,7 @@ export default function ArtistsClient({ artists, instruments, locale, labels }: 
                   {artist.type && artist.type !== 'person' ? (
                     <p className="text-xs uppercase tracking-widest text-gold capitalize">{artist.type}</p>
                   ) : artist.primaryInstrument ? (
-                    <p className="text-xs uppercase tracking-widest text-gold capitalize">{artist.primaryInstrument}</p>
+                    <p className="text-xs uppercase tracking-widest text-gold capitalize">{instLabel(artist.primaryInstrument)}</p>
                   ) : null}
                 </div>
               </div>
