@@ -179,9 +179,7 @@ export const getCities = cache(async () => {
 });
 
 export interface Tag {
-  tag_id?: string;
   name?: string;
-  category?: string;
 }
 
 export const getTags = cache(async () => {

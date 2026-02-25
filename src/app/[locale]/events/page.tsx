@@ -13,7 +13,6 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
   const { locale } = await params;
   const { view } = await searchParams;
   const t = await getTranslations('common');
-  const tInst = await getTranslations('instruments');
   const showPast = view === 'past';
 
   const [events, venues, artists, lineups, cities, tagsResult] = await Promise.all([
@@ -65,23 +64,6 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     };
   });
 
-  // Collect instrument tags present in events
-  const instrumentTagNames = new Set<string>();
-  const instrumentCategory = 'instrument';
-  for (const tag of tags) {
-    if (tag.fields.category === instrumentCategory && tag.fields.name) {
-      // Only include if at least one displayed event has this tag
-      const tagName = tag.fields.name!;
-      const hasEvent = serializedEvents.some((e) => e.tags.includes(tagName));
-      if (hasEvent) instrumentTagNames.add(tagName);
-    }
-  }
-  const instrumentList = [...instrumentTagNames].sort();
-  const instrumentNames: Record<string, string> = {};
-  for (const inst of instrumentList) {
-    try { instrumentNames[inst] = tInst(inst as never); } catch { instrumentNames[inst] = inst; }
-  }
-
   // Build city options (only cities that have venues with events)
   const cityIdsInUse = new Set(
     venues.flatMap((v) => v.fields.city_id || [])
@@ -110,17 +92,14 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       events={serializedEvents}
       cities={cityOptions}
       venues={venueOptions}
-      instruments={instrumentList}
-      instrumentNames={instrumentNames}
       locale={locale}
       showPast={showPast}
       labels={{
         allCities: t('allCities'),
         allVenues: t('allVenues'),
         allCategories: t('allCategories'),
-        allInstruments: t('allInstruments'),
         jamSession: t('jamSession'),
-        withVocals: t('withVocals'),
+        withVocal: t('withVocal'),
         events: t('events'),
         pastEvents: t('pastEvents'),
         upcomingCount: t('upcomingCount'),
