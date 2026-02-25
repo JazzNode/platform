@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
+import { useTheme } from '@/components/ThemeProvider';
+import { cityThemeMap } from '@/lib/themes';
 
 interface SerializedEvent {
   id: string;
@@ -22,7 +24,8 @@ interface SerializedEvent {
 
 interface CityOption {
   recordId: string;
-  label: string;  // localized name
+  citySlug: string;  // e.g. 'tw-tpe', 'hk-hkg'
+  label: string;     // localized name
 }
 
 interface VenueOption {
@@ -53,10 +56,29 @@ interface Props {
 }
 
 export default function EventsClient({ events, cities, venues, locale, showPast, labels }: Props) {
+  const { setTheme } = useTheme();
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
+
+  // Auto-switch theme when exactly one city is selected; reset on unmount
+  useEffect(() => {
+    if (selectedCities.size === 1) {
+      const cityRecordId = [...selectedCities][0];
+      const city = cities.find((c) => c.recordId === cityRecordId);
+      if (city?.citySlug) {
+        setTheme(cityThemeMap[city.citySlug] || 'default');
+      }
+    } else {
+      setTheme('default');
+    }
+  }, [selectedCities, cities, setTheme]);
+
+  // Reset to default when leaving page
+  useEffect(() => {
+    return () => setTheme('default');
+  }, [setTheme]);
 
   const toggleCity = useCallback((recordId: string) => {
     setSelectedCities((prev) => {

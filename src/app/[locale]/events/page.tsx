@@ -72,6 +72,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     .filter((c) => cityIdsInUse.has(c.id))
     .map((c) => ({
       recordId: c.id,
+      citySlug: c.fields.city_id || '',
       label: locale === 'en' ? (c.fields.name_en || c.fields.name_local || '') : (c.fields.name_local || c.fields.name_en || ''),
     }))
     .sort((a, b) => a.label.localeCompare(b.label));

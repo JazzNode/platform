@@ -2,8 +2,8 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
+import { getThemeForCity, themes } from '@/lib/themes';
 import FadeUp from '@/components/animations/FadeUp';
-
 
 export async function generateMetadata() {
   const t = await getTranslations('common');
@@ -20,36 +20,24 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
   const now = new Date().toISOString();
 
-  // Build per-city stats
   const cityStats = cities.map((city) => {
     const cityVenues = venues.filter((v) => v.fields.city_id?.includes(city.id));
     const venueIds = new Set(cityVenues.map((v) => v.id));
-
     const cityEvents = events.filter((e) => e.fields.venue_id?.some((vid) => venueIds.has(vid)));
     const upcomingEvents = cityEvents.filter((e) => e.fields.start_at && e.fields.start_at >= now);
-
-    // Unique artists who have played in this city (via lineup → event → venue)
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
-
-    // Next upcoming event
-    const nextEvent = upcomingEvents.sort((a, b) =>
-      (a.fields.start_at || '').localeCompare(b.fields.start_at || ''),
-    )[0];
 
     return {
       city,
       venueCount: cityVenues.length,
-      eventCount: cityEvents.length,
       upcomingCount: upcomingEvents.length,
       artistCount: cityArtists.length,
-      nextEvent,
       venues: cityVenues,
     };
   });
 
-  // Sort: most venues first, then most events
-  cityStats.sort((a, b) => b.venueCount - a.venueCount || b.eventCount - a.eventCount);
+  cityStats.sort((a, b) => b.venueCount - a.venueCount || b.upcomingCount - a.upcomingCount);
 
   const cityName = (fields: { name_local?: string; name_en?: string }, loc: string) =>
     loc === 'en' ? (fields.name_en || fields.name_local || '?') : (fields.name_local || fields.name_en || '?');
@@ -70,48 +58,70 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
           {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues }) => {
             const f = city.fields;
             const name = cityName(f, locale);
+            const theme = getThemeForCity(f.city_id);
 
             return (
               <div
                 key={city.id}
-                className="bg-[#111111] rounded-2xl border border-[rgba(240,237,230,0.06)] p-6 sm:p-8 group"
+                className="fade-up-item relative bg-[#111111] rounded-2xl border p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1"
+                style={{
+                  borderColor: `rgba(${theme.glowRgb}, 0.12)`,
+                }}
               >
-                <div>
-                  {/* City name */}
-                  <div className="mb-4">
-                    <h2 className="font-serif text-2xl sm:text-3xl font-bold">{name}</h2>
-                  </div>
+                {/* Subtle gradient glow at top */}
+                <div
+                  className="absolute inset-x-0 top-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}40, transparent)` }}
+                />
 
-                  {/* Stats row */}
-                  <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#8A8578] mb-6">
-                    <span><span className="text-gold font-bold">{venueCount}</span> {t('venuesInCity')}</span>
-                    <span><span className="text-gold font-bold">{upcomingCount}</span> {t('eventsInCity')}</span>
-                    <span><span className="text-gold font-bold">{artistCount}</span> {t('artistsInCity')}</span>
-                  </div>
-
-                  {/* Venue chips */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {cityVenues.map((v) => (
-                      <Link
-                        key={v.id}
-                        href={`/${locale}/venues/${v.id}`}
-                        className="text-xs px-3 py-1.5 rounded-full bg-[rgba(200,168,78,0.08)] border border-[rgba(200,168,78,0.15)] text-[#C8A84E] hover:bg-[rgba(200,168,78,0.18)] transition-colors duration-300"
-                      >
-                        {v.fields.display_name || v.fields.name_local || v.fields.name_en}
-                      </Link>
-                    ))}
-                  </div>
-
-                  {/* Action links */}
-                  <div className="flex gap-4">
-                    <Link
-                      href={`/${locale}/events?city=${encodeURIComponent(name)}`}
-                      className="text-xs uppercase tracking-widest text-gold hover:text-[#F0EDE6] transition-colors duration-300"
-                    >
-                      {t('exploreCityEvents')} →
-                    </Link>
-                  </div>
+                {/* City name with accent color underline */}
+                <div className="mb-5">
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold">{name}</h2>
+                  <div
+                    className="mt-2 h-0.5 w-12 rounded-full"
+                    style={{ background: theme.accent }}
+                  />
                 </div>
+
+                {/* Stats row */}
+                <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#8A8578] mb-6">
+                  <span>
+                    <span className="font-bold" style={{ color: theme.accent }}>{venueCount}</span> {t('venuesInCity')}
+                  </span>
+                  <span>
+                    <span className="font-bold" style={{ color: theme.accent }}>{upcomingCount}</span> {t('eventsInCity')}
+                  </span>
+                  <span>
+                    <span className="font-bold" style={{ color: theme.accent }}>{artistCount}</span> {t('artistsInCity')}
+                  </span>
+                </div>
+
+                {/* Venue chips — themed */}
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {cityVenues.map((v) => (
+                    <Link
+                      key={v.id}
+                      href={`/${locale}/venues/${v.id}`}
+                      className="text-xs px-3 py-1.5 rounded-full transition-colors duration-300"
+                      style={{
+                        background: `rgba(${theme.glowRgb}, 0.08)`,
+                        border: `1px solid rgba(${theme.glowRgb}, 0.18)`,
+                        color: theme.accent,
+                      }}
+                    >
+                      {v.fields.display_name || v.fields.name_local || v.fields.name_en}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Action link */}
+                <Link
+                  href={`/${locale}/events?city=${encodeURIComponent(name)}`}
+                  className="text-xs uppercase tracking-widest transition-colors duration-300 hover:text-[#F0EDE6]"
+                  style={{ color: theme.accent }}
+                >
+                  {t('exploreCityEvents')} →
+                </Link>
               </div>
             );
           })}
