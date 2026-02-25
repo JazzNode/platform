@@ -4,13 +4,6 @@ import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
 import FadeUp from '@/components/animations/FadeUp';
 
-/** Country flag emoji from 2-letter country code. */
-function countryFlag(code?: string): string {
-  if (!code || code.length !== 2) return '🌍';
-  return String.fromCodePoint(
-    ...code.toUpperCase().split('').map((c) => 0x1f1e6 + c.charCodeAt(0) - 65),
-  );
-}
 
 export async function generateMetadata() {
   const t = await getTranslations('common');
@@ -76,23 +69,16 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
         <div className="grid gap-6 sm:grid-cols-2">
           {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues }) => {
             const f = city.fields;
-            const flag = countryFlag(f.country_code);
             const name = cityName(f, locale);
 
             return (
               <div
                 key={city.id}
-                className="relative bg-[#111111] rounded-2xl border border-[rgba(240,237,230,0.06)] p-6 sm:p-8 overflow-hidden group"
+                className="bg-[#111111] rounded-2xl border border-[rgba(240,237,230,0.06)] p-6 sm:p-8 group"
               >
-                {/* Large background flag */}
-                <span className="absolute -right-4 -top-4 text-[8rem] opacity-[0.04] leading-none select-none pointer-events-none">
-                  {flag}
-                </span>
-
-                <div className="relative z-10">
-                  {/* City name + flag */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl">{flag}</span>
+                <div>
+                  {/* City name */}
+                  <div className="mb-4">
                     <h2 className="font-serif text-2xl sm:text-3xl font-bold">{name}</h2>
                   </div>
 
@@ -125,7 +111,6 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                       {t('exploreCityEvents')} →
                     </Link>
                   </div>
-                </div>
               </div>
             );
           })}
