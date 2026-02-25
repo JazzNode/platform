@@ -127,6 +127,11 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     });
   }, [events, selectedCities, selectedVenues, selectedCategory]);
 
+  // Key for re-triggering animations on filter change
+  const filterKey = useMemo(() => {
+    return `${[...selectedCities].sort().join(',')}_${[...selectedVenues].sort().join(',')}_${selectedCategory}`;
+  }, [selectedCities, selectedVenues, selectedCategory]);
+
   // Group by month
   const byMonth = useMemo(() => {
     const map = new Map<string, SerializedEvent[]>();
@@ -246,49 +251,53 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
         </FadeUpItem>
       </div>
 
-      {filteredEvents.length === 0 && (
-        <p className="text-[#8A8578]">{labels.noEvents}</p>
-      )}
-
-      {[...byMonth.entries()].map(([month, monthEvents]) => (
-        <section key={month}>
+      <div key={filterKey}>
+        {filteredEvents.length === 0 && (
           <FadeUp>
-            <h2 className="font-serif text-2xl font-bold mb-6 text-gold">{month}</h2>
+            <p className="text-[#8A8578]">{labels.noEvents}</p>
           </FadeUp>
-          <FadeUp stagger={0.12}>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {monthEvents.map((event) => (
-                <Link
-                  key={event.id}
-                  href={`/${locale}/events/${event.id}`}
-                  className="fade-up-item block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
-                >
-                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                    {event.date_display} · {event.time_display}
-                  </div>
-                  <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                    {event.title}
-                  </h3>
-                  <div className="text-xs text-[#8A8578] mt-2 space-y-0.5">
-                    {event.description_short && (
-                      <p className="line-clamp-2 italic">{event.description_short}</p>
-                    )}
-                    {event.venue_name && <p>↗ {event.venue_name}</p>}
-                    {event.primary_artist_name && (
-                      <p>♪ {event.primary_artist_name}</p>
-                    )}
-                    {event.sidemen.length > 0 && (
-                      <p className="text-[#6A6560]">
-                        w/ {event.sidemen.join(', ')}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </FadeUp>
-        </section>
-      ))}
+        )}
+
+        {[...byMonth.entries()].map(([month, monthEvents]) => (
+          <section key={month} className="mt-16 first:mt-0">
+            <FadeUp>
+              <h2 className="font-serif text-2xl font-bold mb-6 text-gold">{month}</h2>
+            </FadeUp>
+            <FadeUp stagger={0.12}>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {monthEvents.map((event) => (
+                  <Link
+                    key={event.id}
+                    href={`/${locale}/events/${event.id}`}
+                    className="fade-up-item block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
+                  >
+                    <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                      {event.date_display} · {event.time_display}
+                    </div>
+                    <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                      {event.title}
+                    </h3>
+                    <div className="text-xs text-[#8A8578] mt-2 space-y-0.5">
+                      {event.description_short && (
+                        <p className="line-clamp-2 italic">{event.description_short}</p>
+                      )}
+                      {event.venue_name && <p>↗ {event.venue_name}</p>}
+                      {event.primary_artist_name && (
+                        <p>♪ {event.primary_artist_name}</p>
+                      )}
+                      {event.sidemen.length > 0 && (
+                        <p className="text-[#6A6560]">
+                          w/ {event.sidemen.join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </FadeUp>
+          </section>
+        ))}
+      </div>
     </div>
   );
 }
