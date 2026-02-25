@@ -4,6 +4,7 @@
     "tagline": "The Jazz Scene, Connected.",
     "venues": "Venues",
     "artists": "Artists",
+    "cities": "Cities",
     "events": "Events",
     "search": "Search...",
     "viewAll": "View All",
@@ -39,7 +40,14 @@
     "sameCityEvents": "More in this city",
     "allCategories": "All Categories",
     "jamSession": "Jam Session",
-    "withVocal": "with Vocal"
+    "withVocal": "with Vocal",
+    "citiesCount": "cities",
+    "venuesInCity": "venues",
+    "eventsInCity": "events",
+    "artistsInCity": "artists",
+    "exploreCityVenues": "Explore Venues",
+    "exploreCityEvents": "Upcoming Events",
+    "noCities": "No cities available."
   },
   "instruments": {
     "piano": "Piano",

@@ -4,6 +4,7 @@
     "tagline": "爵士場景，盡在連結。",
     "venues": "場地",
     "artists": "藝人",
+    "cities": "城市",
     "events": "活動",
     "search": "搜尋...",
     "viewAll": "查看全部",
@@ -39,7 +40,14 @@
     "sameCityEvents": "同城市其他場地演出",
     "allCategories": "所有分類",
     "jamSession": "Jam Session",
-    "withVocal": "with Vocal"
+    "withVocal": "with Vocal",
+    "citiesCount": "座城市",
+    "venuesInCity": "間場地",
+    "eventsInCity": "場活動",
+    "artistsInCity": "位藝人",
+    "exploreCityVenues": "探索場地",
+    "exploreCityEvents": "近期活動",
+    "noCities": "目前沒有城市資料。"
   },
   "instruments": {
     "piano": "鋼琴",

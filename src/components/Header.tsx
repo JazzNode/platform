@@ -51,11 +51,14 @@ export default function Header() {
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
-              {t('events')}
+            <Link href={`/${locale}/cities`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+              {t('cities')}
             </Link>
             <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
               {t('venues')}
+            </Link>
+            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+              {t('events')}
             </Link>
             <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
               {t('artists')}
@@ -114,11 +117,14 @@ export default function Header() {
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <Link href={`/${locale}/events`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
-          {t('events')}
+        <Link href={`/${locale}/cities`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
+          {t('cities')}
         </Link>
         <Link href={`/${locale}/venues`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
           {t('venues')}
+        </Link>
+        <Link href={`/${locale}/events`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
+          {t('events')}
         </Link>
         <Link href={`/${locale}/artists`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
           {t('artists')}

@@ -4,6 +4,7 @@
     "tagline": "ジャズシーンを、つなぐ。",
     "venues": "会場",
     "artists": "アーティスト",
+    "cities": "都市",
     "events": "イベント",
     "search": "検索...",
     "viewAll": "すべて見る",
@@ -39,7 +40,14 @@
     "sameCityEvents": "同じ都市の他会場イベント",
     "allCategories": "すべてのカテゴリ",
     "jamSession": "ジャムセッション",
-    "withVocal": "ボーカルあり"
+    "withVocal": "ボーカルあり",
+    "citiesCount": "都市",
+    "venuesInCity": "会場",
+    "eventsInCity": "イベント",
+    "artistsInCity": "アーティスト",
+    "exploreCityVenues": "会場を見る",
+    "exploreCityEvents": "近日のイベント",
+    "noCities": "都市データがありません。"
   },
   "instruments": {
     "piano": "ピアノ",
