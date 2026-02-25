@@ -111,6 +111,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                       {t('exploreCityEvents')} →
                     </Link>
                   </div>
+                </div>
               </div>
             );
           })}
