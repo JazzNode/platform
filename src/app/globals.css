@@ -275,3 +275,15 @@ body {
 .animate-footer-fade-in {
   animation: footer-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+/* ─── Sound wave animation (Siri-inspired) ─── */
+@keyframes soundwave {
+  0%, 100% {
+    height: 3px;
+    opacity: 0.4;
+  }
+  50% {
+    height: 12px;
+    opacity: 1;
+  }
+}

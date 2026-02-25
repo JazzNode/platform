@@ -5,6 +5,22 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/ThemeProvider';
 import { themes, themeOrder, type Theme } from '@/lib/themes';
 
+function SoundWave() {
+  return (
+    <div className="flex items-center gap-[2px] h-3">
+      {[0, 1, 2, 3, 4].map((i) => (
+        <span
+          key={i}
+          className="w-[2px] rounded-full bg-gold"
+          style={{
+            animation: `soundwave 1.2s ease-in-out ${i * 0.15}s infinite`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function ThemePicker() {
   const { themeId, setTheme } = useTheme();
   const locale = useLocale();
@@ -16,7 +32,7 @@ function ThemePicker() {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       {themeOrder.map((id) => {
         const t = themes[id];
         const active = themeId === id;
@@ -24,27 +40,23 @@ function ThemePicker() {
           <button
             key={id}
             onClick={() => setTheme(id)}
-            title={label(t)}
-            className="group relative flex items-center justify-center transition-all duration-300"
+            className="group relative flex flex-col items-center gap-2 transition-all duration-300"
           >
-            {/* Outer ring for active */}
+            {/* Color dot */}
             <span
-              className={`w-6 h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
-                active ? 'border-current scale-110' : 'border-transparent hover:scale-105'
+              className={`w-5 h-5 rounded-full transition-all duration-300 ${
+                active ? 'scale-110' : 'hover:scale-110'
               }`}
-              style={{ color: t.accent }}
-            >
-              {/* Inner dot */}
-              <span
-                className="w-3.5 h-3.5 rounded-full transition-transform duration-300"
-                style={{
-                  background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
-                  boxShadow: active ? `0 0 8px ${t.accent}40` : 'none',
-                }}
-              />
-            </span>
-            {/* Tooltip */}
-            <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+              style={{
+                background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
+                boxShadow: active ? `0 0 12px ${t.accent}50, 0 0 0 2px var(--card), 0 0 0 4px ${t.accent}` : 'none',
+              }}
+            />
+            {/* Label below — always visible for active, hover for others */}
+            <span
+              className={`text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 ${
+                active ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'
+              }`}
               style={{ color: t.accent }}
             >
               {label(t)}
@@ -79,14 +91,14 @@ export default function Footer() {
             </p>
           </Link>
 
-          {/* Nav links */}
-          <nav className="flex items-center gap-2 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
+          {/* Nav links — uses theme accent color */}
+          <nav className="flex items-center gap-3 text-xs uppercase tracking-widest">
             {navLinks.map((link, i) => (
-              <span key={link.key} className="flex items-center gap-2">
-                {i > 0 && <span className="opacity-30">·</span>}
+              <span key={link.key} className="flex items-center gap-3">
+                {i > 0 && <span className="text-[var(--muted-foreground)] opacity-30">·</span>}
                 <Link
                   href={link.href}
-                  className="hover:text-gold transition-colors duration-300"
+                  className="text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
                 >
                   {t(link.key)}
                 </Link>
@@ -94,13 +106,13 @@ export default function Footer() {
             ))}
           </nav>
 
-          {/* Theme picker */}
+          {/* Theme picker — aligned under nav */}
           <ThemePicker />
 
-          {/* Bottom row */}
+          {/* Bottom row — sound wave instead of pulse dot */}
           <div className="flex items-center gap-6 text-xs text-[var(--muted-foreground,#8A8578)]">
             <div className="flex items-center gap-2">
-              <span className="pulse-dot" />
+              <SoundWave />
               <span className="font-mono uppercase tracking-widest">Live Data</span>
             </div>
             <span className="opacity-30">·</span>

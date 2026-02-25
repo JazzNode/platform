@@ -41,20 +41,20 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* Stats — clickable links to respective pages */}
           <div className="hero-stats grid grid-cols-4 gap-6 sm:gap-8 border-t border-[var(--border)] pt-10 mt-12">
             <Link href={`/${locale}/cities`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={cities.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-gold group-hover:text-[#E8C868] transition-colors duration-300" />
-              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[#8A8578] group-hover:text-[#F0EDE6] transition-colors duration-300">{t('cities')}</p>
+              <CountUp end={cities.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-gold group-hover:text-[var(--color-gold-bright)] transition-colors duration-300" />
+              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('cities')}</p>
             </Link>
             <Link href={`/${locale}/venues`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={venues.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[#F0EDE6] group-hover:text-gold transition-colors duration-300" />
-              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[#8A8578] group-hover:text-[#F0EDE6] transition-colors duration-300">{t('venues')}</p>
+              <CountUp end={venues.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[var(--foreground)] group-hover:text-gold transition-colors duration-300" />
+              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('venues')}</p>
             </Link>
             <Link href={`/${locale}/events`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={events.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[#F0EDE6] group-hover:text-gold transition-colors duration-300" />
-              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[#8A8578] group-hover:text-[#F0EDE6] transition-colors duration-300">{t('events')}</p>
+              <CountUp end={events.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[var(--foreground)] group-hover:text-gold transition-colors duration-300" />
+              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('events')}</p>
             </Link>
             <Link href={`/${locale}/artists`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={artists.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[#F0EDE6] group-hover:text-gold transition-colors duration-300" />
-              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[#8A8578] group-hover:text-[#F0EDE6] transition-colors duration-300">{t('artists')}</p>
+              <CountUp end={artists.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[var(--foreground)] group-hover:text-gold transition-colors duration-300" />
+              <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('artists')}</p>
             </Link>
           </div>
         </HeroReveal>
