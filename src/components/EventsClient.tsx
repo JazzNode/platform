@@ -117,10 +117,10 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       }
       // Category filter
       if (selectedCategory === 'jam') {
-        return e.tags.includes('jam');
+        return e.tags.includes('jam session');
       }
       if (selectedCategory === 'vocal') {
-        return e.tags.includes('vocal') || e.tags.includes('vocals');
+        return e.tags.includes('vocals');
       }
       return true;
     });
