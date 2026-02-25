@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import FadeUp from '@/components/animations/FadeUp';
 
 export default function Footer() {
   const locale = useLocale();
@@ -16,8 +15,7 @@ export default function Footer() {
   ] as const;
 
   return (
-    <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-14 mt-24">
-      <FadeUp>
+    <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-14 mt-24 animate-footer-fade-in">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col items-center gap-8">
           {/* Logo + tagline */}
@@ -54,7 +52,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-      </FadeUp>
     </footer>
   );
 }

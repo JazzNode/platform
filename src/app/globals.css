@@ -260,3 +260,18 @@ body {
   line-height: 0.95;
   letter-spacing: -0.02em;
 }
+
+/* ─── Footer fade-in ─── */
+@keyframes footer-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-footer-fade-in {
+  animation: footer-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
