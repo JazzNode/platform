@@ -41,7 +41,7 @@ export default function Header() {
         className={`sticky top-0 z-50 transition-all duration-500 ease-out ${
           scrolled
             ? 'bg-[var(--background)]/80 backdrop-blur-xl border-b border-[rgba(200,168,78,0.12)] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
-            : 'bg-transparent border-b border-transparent'
+            : 'bg-[var(--background)]/40 backdrop-blur-md border-b border-transparent'
         }`}
       >
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
