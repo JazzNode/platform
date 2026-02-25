@@ -1,15 +1,19 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import { themes, type CityTheme } from '@/lib/themes';
+import { themes, DEFAULT_THEME, type Theme } from '@/lib/themes';
+
+const STORAGE_KEY = 'jazznode-theme';
 
 interface ThemeContextType {
-  theme: CityTheme;
+  theme: Theme;
+  themeId: string;
   setTheme: (id: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: themes.default,
+  theme: themes[DEFAULT_THEME],
+  themeId: DEFAULT_THEME,
   setTheme: () => {},
 });
 
@@ -17,7 +21,7 @@ export function useTheme() {
   return useContext(ThemeContext);
 }
 
-function applyTheme(theme: CityTheme) {
+function applyTheme(theme: Theme) {
   const root = document.documentElement;
 
   // Backgrounds
@@ -46,25 +50,36 @@ function applyTheme(theme: CityTheme) {
   root.style.setProperty('--theme-glow-rgb', theme.glowRgb);
   root.style.setProperty('--theme-glow2-rgb', theme.glow2Rgb);
 
-  // Data attribute for potential CSS selectors
+  // Data attribute
   root.dataset.theme = theme.id;
 }
 
 export default function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<CityTheme>(themes.default);
+  const [themeId, setThemeId] = useState(DEFAULT_THEME);
+  const theme = themes[themeId] || themes[DEFAULT_THEME];
 
   const setTheme = useCallback((id: string) => {
-    const t = themes[id] || themes.default;
-    setThemeState(t);
-    applyTheme(t);
+    const resolved = themes[id] ? id : DEFAULT_THEME;
+    setThemeId(resolved);
+    applyTheme(themes[resolved]);
+    try { localStorage.setItem(STORAGE_KEY, resolved); } catch {}
   }, []);
 
+  // Load saved theme on mount
   useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved && themes[saved]) {
+        setThemeId(saved);
+        applyTheme(themes[saved]);
+        return;
+      }
+    } catch {}
     applyTheme(theme);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, themeId, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

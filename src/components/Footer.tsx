@@ -2,6 +2,59 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
+import { useTheme } from '@/components/ThemeProvider';
+import { themes, themeOrder, type Theme } from '@/lib/themes';
+
+function ThemePicker() {
+  const { themeId, setTheme } = useTheme();
+  const locale = useLocale();
+
+  const label = (t: Theme) => {
+    if (locale === 'zh') return t.label_zh;
+    if (locale === 'ja') return t.label_ja;
+    return t.label;
+  };
+
+  return (
+    <div className="flex items-center gap-3">
+      {themeOrder.map((id) => {
+        const t = themes[id];
+        const active = themeId === id;
+        return (
+          <button
+            key={id}
+            onClick={() => setTheme(id)}
+            title={label(t)}
+            className="group relative flex items-center justify-center transition-all duration-300"
+          >
+            {/* Outer ring for active */}
+            <span
+              className={`w-6 h-6 rounded-full border-2 transition-all duration-300 flex items-center justify-center ${
+                active ? 'border-current scale-110' : 'border-transparent hover:scale-105'
+              }`}
+              style={{ color: t.accent }}
+            >
+              {/* Inner dot */}
+              <span
+                className="w-3.5 h-3.5 rounded-full transition-transform duration-300"
+                style={{
+                  background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
+                  boxShadow: active ? `0 0 8px ${t.accent}40` : 'none',
+                }}
+              />
+            </span>
+            {/* Tooltip */}
+            <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+              style={{ color: t.accent }}
+            >
+              {label(t)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Footer() {
   const locale = useLocale();
@@ -26,7 +79,7 @@ export default function Footer() {
             </p>
           </Link>
 
-          {/* Nav links — subtle, spaced with dots */}
+          {/* Nav links */}
           <nav className="flex items-center gap-2 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
             {navLinks.map((link, i) => (
               <span key={link.key} className="flex items-center gap-2">
@@ -40,6 +93,9 @@ export default function Footer() {
               </span>
             ))}
           </nav>
+
+          {/* Theme picker */}
+          <ThemePicker />
 
           {/* Bottom row */}
           <div className="flex items-center gap-6 text-xs text-[var(--muted-foreground,#8A8578)]">

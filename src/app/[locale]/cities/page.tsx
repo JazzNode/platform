@@ -2,7 +2,6 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
-import { getThemeForCity, themes } from '@/lib/themes';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata() {
@@ -58,60 +57,39 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
           {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues }) => {
             const f = city.fields;
             const name = cityName(f, locale);
-            const theme = getThemeForCity(f.city_id);
 
             return (
               <div
                 key={city.id}
-                className="fade-up-item relative rounded-2xl border p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
-                style={{
-                  backgroundColor: theme.card,
-                  borderColor: `rgba(${theme.glowRgb}, 0.12)`,
-                  boxShadow: `inset 0 1px 0 rgba(${theme.glowRgb}, 0.08)`,
-                }}
+                className="fade-up-item relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
               >
-                {/* Top gradient line */}
-                <div
-                  className="absolute inset-x-0 top-0 h-[2px]"
-                  style={{ background: `linear-gradient(90deg, ${theme.accent}, ${theme.accent2}, transparent)` }}
-                />
-
-                {/* City name with dual-color accent */}
+                {/* City name */}
                 <div className="mb-5">
-                  <h2 className="font-serif text-2xl sm:text-3xl font-bold" style={{ color: theme.text }}>
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold">
                     {name}
                   </h2>
-                  <div className="mt-2 flex gap-1">
-                    <div className="h-0.5 w-8 rounded-full" style={{ background: theme.accent }} />
-                    <div className="h-0.5 w-4 rounded-full" style={{ background: theme.accent2 }} />
-                  </div>
                 </div>
 
                 {/* Stats row */}
-                <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm mb-6" style={{ color: theme.muted }}>
+                <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[var(--muted-foreground)] mb-6">
                   <span>
-                    <span className="font-bold" style={{ color: theme.accent }}>{venueCount}</span> {t('venuesInCity')}
+                    <span className="font-bold text-gold">{venueCount}</span> {t('venuesInCity')}
                   </span>
                   <span>
-                    <span className="font-bold" style={{ color: theme.accent2 }}>{upcomingCount}</span> {t('eventsInCity')}
+                    <span className="font-bold text-gold">{upcomingCount}</span> {t('eventsInCity')}
                   </span>
                   <span>
-                    <span className="font-bold" style={{ color: theme.accent }}>{artistCount}</span> {t('artistsInCity')}
+                    <span className="font-bold text-gold">{artistCount}</span> {t('artistsInCity')}
                   </span>
                 </div>
 
-                {/* Venue chips — themed */}
+                {/* Venue chips */}
                 <div className="flex flex-wrap gap-2 mb-6">
                   {cityVenues.map((v) => (
                     <Link
                       key={v.id}
                       href={`/${locale}/venues/${v.id}`}
-                      className="text-xs px-3 py-1.5 rounded-full transition-colors duration-300"
-                      style={{
-                        background: `rgba(${theme.glowRgb}, 0.08)`,
-                        border: `1px solid rgba(${theme.glowRgb}, 0.18)`,
-                        color: theme.accent,
-                      }}
+                      className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-gold hover:bg-gold/10 transition-colors duration-300"
                     >
                       {v.fields.display_name || v.fields.name_local || v.fields.name_en}
                     </Link>
@@ -121,8 +99,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                 {/* Action link */}
                 <Link
                   href={`/${locale}/events?city=${encodeURIComponent(name)}`}
-                  className="text-xs uppercase tracking-widest transition-colors duration-300 hover:text-[#F0EDE6]"
-                  style={{ color: theme.accent }}
+                  className="text-xs uppercase tracking-widest text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
                 >
                   {t('exploreCityEvents')} →
                 </Link>
