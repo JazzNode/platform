@@ -114,12 +114,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         if (topPerformers.length === 0) return null;
         return (
           <FadeUp stagger={0.08}>
-            <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+            <section className="border-t border-[var(--border)] pt-12">
               <h2 className="font-serif text-2xl font-bold mb-8">{t('topPerformers') || '常駐樂手'}</h2>
               <div className="flex flex-wrap gap-3">
                 {topPerformers.map((a) => (
                   <Link key={a.id} href={`/${locale}/artists/${a.id}`}
-                    className="flex items-center gap-3 bg-[#111111] px-4 py-3 rounded-xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                    className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
                     {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
                       <img src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" className="w-8 h-8 rounded-full object-cover" loading="lazy" />
                     )}
@@ -139,7 +139,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       {/* Events */}
       <FadeUp stagger={0.12}>
-      <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+      <section className="border-t border-[var(--border)] pt-12">
         <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({venueEvents.length})</h2>
         {venueEvents.length === 0 ? (
           <p className="text-[#8A8578]">{t('noEvents')}</p>
@@ -149,7 +149,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               const tz = event.fields.timezone || 'Asia/Taipei';
               const artist = resolveLinks(event.fields.primary_artist, artists)[0];
               return (
-                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                   {event.fields.poster_url && (
                     <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl">
                       <img src={event.fields.poster_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />

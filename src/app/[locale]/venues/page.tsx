@@ -33,7 +33,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
             const f = venue.fields;
             const desc = localized(f as Record<string, unknown>, 'description', locale);
             return (
-              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[#111111] p-6 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group">
                 {photoUrl(f.photo_url, f.photo_file) && (
                   <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl">
                     <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />

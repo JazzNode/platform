@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className="bg-[#111111] rounded-t-[2.5rem] py-14 mt-24">
+    <footer className="bg-[var(--card)] rounded-t-[2.5rem] py-14 mt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <Link href="/" className="group block">

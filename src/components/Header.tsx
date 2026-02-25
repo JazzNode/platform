@@ -40,7 +40,7 @@ export default function Header() {
       <header
         className={`sticky top-0 z-50 transition-all duration-500 ease-out ${
           scrolled
-            ? 'bg-[#0A0A0A]/80 backdrop-blur-xl border-b border-[rgba(200,168,78,0.12)] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
+            ? 'bg-[var(--background)]/80 backdrop-blur-xl border-b border-[rgba(200,168,78,0.12)] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
             : 'bg-transparent border-b border-transparent'
         }`}
       >
@@ -122,7 +122,7 @@ export default function Header() {
 
       {/* Mobile fullscreen menu */}
       <div
-        className={`fixed inset-0 z-40 bg-[#0A0A0A]/98 backdrop-blur-2xl flex flex-col items-center justify-center gap-8 transition-all duration-400 md:hidden ${
+        className={`fixed inset-0 z-40 bg-[var(--background)]/98 backdrop-blur-2xl flex flex-col items-center justify-center gap-8 transition-all duration-400 md:hidden ${
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
       >

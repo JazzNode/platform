@@ -63,33 +63,37 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
             return (
               <div
                 key={city.id}
-                className="fade-up-item relative bg-[#111111] rounded-2xl border p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1"
+                className="fade-up-item relative rounded-2xl border p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
                 style={{
+                  backgroundColor: theme.card,
                   borderColor: `rgba(${theme.glowRgb}, 0.12)`,
+                  boxShadow: `inset 0 1px 0 rgba(${theme.glowRgb}, 0.08)`,
                 }}
               >
-                {/* Subtle gradient glow at top */}
+                {/* Top gradient line */}
                 <div
-                  className="absolute inset-x-0 top-0 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${theme.accent}40, transparent)` }}
+                  className="absolute inset-x-0 top-0 h-[2px]"
+                  style={{ background: `linear-gradient(90deg, ${theme.accent}, ${theme.accent2}, transparent)` }}
                 />
 
-                {/* City name with accent color underline */}
+                {/* City name with dual-color accent */}
                 <div className="mb-5">
-                  <h2 className="font-serif text-2xl sm:text-3xl font-bold">{name}</h2>
-                  <div
-                    className="mt-2 h-0.5 w-12 rounded-full"
-                    style={{ background: theme.accent }}
-                  />
+                  <h2 className="font-serif text-2xl sm:text-3xl font-bold" style={{ color: theme.text }}>
+                    {name}
+                  </h2>
+                  <div className="mt-2 flex gap-1">
+                    <div className="h-0.5 w-8 rounded-full" style={{ background: theme.accent }} />
+                    <div className="h-0.5 w-4 rounded-full" style={{ background: theme.accent2 }} />
+                  </div>
                 </div>
 
                 {/* Stats row */}
-                <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#8A8578] mb-6">
+                <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm mb-6" style={{ color: theme.muted }}>
                   <span>
                     <span className="font-bold" style={{ color: theme.accent }}>{venueCount}</span> {t('venuesInCity')}
                   </span>
                   <span>
-                    <span className="font-bold" style={{ color: theme.accent }}>{upcomingCount}</span> {t('eventsInCity')}
+                    <span className="font-bold" style={{ color: theme.accent2 }}>{upcomingCount}</span> {t('eventsInCity')}
                   </span>
                   <span>
                     <span className="font-bold" style={{ color: theme.accent }}>{artistCount}</span> {t('artistsInCity')}

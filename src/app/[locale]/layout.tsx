@@ -43,7 +43,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-[#0A0A0A] text-[#F0EDE6] antialiased noise-overlay`}>
+      <body className={`${inter.className} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased noise-overlay`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <Header />

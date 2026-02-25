@@ -49,11 +49,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       <div className="flex flex-col md:flex-row gap-10 items-start">
         {/* Photo */}
         {photoUrl(f.photo_url, f.photo_file) ? (
-          <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[rgba(240,237,230,0.08)]">
+          <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[var(--border)]">
             <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
           </div>
         ) : (
-          <div className="w-48 h-48 rounded-2xl bg-[#111111] flex items-center justify-center text-6xl shrink-0 border border-[rgba(240,237,230,0.08)]">
+          <div className="w-48 h-48 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl shrink-0 border border-[var(--border)]">
             ♪
           </div>
         )}
@@ -103,7 +103,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           {f.genres && f.genres.length > 0 && (
             <div className="flex gap-2 flex-wrap">
               {f.genres.map((g) => (
-                <span key={g} className="text-xs px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.08)] text-[#8A8578]">{g}</span>
+                <span key={g} className="text-xs px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#8A8578]">{g}</span>
               ))}
             </div>
           )}
@@ -111,12 +111,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           {/* Bio */}
           {bioShort && <p className="text-[#F0EDE6] font-medium text-lg leading-relaxed">{bioShort}</p>}
           {bioFull && (
-            <div className="border-t border-[rgba(240,237,230,0.06)] pt-5">
+            <div className="border-t border-[var(--border)] pt-5">
               <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">{bioFull}</p>
             </div>
           )}
           {!bioFull && desc && (
-            <div className="border-t border-[rgba(240,237,230,0.06)] pt-5">
+            <div className="border-t border-[var(--border)] pt-5">
               <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>
             </div>
           )}
@@ -136,7 +136,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
       {/* Events */}
       <FadeUp stagger={0.12}>
-      <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+      <section className="border-t border-[var(--border)] pt-12">
         <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({artistEvents.length})</h2>
         {artistEvents.length === 0 ? (
           <p className="text-[#8A8578]">{t('noEvents')}</p>
@@ -146,7 +146,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               const tz = event.fields.timezone || 'Asia/Taipei';
               const venue = resolveLinks(event.fields.venue_id, venues)[0];
               return (
-                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                   <div className="text-xs uppercase tracking-widest text-gold mb-2">
                     {formatDate(event.fields.start_at, locale, tz)}
                   </div>

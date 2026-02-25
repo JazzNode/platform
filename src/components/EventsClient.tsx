@@ -196,7 +196,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                 selectedVenues.size === 0
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
               }`}
             >
               {labels.allVenues}
@@ -208,7 +208,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                   selectedVenues.has(venue.recordId)
                     ? 'bg-gold/10 border-gold/60 text-gold'
-                    : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                    : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
                 }`}
               >
                 {venue.label}
@@ -230,7 +230,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                 selectedCategory === key
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
               }`}
             >
               {label}
@@ -254,7 +254,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 <Link
                   key={event.id}
                   href={`/${locale}/events/${event.id}`}
-                  className="fade-up-item block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group"
+                  className="fade-up-item block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
                 >
                   <div className="text-xs uppercase tracking-widest text-gold mb-2">
                     {event.date_display} · {event.time_display}

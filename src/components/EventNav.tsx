@@ -31,11 +31,11 @@ export default function EventNav({ prevHref, prevTitle, nextHref, nextTitle, pre
   }, [prevHref, nextHref, router]);
 
   return (
-    <nav className="flex items-stretch gap-3 border-t border-[rgba(240,237,230,0.06)] pt-8">
+    <nav className="flex items-stretch gap-3 border-t border-[var(--border)] pt-8">
       {prevHref ? (
         <Link
           href={prevHref}
-          className="flex-1 group block bg-[#111111] p-4 sm:p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover text-left"
+          className="flex-1 group block bg-[var(--card)] p-4 sm:p-5 rounded-2xl border border-[var(--border)] card-hover text-left"
         >
           <span className="text-xs uppercase tracking-widest text-[#6A6560]">← {prevLabel}</span>
           <p className="font-serif text-sm sm:text-base font-bold mt-1 group-hover:text-gold transition-colors duration-300 line-clamp-2">
@@ -48,7 +48,7 @@ export default function EventNav({ prevHref, prevTitle, nextHref, nextTitle, pre
       {nextHref ? (
         <Link
           href={nextHref}
-          className="flex-1 group block bg-[#111111] p-4 sm:p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover text-right"
+          className="flex-1 group block bg-[var(--card)] p-4 sm:p-5 rounded-2xl border border-[var(--border)] card-hover text-right"
         >
           <span className="text-xs uppercase tracking-widest text-[#6A6560]">{nextLabel} →</span>
           <p className="font-serif text-sm sm:text-base font-bold mt-1 group-hover:text-gold transition-colors duration-300 line-clamp-2">

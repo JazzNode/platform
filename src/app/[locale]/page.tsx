@@ -39,7 +39,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </p>
 
           {/* Stats — clickable links to respective pages */}
-          <div className="hero-stats grid grid-cols-4 gap-6 sm:gap-8 border-t border-[rgba(240,237,230,0.06)] pt-10 mt-12">
+          <div className="hero-stats grid grid-cols-4 gap-6 sm:gap-8 border-t border-[var(--border)] pt-10 mt-12">
             <Link href={`/${locale}/cities`} className="hero-stat-item group cursor-pointer">
               <CountUp end={cities.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-gold group-hover:text-[#E8C868] transition-colors duration-300" />
               <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[#8A8578] group-hover:text-[#F0EDE6] transition-colors duration-300">{t('cities')}</p>
@@ -63,7 +63,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* ─── Upcoming Events ─── */}
       <section>
         <FadeUp>
-          <div className="flex items-end justify-between mb-12 border-b border-[rgba(240,237,230,0.06)] pb-6">
+          <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
             <h2 className="font-serif text-4xl sm:text-5xl font-bold">{t('upcomingEvents')}</h2>
             <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
               {t('viewAll')} →
@@ -81,7 +81,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 const venue = resolveLinks(event.fields.venue_id, venues)[0];
                 const artist = resolveLinks(event.fields.primary_artist, artists)[0];
                 return (
-                  <Link key={event.id} href={`/${locale}/events/${event.id}`} className="fade-up-item block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
+                  <Link key={event.id} href={`/${locale}/events/${event.id}`} className="fade-up-item block bg-[var(--card)] p-6 card-hover group border border-[var(--border)]">
                     <div className="text-xs uppercase tracking-widest text-gold mb-3">
                       {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                     </div>
@@ -108,7 +108,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* ─── Venues ─── */}
       <section>
         <FadeUp>
-          <div className="flex items-end justify-between mb-12 border-b border-[rgba(240,237,230,0.06)] pb-6">
+          <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
             <h2 className="font-serif text-4xl sm:text-5xl font-bold">{t('featuredVenues')}</h2>
             <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
               {t('viewAll')} →
@@ -118,7 +118,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <FadeUp stagger={0.15}>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((venue) => (
-              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[#111111] p-6 card-hover group border border-[rgba(240,237,230,0.06)]">
+              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[var(--card)] p-6 card-hover group border border-[var(--border)]">
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                   {displayName(venue.fields)}
                 </h3>

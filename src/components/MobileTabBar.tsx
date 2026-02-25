@@ -13,7 +13,7 @@ const tabs = [
 
 /** Minimal SVG icons — designed for JazzNode's aesthetic */
 function TabIcon({ tab, active }: { tab: string; active: boolean }) {
-  const stroke = active ? '#C8A84E' : '#6A6560';
+  const stroke = active ? 'var(--color-gold)' : 'var(--muted-foreground, #6A6560)';
   const props = { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke, strokeWidth: 1.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
   switch (tab) {
@@ -74,11 +74,13 @@ export default function MobileTabBar() {
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
       {/* Frosted glass bar */}
       <div
-        className="mx-3 mb-2 rounded-2xl border border-[rgba(240,237,230,0.08)] shadow-[0_-4px_30px_rgba(0,0,0,0.4)]"
+        className="mx-3 mb-2 rounded-2xl border border-[var(--border)] shadow-[0_-4px_30px_rgba(0,0,0,0.4)]"
         style={{
-          background: 'rgba(18, 18, 18, 0.72)',
+          background: 'color-mix(in srgb, var(--card) 72%, transparent)',
           backdropFilter: 'blur(24px) saturate(1.4)',
           WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+          borderColor: 'var(--border)',
+          transition: 'background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <div className="flex items-center justify-around py-2">
@@ -89,11 +91,8 @@ export default function MobileTabBar() {
               <Link
                 key={key}
                 href={href}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300 ${
-                  active
-                    ? 'bg-[rgba(200,168,78,0.12)]'
-                    : ''
-                }`}
+                className="flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-300"
+                style={active ? { background: `rgba(var(--theme-glow-rgb, 200, 168, 78), 0.12)` } : {}}
               >
                 <TabIcon tab={key} active={active} />
                 <span

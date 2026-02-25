@@ -115,7 +115,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
               selectedInstruments.size === 0
                 ? 'bg-gold/10 border-gold/60 text-gold'
-                : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
             }`}
           >
             {labels.allInstruments}
@@ -127,7 +127,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                 selectedInstruments.has(inst)
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
               }`}
             >
               {instLabel(inst)}
@@ -147,15 +147,15 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link
               href={`/${locale}/artists/${artist.id}`}
-              className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group h-full"
+              className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group h-full"
             >
               <div className="flex items-center gap-4 mb-3">
                 {artist.photoUrl ? (
-                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[rgba(240,237,230,0.08)]">
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[var(--border)]">
                     <img src={artist.photoUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 rounded-xl bg-[#1A1A1A] flex items-center justify-center text-xl shrink-0 border border-[rgba(240,237,230,0.08)]">♪</div>
+                  <div className="w-14 h-14 rounded-xl bg-[#1A1A1A] flex items-center justify-center text-xl shrink-0 border border-[var(--border)]">♪</div>
                 )}
                 <div>
                   <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">

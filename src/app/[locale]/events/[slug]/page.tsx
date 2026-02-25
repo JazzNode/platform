@@ -99,13 +99,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Price badge */}
           {(f.min_price != null || f.price_info) && (
-            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[rgba(240,237,230,0.08)] ml-4">
+            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[var(--border)] ml-4">
               {formatPriceBadge(f.currency, f.min_price, f.max_price, f.price_info)}
             </span>
           )}
 
           {/* ─── Event Details Block ─── */}
-          <div className="bg-[#111111] rounded-2xl p-5 border border-[rgba(240,237,230,0.06)] space-y-3 text-sm mt-4">
+          <div className="bg-[var(--card)] rounded-2xl p-5 border border-[var(--border)] space-y-3 text-sm mt-4">
             {/* City */}
             {venue && deriveCity(venue.fields.address_local || venue.fields.address_en) && (
               <div className="flex gap-3">
@@ -142,7 +142,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Description */}
           {(descShort || desc) && (
-            <div className="border-t border-[rgba(240,237,230,0.06)] pt-6">
+            <div className="border-t border-[var(--border)] pt-6">
               <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">
                 {descShort || desc}
               </p>
@@ -163,13 +163,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       {/* ─── Lineup ─── */}
       {lineupArtists.length > 0 && (
         <FadeUp>
-        <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+        <section className="border-t border-[var(--border)] pt-12">
           <h2 className="font-serif text-2xl font-bold mb-8">{t('lineup')}</h2>
           <div className="space-y-6">
             {lineupArtists.map(({ artist, instruments, role }) => {
               const bioShort = localized(artist.fields as Record<string, unknown>, 'bio_short', locale);
               return (
-                <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                   <div className="flex items-start gap-4">
                     <div className="flex-1">
                       <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300">
@@ -225,7 +225,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         if (sameCityEvents.length === 0) return null;
         return (
           <FadeUp>
-          <section className="border-t border-[rgba(240,237,230,0.06)] pt-12">
+          <section className="border-t border-[var(--border)] pt-12">
             <h2 className="font-serif text-2xl font-bold mb-8">
               {t('sameCityEvents')}
             </h2>
@@ -234,7 +234,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 const rtz = related.fields.timezone || 'Asia/Taipei';
                 const rVenue = resolveLinks(related.fields.venue_id, venues)[0];
                 return (
-                  <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[#111111] p-5 rounded-2xl border border-[rgba(240,237,230,0.06)] card-hover group">
+                  <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
                     </div>
