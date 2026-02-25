@@ -6,13 +6,15 @@ import { useTheme } from '@/components/ThemeProvider';
 import { themes, themeOrder, type Theme } from '@/lib/themes';
 
 function SoundWave() {
+  const { theme } = useTheme();
   return (
-    <div className="flex items-center gap-[2px] h-3">
+    <div className="flex items-center gap-[1.5px] h-2.5">
       {[0, 1, 2, 3, 4].map((i) => (
         <span
           key={i}
-          className="w-[2px] rounded-full bg-gold"
+          className="w-[1.5px] rounded-full"
           style={{
+            background: `linear-gradient(to top, ${theme.accent}, ${theme.accent2})`,
             animation: `soundwave 1.2s ease-in-out ${i * 0.15}s infinite`,
           }}
         />
@@ -52,11 +54,9 @@ function ThemePicker() {
                 boxShadow: active ? `0 0 12px ${t.accent}50, 0 0 0 2px var(--card), 0 0 0 4px ${t.accent}` : 'none',
               }}
             />
-            {/* Label below — always visible for active, hover for others */}
+            {/* Label below — hover only */}
             <span
-              className={`text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 ${
-                active ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'
-              }`}
+              className="text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70"
               style={{ color: t.accent }}
             >
               {label(t)}
