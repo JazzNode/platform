@@ -47,7 +47,8 @@
     "artistsInCity": "アーティスト",
     "exploreCityVenues": "会場を見る",
     "exploreCityEvents": "近日のイベント",
-    "noCities": "都市データがありません。"
+    "noCities": "都市データがありません。",
+    "noVenues": "会場が見つかりません"
   },
   "instruments": {
     "piano": "ピアノ",

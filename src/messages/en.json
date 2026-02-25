@@ -47,7 +47,8 @@
     "artistsInCity": "artists",
     "exploreCityVenues": "Explore Venues",
     "exploreCityEvents": "Upcoming Events",
-    "noCities": "No cities available."
+    "noCities": "No cities available.",
+    "noVenues": "No venues found"
   },
   "instruments": {
     "piano": "Piano",
