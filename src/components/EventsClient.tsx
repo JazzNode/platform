@@ -3,6 +3,7 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
+import FadeUpItem from '@/components/animations/FadeUpItem';
 import { useTheme } from '@/components/ThemeProvider';
 import { cityThemeMap } from '@/lib/themes';
 
@@ -174,6 +175,7 @@ export default function EventsClient({ events, cities, venues, instruments, inst
       {/* Filter Bar */}
       <div className="space-y-3">
         {/* City pills */}
+        <FadeUpItem delay={100}>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => { setSelectedCities(new Set()); setSelectedVenues(new Set()); }}
@@ -199,9 +201,11 @@ export default function EventsClient({ events, cities, venues, instruments, inst
             </button>
           ))}
         </div>
+        </FadeUpItem>
 
         {/* Venue pills — only show when there are venues to filter */}
         {visibleVenues.length > 1 && (
+          <FadeUpItem delay={180}>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setSelectedVenues(new Set())}
@@ -227,9 +231,11 @@ export default function EventsClient({ events, cities, venues, instruments, inst
               </button>
             ))}
           </div>
+          </FadeUpItem>
         )}
 
         {/* Tag pills: special categories + instruments */}
+        <FadeUpItem delay={260}>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedTags(new Set())}
@@ -273,6 +279,7 @@ export default function EventsClient({ events, cities, venues, instruments, inst
             </button>
           ))}
         </div>
+        </FadeUpItem>
       </div>
 
       {filteredEvents.length === 0 && (
