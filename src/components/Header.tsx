@@ -103,9 +103,18 @@ export default function Header() {
               className="flex flex-col justify-center items-center w-10 h-10 gap-1.5"
               aria-label="Toggle menu"
             >
-              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2 delay-150' : 'delay-0'}`} />
-              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-opacity duration-200 ${menuOpen ? 'opacity-0 delay-0' : 'opacity-100 delay-200'}`} />
-              <span className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2 delay-150' : 'delay-0'}`} />
+              <span
+                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}
+                style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-opacity duration-200 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}
+                style={{ transitionDelay: menuOpen ? '0ms' : '200ms' }}
+              />
+              <span
+                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}
+                style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}
+              />
             </button>
           </div>
         </div>
