@@ -72,7 +72,6 @@ export default function MobileTabBar() {
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight;
       const winHeight = window.innerHeight;
       const footer = document.getElementById('site-footer');
       const footerTop = footer ? footer.getBoundingClientRect().top : Infinity;
