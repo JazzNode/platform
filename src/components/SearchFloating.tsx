@@ -24,8 +24,6 @@ export default function SearchFloating() {
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
-  const triggerRef = useRef<HTMLDivElement>(null);
-  
   const locale = useLocale();
   const t = useTranslations('common');
 
@@ -43,13 +41,11 @@ export default function SearchFloating() {
       setIsFloating(shouldFloat);
     };
 
-    // iOS Keyboard positioning fix using VisualViewport
     const handleViewportChange = () => {
       if (!window.visualViewport) return;
       const vh = window.innerHeight;
       const vv = window.visualViewport.height;
       const offset = vh - vv;
-      // If the offset is significant, it's likely the keyboard
       setKeyboardHeight(offset > 50 ? offset : 0);
     };
 
@@ -81,24 +77,17 @@ export default function SearchFloating() {
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
-      // Lock scroll completely for iOS
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
     } else {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
+      document.body.style.overflow = '';
       setQuery('');
     }
+    return () => { document.body.style.overflow = ''; };
   }, [open]);
 
   return (
     <>
-      {/* 1. Static Search Bar... (Keep original) */}
+      {/* 1. Static Search Bar */}
       <div className="mx-auto max-w-xs mt-8 mb-12 md:hidden">
         <button 
           onClick={() => setOpen(true)}
@@ -111,7 +100,7 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* 2. Floating Trigger... (Keep original) */}
+      {/* 2. Floating Trigger */}
       <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 md:hidden ${
         isFloating && !open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
       }`}>
@@ -126,22 +115,22 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* 3. Search Overlay - The "Atmospheric" Safari Search */}
+      {/* 3. Search Overlay */}
       <div 
         className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-        style={{ transform: `translateY(-${keyboardHeight}px)` }}
+        style={{ 
+          bottom: `${keyboardHeight}px`,
+          height: keyboardHeight > 0 ? `calc(100% - ${keyboardHeight}px)` : '100%' 
+        }}
       >
-        {/* Background Gradient Fade-out (Center out from input) */}
         <div 
           className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/90 to-transparent transition-opacity duration-500" 
           onClick={() => setOpen(false)} 
         />
         
-        <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full max-h-screen overflow-hidden">
-          {/* Transparent Spacer */}
+        <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full overflow-hidden">
           <div className="flex-1" onClick={() => setOpen(false)} />
 
-          {/* Results List - Floats with subtle background */}
           <div className="w-full overflow-y-auto px-4 pb-4 custom-scrollbar max-h-[50vh]">
             {results.length > 0 ? (
               <div className="space-y-2">
@@ -172,9 +161,8 @@ export default function SearchFloating() {
             ) : null}
           </div>
 
-          {/* Bottom Search Input Bar */}
           <div 
-            className="p-4 bg-gradient-to-t from-[var(--background)] to-[var(--background)]/0"
+            className="p-4 bg-[var(--background)]"
             style={{ paddingBottom: keyboardHeight > 0 ? '1rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)' }}
           >
             <div className="relative group">
@@ -204,9 +192,6 @@ export default function SearchFloating() {
           </div>
         </div>
       </div>
-    </>
-  );
-}
     </>
   );
 }
