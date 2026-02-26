@@ -21,6 +21,7 @@ export default function SearchFloating() {
   const [results, setResults] = useState<SearchItem[]>([]);
   const [index, setIndex] = useState<SearchItem[]>([]);
   const [isFloating, setIsFloating] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   
   const inputRef = useRef<HTMLInputElement>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
@@ -35,18 +36,32 @@ export default function SearchFloating() {
       .then(data => setIndex(data));
 
     const handleScroll = () => {
-      // Logic: If we've scrolled past 400px (roughly stats section), enable floating
-      // But if we're near the bottom (footer), hide it.
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
       const shouldFloat = scrollY > 400 && (documentHeight - scrollY - windowHeight > 150);
       setIsFloating(shouldFloat);
     };
 
+    // iOS Keyboard positioning fix using VisualViewport
+    const handleViewportChange = () => {
+      if (!window.visualViewport) return;
+      const vh = window.innerHeight;
+      const vv = window.visualViewport.height;
+      const offset = vh - vv;
+      // If the offset is significant, it's likely the keyboard
+      setKeyboardHeight(offset > 50 ? offset : 0);
+    };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('scroll', handleViewportChange);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+    };
   }, []);
 
   const fuse = new Fuse(index, {
@@ -104,7 +119,10 @@ export default function SearchFloating() {
       </div>
 
       {/* Fullscreen Overlay - Safari Style (Bottom Focused) */}
-      <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div 
+        className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        style={{ transform: `translateY(-${keyboardHeight}px)` }}
+      >
         <div className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-3xl" onClick={() => setOpen(false)} />
         
         <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full max-h-screen overflow-hidden">
@@ -143,7 +161,10 @@ export default function SearchFloating() {
           </div>
 
           {/* Bottom Search Input Bar (Safari Position) - Fixed iOS Keyboard issues */}
-          <div className="p-4 pb-[env(safe-area-inset-bottom,1rem)] bg-gradient-to-t from-[var(--background)] via-[var(--background)] to-transparent">
+          <div 
+            className="p-4 bg-gradient-to-t from-[var(--background)] via-[var(--background)] to-transparent"
+            style={{ paddingBottom: keyboardHeight > 0 ? '1rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)' }}
+          >
             <div className="relative group">
               <div 
                 className="absolute -inset-[1.5px] rounded-full opacity-60 group-focus-within:opacity-100 transition-opacity blur-[0.5px]" 
