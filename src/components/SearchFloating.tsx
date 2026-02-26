@@ -27,7 +27,6 @@ export default function SearchFloating() {
   const locale = useLocale();
   const t = useTranslations('common');
 
-  // Load index and setup scroll listener
   useEffect(() => {
     fetch('/search-index.json')
       .then(res => res.json())
@@ -66,7 +65,6 @@ export default function SearchFloating() {
     threshold: 0.3,
   }), [index]);
 
-  // Handle Search Input directly (avoids useEffect setState warning)
   const handleQueryChange = (val: string) => {
     setQuery(val);
     if (val.length > 1) {
@@ -79,8 +77,11 @@ export default function SearchFloating() {
 
   const handleClose = () => {
     setOpen(false);
-    setQuery('');
-    setResults([]);
+    // Add small delay to clear results for smoother exit
+    setTimeout(() => {
+      setQuery('');
+      setResults([]);
+    }, 300);
   };
 
   useEffect(() => {
@@ -92,10 +93,6 @@ export default function SearchFloating() {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
     }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
   }, [open]);
 
   return (
@@ -128,23 +125,30 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* 3. Search Overlay */}
+      {/* 3. Search Overlay - Enhanced for Smoothness and Blur */}
       <div 
-        className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-300 ease-out ${
+          open ? 'opacity-100' : 'opacity-0 pointer-events-none translate-y-4'
+        }`}
         style={{ 
           bottom: `${keyboardHeight}px`,
           height: keyboardHeight > 0 ? `calc(100% - ${keyboardHeight}px)` : '100%' 
         }}
       >
+        {/* Full screen blur backdrop */}
         <div 
-          className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/90 to-transparent transition-opacity duration-500" 
+          className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-2xl transition-opacity duration-500" 
           onClick={handleClose} 
         />
         
         <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full overflow-hidden">
+          {/* Transparent Spacer - Clicking here also closes */}
           <div className="flex-1" onClick={handleClose} />
 
-          <div className="w-full overflow-y-auto px-4 pb-4 custom-scrollbar max-h-[50vh]">
+          {/* Results List */}
+          <div className={`w-full overflow-y-auto px-4 pb-4 custom-scrollbar transition-all duration-500 ${
+            open ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
+          }`} style={{ maxHeight: '60vh' }}>
             {results.length > 0 ? (
               <div className="space-y-2">
                 {results.map((item) => (
@@ -174,9 +178,17 @@ export default function SearchFloating() {
             ) : null}
           </div>
 
+          {/* Bottom Search Input Bar - The "Pill" */}
           <div 
-            className="p-4 bg-[var(--background)]"
-            style={{ paddingBottom: keyboardHeight > 0 ? '1rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)' }}
+            className="p-4"
+            onClick={(e) => {
+              // Bug fix: if clicking the container but not the pill, close it
+              if (e.target === e.currentTarget) handleClose();
+            }}
+            style={{ 
+              paddingBottom: keyboardHeight > 0 ? '0.75rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)',
+              backgroundColor: 'var(--background)' 
+            }}
           >
             <div className="relative group">
               <div 
@@ -195,13 +207,14 @@ export default function SearchFloating() {
                 />
                 <button 
                   onClick={handleClose}
-                  className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest"
+                  className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest active:text-gold"
                 >
                   {t('viewAll') === 'View All' ? 'Close' : '關閉'}
                 </button>
               </div>
             </div>
-            <div className="h-2 md:hidden" />
+            {/* iOS Bottom Gap Protection */}
+            <div className="h-1 md:hidden" />
           </div>
         </div>
       </div>
