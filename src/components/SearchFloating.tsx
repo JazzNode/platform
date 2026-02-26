@@ -21,7 +21,7 @@ export default function SearchFloating() {
   const [results, setResults] = useState<SearchItem[]>([]);
   const [index, setIndex] = useState<SearchItem[]>([]);
   const [isFloating, setIsFloating] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [viewportStyle, setViewportStyle] = useState<React.CSSProperties>({ display: 'none' });
   
   const inputRef = useRef<HTMLInputElement>(null);
   const locale = useLocale();
@@ -41,24 +41,40 @@ export default function SearchFloating() {
       setIsFloating(shouldFloat);
     };
 
-    const handleViewportChange = () => {
+    const updateViewport = () => {
       if (!window.visualViewport) return;
-      const vh = window.innerHeight;
-      const vv = window.visualViewport.height;
-      const offset = vh - vv;
-      setKeyboardHeight(offset > 50 ? offset : 0);
+      const { height, offsetTop, width, scale } = window.visualViewport;
+      
+      // We use absolute positioning within a fixed container that follows the visual viewport
+      setViewportStyle({
+        position: 'fixed',
+        left: 0,
+        top: offsetTop,
+        width: width,
+        height: height,
+        display: open ? 'flex' : 'none',
+        flexDirection: 'column',
+        justifyContent: 'end',
+        zIndex: 60,
+        overflow: 'hidden',
+        transition: 'opacity 0.3s ease-out',
+        opacity: open ? 1 : 0,
+        pointerEvents: open ? 'auto' : 'none',
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    window.visualViewport?.addEventListener('resize', handleViewportChange);
-    window.visualViewport?.addEventListener('scroll', handleViewportChange);
+    window.visualViewport?.addEventListener('resize', updateViewport);
+    window.visualViewport?.addEventListener('scroll', updateViewport);
+
+    if (open) updateViewport();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.visualViewport?.removeEventListener('resize', handleViewportChange);
-      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      window.visualViewport?.removeEventListener('resize', updateViewport);
+      window.visualViewport?.removeEventListener('scroll', updateViewport);
     };
-  }, []);
+  }, [open]);
 
   const fuse = useMemo(() => new Fuse(index, {
     keys: ['keys', 'title'],
@@ -77,7 +93,6 @@ export default function SearchFloating() {
 
   const handleClose = () => {
     setOpen(false);
-    // Add small delay to clear results for smoother exit
     setTimeout(() => {
       setQuery('');
       setResults([]);
@@ -125,31 +140,22 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* 3. Search Overlay - Enhanced for Smoothness and Blur */}
-      <div 
-        className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-300 ease-out ${
-          open ? 'opacity-100' : 'opacity-0 pointer-events-none translate-y-4'
-        }`}
-        style={{ 
-          bottom: `${keyboardHeight}px`,
-          height: keyboardHeight > 0 ? `calc(100% - ${keyboardHeight}px)` : '100%' 
-        }}
-      >
+      {/* 3. Search Overlay - Anchored to Visual Viewport */}
+      <div style={viewportStyle}>
         {/* Full screen blur backdrop */}
         <div 
-          className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-2xl transition-opacity duration-500" 
+          className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-2xl" 
           onClick={handleClose} 
         />
         
         <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full overflow-hidden">
-          {/* Transparent Spacer - Clicking here also closes */}
           <div className="flex-1" onClick={handleClose} />
 
           {/* Results List */}
-          <div className={`w-full overflow-y-auto px-4 pb-2 custom-scrollbar transition-all duration-500 ${
-            open ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
-          }`} style={{ maxHeight: '60vh' }}>
-            {results.length > 0 ? (
+          <div className={`w-full overflow-y-auto px-4 pb-2 custom-scrollbar transition-all duration-300 ${
+            open ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+          }`} style={{ maxHeight: '60%' }}>
+            {results.length > 0 && (
               <div className="space-y-2">
                 {results.map((item) => (
                   <Link
@@ -171,22 +177,13 @@ export default function SearchFloating() {
                   </Link>
                 ))}
               </div>
-            ) : query.length > 1 ? (
-              <div className="text-center py-10 bg-[var(--card)]/40 backdrop-blur-md rounded-2xl border border-[var(--border)] mx-4">
-                <p className="text-[var(--muted-foreground)] font-serif italic text-sm">Searching the coordinates...</p>
-              </div>
-            ) : null}
+            )}
           </div>
 
-          {/* Bottom Search Input Bar - Transparent and Integrated */}
+          {/* Bottom Search Input Bar - Truly pinned to bottom */}
           <div 
-            className="p-4 relative z-10"
-            onClick={(e) => {
-              if (e.target === e.currentTarget) handleClose();
-            }}
-            style={{ 
-              paddingBottom: keyboardHeight > 0 ? '0.75rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)'
-            }}
+            className="p-4 relative"
+            style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 1rem) + 0.5rem)' }}
           >
             <div className="relative group">
               <div 
@@ -211,8 +208,6 @@ export default function SearchFloating() {
                 </button>
               </div>
             </div>
-            {/* iOS Bottom Gap Protection */}
-            <div className="h-1 md:hidden" />
           </div>
         </div>
       </div>
