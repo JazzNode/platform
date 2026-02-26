@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSearch } from './SearchProvider';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日' };
 const localeList = ['en', 'zh', 'ja'] as const;
@@ -13,6 +14,7 @@ export default function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const { open: openSearch } = useSearch();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -64,6 +66,18 @@ export default function Header() {
               {t('artists')}
             </Link>
 
+            {/* Search */}
+            <button
+              onClick={openSearch}
+              className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)] group"
+              aria-label="Search"
+            >
+              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </button>
+
             <div className="flex items-center gap-1 ml-6 border-l border-[var(--border)] pl-6">
               {localeList.map((l) => (
                 <button
@@ -81,8 +95,18 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile: locale switcher + hamburger */}
+          {/* Mobile: search + locale switcher + hamburger */}
           <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={openSearch}
+              className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5"
+              aria-label="Search"
+            >
+              <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </button>
             <div className="flex items-center gap-0.5">
               {localeList.map((l) => (
                 <button
