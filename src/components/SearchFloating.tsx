@@ -81,16 +81,24 @@ export default function SearchFloating() {
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
-      document.body.style.overflow = 'hidden';
+      // Lock scroll completely for iOS
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
     } else {
-      document.body.style.overflow = '';
+      const scrollY = document.body.style.top;
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * -1);
       setQuery('');
     }
   }, [open]);
 
   return (
     <>
-      {/* 1. Static Search Bar (Only shown on top of pages, before scroll) */}
+      {/* 1. Static Search Bar... (Keep original) */}
       <div className="mx-auto max-w-xs mt-8 mb-12 md:hidden">
         <button 
           onClick={() => setOpen(true)}
@@ -103,7 +111,7 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* 2. Floating Trigger - Shown when scrolled past threshold, hidden at footer */}
+      {/* 2. Floating Trigger... (Keep original) */}
       <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 md:hidden ${
         isFloating && !open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
       }`}>
@@ -118,19 +126,23 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* Fullscreen Overlay - Safari Style (Bottom Focused) */}
+      {/* 3. Search Overlay - The "Atmospheric" Safari Search */}
       <div 
         className={`fixed inset-0 z-[60] flex flex-col justify-end transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         style={{ transform: `translateY(-${keyboardHeight}px)` }}
       >
-        <div className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-3xl" onClick={() => setOpen(false)} />
+        {/* Background Gradient Fade-out (Center out from input) */}
+        <div 
+          className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/90 to-transparent transition-opacity duration-500" 
+          onClick={() => setOpen(false)} 
+        />
         
         <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full max-h-screen overflow-hidden">
-          {/* Spacer to push content down */}
+          {/* Transparent Spacer */}
           <div className="flex-1" onClick={() => setOpen(false)} />
 
-          {/* Results List - Floats above the input */}
-          <div className="w-full overflow-y-auto px-4 pb-2 custom-scrollbar max-h-[60vh]">
+          {/* Results List - Floats with subtle background */}
+          <div className="w-full overflow-y-auto px-4 pb-4 custom-scrollbar max-h-[50vh]">
             {results.length > 0 ? (
               <div className="space-y-2">
                 {results.map((item) => (
@@ -138,10 +150,10 @@ export default function SearchFloating() {
                     key={`${item.type}-${item.id}`}
                     href={`/${locale}/${item.type}s/${item.id}`}
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between p-4 rounded-2xl bg-[var(--card)]/60 border border-[var(--border)] transition-all active:scale-[0.98]"
+                    className="flex items-center justify-between p-4 rounded-2xl bg-[var(--card)]/80 backdrop-blur-md border border-[var(--border)] transition-all active:scale-[0.98]"
                   >
                     <div>
-                      <div className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-gold)] mb-1 opacity-60">
+                      <div className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-gold)] mb-1">
                         {item.type}
                       </div>
                       <div className="font-serif text-base">{item.title}</div>
@@ -154,15 +166,15 @@ export default function SearchFloating() {
                 ))}
               </div>
             ) : query.length > 1 ? (
-              <div className="text-center py-10 text-[var(--muted-foreground)] font-serif italic text-sm opacity-40">
-                Searching the coordinates...
+              <div className="text-center py-10 bg-[var(--card)]/40 backdrop-blur-md rounded-2xl border border-[var(--border)] mx-4">
+                <p className="text-[var(--muted-foreground)] font-serif italic text-sm">Searching the coordinates...</p>
               </div>
             ) : null}
           </div>
 
-          {/* Bottom Search Input Bar (Safari Position) - Fixed iOS Keyboard issues */}
+          {/* Bottom Search Input Bar */}
           <div 
-            className="p-4 bg-gradient-to-t from-[var(--background)] via-[var(--background)] to-transparent"
+            className="p-4 bg-gradient-to-t from-[var(--background)] to-[var(--background)]/0"
             style={{ paddingBottom: keyboardHeight > 0 ? '1rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)' }}
           >
             <div className="relative group">
@@ -188,11 +200,13 @@ export default function SearchFloating() {
                 </button>
               </div>
             </div>
-            {/* Extra spacer for iOS keyboard context */}
             <div className="h-2 md:hidden" />
           </div>
         </div>
       </div>
+    </>
+  );
+}
     </>
   );
 }
