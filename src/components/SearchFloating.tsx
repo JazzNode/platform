@@ -108,22 +108,28 @@ export default function SearchFloating() {
         <div className="absolute inset-0 bg-[var(--background)]/90 backdrop-blur-3xl" onClick={() => setOpen(false)} />
         
         <div className="relative max-w-2xl mx-auto pt-20 px-4 h-full flex flex-col">
-          {/* Safari Style Search Input */}
-          <div className="relative">
-            <input
-              ref={inputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t('search')}
-              className="w-full h-14 bg-[var(--card)] border-b-2 border-[var(--color-gold)] text-xl px-4 outline-none font-serif"
+          {/* Safari Style Search Input - Enhanced with Pill shape and Theme Gradient */}
+          <div className="relative group">
+            <div 
+              className="absolute -inset-[1.5px] rounded-full opacity-60 group-focus-within:opacity-100 transition-opacity blur-[0.5px]" 
+              style={{ background: `linear-gradient(to right, var(--color-gold), var(--color-gold-bright), var(--border))` }} 
             />
-            <button 
-              onClick={() => setOpen(false)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest hover:text-[var(--foreground)]"
-            >
-              ESC
-            </button>
+            <div className="relative flex items-center bg-[var(--background)] rounded-full overflow-hidden border border-white/5">
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={t('search')}
+                className="w-full h-12 bg-transparent text-lg px-6 outline-none font-serif text-[var(--foreground)]"
+              />
+              <button 
+                onClick={() => setOpen(false)}
+                className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest hover:text-[var(--foreground)]"
+              >
+                ESC
+              </button>
+            </div>
           </div>
 
           {/* Results List */}
