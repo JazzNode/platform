@@ -72,6 +72,7 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved && themes[saved]) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setThemeId(saved);
         applyTheme(themes[saved]);
       } else {

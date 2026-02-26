@@ -41,6 +41,7 @@ export default function SearchOverlay() {
   // Reset on open
   useEffect(() => {
     if (isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setQuery('');
       setFilter('all');
       setActiveIndex(-1);
@@ -107,21 +108,7 @@ export default function SearchOverlay() {
     return results.slice(0, 20);
   }, [grouped, results]);
 
-  // Keyboard navigation
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, flatResults.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setActiveIndex((i) => Math.max(i - 1, -1));
-    } else if (e.key === 'Enter' && activeIndex >= 0 && flatResults[activeIndex]) {
-      e.preventDefault();
-      navigateTo(flatResults[activeIndex]);
-    }
-  }, [flatResults, activeIndex]);
-
-  function navigateTo(result: SearchResult) {
+  const navigateTo = useCallback((result: SearchResult) => {
     const base = `/${locale}`;
     switch (result.type) {
       case 'event':
@@ -138,7 +125,21 @@ export default function SearchOverlay() {
         break;
     }
     close();
-  }
+  }, [locale, router, close]);
+
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, flatResults.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, -1));
+    } else if (e.key === 'Enter' && activeIndex >= 0 && flatResults[activeIndex]) {
+      e.preventDefault();
+      navigateTo(flatResults[activeIndex]);
+    }
+  }, [flatResults, activeIndex, navigateTo]);
 
   function renderResult(result: SearchResult, index: number) {
     const isActive = index === activeIndex;
