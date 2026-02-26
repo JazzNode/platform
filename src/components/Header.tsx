@@ -100,21 +100,26 @@ export default function Header() {
             </div>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="flex flex-col justify-center items-center w-10 h-10 gap-1.5"
+              className="relative w-10 h-10 flex flex-col items-center justify-center group"
               aria-label="Toggle menu"
             >
-              <span
-                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? 'rotate-45 translate-y-2' : ''}`}
-                style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}
-              />
-              <span
-                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-opacity duration-200 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}
-                style={{ transitionDelay: menuOpen ? '0ms' : '200ms' }}
-              />
-              <span
-                className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 ${menuOpen ? '-rotate-45 -translate-y-2' : ''}`}
-                style={{ transitionDelay: menuOpen ? '150ms' : '0ms' }}
-              />
+              <div className="relative w-5 h-4 flex flex-col justify-between items-center overflow-hidden">
+                <span
+                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 transform origin-center ${
+                    menuOpen ? 'rotate-45 translate-y-[7px]' : 'translate-y-0'
+                  }`}
+                />
+                <span
+                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-200 ${
+                    menuOpen ? 'opacity-0 -translate-x-full' : 'opacity-100'
+                  }`}
+                />
+                <span
+                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 transform origin-center ${
+                    menuOpen ? '-rotate-45 -translate-y-[7px]' : 'translate-y-0'
+                  }`}
+                />
+              </div>
             </button>
           </div>
         </div>
