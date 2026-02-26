@@ -45,34 +45,34 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link href={`/${locale}`} className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-gold link-lift">
+          <Link href={`/${locale}`} className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-gold)] group-hover:text-[var(--color-gold-bright)] transition-colors link-lift">
             JazzNode
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-8">
-            <Link href={`/${locale}/cities`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+            <Link href={`/${locale}/cities`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
               {t('cities')}
             </Link>
-            <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+            <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
               {t('venues')}
             </Link>
-            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
               {t('events')}
             </Link>
-            <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[#8A8578] hover:text-[#F0EDE6] transition-colors duration-300 link-lift">
+            <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
               {t('artists')}
             </Link>
 
-            <div className="flex items-center gap-1 ml-6 border-l border-[rgba(240,237,230,0.1)] pl-6">
+            <div className="flex items-center gap-1 ml-6 border-l border-[var(--border)] pl-6">
               {localeList.map((l) => (
                 <button
                   key={l}
                   onClick={() => switchLocale(l)}
                   className={`px-2.5 py-1 text-xs tracking-wider rounded-lg transition-all duration-300 ${
                     locale === l
-                      ? 'bg-gold text-[#0A0A0A] font-bold'
-                      : 'text-[#8A8578] hover:text-[#F0EDE6]'
+                      ? 'bg-[var(--color-gold)] text-[var(--background)] font-bold'
+                      : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                   }`}
                 >
                   {localeLabels[l]}
@@ -90,8 +90,8 @@ export default function Header() {
                   onClick={() => switchLocale(l)}
                   className={`px-2 py-1 text-xs tracking-wider rounded-lg transition-all duration-300 ${
                     locale === l
-                      ? 'bg-gold text-[#0A0A0A] font-bold'
-                      : 'text-[#8A8578] hover:text-[#F0EDE6]'
+                      ? 'bg-[var(--color-gold)] text-[var(--background)] font-bold'
+                      : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                   }`}
                 >
                   {localeLabels[l]}
@@ -105,17 +105,17 @@ export default function Header() {
             >
               <div className="relative w-5 h-4 flex flex-col justify-between items-center overflow-hidden">
                 <span
-                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 transform origin-center ${
+                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-300 transform origin-center ${
                     menuOpen ? 'rotate-45 translate-y-[7px]' : 'translate-y-0'
                   }`}
                 />
                 <span
-                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-200 ${
+                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-200 ${
                     menuOpen ? 'opacity-0 -translate-x-full' : 'opacity-100'
                   }`}
                 />
                 <span
-                  className={`block w-5 h-0.5 bg-[#F0EDE6] transition-all duration-300 transform origin-center ${
+                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-300 transform origin-center ${
                     menuOpen ? '-rotate-45 -translate-y-[7px]' : 'translate-y-0'
                   }`}
                 />
