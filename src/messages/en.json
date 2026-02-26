@@ -1,14 +1,14 @@
 {
   "common": {
     "siteName": "JazzNode",
-    "tagline": "The Jazz Scene, Connected.",
+    "tagline": "Mapping the Global Jazz Pulse.",
     "venues": "Venues",
     "artists": "Artists",
     "cities": "Cities",
     "events": "Events",
     "search": "Search...",
     "viewAll": "View All",
-    "upcomingEvents": "Upcoming Events",
+    "upcomingEvents": "Live Now & Next",
     "featuredVenues": "Featured Venues",
     "noEvents": "No upcoming events.",
     "topPerformers": "Frequent Performers",
@@ -33,7 +33,7 @@
     "eventCity": "City",
     "eventDate": "Date",
     "eventTime": "Time",
-    "eventVenue": "Jazz Venue",
+    "eventVenue": "Venue",
     "eventAddress": "Address",
     "prevEvent": "Previous",
     "nextEvent": "Next",
@@ -46,9 +46,13 @@
     "eventsInCity": "events",
     "artistsInCity": "artists",
     "exploreCityVenues": "Explore Venues",
-    "exploreCityEvents": "Upcoming Events",
+    "exploreCityEvents": "Explore Events",
     "noCities": "No cities available.",
-    "noVenues": "No venues found"
+    "noVenues": "No venues found",
+    "contact": "Contact",
+    "contactUs": "Contact Us",
+    "contactEmail": "hello@jazznode.com",
+    "manifesto": "Mapping the city's heartbeat, one note at a time."
   },
   "instruments": {
     "piano": "Piano",

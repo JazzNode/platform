@@ -175,7 +175,31 @@ export interface Lineup {
 }
 
 export const getCities = cache(async () => {
-  return fetchTable<City>(TABLE_IDS.Cities);
+  const cities = await fetchTable<City>(TABLE_IDS.Cities);
+  
+  // Custom sorting to emphasize international scope and hide identity
+  // 1. Tokyo (jp-tyo) / Hong Kong (hk-hkg) / Singapore (sg-sin) first
+  // 2. Taipei (tw-tpe) in the middle
+  // 3. Others alphabetical
+  const PRIORITY: Record<string, number> = {
+    'jp-tyo': 100,
+    'hk-hkg': 90,
+    'sg-sin': 80,
+    'th-bkk': 70, // Bangkok
+    'my-kul': 60, // Kuala Lumpur
+    'id-jkp': 50, // Jakarta
+    'tw-tpe': 40, // Taipei (moved from top)
+    'tw-tnn': 30, // Tainan
+    'tw-khh': 20, // Kaohsiung
+    'tw-txg': 10, // Taichung
+  };
+
+  return cities.sort((a, b) => {
+    const scoreA = PRIORITY[a.fields.city_id || ''] || 0;
+    const scoreB = PRIORITY[b.fields.city_id || ''] || 0;
+    if (scoreA !== scoreB) return scoreB - scoreA;
+    return (a.fields.name_en || '').localeCompare(b.fields.name_en || '');
+  });
 });
 
 export interface Tag {

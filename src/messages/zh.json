@@ -1,14 +1,14 @@
 {
   "common": {
     "siteName": "JazzNode",
-    "tagline": "爵士場景，盡在連結。",
+    "tagline": "城市在跳動，而我們記錄它的心跳。",
     "venues": "場地",
     "artists": "藝人",
     "cities": "城市",
     "events": "活動",
     "search": "搜尋...",
     "viewAll": "查看全部",
-    "upcomingEvents": "近期活動",
+    "upcomingEvents": "此刻與即將",
     "featuredVenues": "精選場地",
     "noEvents": "目前沒有近期活動。",
     "topPerformers": "常駐樂手",
@@ -48,7 +48,11 @@
     "exploreCityVenues": "探索場地",
     "exploreCityEvents": "近期活動",
     "noCities": "目前沒有城市資料。",
-    "noVenues": "找不到場地"
+    "noVenues": "找不到場地",
+    "contact": "聯繫我們",
+    "contactUs": "聯繫我們",
+    "contactEmail": "hello@jazznode.com",
+    "manifesto": "記錄城市的脈動，每個音符都是座標。"
   },
   "instruments": {
     "piano": "鋼琴",

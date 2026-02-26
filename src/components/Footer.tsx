@@ -87,7 +87,7 @@ export default function Footer() {
           <Link href={`/${locale}`} className="group block text-center">
             <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode</p>
             <p className="mt-1 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
-              The Jazz Scene, Connected.
+              {t('tagline')}
             </p>
           </Link>
 
@@ -104,6 +104,13 @@ export default function Footer() {
                 </Link>
               </span>
             ))}
+            <span className="text-[var(--muted-foreground)] opacity-30">·</span>
+            <a
+              href={`mailto:${t('contactEmail')}`}
+              className="text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
+            >
+              {t('contact')}
+            </a>
           </nav>
 
           {/* Theme picker — aligned under nav */}
