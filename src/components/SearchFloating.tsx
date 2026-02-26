@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import Fuse from 'fuse.js';
@@ -31,7 +31,8 @@ export default function SearchFloating() {
   useEffect(() => {
     fetch('/search-index.json')
       .then(res => res.json())
-      .then(data => setIndex(data));
+      .then(data => setIndex(data))
+      .catch(() => console.error('Failed to load search index'));
 
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -60,29 +61,41 @@ export default function SearchFloating() {
     };
   }, []);
 
-  const fuse = new Fuse(index, {
+  const fuse = useMemo(() => new Fuse(index, {
     keys: ['keys', 'title'],
     threshold: 0.3,
-  });
+  }), [index]);
 
-  useEffect(() => {
-    if (query.length > 1) {
-      const r = fuse.search(query).map(res => res.item);
+  // Handle Search Input directly (avoids useEffect setState warning)
+  const handleQueryChange = (val: string) => {
+    setQuery(val);
+    if (val.length > 1) {
+      const r = fuse.search(val).map(res => res.item);
       setResults(r.slice(0, 8));
     } else {
       setResults([]);
     }
-  }, [query]);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setQuery('');
+    setResults([]);
+  };
 
   useEffect(() => {
     if (open) {
       inputRef.current?.focus();
       document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
     } else {
       document.body.style.overflow = '';
-      setQuery('');
+      document.body.style.touchAction = '';
     }
-    return () => { document.body.style.overflow = ''; };
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
   }, [open]);
 
   return (
@@ -125,11 +138,11 @@ export default function SearchFloating() {
       >
         <div 
           className="absolute inset-0 bg-gradient-to-t from-[var(--background)] via-[var(--background)]/90 to-transparent transition-opacity duration-500" 
-          onClick={() => setOpen(false)} 
+          onClick={handleClose} 
         />
         
         <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full overflow-hidden">
-          <div className="flex-1" onClick={() => setOpen(false)} />
+          <div className="flex-1" onClick={handleClose} />
 
           <div className="w-full overflow-y-auto px-4 pb-4 custom-scrollbar max-h-[50vh]">
             {results.length > 0 ? (
@@ -138,7 +151,7 @@ export default function SearchFloating() {
                   <Link
                     key={`${item.type}-${item.id}`}
                     href={`/${locale}/${item.type}s/${item.id}`}
-                    onClick={() => setOpen(false)}
+                    onClick={handleClose}
                     className="flex items-center justify-between p-4 rounded-2xl bg-[var(--card)]/80 backdrop-blur-md border border-[var(--border)] transition-all active:scale-[0.98]"
                   >
                     <div>
@@ -175,13 +188,13 @@ export default function SearchFloating() {
                   ref={inputRef}
                   type="text"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => handleQueryChange(e.target.value)}
                   placeholder={t('search')}
                   className="w-full h-12 bg-transparent text-lg px-6 outline-none font-serif text-[var(--foreground)]"
                   enterKeyHint="search"
                 />
                 <button 
-                  onClick={() => setOpen(false)}
+                  onClick={handleClose}
                   className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest"
                 >
                   {t('viewAll') === 'View All' ? 'Close' : '關閉'}

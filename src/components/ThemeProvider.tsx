@@ -1,3 +1,4 @@
+
 'use client';
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
@@ -22,6 +23,7 @@ export function useTheme() {
 }
 
 function applyTheme(theme: Theme) {
+  if (typeof document === 'undefined') return;
   const root = document.documentElement;
 
   // Backgrounds
@@ -72,10 +74,12 @@ export default function ThemeProvider({ children }: { children: React.ReactNode 
       if (saved && themes[saved]) {
         setThemeId(saved);
         applyTheme(themes[saved]);
-        return;
+      } else {
+        applyTheme(theme);
       }
-    } catch {}
-    applyTheme(theme);
+    } catch {
+      applyTheme(theme);
+    }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
