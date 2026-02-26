@@ -3,6 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
 import FadeUp from '@/components/animations/FadeUp';
+import { cityThemeMap, themes } from '@/lib/themes';
 
 export async function generateMetadata() {
   const t = await getTranslations('common');
@@ -36,7 +37,9 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     };
   });
 
-  cityStats.sort((a, b) => b.venueCount - a.venueCount || b.upcomingCount - a.upcomingCount);
+  // Preserve the order from getCities() (which has international priority)
+  const cityOrder = new Map(cities.map((c, i) => [c.id, i]));
+  cityStats.sort((a, b) => (cityOrder.get(a.city.id) ?? 0) - (cityOrder.get(b.city.id) ?? 0));
 
   const cityName = (fields: { name_local?: string; name_en?: string }, loc: string) =>
     loc === 'en' ? (fields.name_en || fields.name_local || '?') : (fields.name_local || fields.name_en || '?');
@@ -57,12 +60,22 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
           {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues }) => {
             const f = city.fields;
             const name = cityName(f, locale);
+            const themeId = cityThemeMap[f.city_id || ''];
+            const theme = themeId ? (themes[themeId] || themes['midnight-gold']) : null;
 
             return (
               <div
                 key={city.id}
                 className="fade-up-item relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
               >
+                {/* Theme Accent Bar */}
+                {theme && (
+                  <div 
+                    className="absolute top-0 left-0 w-full h-1 opacity-60"
+                    style={{ background: `linear-gradient(to right, ${theme.accent}, ${theme.accent2})` }}
+                  />
+                )}
+
                 {/* City name */}
                 <div className="mb-5">
                   <h2 className="font-serif text-2xl sm:text-3xl font-bold">
@@ -73,13 +86,13 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                 {/* Stats row */}
                 <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[var(--muted-foreground)] mb-6">
                   <span>
-                    <span className="font-bold text-gold">{venueCount}</span> {t('venuesInCity')}
+                    <span className="font-bold" style={{ color: theme?.accent || 'var(--color-gold)' }}>{venueCount}</span> {t('venuesInCity')}
                   </span>
                   <span>
-                    <span className="font-bold text-gold">{upcomingCount}</span> {t('eventsInCity')}
+                    <span className="font-bold" style={{ color: theme?.accent2 || 'var(--color-gold)' }}>{upcomingCount}</span> {t('eventsInCity')}
                   </span>
                   <span>
-                    <span className="font-bold text-gold">{artistCount}</span> {t('artistsInCity')}
+                    <span className="font-bold" style={{ color: theme?.accent || 'var(--color-gold)' }}>{artistCount}</span> {t('artistsInCity')}
                   </span>
                 </div>
 

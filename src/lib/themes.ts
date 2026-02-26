@@ -102,13 +102,77 @@ export const themes: Record<string, Theme> = {
     glowRgb: '129, 140, 248',
     glow2Rgb: '244, 114, 182',
   },
+  'orchid-gold': {
+    id: 'orchid-gold',
+    label: 'Orchid Gold',
+    label_zh: '蘭花金',
+    label_ja: 'オーキッドゴールド',
+    emoji: '🌸',
+    bg: '#140612',
+    card: '#1F0C1C',
+    accent: '#E879F9',
+    accentDim: '#D946EF',
+    accentBright: '#F5D0FE',
+    accent2: '#C8A84E',
+    text: '#F5E8F4',
+    muted: '#A0789E',
+    border: 'rgba(232, 121, 249, 0.08)',
+    glowRgb: '232, 121, 249',
+    glow2Rgb: '200, 168, 78',
+  },
+  'equator-sunset': {
+    id: 'equator-sunset',
+    label: 'Equator Sunset',
+    label_zh: '赤道夕陽',
+    label_ja: 'エキエーターサンセット',
+    emoji: '☀️',
+    bg: '#0F0B06',
+    card: '#1A130C',
+    accent: '#FB923C',
+    accentDim: '#F97316',
+    accentBright: '#FDBA74',
+    accent2: '#4ADE80',
+    text: '#F5F0E8',
+    muted: '#A08E78',
+    border: 'rgba(251, 146, 60, 0.08)',
+    glowRgb: '251, 146, 60',
+    glow2Rgb: '74, 222, 128',
+  },
+  'jakarta-ground': {
+    id: 'jakarta-ground',
+    label: 'Jakarta Ground',
+    label_zh: '雅加達大地',
+    label_ja: 'ジャカルタグラウンド',
+    emoji: '🪵',
+    bg: '#0F0906',
+    card: '#1A120C',
+    accent: '#D4D4D4',
+    accentDim: '#A3A3A3',
+    accentBright: '#F5F5F5',
+    accent2: '#10B981',
+    text: '#F5EFE8',
+    muted: '#A08B78',
+    border: 'rgba(212, 212, 212, 0.08)',
+    glowRgb: '212, 212, 212',
+    glow2Rgb: '16, 185, 129',
+  },
 };
 
 // Default theme
 export const DEFAULT_THEME = 'midnight-gold';
 
 // Ordered list for the picker
-export const themeOrder = ['midnight-gold', 'jade-mist', 'neon-noir', 'indigo-rain'];
+export const themeOrder = ['midnight-gold', 'jade-mist', 'neon-noir', 'indigo-rain', 'orchid-gold', 'equator-sunset', 'jakarta-ground'];
+
+// City to Theme Mapping
+export const cityThemeMap: Record<string, string> = {
+  'hk-hkg': 'neon-noir',
+  'tw-tpe': 'jade-mist',
+  'jp-tyo': 'indigo-rain',
+  'sg-sin': 'orchid-gold',
+  'my-kul': 'equator-sunset',
+  'id-jkp': 'jakarta-ground',
+};
 
 export function getThemeById(id: string): Theme {
   return themes[id] || themes[DEFAULT_THEME];
