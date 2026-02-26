@@ -103,37 +103,13 @@ export default function SearchFloating() {
         </button>
       </div>
 
-      {/* Fullscreen Overlay */}
-      <div className={`fixed inset-0 z-[60] transition-all duration-500 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <div className="absolute inset-0 bg-[var(--background)]/90 backdrop-blur-3xl" onClick={() => setOpen(false)} />
+      {/* Fullscreen Overlay - Safari Style (Bottom Focused) */}
+      <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-500 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <div className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-3xl" onClick={() => setOpen(false)} />
         
-        <div className="relative max-w-2xl mx-auto pt-20 px-4 h-full flex flex-col">
-          {/* Safari Style Search Input - Enhanced with Pill shape and Theme Gradient */}
-          <div className="relative group">
-            <div 
-              className="absolute -inset-[1.5px] rounded-full opacity-60 group-focus-within:opacity-100 transition-opacity blur-[0.5px]" 
-              style={{ background: `linear-gradient(to right, var(--color-gold), var(--color-gold-bright), var(--border))` }} 
-            />
-            <div className="relative flex items-center bg-[var(--background)] rounded-full overflow-hidden border border-white/5">
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t('search')}
-                className="w-full h-12 bg-transparent text-lg px-6 outline-none font-serif text-[var(--foreground)]"
-              />
-              <button 
-                onClick={() => setOpen(false)}
-                className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest hover:text-[var(--foreground)]"
-              >
-                ESC
-              </button>
-            </div>
-          </div>
-
-          {/* Results List */}
-          <div className="mt-8 flex-1 overflow-y-auto pb-20 custom-scrollbar">
+        <div className="relative w-full max-w-2xl mx-auto flex flex-col max-h-[90vh]">
+          {/* Results List - Floats above the input */}
+          <div className="flex-1 overflow-y-auto px-4 pb-4 custom-scrollbar">
             {results.length > 0 ? (
               <div className="space-y-2">
                 {results.map((item) => (
@@ -141,28 +117,52 @@ export default function SearchFloating() {
                     key={`${item.type}-${item.id}`}
                     href={`/${locale}/${item.type}s/${item.id}`}
                     onClick={() => setOpen(false)}
-                    className="flex items-center justify-between p-4 rounded-xl bg-[var(--card)]/40 hover:bg-[var(--card)] border border-transparent hover:border-[var(--border)] transition-all group"
+                    className="flex items-center justify-between p-4 rounded-2xl bg-[var(--card)]/60 border border-[var(--border)] transition-all active:scale-[0.98]"
                   >
                     <div>
-                      <div className="text-[10px] uppercase tracking-[0.2em] text-[var(--color-gold)] mb-1 opacity-60">
+                      <div className="text-[9px] uppercase tracking-[0.2em] text-[var(--color-gold)] mb-1 opacity-60">
                         {item.type}
                       </div>
-                      <div className="font-serif text-lg group-hover:translate-x-1 transition-transform">{item.title}</div>
-                      <div className="text-xs text-[var(--muted-foreground)] mt-1">{item.sub}</div>
+                      <div className="font-serif text-base">{item.title}</div>
+                      <div className="text-[10px] text-[var(--muted-foreground)] mt-0.5">{item.sub}</div>
                     </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg className="w-5 h-5 text-[var(--color-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </div>
+                    <svg className="w-4 h-4 text-[var(--color-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </Link>
                 ))}
               </div>
             ) : query.length > 1 ? (
-              <div className="text-center py-20 text-[var(--muted-foreground)] font-serif italic text-lg opacity-40">
-                No coordinates found in the pulse...
+              <div className="text-center py-10 text-[var(--muted-foreground)] font-serif italic text-sm opacity-40">
+                Searching the coordinates...
               </div>
             ) : null}
+          </div>
+
+          {/* Bottom Search Input Bar (Safari Position) */}
+          <div className="p-4 pb-8 sm:pb-10 bg-gradient-to-t from-[var(--background)] to-transparent">
+            <div className="relative group">
+              <div 
+                className="absolute -inset-[1.5px] rounded-full opacity-60 group-focus-within:opacity-100 transition-opacity blur-[0.5px]" 
+                style={{ background: `linear-gradient(to right, var(--color-gold), var(--color-gold-bright), var(--border))` }} 
+              />
+              <div className="relative flex items-center bg-[var(--card)] rounded-full border border-white/5 shadow-2xl">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={t('search')}
+                  className="w-full h-12 bg-transparent text-lg px-6 outline-none font-serif text-[var(--foreground)]"
+                />
+                <button 
+                  onClick={() => setOpen(false)}
+                  className="pr-6 text-[var(--muted-foreground)] uppercase text-[10px] tracking-widest"
+                >
+                  {t('viewAll') === 'View All' ? 'Close' : '關閉'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
