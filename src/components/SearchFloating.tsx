@@ -146,7 +146,7 @@ export default function SearchFloating() {
           <div className="flex-1" onClick={handleClose} />
 
           {/* Results List */}
-          <div className={`w-full overflow-y-auto px-4 pb-4 custom-scrollbar transition-all duration-500 ${
+          <div className={`w-full overflow-y-auto px-4 pb-2 custom-scrollbar transition-all duration-500 ${
             open ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
           }`} style={{ maxHeight: '60vh' }}>
             {results.length > 0 ? (
@@ -178,16 +178,14 @@ export default function SearchFloating() {
             ) : null}
           </div>
 
-          {/* Bottom Search Input Bar - The "Pill" */}
+          {/* Bottom Search Input Bar - Transparent and Integrated */}
           <div 
-            className="p-4"
+            className="p-4 relative z-10"
             onClick={(e) => {
-              // Bug fix: if clicking the container but not the pill, close it
               if (e.target === e.currentTarget) handleClose();
             }}
             style={{ 
-              paddingBottom: keyboardHeight > 0 ? '0.75rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)',
-              backgroundColor: 'var(--background)' 
+              paddingBottom: keyboardHeight > 0 ? '0.75rem' : 'calc(env(safe-area-inset-bottom, 1rem) + 1rem)'
             }}
           >
             <div className="relative group">
