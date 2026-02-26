@@ -5,7 +5,6 @@ import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import MobileTabBar from '@/components/MobileTabBar';
-import SearchFloating from '@/components/SearchFloating';
 import ThemeProvider from '@/components/ThemeProvider';
 import '@/app/globals.css';
 
@@ -50,7 +49,6 @@ export default async function LocaleLayout({
             <Header />
             <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8">{children}</main>
             <Footer />
-            <SearchFloating />
             <MobileTabBar />
           </ThemeProvider>
         </NextIntlClientProvider>
