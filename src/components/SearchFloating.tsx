@@ -104,12 +104,15 @@ export default function SearchFloating() {
       </div>
 
       {/* Fullscreen Overlay - Safari Style (Bottom Focused) */}
-      <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-500 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+      <div className={`fixed inset-0 z-[60] flex flex-col justify-end transition-all duration-300 ${open ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <div className="absolute inset-0 bg-[var(--background)]/80 backdrop-blur-3xl" onClick={() => setOpen(false)} />
         
-        <div className="relative w-full max-w-2xl mx-auto flex flex-col max-h-[90vh]">
+        <div className="relative w-full max-w-2xl mx-auto flex flex-col h-full max-h-screen overflow-hidden">
+          {/* Spacer to push content down */}
+          <div className="flex-1" onClick={() => setOpen(false)} />
+
           {/* Results List - Floats above the input */}
-          <div className="flex-1 overflow-y-auto px-4 pb-4 custom-scrollbar">
+          <div className="w-full overflow-y-auto px-4 pb-2 custom-scrollbar max-h-[60vh]">
             {results.length > 0 ? (
               <div className="space-y-2">
                 {results.map((item) => (
@@ -139,8 +142,8 @@ export default function SearchFloating() {
             ) : null}
           </div>
 
-          {/* Bottom Search Input Bar (Safari Position) */}
-          <div className="p-4 pb-8 sm:pb-10 bg-gradient-to-t from-[var(--background)] to-transparent">
+          {/* Bottom Search Input Bar (Safari Position) - Fixed iOS Keyboard issues */}
+          <div className="p-4 pb-[env(safe-area-inset-bottom,1rem)] bg-gradient-to-t from-[var(--background)] via-[var(--background)] to-transparent">
             <div className="relative group">
               <div 
                 className="absolute -inset-[1.5px] rounded-full opacity-60 group-focus-within:opacity-100 transition-opacity blur-[0.5px]" 
@@ -154,6 +157,7 @@ export default function SearchFloating() {
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder={t('search')}
                   className="w-full h-12 bg-transparent text-lg px-6 outline-none font-serif text-[var(--foreground)]"
+                  enterKeyHint="search"
                 />
                 <button 
                   onClick={() => setOpen(false)}
@@ -163,6 +167,8 @@ export default function SearchFloating() {
                 </button>
               </div>
             </div>
+            {/* Extra spacer for iOS keyboard context */}
+            <div className="h-2 md:hidden" />
           </div>
         </div>
       </div>
