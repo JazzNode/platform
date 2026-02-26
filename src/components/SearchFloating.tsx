@@ -20,15 +20,33 @@ export default function SearchFloating() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchItem[]>([]);
   const [index, setIndex] = useState<SearchItem[]>([]);
+  const [isFloating, setIsFloating] = useState(false);
+  
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  
   const locale = useLocale();
   const t = useTranslations('common');
 
-  // Load index
+  // Load index and setup scroll listener
   useEffect(() => {
     fetch('/search-index.json')
       .then(res => res.json())
       .then(data => setIndex(data));
+
+    const handleScroll = () => {
+      // Logic: If we've scrolled past 400px (roughly stats section), enable floating
+      // But if we're near the bottom (footer), hide it.
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      
+      const shouldFloat = scrollY > 400 && (documentHeight - scrollY - windowHeight > 150);
+      setIsFloating(shouldFloat);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const fuse = new Fuse(index, {
@@ -57,8 +75,23 @@ export default function SearchFloating() {
 
   return (
     <>
-      {/* Trigger Capsule - Floating above Tab Bar */}
-      <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 ${open ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100'}`}>
+      {/* 1. Static Search Bar (Only shown on top of pages, before scroll) */}
+      <div className="mx-auto max-w-xs mt-8 mb-12 md:hidden">
+        <button 
+          onClick={() => setOpen(true)}
+          className="w-full h-11 px-5 rounded-full bg-[var(--card)] border border-[var(--border)] flex items-center justify-center gap-3 text-[var(--muted-foreground)] active:scale-95 transition-all"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <span className="text-xs uppercase tracking-widest">{t('search')}</span>
+        </button>
+      </div>
+
+      {/* 2. Floating Trigger - Shown when scrolled past threshold, hidden at footer */}
+      <div className={`fixed bottom-24 left-1/2 -translate-x-1/2 z-40 transition-all duration-500 md:hidden ${
+        isFloating && !open ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10 pointer-events-none'
+      }`}>
         <button 
           onClick={() => setOpen(true)}
           className="h-10 px-5 rounded-full bg-[var(--card)]/60 backdrop-blur-2xl border border-[var(--border)] shadow-2xl flex items-center gap-3 text-[var(--muted-foreground)] hover:border-[var(--color-gold)] transition-all group"
