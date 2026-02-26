@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
-import { useTheme } from '@/components/ThemeProvider';
-import { cityThemeMap } from '@/lib/themes';
 
 
 interface SerializedEvent {
@@ -60,27 +58,8 @@ interface Props {
 export default function EventsClient({ events, cities, venues, locale, showPast, labels }: Props) {
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const { setTheme } = useTheme();
 
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
-
-  // Auto-switch theme based on city filter
-  useEffect(() => {
-    if (selectedCities.size === 1) {
-      const cityId = [...selectedCities][0];
-      const cityOption = cities.find(c => c.recordId === cityId);
-      const themeId = cityThemeMap[cityOption?.citySlug || ''];
-      if (themeId) {
-        setTheme(themeId);
-      }
-    } else {
-      // Default theme if no city or multiple cities selected
-      setTheme('midnight-gold');
-    }
-    
-    // Cleanup on unmount: reset to default theme
-    return () => setTheme('midnight-gold');
-  }, [selectedCities, cities, setTheme]);
 
   const toggleCity = useCallback((recordId: string) => {
     setSelectedCities((prev) => {
