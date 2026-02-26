@@ -34,7 +34,7 @@ function ThemePicker() {
   };
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-4 max-w-xs mx-auto">
       {themeOrder.map((id) => {
         const t = themes[id];
         const active = themeId === id;
@@ -46,17 +46,17 @@ function ThemePicker() {
           >
             {/* Color dot */}
             <span
-              className={`w-5 h-5 rounded-full transition-all duration-300 ${
+              className={`w-6 h-6 rounded-full transition-all duration-300 ${
                 active ? 'scale-110' : 'hover:scale-110'
               }`}
               style={{
                 background: `linear-gradient(135deg, ${t.accent}, ${t.accent2})`,
-                boxShadow: active ? `0 0 12px ${t.accent}50, 0 0 0 2px var(--card), 0 0 0 4px ${t.accent}` : 'none',
+                boxShadow: active ? `0 0 15px ${t.accent}60, 0 0 0 2px var(--card), 0 0 0 4px ${t.accent}` : 'none',
               }}
             />
-            {/* Label below — hover only */}
+            {/* Label below — hover only on desktop */}
             <span
-              className="text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70"
+              className="absolute -bottom-5 text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70 pointer-events-none"
               style={{ color: t.accent }}
             >
               {label(t)}
