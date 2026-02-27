@@ -21,7 +21,6 @@ export const TABLE_IDS = {
   Tags: 'tblJ1hlwVdHLv2Z2s',
   Lineups: 'tblDd2gI9smwyoCI1',
   Cities: 'tblV4kFurFNHYKEhh',
-  Sources: '',    // TODO: fill in
 } as const;
 
 interface AirtableResponse<T = Record<string, unknown>> {
