@@ -222,3 +222,34 @@ export function resolveLinks<T>(
   const map = new Map(records.map((r) => [r.id, r]));
   return ids.map((id) => map.get(id)).filter(Boolean) as { id: string; fields: T }[];
 }
+
+/**
+ * Build a venue→eventCount map directly from Events data.
+ * Fallback for when Venue.event_list (linked field) is empty
+ * because artist_enricher --derive-only hasn't run yet.
+ */
+export function buildVenueEventCounts(
+  events: { id: string; fields: Event }[],
+): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const e of events) {
+    const venueIds = e.fields.venue_id || [];
+    for (const vid of venueIds) {
+      counts.set(vid, (counts.get(vid) || 0) + 1);
+    }
+  }
+  return counts;
+}
+
+/**
+ * Get the event count for a venue, preferring the linked event_list,
+ * falling back to a pre-computed counts map.
+ */
+export function venueEventCount(
+  venue: { id: string; fields: Venue },
+  fallbackCounts?: Map<string, number>,
+): number {
+  const linked = venue.fields.event_list?.length || 0;
+  if (linked > 0) return linked;
+  return fallbackCounts?.get(venue.id) || 0;
+}

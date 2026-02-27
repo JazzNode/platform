@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getCities, resolveLinks } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getCities, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
@@ -20,8 +20,9 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
     .slice(0, 6);
 
+  const venueCountsFallback = buildVenueEventCounts(events);
   const featured = [...venues]
-    .sort((a, b) => (b.fields.event_list?.length || 0) - (a.fields.event_list?.length || 0))
+    .sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback))
     .slice(0, 6);
 
   return (
@@ -123,7 +124,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   {displayName(venue.fields)}
                 </h3>
                 <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? (locale === 'en' ? c.name_en : c.name_local) || '' : ''; })()} · {venue.fields.event_list?.length || 0} events
+                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? (locale === 'en' ? c.name_en : c.name_local) || '' : ''; })()} · {venueEventCount(venue, venueCountsFallback)} events
                 </p>
                 {venue.fields.jazz_frequency && (
                   <p className="mt-1 text-xs text-[#6A6560] capitalize">{venue.fields.jazz_frequency}</p>

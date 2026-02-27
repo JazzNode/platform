@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getVenues, getCities } from '@/lib/airtable';
+import { getVenues, getEvents, getCities, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
 import { displayName, photoUrl, localized } from '@/lib/helpers';
 import VenuesClient from '@/components/VenuesClient';
 
@@ -13,11 +13,12 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
   const { locale } = await params;
   const t = await getTranslations('common');
 
-  const [venues, cities] = await Promise.all([getVenues(), getCities()]);
+  const [venues, events, cities] = await Promise.all([getVenues(), getEvents(), getCities()]);
 
   // Serialize venues
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
-  const sorted = [...venues].sort((a, b) => (b.fields.event_list?.length || 0) - (a.fields.event_list?.length || 0));
+  const venueCountsFallback = buildVenueEventCounts(events);
+  const sorted = [...venues].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
 
   const serializedVenues = sorted.map((venue) => {
     const f = venue.fields;
@@ -30,7 +31,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       cityLabel: cityFields
         ? (locale === 'en' ? cityFields.name_en || cityFields.name_local || '' : cityFields.name_local || cityFields.name_en || '')
         : '',
-      eventCount: f.event_list?.length || 0,
+      eventCount: venueEventCount(venue, venueCountsFallback),
       jazzFrequency: f.jazz_frequency || null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
     };
