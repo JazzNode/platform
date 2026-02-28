@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/ThemeProvider';
 import { themes, themeOrder, type Theme } from '@/lib/themes';
+import LegalModal from '@/components/LegalModal';
 
 function SoundWave() {
   const { theme } = useTheme();
@@ -71,6 +73,7 @@ function ThemePicker() {
 export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('common');
+  const [legalOpen, setLegalOpen] = useState(false);
 
   const navLinks = [
     { key: 'cities', href: `/${locale}/cities` },
@@ -124,9 +127,18 @@ export default function Footer() {
             </div>
             <span className="opacity-30">·</span>
             <span>© {new Date().getFullYear()} JazzNode</span>
+            <span className="opacity-30">·</span>
+            <button
+              onClick={() => setLegalOpen(true)}
+              className="hover:text-gold transition-colors duration-300"
+            >
+              {t('legal')}
+            </button>
           </div>
         </div>
       </div>
+
+      <LegalModal isOpen={legalOpen} onClose={() => setLegalOpen(false)} />
     </footer>
   );
 }
