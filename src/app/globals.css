@@ -276,11 +276,23 @@ body {
   animation: footer-fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* ─── Geographic pill slide-in ─── */
+/* ─── Geographic pill slide-in (city pills) ─── */
 @keyframes geo-pill-in {
   from {
     opacity: 0;
     transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ─── Geographic region fade-in (region pill transitions) ─── */
+@keyframes geo-fade-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
   }
   to {
     opacity: 1;

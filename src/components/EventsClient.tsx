@@ -81,6 +81,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
   // Derive selectedCities set for filtering (from region or single city)
+  // When a region is active but no city is explicitly selected, filter by all cities in that region
   const selectedCities = useMemo(() => {
     if (selectedCity) return new Set([selectedCity]);
     if (activeRegion && regionGroups[activeRegion]) {
@@ -90,7 +91,6 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
-    const citiesInRegion = regionGroups[code] || [];
     if (activeRegion === code) {
       // Click active region → deselect back to world map
       setActiveRegion(null);
@@ -99,14 +99,9 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       return;
     }
     setActiveRegion(code);
+    setSelectedCity(null);
     setSelectedVenues(new Set());
-    // City-state (only 1 city): auto-select it
-    if (citiesInRegion.length === 1) {
-      setSelectedCity(citiesInRegion[0].recordId);
-    } else {
-      setSelectedCity(null);
-    }
-  }, [activeRegion, regionGroups]);
+  }, [activeRegion]);
 
   const handleCityClick = useCallback((recordId: string) => {
     setSelectedCity((prev) => prev === recordId ? null : recordId);
@@ -212,7 +207,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
           {/* World Map pill */}
           <button
             onClick={handleWorldMapClick}
-            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
                 : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -221,26 +216,29 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             {worldMapLabel}
           </button>
 
-          {/* Region pills */}
-          {regionOrder.map((code) => {
+          {/* Region pills — keyed to trigger re-mount animation on state change */}
+          {regionOrder.map((code, regionIdx) => {
             const isActive = activeRegion === code;
             const citiesInRegion = regionGroups[code] || [];
-            const isSingleCity = citiesInRegion.length <= 1;
 
             // Hide non-active regions when a region is drilled into
             if (activeRegion && !isActive) return null;
 
             return (
-              <span key={code} className="contents">
+              <span key={`${code}-${activeRegion || 'w'}`} className="contents">
                 {/* Separator */}
                 {isActive && (
-                  <span className="text-gold/40 text-xs select-none mx-0.5">│</span>
+                  <span
+                    className="text-gold/40 text-xs select-none mx-0.5"
+                    style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+                  >│</span>
                 )}
 
                 {/* Region pill */}
                 <button
                   onClick={() => handleRegionClick(code)}
-                  className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                  style={{ animation: `geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${regionIdx * 0.04}s both` }}
+                  className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
                       : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -249,15 +247,18 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                   {regionLabels[code] || code}
                 </button>
 
-                {/* City sub-pills (only when region is active and has multiple cities) */}
-                {isActive && !isSingleCity && (
+                {/* City sub-pills — show when region is active (skip if single city with same name as region) */}
+                {isActive && !(citiesInRegion.length === 1 && citiesInRegion[0].label === (regionLabels[code] || code)) && (
                   <>
-                    <span className="text-gold/40 text-xs select-none mx-0.5">›</span>
+                    <span
+                      className="text-gold/40 text-xs select-none mx-0.5"
+                      style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both' }}
+                    >›</span>
                     {citiesInRegion.map((city, i) => (
                       <button
                         key={city.recordId}
                         onClick={() => handleCityClick(city.recordId)}
-                        style={{ animation: `geo-pill-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.06}s both` }}
+                        style={{ animation: `geo-pill-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${(i + 1) * 0.07}s both` }}
                         className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
@@ -276,7 +277,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
         </FadeUpItem>
 
         {/* Venue pills — only show when there are venues to filter */}
-        {visibleVenues.length > 1 && (
+        {visibleVenues.length > 0 && (
           <FadeUpItem delay={180}>
           <div className="flex flex-wrap gap-2">
             <button
