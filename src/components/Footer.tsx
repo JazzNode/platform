@@ -36,7 +36,7 @@ function ThemePicker() {
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-4 max-w-xs mx-auto">
+    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-4 max-w-xs mx-auto pb-4">
       {themeOrder.map((id) => {
         const t = themes[id];
         const active = themeId === id;
@@ -44,7 +44,7 @@ function ThemePicker() {
           <button
             key={id}
             onClick={() => setTheme(id)}
-            className="group relative flex flex-col items-center gap-2 transition-all duration-300"
+            className="group relative flex flex-col items-center gap-2 cursor-pointer transition-all duration-300"
           >
             {/* Color dot */}
             <span
@@ -58,7 +58,7 @@ function ThemePicker() {
             />
             {/* Label below — hover only on desktop */}
             <span
-              className="absolute -bottom-5 text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70 pointer-events-none"
+              className="absolute top-full mt-2 text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70 pointer-events-none"
               style={{ color: t.accent }}
             >
               {label(t)}
@@ -83,21 +83,21 @@ export default function Footer() {
   ] as const;
 
   return (
-    <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-14 mt-24 animate-footer-fade-in">
+    <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-16 mt-24 animate-footer-fade-in">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center gap-10">
           {/* Logo + tagline */}
           <Link href={`/${locale}`} className="group block text-center">
             <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode</p>
-            <p className="mt-1 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
+            <p className="mt-1.5 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
               {t('tagline')}
             </p>
           </Link>
 
           {/* Nav links — uses theme accent color */}
-          <nav className="flex items-center gap-3 text-xs uppercase tracking-widest">
+          <nav className="flex items-center gap-4 text-xs uppercase tracking-widest">
             {navLinks.map((link, i) => (
-              <span key={link.key} className="flex items-center gap-3">
+              <span key={link.key} className="flex items-center gap-4">
                 {i > 0 && <span className="text-[var(--muted-foreground)] opacity-30">·</span>}
                 <Link
                   href={link.href}
@@ -116,11 +116,11 @@ export default function Footer() {
             </a>
           </nav>
 
-          {/* Theme picker — aligned under nav */}
+          {/* Theme picker */}
           <ThemePicker />
 
           {/* Bottom row — sound wave instead of pulse dot */}
-          <div className="flex items-center gap-6 text-xs text-[var(--muted-foreground,#8A8578)]">
+          <div className="flex items-center gap-8 text-xs text-[var(--muted-foreground,#8A8578)]">
             <div className="flex items-center gap-2">
               <SoundWave />
               <span className="font-mono uppercase tracking-widest">Live Data</span>
@@ -130,7 +130,7 @@ export default function Footer() {
             <span className="opacity-30">·</span>
             <button
               onClick={() => setLegalOpen(true)}
-              className="hover:text-gold transition-colors duration-300"
+              className="cursor-pointer hover:text-gold transition-colors duration-300"
             >
               {t('legal')}
             </button>
