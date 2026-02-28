@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 interface Props {
   isOpen: boolean;
@@ -8,6 +9,9 @@ interface Props {
 }
 
 export default function LegalModal({ isOpen, onClose }: Props) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+
   // ESC to close
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -30,7 +34,9 @@ export default function LegalModal({ isOpen, onClose }: Props) {
     onClose();
   }, [onClose]);
 
-  return (
+  if (!mounted) return null;
+
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
@@ -158,6 +164,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
           </div>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   );
 }
