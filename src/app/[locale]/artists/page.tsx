@@ -60,6 +60,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
         allTypes: t('allTypes'),
         musicians: t('musicians'),
         groups: t('groups'),
+        bigBands: t('bigBands'),
         noArtists: t('noArtists'),
       }}
     />

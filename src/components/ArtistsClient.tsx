@@ -28,6 +28,7 @@ interface Props {
     allTypes: string;
     musicians: string;
     groups: string;
+    bigBands: string;
     noArtists: string;
   };
 }
@@ -52,7 +53,9 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       if (selectedType === 'musicians') {
         if (a.type && a.type !== 'person') return false;
       } else if (selectedType === 'groups') {
-        if (!a.type || a.type === 'person') return false;
+        if (!a.type || a.type === 'person' || a.type === 'big band') return false;
+      } else if (selectedType === 'bigBands') {
+        if (a.type !== 'big band') return false;
       }
       // Instrument filter
       if (selectedInstruments.size > 0) {
@@ -83,10 +86,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             { key: 'all', label: labels.allTypes },
             { key: 'musicians', label: labels.musicians },
             { key: 'groups', label: labels.groups },
+            { key: 'bigBands', label: labels.bigBands },
           ] as const).map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => { setSelectedType(key); if (key === 'groups') setSelectedInstruments(new Set()); }}
+              onClick={() => { setSelectedType(key); if (key !== 'musicians' && key !== 'all') setSelectedInstruments(new Set()); }}
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
@@ -103,8 +107,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         <div
           className="overflow-hidden"
           style={{
-            maxHeight: selectedType === 'groups' ? 0 : 200,
-            opacity: selectedType === 'groups' ? 0 : 1,
+            maxHeight: (selectedType === 'groups' || selectedType === 'bigBands') ? 0 : 200,
+            opacity: (selectedType === 'groups' || selectedType === 'bigBands') ? 0 : 1,
             transition: 'max-height 0.4s cubic-bezier(0.16,1,0.3,1), opacity 0.3s ease',
           }}
         >
