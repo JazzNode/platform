@@ -46,6 +46,7 @@ interface Props {
     allCategories: string;
     jamSession: string;
     withVocal: string;
+    matinee: string;
     events: string;
     pastEvents: string;
     upcomingCount: string;
@@ -102,6 +103,9 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       }
       if (selectedCategory === 'vocal') {
         return e.tags.includes('vocals');
+      }
+      if (selectedCategory === 'matinee') {
+        return e.tags.includes('matinee');
       }
       return true;
     });
@@ -214,6 +218,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             { key: 'all', label: labels.allCategories },
             { key: 'jam', label: labels.jamSession },
             { key: 'vocal', label: labels.withVocal },
+            { key: 'matinee', label: labels.matinee },
           ] as const).map(({ key, label }) => (
             <button
               key={key}
@@ -252,7 +257,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     className="fade-up-item block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
                   >
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                      {event.date_display} · {event.time_display}
+                      {event.tags.includes('matinee') && '☀️ '}{event.date_display} · {event.time_display}
                     </div>
                     <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
                       {event.title}

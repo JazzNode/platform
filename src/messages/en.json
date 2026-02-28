@@ -50,6 +50,7 @@
     "allCategories": "All Categories",
     "jamSession": "Jam Session",
     "withVocal": "with Vocals",
+    "matinee": "Matinee",
     "citiesCount": "cities",
     "venuesInCity": "venues",
     "eventsInCity": "events",
@@ -90,6 +91,11 @@
     "dj": "DJ",
     "tap dance": "Tap Dance",
     "others": "Others",
-    "double_bass": "Double Bass"
+    "double_bass": "Double Bass",
+    "flugelhorn": "Flugelhorn",
+    "marimba": "Marimba",
+    "tabla": "Tabla",
+    "shakuhachi": "Shakuhachi",
+    "kora": "Kora"
   }
 }

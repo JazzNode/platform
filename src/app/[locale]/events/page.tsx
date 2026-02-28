@@ -100,6 +100,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
         allCategories: t('allCategories'),
         jamSession: t('jamSession'),
         withVocal: t('withVocal'),
+        matinee: t('matinee'),
         events: t('events'),
         pastEvents: t('pastEvents'),
         upcomingCount: t('upcomingCount'),

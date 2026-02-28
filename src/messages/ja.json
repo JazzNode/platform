@@ -50,6 +50,7 @@
     "allCategories": "すべてのカテゴリ",
     "jamSession": "ジャムセッション",
     "withVocal": "ボーカルあり",
+    "matinee": "昼の部",
     "citiesCount": "都市",
     "venuesInCity": "会場",
     "eventsInCity": "イベント",
@@ -90,6 +91,11 @@
     "dj": "DJ",
     "tap dance": "タップダンス",
     "others": "その他",
-    "double_bass": "コントラバス"
+    "double_bass": "コントラバス",
+    "flugelhorn": "フリューゲルホルン",
+    "marimba": "マリンバ",
+    "tabla": "タブラ",
+    "shakuhachi": "尺八",
+    "kora": "コラ"
   }
 }

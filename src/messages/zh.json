@@ -50,6 +50,7 @@
     "allCategories": "所有分類",
     "jamSession": "Jam Session",
     "withVocal": "with Vocals",
+    "matinee": "日場",
     "citiesCount": "座城市",
     "venuesInCity": "間場地",
     "eventsInCity": "場活動",
@@ -90,6 +91,11 @@
     "dj": "DJ",
     "tap dance": "踢踏舞",
     "others": "其他",
-    "double_bass": "低音提琴"
+    "double_bass": "低音提琴",
+    "flugelhorn": "柔音號",
+    "marimba": "馬林巴",
+    "tabla": "塔布拉鼓",
+    "shakuhachi": "尺八",
+    "kora": "科拉琴"
   }
 }
