@@ -298,9 +298,13 @@ export default function SearchOverlay() {
             <button onClick={close} className="sm:hidden text-sm text-[var(--muted-foreground)] shrink-0">
               {locale === 'zh' ? '取消' : locale === 'ja' ? 'キャンセル' : 'Cancel'}
             </button>
-            <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[var(--card)] border border-[var(--border)] text-[10px] text-[var(--muted-foreground)] shrink-0">
+            <button
+              onClick={close}
+              className="hidden sm:inline-flex items-center gap-1 px-2 py-1 rounded-md bg-[var(--card)] border border-[var(--border)] text-[10px] text-[var(--muted-foreground)] shrink-0 cursor-pointer transition-all duration-200 hover:bg-[var(--color-gold)]/10 hover:border-[var(--color-gold)]/40 hover:text-gold active:scale-95"
+              aria-label="Close search"
+            >
               ESC
-            </kbd>
+            </button>
           </div>
 
           {/* Category filters */}
