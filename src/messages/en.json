@@ -64,6 +64,12 @@
     "contactEmail": "hello@jazznode.com",
     "manifesto": "Mapping the city's heartbeat, one note at a time."
   },
+  "regions": {
+    "worldMap": "World Map",
+    "TW": "Taiwan",
+    "JP": "Japan",
+    "HK": "Hong Kong"
+  },
   "instruments": {
     "piano": "Piano",
     "drums": "Drums",

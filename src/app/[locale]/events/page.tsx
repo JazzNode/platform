@@ -13,6 +13,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
   const { locale } = await params;
   const { view } = await searchParams;
   const t = await getTranslations('common');
+  const tRegions = await getTranslations('regions');
   const showPast = view === 'past';
 
   const [events, venues, artists, lineups, cities, tagsResult] = await Promise.all([
@@ -74,8 +75,16 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       recordId: c.id,
       citySlug: c.fields.city_id || '',
       label: locale === 'en' ? (c.fields.name_en || c.fields.name_local || '') : (c.fields.name_local || c.fields.name_en || ''),
+      countryCode: c.fields.country_code || '',
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
+
+  // Build region labels from i18n
+  const regionCodes = [...new Set(cityOptions.map((c) => c.countryCode).filter(Boolean))];
+  const regionLabels: Record<string, string> = {};
+  for (const code of regionCodes) {
+    try { regionLabels[code] = tRegions(code as 'TW' | 'JP' | 'HK'); } catch { regionLabels[code] = code; }
+  }
 
   // Build venue options
   const venueOptions = venues
@@ -94,6 +103,8 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       venues={venueOptions}
       locale={locale}
       showPast={showPast}
+      regionLabels={regionLabels}
+      worldMapLabel={tRegions('worldMap')}
       labels={{
         allCities: t('allCities'),
         allVenues: t('allVenues'),

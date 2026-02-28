@@ -64,6 +64,12 @@
     "contactEmail": "hello@jazznode.com",
     "manifesto": "都市の鼓動をマッピングする。すべての音符が座標になる。"
   },
+  "regions": {
+    "worldMap": "世界地図",
+    "TW": "台湾",
+    "JP": "日本",
+    "HK": "香港"
+  },
   "instruments": {
     "piano": "ピアノ",
     "drums": "ドラム",

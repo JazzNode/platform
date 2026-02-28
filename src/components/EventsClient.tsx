@@ -26,6 +26,7 @@ interface CityOption {
   recordId: string;
   citySlug: string;  // e.g. 'tw-tpe', 'hk-hkg'
   label: string;     // localized name
+  countryCode: string; // e.g. 'TW', 'JP', 'HK'
 }
 
 interface VenueOption {
@@ -40,6 +41,8 @@ interface Props {
   venues: VenueOption[];
   locale: string;
   showPast: boolean;
+  regionLabels: Record<string, string>;  // e.g. { TW: '台灣', JP: '日本', HK: '香港' }
+  worldMapLabel: string;                  // e.g. '世界版圖'
   labels: {
     allCities: string;
     allVenues: string;
@@ -56,20 +59,63 @@ interface Props {
   };
 }
 
-export default function EventsClient({ events, cities, venues, locale, showPast, labels }: Props) {
-  const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, labels }: Props) {
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
 
-  const toggleCity = useCallback((recordId: string) => {
-    setSelectedCities((prev) => {
-      const next = new Set(prev);
-      if (next.has(recordId)) next.delete(recordId);
-      else next.add(recordId);
-      return next;
-    });
-    // Reset venue selection when city filter changes
+  // Group cities by country code
+  const regionGroups = useMemo(() => {
+    const map: Record<string, CityOption[]> = {};
+    for (const c of cities) {
+      const code = c.countryCode;
+      if (!code) continue;
+      if (!map[code]) map[code] = [];
+      map[code].push(c);
+    }
+    return map;
+  }, [cities]);
+
+  // Stable region order
+  const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
+
+  // Derive selectedCities set for filtering (from region or single city)
+  const selectedCities = useMemo(() => {
+    if (selectedCity) return new Set([selectedCity]);
+    if (activeRegion && regionGroups[activeRegion]) {
+      return new Set(regionGroups[activeRegion].map((c) => c.recordId));
+    }
+    return new Set<string>();
+  }, [selectedCity, activeRegion, regionGroups]);
+
+  const handleRegionClick = useCallback((code: string) => {
+    const citiesInRegion = regionGroups[code] || [];
+    if (activeRegion === code) {
+      // Click active region → deselect back to world map
+      setActiveRegion(null);
+      setSelectedCity(null);
+      setSelectedVenues(new Set());
+      return;
+    }
+    setActiveRegion(code);
+    setSelectedVenues(new Set());
+    // City-state (only 1 city): auto-select it
+    if (citiesInRegion.length === 1) {
+      setSelectedCity(citiesInRegion[0].recordId);
+    } else {
+      setSelectedCity(null);
+    }
+  }, [activeRegion, regionGroups]);
+
+  const handleCityClick = useCallback((recordId: string) => {
+    setSelectedCity((prev) => prev === recordId ? null : recordId);
+    setSelectedVenues(new Set());
+  }, []);
+
+  const handleWorldMapClick = useCallback(() => {
+    setActiveRegion(null);
+    setSelectedCity(null);
     setSelectedVenues(new Set());
   }, []);
 
@@ -80,7 +126,16 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       else next.add(recordId);
       return next;
     });
-  }, []);
+    // Reverse sync: when selecting a venue, sync region + city
+    const venue = venues.find((v) => v.recordId === recordId);
+    if (venue?.cityRecordId) {
+      const city = cities.find((c) => c.recordId === venue.cityRecordId);
+      if (city) {
+        setActiveRegion(city.countryCode || null);
+        setSelectedCity(city.recordId);
+      }
+    }
+  }, [venues, cities]);
 
   // Filter venues by selected cities
   const visibleVenues = useMemo(() => {
@@ -113,8 +168,8 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
 
   // Key for re-triggering animations on filter change
   const filterKey = useMemo(() => {
-    return `${[...selectedCities].sort().join(',')}_${[...selectedVenues].sort().join(',')}_${selectedCategory}`;
-  }, [selectedCities, selectedVenues, selectedCategory]);
+    return `${activeRegion}_${selectedCity}_${[...selectedVenues].sort().join(',')}_${selectedCategory}`;
+  }, [activeRegion, selectedCity, selectedVenues, selectedCategory]);
 
   // Group by month
   const byMonth = useMemo(() => {
@@ -151,32 +206,72 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
 
       {/* Filter Bar */}
       <div className="space-y-3">
-        {/* City pills */}
+        {/* Geographic hierarchy: World Map │ Region › Cities */}
         <FadeUpItem delay={100}>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* World Map pill */}
           <button
-            onClick={() => { setSelectedCities(new Set()); setSelectedVenues(new Set()); }}
+            onClick={handleWorldMapClick}
             className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-              selectedCities.size === 0
+              !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
                 : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
-            {labels.allCities}
+            {worldMapLabel}
           </button>
-          {cities.map((city) => (
-            <button
-              key={city.recordId}
-              onClick={() => toggleCity(city.recordId)}
-              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-                selectedCities.has(city.recordId)
-                  ? 'bg-gold/20 border-gold text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
-              }`}
-            >
-              {city.label}
-            </button>
-          ))}
+
+          {/* Region pills */}
+          {regionOrder.map((code) => {
+            const isActive = activeRegion === code;
+            const citiesInRegion = regionGroups[code] || [];
+            const isSingleCity = citiesInRegion.length <= 1;
+
+            // Hide non-active regions when a region is drilled into
+            if (activeRegion && !isActive) return null;
+
+            return (
+              <span key={code} className="contents">
+                {/* Separator */}
+                {isActive && (
+                  <span className="text-gold/40 text-xs select-none mx-0.5">│</span>
+                )}
+
+                {/* Region pill */}
+                <button
+                  onClick={() => handleRegionClick(code)}
+                  className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                    isActive
+                      ? 'bg-gold/20 border-gold text-gold'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                  }`}
+                >
+                  {regionLabels[code] || code}
+                </button>
+
+                {/* City sub-pills (only when region is active and has multiple cities) */}
+                {isActive && !isSingleCity && (
+                  <>
+                    <span className="text-gold/40 text-xs select-none mx-0.5">›</span>
+                    {citiesInRegion.map((city, i) => (
+                      <button
+                        key={city.recordId}
+                        onClick={() => handleCityClick(city.recordId)}
+                        style={{ animation: `geo-pill-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) ${i * 0.06}s both` }}
+                        className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                          selectedCity === city.recordId
+                            ? 'bg-gold/15 border-gold/70 text-gold'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
+                        }`}
+                      >
+                        {city.label}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </span>
+            );
+          })}
         </div>
         </FadeUpItem>
 

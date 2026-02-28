@@ -64,6 +64,12 @@
     "contactEmail": "hello@jazznode.com",
     "manifesto": "記錄城市的脈動，每個音符都是座標。"
   },
+  "regions": {
+    "worldMap": "世界版圖",
+    "TW": "台灣",
+    "JP": "日本",
+    "HK": "香港"
+  },
   "instruments": {
     "piano": "鋼琴",
     "drums": "鼓",
