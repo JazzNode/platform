@@ -107,13 +107,6 @@ export default function Footer() {
                 </Link>
               </span>
             ))}
-            <span className="text-[var(--muted-foreground)] opacity-30">·</span>
-            <a
-              href={`mailto:${t('contactEmail')}`}
-              className="text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
-            >
-              {t('contact')}
-            </a>
           </nav>
 
           {/* Theme picker */}
