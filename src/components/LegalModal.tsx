@@ -92,18 +92,18 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. Disclaimer of Liability</h4>
-                  <p>Information on this platform (including dates, lineups, and ticket prices) is aggregated for reference purposes only and may include AI-assisted translations. Please verify all event details on the official venue or ticketing website. JazzNode is not responsible for any changes, cancellations, or ticketing discrepancies.</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. Jazz is Spontaneous, and So Are Live Gigs</h4>
+                  <p>Lineups shift and schedules change. We do our absolute best to curate accurate, cross-border info (sometimes using AI to bridge language gaps), but please double-check with the official venue or ticketing site before heading out. If a gig gets canceled or prices change, please don&#39;t shoot the messenger.</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. Copyright &amp; Intellectual Property</h4>
-                  <p>All event posters, venue photographs, and original promotional texts are the property of their respective creators, venues, or organizers. They are used here under fair use solely for the purpose of promoting jazz music and events.</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. Out of Deep Respect for Creators</h4>
+                  <p>The beautiful posters, venue photos, and promotional texts you see here belong entirely to their original creators, artists, or venues. We showcase them purely out of love for the music and to help pack your rooms with passionate listeners.</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. Content Takedown &amp; Opt-Out</h4>
-                  <p>If you are a venue operator or performing artist and wish to have your information, images, or profiles removed or corrected, please contact us at{' '}
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. Your Music, Your Rules</h4>
+                  <p>If you&#39;re an artist or venue owner and prefer not to be listed on our platform, or if you spot a mistake, just drop a note to{' '}
                     <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
-                    . We will process your request unconditionally within 24 hours.
+                    . We will update or remove your profile unconditionally within 24 hours. No questions asked.
                   </p>
                 </div>
               </div>
@@ -118,18 +118,18 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. 資訊準確性與免責聲明</h4>
-                  <p>本平台整合之演出時間、陣容與票價等資訊僅供參考，且部分內容由 AI 輔助翻譯與摘要。所有活動詳情請一律以主辦單位或官方售票平台之最新公告為準。對於資訊變更、演出取消或購票衍生之爭議，JazzNode 概不負責。</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. 即興是爵士的靈魂，現場演出也是</h4>
+                  <p>演出時間與陣容難免有臨時的變動。我們竭盡所能為您整理跨國界的現場資訊（部分外語內容藉由 AI 輔助翻譯以跨越語言隔閡），但在您出發前往場館前，請務必至官方售票連結再次確認。如果遇到演出取消或票價調整，請別怪罪我們這群熱心的傳聲筒。</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. 著作權宣告</h4>
-                  <p>本網站所展示之活動海報、場地照片及部分官方介紹文字，其著作權均歸屬原創作者、場館或主辦單位所有。本平台僅基於推廣爵士樂與協助宣傳之目的進行合理使用。</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. 出於對創作者的絕對敬意</h4>
+                  <p>平台上展示的活動海報、場館照片與官方介紹，版權皆完全歸屬於原創作者、場館或主辦單位。我們將這些美麗的視覺與文字放在這裡，純粹出於對爵士樂的熱愛，希望能為每一場現場演出帶來更多熱情的聽眾。</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 內容下架與資訊修正機制</h4>
-                  <p>若您為場館營運方或演出藝人，不希望您的資訊、影像或演出資料刊登於本平台，或發現資訊有誤需要更正，請隨時來信至{' '}
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 你的音樂，你做主</h4>
+                  <p>如果您是場館經營者或音樂家，不希望您的資訊出現在 JazzNode 上，或者發現我們哪裡寫錯了，請隨時發信至{' '}
                     <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
-                    ，我們將於 24 小時內為您無條件下架或修正。
+                    。我們會在 24 小時內無條件為您修正或將資訊撤下，絕不囉嗦。
                   </p>
                 </div>
               </div>
@@ -144,18 +144,18 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. 免責事項</h4>
-                  <p>当プラットフォームに掲載されている公演日時、出演者、チケット料金などの情報は参考用であり、一部 AI による翻訳や要約が含まれています。最新の正確な情報は、必ず主催者または公式販売サイトにてご確認ください。情報の変更、公演の中止、チケット購入に関するトラブルについて、JazzNode は一切の責任を負いません。</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. ジャズの魂は即興にあり、ライブもまた然り</h4>
+                  <p>出演者や時間は急に変更されることがあります。国境を越えた情報をお届けするため最善を尽くしていますが（一部の翻訳にはAIを活用しています）、お出かけの前に必ず会場や公式チケットサイトで最新情報をご確認ください。公演のキャンセルや料金の変更について、どうか私たちを責めないでくださいね。</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. 著作権について</h4>
-                  <p>当サイトに掲載されているイベントポスター、会場の写真、および公式の紹介文の著作権は、原作者、会場、または主催者に帰属します。当プラットフォームでは、ジャズ音楽の普及およびイベントの広報支援を目的とした正当な範囲内でこれらを使用しています。</p>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. クリエイターへの深い敬意</h4>
+                  <p>掲載されている美しいポスター、会場の写真、紹介文の著作権は、すべて原作者、会場、または主催者に帰属します。私たちがこれらを使用するのは、純粋にジャズへの愛からであり、あなたのライブに一人でも多くのリスナーを呼ぶためです。</p>
                 </div>
                 <div>
-                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 削除・修正のリクエスト</h4>
-                  <p>会場運営者または出演アーティストの方で、ご自身の情報、画像、プロフィールの掲載取り下げ、または情報の修正をご希望の場合は、{' '}
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. あなたの音楽、あなたのルール</h4>
+                  <p>もしあなたがアーティストや会場の運営者で、JazzNodeへの掲載を希望されない場合、または情報の訂正が必要な場合は、{' '}
                     <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
-                    {' '}までご連絡ください。24時間以内に無条件で対応いたします。
+                    {' '}までご連絡ください。24時間以内に無条件で修正または削除いたします。
                   </p>
                 </div>
               </div>
