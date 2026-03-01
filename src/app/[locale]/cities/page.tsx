@@ -5,6 +5,7 @@ import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
 import { displayName, photoUrl, formatDate, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
+import EventCarousel from '@/components/EventCarousel';
 
 export async function generateMetadata() {
   const t = await getTranslations('common');
@@ -29,10 +30,14 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
 
-    // Next upcoming event (sorted by start_at ascending)
-    const nextEvent = [...upcomingEvents]
+    // Upcoming event slides (up to 5, pre-serialized for client carousel)
+    const upcomingSlides = [...upcomingEvents]
       .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-      [0] || null;
+      .slice(0, 5)
+      .map((e) => ({
+        date: formatDate(e.fields.start_at, locale, e.fields.timezone || city.fields.timezone || 'Asia/Taipei'),
+        title: e.fields.title || e.fields.title_local || e.fields.title_en || 'Event',
+      }));
 
     // Venue photos (up to 3)
     const venuePhotos = cityVenues
@@ -59,7 +64,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
       upcomingCount: upcomingEvents.length,
       artistCount: cityArtists.length,
       venues: cityVenues,
-      nextEvent,
+      upcomingSlides,
       venuePhotos,
       topArtists,
     };
@@ -82,7 +87,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
       <FadeUp stagger={0.15}>
         <div className="grid gap-6 sm:grid-cols-2">
-          {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, nextEvent, venuePhotos, topArtists }) => {
+          {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, upcomingSlides, venuePhotos, topArtists }) => {
             const f = city.fields;
             const name = cityName(f, locale);
 
@@ -165,19 +170,9 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                   </div>
                 )}
 
-                {/* Next event preview */}
-                {nextEvent && (
-                  <div className="flex items-start gap-2.5 mb-5 py-3 border-t border-[var(--border)]">
-                    <span className="pulse-dot mt-1.5 shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-widest text-gold">
-                        {t('nextUpcoming')} · {formatDate(nextEvent.fields.start_at, locale, nextEvent.fields.timezone || f.timezone || 'Asia/Taipei')}
-                      </p>
-                      <p className="text-sm text-[var(--foreground)] truncate">
-                        {nextEvent.fields.title || nextEvent.fields.title_local || nextEvent.fields.title_en || 'Event'}
-                      </p>
-                    </div>
-                  </div>
+                {/* Upcoming events carousel */}
+                {upcomingSlides.length > 0 && (
+                  <EventCarousel events={upcomingSlides} label={t('nextUpcoming')} />
                 )}
 
                 {/* Action link */}
