@@ -6,6 +6,7 @@ import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
+import ManifestoReveal from '@/components/animations/ManifestoReveal';
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -59,6 +60,32 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </Link>
           </div>
         </HeroReveal>
+      </section>
+
+      {/* ─── Brand Manifesto ─── */}
+      <section className="manifesto-section relative">
+        <ManifestoReveal>
+          <div className="relative pl-8 sm:pl-12 max-w-2xl">
+            <div className="manifesto-accent absolute left-0 top-0 bottom-0 w-px bg-gold" />
+            <div className="space-y-5 sm:space-y-6">
+              <p className="manifesto-line font-serif text-lg sm:text-xl leading-relaxed text-[var(--foreground)]">
+                {t('manifestoL1')}
+              </p>
+              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
+                {t('manifestoL2')}
+              </p>
+              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
+                {t('manifestoL3')}
+              </p>
+              <p className="manifesto-line font-serif text-base sm:text-lg leading-relaxed text-[var(--foreground)]">
+                {t('manifestoL4')}
+              </p>
+            </div>
+            <p className="manifesto-attr mt-10 text-xs uppercase tracking-[0.3em] text-gold">
+              ── JazzNode
+            </p>
+          </div>
+        </ManifestoReveal>
       </section>
 
       {/* ─── Upcoming Events ─── */}

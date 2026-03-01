@@ -232,6 +232,23 @@
   animation: pulse-dot 2s ease-in-out infinite;
 }
 
+/* ─── Manifesto section ─── */
+.manifesto-section {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+@media (min-width: 640px) {
+  .manifesto-section {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+.manifesto-accent {
+  box-shadow: 0 0 12px rgba(var(--theme-glow-rgb, 200, 168, 78), 0.3);
+}
+
 /* ─── Large number display (Microfeller style) ─── */
 .stat-number {
   font-family: var(--font-serif);
