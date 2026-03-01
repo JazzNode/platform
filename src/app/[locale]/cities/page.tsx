@@ -2,7 +2,9 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
+import { displayName, photoUrl, formatDate } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import CountUp from '@/components/animations/CountUp';
 
 export async function generateMetadata() {
   const t = await getTranslations('common');
@@ -27,12 +29,39 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
 
+    // Next upcoming event (sorted by start_at ascending)
+    const nextEvent = [...upcomingEvents]
+      .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
+      [0] || null;
+
+    // Venue photos (up to 3)
+    const venuePhotos = cityVenues
+      .map((v) => ({
+        url: photoUrl(v.fields.photo_url, v.fields.photo_file),
+        name: v.fields.display_name || v.fields.name_local || v.fields.name_en || '',
+      }))
+      .filter((p): p is { url: string; name: string } => p.url !== null)
+      .slice(0, 3);
+
+    // Top artists by event frequency in this city
+    const topArtists = cityArtists
+      .map((a) => ({
+        artist: a,
+        count: (a.fields.event_list || []).filter((eid) => eventIds.has(eid)).length,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 3)
+      .map((af) => af.artist);
+
     return {
       city,
       venueCount: cityVenues.length,
       upcomingCount: upcomingEvents.length,
       artistCount: cityArtists.length,
       venues: cityVenues,
+      nextEvent,
+      venuePhotos,
+      topArtists,
     };
   });
 
@@ -56,15 +85,36 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
       <FadeUp stagger={0.15}>
         <div className="grid gap-6 sm:grid-cols-2">
-          {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues }) => {
+          {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, nextEvent, venuePhotos, topArtists }) => {
             const f = city.fields;
             const name = cityName(f, locale);
 
             return (
               <div
                 key={city.id}
-                className="fade-up-item relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group transition-all duration-500 hover:-translate-y-1 hover:shadow-lg"
+                className="fade-up-item relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group card-hover"
               >
+                {/* Venue photo strip */}
+                {venuePhotos.length > 0 && (
+                  <div className="flex items-center -space-x-3 mb-5">
+                    {venuePhotos.map((photo, i) => (
+                      <img
+                        key={i}
+                        src={photo.url}
+                        alt={photo.name}
+                        className="w-10 h-10 rounded-full object-cover border-2 border-[var(--card)]"
+                        loading="lazy"
+                        style={{ zIndex: venuePhotos.length - i }}
+                      />
+                    ))}
+                    {cityVenues.length > venuePhotos.length && (
+                      <span className="text-xs text-[#8A8578] ml-4">
+                        +{cityVenues.length - venuePhotos.length}
+                      </span>
+                    )}
+                  </div>
+                )}
+
                 {/* City name */}
                 <div className="mb-5">
                   <h2 className="font-serif text-2xl sm:text-3xl font-bold">
@@ -75,13 +125,13 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                 {/* Stats row */}
                 <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[var(--muted-foreground)] mb-6">
                   <span>
-                    <span className="font-bold text-gold">{venueCount}</span> {t('venuesInCity')}
+                    <CountUp end={venueCount} trigger="visible" className="font-bold text-gold" /> {t('venuesInCity')}
                   </span>
                   <span>
-                    <span className="font-bold text-gold">{upcomingCount}</span> {t('eventsInCity')}
+                    <CountUp end={upcomingCount} trigger="visible" className="font-bold text-gold" /> {t('eventsInCity')}
                   </span>
                   <span>
-                    <span className="font-bold text-gold">{artistCount}</span> {t('artistsInCity')}
+                    <CountUp end={artistCount} trigger="visible" className="font-bold text-gold" /> {t('artistsInCity')}
                   </span>
                 </div>
 
@@ -97,6 +147,41 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                     </Link>
                   ))}
                 </div>
+
+                {/* Top artist pills */}
+                {topArtists.length > 0 && (
+                  <div className="mb-5">
+                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-2">
+                      {t('topPerformers')}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {topArtists.map((a) => (
+                        <Link
+                          key={a.id}
+                          href={`/${locale}/artists/${a.id}`}
+                          className="text-xs px-2.5 py-1 rounded-full bg-[var(--secondary)] text-[var(--foreground)] hover:text-gold hover:bg-gold/10 transition-colors duration-300"
+                        >
+                          {displayName(a.fields)}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Next event preview */}
+                {nextEvent && (
+                  <div className="flex items-start gap-2.5 mb-5 py-3 border-t border-[var(--border)]">
+                    <span className="pulse-dot mt-1.5 shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-xs uppercase tracking-widest text-gold">
+                        {t('nextUpcoming')} · {formatDate(nextEvent.fields.start_at, locale, nextEvent.fields.timezone || f.timezone || 'Asia/Taipei')}
+                      </p>
+                      <p className="text-sm text-[var(--foreground)] truncate">
+                        {nextEvent.fields.title || nextEvent.fields.title_local || nextEvent.fields.title_en || 'Event'}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Action link */}
                 <Link
