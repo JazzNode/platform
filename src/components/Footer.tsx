@@ -58,7 +58,7 @@ function ThemePicker() {
             />
             {/* Label below — hover only on desktop */}
             <span
-              className="absolute top-full mt-2 text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70 pointer-events-none"
+              className="absolute top-full mt-4 text-[9px] uppercase tracking-[0.15em] whitespace-nowrap transition-all duration-300 opacity-0 group-hover:opacity-70 pointer-events-none"
               style={{ color: t.accent }}
             >
               {label(t)}
@@ -85,7 +85,7 @@ export default function Footer() {
   return (
     <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-16 mt-24 animate-footer-fade-in">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="flex flex-col items-center gap-10">
+        <div className="flex flex-col items-center">
           {/* Logo + tagline */}
           <Link href={`/${locale}`} className="group block text-center">
             <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode</p>
@@ -94,8 +94,8 @@ export default function Footer() {
             </p>
           </Link>
 
-          {/* Nav links — uses theme accent color */}
-          <nav className="flex items-center gap-4 text-xs uppercase tracking-widest">
+          {/* Nav links — gap matches JazzNode→tagline spacing */}
+          <nav className="mt-1.5 flex items-center gap-4 text-xs uppercase tracking-widest">
             {navLinks.map((link, i) => (
               <span key={link.key} className="flex items-center gap-4">
                 {i > 0 && <span className="text-[var(--muted-foreground)] opacity-30">·</span>}
@@ -110,10 +110,12 @@ export default function Footer() {
           </nav>
 
           {/* Theme picker */}
-          <ThemePicker />
+          <div className="mt-10">
+            <ThemePicker />
+          </div>
 
           {/* Bottom row — sound wave instead of pulse dot */}
-          <div className="flex items-center gap-8 text-xs text-[var(--muted-foreground,#8A8578)]">
+          <div className="mt-10 flex items-center gap-8 text-xs text-[var(--muted-foreground,#8A8578)]">
             <div className="flex items-center gap-2">
               <SoundWave />
               <span className="font-mono uppercase tracking-widest">Live Data</span>
