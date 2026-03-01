@@ -6,8 +6,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useSearch } from './SearchProvider';
 
-const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日' };
-const localeList = ['en', 'zh', 'ja'] as const;
+const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한' };
+const localeList = ['en', 'zh', 'ja', 'ko'] as const;
 
 export default function Header() {
   const t = useTranslations('common');

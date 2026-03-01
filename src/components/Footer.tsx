@@ -32,6 +32,7 @@ function ThemePicker() {
   const label = (t: Theme) => {
     if (locale === 'zh') return t.label_zh;
     if (locale === 'ja') return t.label_ja;
+    if (locale === 'ko') return t.label_ko;
     return t.label;
   };
 

@@ -87,7 +87,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <div className="flex gap-2">
               {venueBadges.map((b) => (
                 <span key={b.id} className="text-xs px-3 py-1.5 rounded-xl bg-[#1A1A1A] text-gold border border-gold/20">
-                  {locale === 'zh' ? b.fields.name_zh : locale === 'ja' ? b.fields.name_ja : b.fields.name_en}
+                  {locale === 'zh' ? b.fields.name_zh : locale === 'ja' ? b.fields.name_ja : locale === 'ko' ? b.fields.name_ko : b.fields.name_en}
                 </span>
               ))}
             </div>

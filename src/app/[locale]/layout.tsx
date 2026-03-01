@@ -67,7 +67,7 @@ export default async function LocaleLayout({
           venue_name: venue ? displayName(venue.fields) : '',
           primary_artist_name: artist ? displayName(artist.fields) : null,
           description_short: localized(e.fields as Record<string, unknown>, 'description_short', locale) || null,
-          date_display: d ? d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : 'en-US', { month: 'short', day: 'numeric', timeZone: tz }) : '',
+          date_display: d ? d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', timeZone: tz }) : '',
           time_display: d ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }) : '',
         };
       }),

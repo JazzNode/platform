@@ -6,7 +6,7 @@
 export function makeSlug(name: string | undefined, id: string): string {
   const base = (name || 'untitled')
     .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff]+/g, '-')
+    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]+/g, '-')
     .replace(/^-|-$/g, '');
   // Use last 6 chars of Airtable record ID for uniqueness
   const suffix = id.slice(-6);
@@ -22,7 +22,7 @@ export function displayName(fields: { display_name?: string; name_local?: string
 export function formatDate(iso: string | undefined, locale: string = 'en', timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : 'en-US', {
+  return d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -49,9 +49,10 @@ export function localized(
   locale: string,
 ): string | undefined {
   const suffixMap: Record<string, string[]> = {
-    en: ['_en', '_zh', '_ja'],
-    zh: ['_zh', '_en', '_ja'],
-    ja: ['_ja', '_en', '_zh'],
+    en: ['_en', '_zh', '_ja', '_ko'],
+    zh: ['_zh', '_en', '_ja', '_ko'],
+    ja: ['_ja', '_en', '_zh', '_ko'],
+    ko: ['_ko', '_en', '_zh', '_ja'],
   };
   for (const suffix of (suffixMap[locale] || suffixMap.en)) {
     const val = fields[`${prefix}${suffix}`];
@@ -62,7 +63,7 @@ export function localized(
 
 /** Pick a localized city name. Uses localized() with name_local fallback. */
 export function cityName(
-  fields: { name_en?: string; name_zh?: string; name_ja?: string; name_local?: string },
+  fields: { name_en?: string; name_zh?: string; name_ja?: string; name_ko?: string; name_local?: string },
   locale: string,
 ): string {
   return localized(fields as Record<string, unknown>, 'name', locale)
@@ -84,7 +85,7 @@ export function deriveCity(address: string | undefined): string | undefined {
 /** Format price badge from currency + min/max price. Falls back to price_info. */
 export function formatPriceBadge(currency?: string, minPrice?: number, maxPrice?: number, priceInfo?: string): string | undefined {
   if (minPrice != null) {
-    const sym = currency === 'HKD' ? 'HK$' : currency === 'TWD' ? 'NT$' : '$';
+    const sym = currency === 'HKD' ? 'HK$' : currency === 'TWD' ? 'NT$' : currency === 'KRW' ? '₩' : '$';
     if (maxPrice != null && maxPrice !== minPrice) {
       return `${sym}${minPrice} – ${sym}${maxPrice}`;
     }
@@ -99,5 +100,5 @@ export function formatPriceBadge(currency?: string, minPrice?: number, maxPrice?
 }
 
 /** Supported locales. */
-export const locales = ['en', 'zh', 'ja'] as const;
+export const locales = ['en', 'zh', 'ja', 'ko'] as const;
 export type Locale = (typeof locales)[number];

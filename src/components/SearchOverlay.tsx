@@ -15,18 +15,18 @@ const CATEGORY_FILTERS: { key: SearchResultType | 'all'; icon: string }[] = [
 ];
 
 const TYPE_LABELS: Record<string, Record<string, string>> = {
-  all:    { en: 'All', zh: '全部', ja: 'すべて' },
-  event:  { en: 'Events', zh: '活動', ja: 'イベント' },
-  artist: { en: 'Artists', zh: '藝人', ja: 'アーティスト' },
-  venue:  { en: 'Venues', zh: '場地', ja: '会場' },
-  city:   { en: 'Cities', zh: '城市', ja: '都市' },
+  all:    { en: 'All', zh: '全部', ja: 'すべて', ko: '전체' },
+  event:  { en: 'Events', zh: '活動', ja: 'イベント', ko: '이벤트' },
+  artist: { en: 'Artists', zh: '藝人', ja: 'アーティスト', ko: '아티스트' },
+  venue:  { en: 'Venues', zh: '場地', ja: '会場', ko: '베뉴' },
+  city:   { en: 'Cities', zh: '城市', ja: '都市', ko: '도시' },
 };
 
 const SECTION_LABELS: Record<string, Record<string, string>> = {
-  event:  { en: 'EVENTS', zh: '活動', ja: 'イベント' },
-  artist: { en: 'ARTISTS', zh: '藝人', ja: 'アーティスト' },
-  venue:  { en: 'VENUES', zh: '場地', ja: '会場' },
-  city:   { en: 'CITIES', zh: '城市', ja: '都市' },
+  event:  { en: 'EVENTS', zh: '活動', ja: 'イベント', ko: '이벤트' },
+  artist: { en: 'ARTISTS', zh: '藝人', ja: 'アーティスト', ko: '아티스트' },
+  venue:  { en: 'VENUES', zh: '場地', ja: '会場', ko: '베뉴' },
+  city:   { en: 'CITIES', zh: '城市', ja: '都市', ko: '도시' },
 };
 
 export default function SearchOverlay() {
@@ -288,7 +288,7 @@ export default function SearchOverlay() {
               value={query}
               onChange={(e) => { setQuery(e.target.value); setActiveIndex(-1); }}
               onKeyDown={handleKeyDown}
-              placeholder={locale === 'zh' ? '搜尋活動、藝人、場地...' : locale === 'ja' ? 'イベント、アーティスト、会場を検索...' : 'Search events, artists, venues...'}
+              placeholder={locale === 'zh' ? '搜尋活動、藝人、場地...' : locale === 'ja' ? 'イベント、アーティスト、会場を検索...' : locale === 'ko' ? '이벤트, 아티스트, 베뉴 검색...' : 'Search events, artists, venues...'}
               className="flex-1 bg-transparent text-[var(--foreground)] text-base placeholder:text-[var(--muted-foreground)] focus:outline-none font-serif"
               autoComplete="off"
               autoCorrect="off"
@@ -296,7 +296,7 @@ export default function SearchOverlay() {
             />
             {/* Mobile cancel / Desktop shortcut hint */}
             <button onClick={close} className="sm:hidden text-sm text-[var(--muted-foreground)] shrink-0">
-              {locale === 'zh' ? '取消' : locale === 'ja' ? 'キャンセル' : 'Cancel'}
+              {locale === 'zh' ? '取消' : locale === 'ja' ? 'キャンセル' : locale === 'ko' ? '취소' : 'Cancel'}
             </button>
             <button
               onClick={close}
@@ -331,20 +331,20 @@ export default function SearchOverlay() {
               /* Empty state — keyboard hint */
               <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-foreground)]">
                 <p className="text-sm">
-                  {locale === 'zh' ? '輸入關鍵字開始搜尋' : locale === 'ja' ? 'キーワードを入力して検索' : 'Start typing to search'}
+                  {locale === 'zh' ? '輸入關鍵字開始搜尋' : locale === 'ja' ? 'キーワードを入力して検索' : locale === 'ko' ? '키워드를 입력하여 검색' : 'Start typing to search'}
                 </p>
                 <div className="hidden sm:flex items-center gap-2 mt-3 text-xs">
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)]">↑↓</kbd>
-                  <span>{locale === 'zh' ? '瀏覽' : locale === 'ja' ? 'ナビゲート' : 'Navigate'}</span>
+                  <span>{locale === 'zh' ? '瀏覽' : locale === 'ja' ? 'ナビゲート' : locale === 'ko' ? '이동' : 'Navigate'}</span>
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)]">↵</kbd>
-                  <span>{locale === 'zh' ? '前往' : locale === 'ja' ? '開く' : 'Open'}</span>
+                  <span>{locale === 'zh' ? '前往' : locale === 'ja' ? '開く' : locale === 'ko' ? '열기' : 'Open'}</span>
                 </div>
               </div>
             ) : flatResults.length === 0 ? (
               /* No results */
               <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-foreground)]">
                 <p className="text-sm">
-                  {locale === 'zh' ? '找不到相關結果' : locale === 'ja' ? '結果が見つかりません' : 'No results found'}
+                  {locale === 'zh' ? '找不到相關結果' : locale === 'ja' ? '結果が見つかりません' : locale === 'ko' ? '검색 결과가 없습니다' : 'No results found'}
                 </p>
               </div>
             ) : grouped ? (
