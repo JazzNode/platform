@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getCities, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
@@ -124,7 +124,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   {displayName(venue.fields)}
                 </h3>
                 <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? (locale === 'en' ? c.name_en : c.name_local) || '' : ''; })()} · {venueEventCount(venue, venueCountsFallback)} events
+                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? cityName(c, locale) : ''; })()} · {venueEventCount(venue, venueCountsFallback)} events
                 </p>
                 {venue.fields.jazz_frequency && (
                   <p className="mt-1 text-xs text-[#6A6560] capitalize">{venue.fields.jazz_frequency}</p>

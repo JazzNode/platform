@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, localized } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
 export async function generateMetadata() {
@@ -74,7 +74,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     .map((c) => ({
       recordId: c.id,
       citySlug: c.fields.city_id || '',
-      label: locale === 'en' ? (c.fields.name_en || c.fields.name_local || '') : (c.fields.name_local || c.fields.name_en || ''),
+      label: cityName(c.fields, locale),
       countryCode: c.fields.country_code || '',
     }))
     .sort((a, b) => a.label.localeCompare(b.label));

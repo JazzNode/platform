@@ -60,6 +60,15 @@ export function localized(
   return undefined;
 }
 
+/** Pick a localized city name. Uses localized() with name_local fallback. */
+export function cityName(
+  fields: { name_en?: string; name_zh?: string; name_ja?: string; name_local?: string },
+  locale: string,
+): string {
+  return localized(fields as Record<string, unknown>, 'name', locale)
+    || fields.name_local || fields.name_en || '?';
+}
+
 /** Derive city name from address (e.g. "台北市大安區..." → "台北", "香港灣仔..." → "香港"). */
 export function deriveCity(address: string | undefined): string | undefined {
   if (!address) return undefined;

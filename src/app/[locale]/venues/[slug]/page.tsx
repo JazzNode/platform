@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getBadges, getCities, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl, localized } from '@/lib/helpers';
+import { displayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -62,7 +62,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <div className="flex flex-wrap gap-2">
             {f.city_id?.[0] && cityMap.get(f.city_id[0]) && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                📍 {locale === 'en' ? cityMap.get(f.city_id[0])!.name_en : cityMap.get(f.city_id[0])!.name_local}
+                📍 {cityName(cityMap.get(f.city_id[0])!, locale)}
               </span>
             )}
             {f.jazz_frequency && (

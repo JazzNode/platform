@@ -9,7 +9,7 @@ import ThemeProvider from '@/components/ThemeProvider';
 import SearchProvider from '@/components/SearchProvider';
 import SearchOverlay from '@/components/SearchOverlay';
 import { getEvents, getArtists, getVenues, getCities, resolveLinks } from '@/lib/airtable';
-import { displayName, localized } from '@/lib/helpers';
+import { displayName, localized, cityName } from '@/lib/helpers';
 import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -85,7 +85,7 @@ export default async function LocaleLayout({
       return {
         id: v.id,
         displayName: displayName(v.fields),
-        cityName: city ? (locale === 'en' ? city.fields.name_en : city.fields.name_local) || '' : '',
+        cityName: city ? cityName(city.fields, locale) : '',
         address: v.fields.address_local || v.fields.address_en || null,
         jazz_frequency: v.fields.jazz_frequency || null,
       };
@@ -93,7 +93,7 @@ export default async function LocaleLayout({
     cities: cities.map((c) => ({
       id: c.id,
       citySlug: c.fields.city_id || '',
-      name: locale === 'en' ? (c.fields.name_en || c.fields.name_local || '') : (c.fields.name_local || c.fields.name_en || ''),
+      name: cityName(c.fields, locale),
       venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id)).length,
     })),
   };

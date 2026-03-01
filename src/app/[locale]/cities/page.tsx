@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
-import { displayName, photoUrl, formatDate } from '@/lib/helpers';
+import { displayName, photoUrl, formatDate, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
 
@@ -68,9 +68,6 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
   // Preserve the order from getCities() (which has international priority)
   const cityOrder = new Map(cities.map((c, i) => [c.id, i]));
   cityStats.sort((a, b) => (cityOrder.get(a.city.id) ?? 0) - (cityOrder.get(b.city.id) ?? 0));
-
-  const cityName = (fields: { name_local?: string; name_en?: string }, loc: string) =>
-    loc === 'en' ? (fields.name_en || fields.name_local || '?') : (fields.name_local || fields.name_en || '?');
 
   return (
     <div className="space-y-12">

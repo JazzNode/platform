@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import { getVenues, getEvents, getCities, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
-import { displayName, photoUrl, localized } from '@/lib/helpers';
+import { displayName, photoUrl, localized, cityName } from '@/lib/helpers';
 import VenuesClient from '@/components/VenuesClient';
 
 export async function generateMetadata() {
@@ -28,9 +28,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       displayName: displayName(f),
       photoUrl: photoUrl(f.photo_url, f.photo_file) || null,
       cityRecordId: f.city_id?.[0] || null,
-      cityLabel: cityFields
-        ? (locale === 'en' ? cityFields.name_en || cityFields.name_local || '' : cityFields.name_local || cityFields.name_en || '')
-        : '',
+      cityLabel: cityFields ? cityName(cityFields, locale) : '',
       eventCount: venueEventCount(venue, venueCountsFallback),
       jazzFrequency: f.jazz_frequency || null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
@@ -43,7 +41,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
     .filter((c) => cityIdsInUse.has(c.id))
     .map((c) => ({
       recordId: c.id,
-      label: locale === 'en' ? (c.fields.name_en || c.fields.name_local || '') : (c.fields.name_local || c.fields.name_en || ''),
+      label: cityName(c.fields, locale),
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 

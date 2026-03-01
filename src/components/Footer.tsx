@@ -86,16 +86,17 @@ export default function Footer() {
     <footer id="site-footer" className="bg-[var(--card)] rounded-t-[2.5rem] py-16 mt-24 animate-footer-fade-in">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col items-center">
-          {/* Logo + tagline */}
-          <Link href={`/${locale}`} className="group block text-center">
+          {/* Logo + tagline — inline on desktop, stacked on mobile */}
+          <Link href={`/${locale}`} className="group flex flex-col sm:flex-row items-center sm:items-baseline gap-1.5 sm:gap-3 text-center">
             <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode</p>
-            <p className="mt-1.5 text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
+            <span className="hidden sm:inline text-[var(--muted-foreground)] opacity-30">·</span>
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
               {t('tagline')}
             </p>
           </Link>
 
-          {/* Nav links — gap matches JazzNode→tagline spacing */}
-          <nav className="mt-1.5 flex items-center gap-4 text-xs uppercase tracking-widest">
+          {/* Nav links */}
+          <nav className="mt-3 flex items-center gap-4 text-xs uppercase tracking-widest">
             {navLinks.map((link, i) => (
               <span key={link.key} className="flex items-center gap-4">
                 {i > 0 && <span className="text-[var(--muted-foreground)] opacity-30">·</span>}

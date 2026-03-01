@@ -159,6 +159,8 @@ export interface City {
   city_id?: string;
   name_local?: string;
   name_en?: string;
+  name_zh?: string;
+  name_ja?: string;
   country_code?: string;
   timezone?: string;
 }
