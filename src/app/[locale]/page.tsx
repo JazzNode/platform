@@ -14,6 +14,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const [venues, events, artists, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getCities()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
+  const activeCities = cities.filter((c) => venues.some((v) => v.fields.city_id?.includes(c.id)));
 
   const now = new Date().toISOString();
   const upcoming = events
@@ -43,7 +44,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           {/* Stats — clickable links to respective pages */}
           <div className="hero-stats grid grid-cols-4 gap-6 sm:gap-8 border-t border-[var(--border)] pt-10 mt-12">
             <Link href={`/${locale}/cities`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={cities.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-gold group-hover:text-[var(--color-gold-bright)] transition-colors duration-300" />
+              <CountUp end={activeCities.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-gold group-hover:text-[var(--color-gold-bright)] transition-colors duration-300" />
               <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('cities')}</p>
             </Link>
             <Link href={`/${locale}/venues`} className="hero-stat-item group cursor-pointer">

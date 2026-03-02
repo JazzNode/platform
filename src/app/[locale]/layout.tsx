@@ -90,12 +90,14 @@ export default async function LocaleLayout({
         jazz_frequency: v.fields.jazz_frequency || null,
       };
     }),
-    cities: cities.map((c) => ({
-      id: c.id,
-      citySlug: c.fields.city_id || '',
-      name: cityName(c.fields, locale),
-      venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id)).length,
-    })),
+    cities: cities
+      .filter((c) => venues.some((v) => v.fields.city_id?.includes(c.id)))
+      .map((c) => ({
+        id: c.id,
+        citySlug: c.fields.city_id || '',
+        name: cityName(c.fields, locale),
+        venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id)).length,
+      })),
   };
 
   return (

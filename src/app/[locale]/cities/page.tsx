@@ -70,9 +70,12 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     };
   });
 
+  // Only show cities that have at least one venue
+  const activeCityStats = cityStats.filter((s) => s.venueCount > 0);
+
   // Preserve the order from getCities() (which has international priority)
   const cityOrder = new Map(cities.map((c, i) => [c.id, i]));
-  cityStats.sort((a, b) => (cityOrder.get(a.city.id) ?? 0) - (cityOrder.get(b.city.id) ?? 0));
+  activeCityStats.sort((a, b) => (cityOrder.get(a.city.id) ?? 0) - (cityOrder.get(b.city.id) ?? 0));
 
   return (
     <div className="space-y-12">
@@ -80,14 +83,14 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
         <div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold">{t('cities')}</h1>
           <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
-            {cities.length} {t('citiesCount')}
+            {activeCityStats.length} {t('citiesCount')}
           </p>
         </div>
       </FadeUp>
 
       <FadeUp stagger={0.15}>
         <div className="grid gap-6 sm:grid-cols-2">
-          {cityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, upcomingSlides, venuePhotos, topArtists }) => {
+          {activeCityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, upcomingSlides, venuePhotos, topArtists }) => {
             const f = city.fields;
             const name = cityName(f, locale);
 
