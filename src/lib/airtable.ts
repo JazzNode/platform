@@ -66,6 +66,7 @@ export interface Venue {
   description_zh?: string;
   description_en?: string;
   description_ja?: string;
+  description_ko?: string;
   city_id?: string[];       // linked Cities records
   country_code?: string;
   address?: string;           // legacy
@@ -94,9 +95,11 @@ export interface Artist {
   bio_short_en?: string;
   bio_short_zh?: string;
   bio_short_ja?: string;
+  bio_short_ko?: string;
   description_zh?: string;
   description_en?: string;
   description_ja?: string;
+  description_ko?: string;
   country_code?: string;
   primary_instrument?: string;
   instrument_list?: string[];
@@ -123,9 +126,11 @@ export interface Event {
   description_en?: string;
   description_zh?: string;
   description_ja?: string;
+  description_ko?: string;
   description_short_en?: string;
   description_short_zh?: string;
   description_short_ja?: string;
+  description_short_ko?: string;
   start_at?: string;
   end_at?: string;
   timezone?: string;        // e.g. "Asia/Taipei"
@@ -149,9 +154,11 @@ export interface BadgeDef {
   name_en?: string;
   name_zh?: string;
   name_ja?: string;
+  name_ko?: string;
   description?: string;
   description_zh?: string;
   description_ja?: string;
+  description_ko?: string;
   icon?: string;
 }
 
@@ -161,6 +168,7 @@ export interface City {
   name_en?: string;
   name_zh?: string;
   name_ja?: string;
+  name_ko?: string;
   country_code?: string;
   timezone?: string;
 }
