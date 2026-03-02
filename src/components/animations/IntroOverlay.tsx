@@ -12,12 +12,17 @@ const LINES = [
 
 export default function IntroOverlay() {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(true);
+  const [removed, setRemoved] = useState(false);
 
   useEffect(() => {
-    // Only show once per session
+    // Already seen this session — smooth fade out the black overlay
     if (sessionStorage.getItem('jazznode-intro-seen')) {
-      setVisible(false);
+      gsap.to(overlayRef.current, {
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.out',
+        onComplete: () => setRemoved(true),
+      });
       return;
     }
 
@@ -30,17 +35,13 @@ export default function IntroOverlay() {
       const tl = gsap.timeline({
         onComplete: () => {
           document.body.style.overflow = '';
-          setVisible(false);
+          setRemoved(true);
         },
       });
 
       const lines = overlayRef.current?.querySelectorAll('.intro-line');
       const divider = overlayRef.current?.querySelector('.intro-divider');
       if (!lines || !divider) return;
-
-      // Initial state
-      gsap.set(lines, { opacity: 0, y: 12, filter: 'blur(6px)' });
-      gsap.set(divider, { scaleX: 0, opacity: 0 });
 
       // ─── Phase 1: Main Chinese line fades in with focus effect ───
       tl.to(lines[0], {
@@ -85,7 +86,7 @@ export default function IntroOverlay() {
     };
   }, []);
 
-  if (!visible) return null;
+  if (removed) return null;
 
   return (
     <div

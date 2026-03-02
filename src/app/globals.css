@@ -345,6 +345,8 @@ body {
   letter-spacing: 0.12em;
   color: #F0EDE6;
   line-height: 1.6;
+  opacity: 0;
+  filter: blur(6px);
 }
 
 .intro-divider {
@@ -354,6 +356,8 @@ body {
   margin: 1.5rem 0;
   transform-origin: center;
   box-shadow: 0 0 8px rgba(200, 168, 78, 0.3);
+  opacity: 0;
+  transform: scaleX(0);
 }
 
 .intro-line-sub {
@@ -363,6 +367,8 @@ body {
   letter-spacing: 0.08em;
   color: #8A8578;
   line-height: 2;
+  opacity: 0;
+  filter: blur(6px);
 }
 
 /* ─── Sound wave animation (Siri-inspired) ─── */
