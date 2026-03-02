@@ -112,7 +112,7 @@ export default async function LocaleLayout({
               <Footer />
               <MobileTabBar />
               <SearchOverlay />
-              <IntroOverlay />
+              <IntroOverlay locale={locale} />
             </SearchProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
