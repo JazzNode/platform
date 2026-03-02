@@ -317,6 +317,54 @@ body {
   }
 }
 
+/* ─── Intro Overlay ─── */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: #0A0A0A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+}
+
+.intro-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.intro-line-main {
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 4vw, 2.25rem);
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  color: #F0EDE6;
+  line-height: 1.6;
+}
+
+.intro-divider {
+  width: 48px;
+  height: 1px;
+  background: var(--color-gold);
+  margin: 1.5rem 0;
+  transform-origin: center;
+  box-shadow: 0 0 8px rgba(200, 168, 78, 0.3);
+}
+
+.intro-line-sub {
+  font-family: var(--font-serif);
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: #8A8578;
+  line-height: 2;
+}
+
 /* ─── Sound wave animation (Siri-inspired) ─── */
 @keyframes soundwave {
   0%, 100% {

@@ -8,6 +8,7 @@ import MobileTabBar from '@/components/MobileTabBar';
 import ThemeProvider from '@/components/ThemeProvider';
 import SearchProvider from '@/components/SearchProvider';
 import SearchOverlay from '@/components/SearchOverlay';
+import IntroOverlay from '@/components/animations/IntroOverlay';
 import { getEvents, getArtists, getVenues, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, localized, cityName } from '@/lib/helpers';
 import '@/app/globals.css';
@@ -111,6 +112,7 @@ export default async function LocaleLayout({
               <Footer />
               <MobileTabBar />
               <SearchOverlay />
+              <IntroOverlay />
             </SearchProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
