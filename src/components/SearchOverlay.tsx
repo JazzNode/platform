@@ -56,18 +56,11 @@ export default function SearchOverlay() {
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  // ⌘K shortcut
+  // Escape to close
   useEffect(() => {
+    if (!isOpen) return;
     function onKeyDown(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        if (isOpen) close();
-        else {
-          // Need to use the toggle from context — but we only have close here
-          // We'll handle open from Header
-        }
-      }
-      if (e.key === 'Escape' && isOpen) {
+      if (e.key === 'Escape') {
         e.preventDefault();
         close();
       }

@@ -1,11 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useEffect, useRef, useState } from 'react';
 
-gsap.registerPlugin(ScrollTrigger);
-
+/**
+ * Scroll-triggered fade-up animation using Intersection Observer.
+ * Supports two modes:
+ * - Container mode: animates the wrapper div itself
+ * - Stagger mode: animates children with `.fade-up-item` class individually
+ *
+ * Drop-in replacement for the previous GSAP-based implementation.
+ */
 export default function FadeUp({
   children,
   className = '',
@@ -18,48 +22,59 @@ export default function FadeUp({
   delay?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
 
+  // Set initial hidden state on stagger children + observe
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      const items = ref.current?.querySelectorAll('.fade-up-item');
-      if (!items || items.length === 0) {
-        // Animate the container itself
-        gsap.set(ref.current!, { y: 40, opacity: 0 });
-        gsap.to(ref.current!, {
-          y: 0,
-          opacity: 1,
-          duration: 0.9,
-          ease: 'power3.out',
-          delay,
-          scrollTrigger: {
-            trigger: ref.current!,
-            start: 'top 88%',
-            once: true,
-          },
-        });
-      } else {
-        gsap.set(items, { y: 40, opacity: 0 });
-        gsap.to(items, {
-          y: 0,
-          opacity: 1,
-          duration: 0.9,
-          ease: 'power3.out',
-          stagger,
-          delay,
-          scrollTrigger: {
-            trigger: ref.current!,
-            start: 'top 88%',
-            once: true,
-          },
-        });
-      }
-    }, ref);
+    const el = ref.current;
+    if (!el) return;
 
-    return () => ctx.revert();
-  }, [stagger, delay]);
+    const items = el.querySelectorAll<HTMLElement>('.fade-up-item');
+    items.forEach((item) => {
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(24px)';
+    });
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.08 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Animate stagger children when visible
+  useEffect(() => {
+    if (!visible || !ref.current) return;
+
+    const items = ref.current.querySelectorAll<HTMLElement>('.fade-up-item');
+    items.forEach((item, i) => {
+      item.style.transition =
+        'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)';
+      item.style.transitionDelay = `${delay + i * stagger}s`;
+      item.style.opacity = '1';
+      item.style.transform = 'translateY(0)';
+    });
+  }, [visible, stagger, delay]);
 
   return (
-    <div ref={ref} className={className}>
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: visible ? 1 : 0,
+        transform: visible ? 'translateY(0)' : 'translateY(24px)',
+        transition:
+          'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+        transitionDelay: `${delay}s`,
+      }}
+    >
       {children}
     </div>
   );

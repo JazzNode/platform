@@ -1,71 +1,61 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-gsap.registerPlugin(ScrollTrigger);
+const EASE_OUT = 'cubic-bezier(0.33, 1, 0.68, 1)';
+const EASE_IN_OUT = 'cubic-bezier(0.65, 0, 0.35, 1)';
 
 export default function ManifestoReveal({ children }: { children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Gold accent line grows downward
-      const accent = ref.current?.querySelector('.manifesto-accent');
-      if (accent) {
-        gsap.set(accent, { scaleY: 0, transformOrigin: 'top' });
-        gsap.to(accent, {
-          scaleY: 1,
-          duration: 1.4,
-          ease: 'power3.inOut',
-          scrollTrigger: {
-            trigger: ref.current!,
-            start: 'top 82%',
-            once: true,
-          },
-        });
-      }
+    const el = ref.current;
+    if (!el) return;
 
-      // Lines stagger in — each sentence arrives like a phrase in a solo
-      const lines = ref.current?.querySelectorAll('.manifesto-line');
-      if (lines?.length) {
-        gsap.set(lines, { y: 20, opacity: 0 });
-        gsap.to(lines, {
-          y: 0,
-          opacity: 1,
-          duration: 1,
-          ease: 'power3.out',
-          stagger: 0.35,
-          delay: 0.3,
-          scrollTrigger: {
-            trigger: ref.current!,
-            start: 'top 82%',
-            once: true,
-          },
-        });
-      }
+    const accent = el.querySelector<HTMLElement>('.manifesto-accent');
+    const lines = el.querySelectorAll<HTMLElement>('.manifesto-line');
+    const attr = el.querySelector<HTMLElement>('.manifesto-attr');
 
-      // Signature fades in last
-      const attr = ref.current?.querySelector('.manifesto-attr');
-      if (attr) {
-        gsap.set(attr, { opacity: 0, x: -8 });
-        gsap.to(attr, {
-          opacity: 1,
-          x: 0,
-          duration: 0.8,
-          ease: 'power2.out',
-          delay: 1.8,
-          scrollTrigger: {
-            trigger: ref.current!,
-            start: 'top 82%',
-            once: true,
-          },
-        });
-      }
-    }, ref);
+    // Set initial hidden states
+    if (accent) {
+      accent.style.transform = 'scaleY(0)';
+      accent.style.transformOrigin = 'top';
+    }
+    lines.forEach((l) => { l.style.opacity = '0'; l.style.transform = 'translateY(20px)'; });
+    if (attr) { attr.style.opacity = '0'; attr.style.transform = 'translateX(-8px)'; }
 
-    return () => ctx.revert();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+
+        // Gold accent line grows (duration 1.4s)
+        if (accent) {
+          accent.style.transition = `transform 1.4s ${EASE_IN_OUT}`;
+          accent.style.transform = 'scaleY(1)';
+        }
+
+        // Lines stagger in (delay 0.3s + i * 0.35s, duration 1s)
+        lines.forEach((line, i) => {
+          line.style.transition = `opacity 1s ${EASE_OUT}, transform 1s ${EASE_OUT}`;
+          line.style.transitionDelay = `${0.3 + i * 0.35}s`;
+          line.style.opacity = '1';
+          line.style.transform = 'translateY(0)';
+        });
+
+        // Attribution fades in last (delay 1.8s, duration 0.8s)
+        if (attr) {
+          attr.style.transition = `opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1), transform 0.8s cubic-bezier(0.25, 1, 0.5, 1)`;
+          attr.style.transitionDelay = '1.8s';
+          attr.style.opacity = '1';
+          attr.style.transform = 'translateX(0)';
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   return <div ref={ref}>{children}</div>;

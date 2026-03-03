@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
@@ -75,7 +76,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         {f.poster_url && (
           <div className="w-full lg:w-[400px] shrink-0">
             <div className="overflow-hidden rounded-2xl">
-              <img src={f.poster_url} alt={f.title || ''} className="w-full h-auto object-cover" />
+              <Image src={f.poster_url} alt={f.title || ''} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
             </div>
           </div>
         )}

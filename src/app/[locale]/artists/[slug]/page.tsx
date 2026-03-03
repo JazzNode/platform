@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
@@ -117,8 +118,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         <div className="flex flex-col md:flex-row gap-10 items-start">
           {/* Photo */}
           {photoUrl(f.photo_url, f.photo_file) ? (
-            <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[var(--border)]">
-              <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-full object-cover" />
+            <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[var(--border)] relative">
+              <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} fill className="object-cover" sizes="192px" />
             </div>
           ) : (
             <div className="w-48 h-48 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl shrink-0 border border-[var(--border)]">

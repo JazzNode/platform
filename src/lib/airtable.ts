@@ -47,6 +47,7 @@ interface AirtableResponse<T = Record<string, unknown>> {
 async function fetchTable<T = Record<string, unknown>>(
   tableId: string,
   params: Record<string, string> = {},
+  options: { fields?: string[]; formula?: string } = {},
 ): Promise<{ id: string; fields: T }[]> {
   const all: { id: string; fields: T }[] = [];
   let offset: string | undefined;
@@ -54,6 +55,10 @@ async function fetchTable<T = Record<string, unknown>>(
   do {
     const url = new URL(`${BASE_URL}/${tableId}`);
     for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+    if (options.fields) {
+      for (const f of options.fields) url.searchParams.append('fields[]', f);
+    }
+    if (options.formula) url.searchParams.set('filterByFormula', options.formula);
     if (offset) url.searchParams.set('offset', offset);
 
     const res = await fetch(url.toString(), {
@@ -273,13 +278,18 @@ export const getBadges = cache(
   ),
 );
 
+// Build a lookup map from records (call once, reuse across multiple resolveLinks calls)
+export function buildMap<T>(records: { id: string; fields: T }[]): Map<string, { id: string; fields: T }> {
+  return new Map(records.map((r) => [r.id, r]));
+}
+
 // Resolve linked record IDs to objects (for build-time denormalization)
 export function resolveLinks<T>(
   ids: string[] | undefined,
-  records: { id: string; fields: T }[],
+  recordsOrMap: { id: string; fields: T }[] | Map<string, { id: string; fields: T }>,
 ): { id: string; fields: T }[] {
   if (!ids) return [];
-  const map = new Map(records.map((r) => [r.id, r]));
+  const map = recordsOrMap instanceof Map ? recordsOrMap : new Map(recordsOrMap.map((r) => [r.id, r]));
   return ids.map((id) => map.get(id)).filter(Boolean) as { id: string; fields: T }[];
 }
 

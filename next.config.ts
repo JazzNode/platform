@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
   },
   images: {
     remotePatterns: [
-      { protocol: 'https', hostname: 'v5.airtableusercontent.com' },
-      { protocol: 'https', hostname: 'dl.airtable.com' },
+      { protocol: 'https', hostname: '**' },
+      { protocol: 'http', hostname: '**' },
     ],
   },
 };

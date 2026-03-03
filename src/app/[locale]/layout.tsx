@@ -7,9 +7,10 @@ import Footer from '@/components/Footer';
 import MobileTabBar from '@/components/MobileTabBar';
 import ThemeProvider from '@/components/ThemeProvider';
 import SearchProvider from '@/components/SearchProvider';
-import SearchOverlay from '@/components/SearchOverlay';
+import dynamic from 'next/dynamic';
+const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
-import { getEvents, getArtists, getVenues, getCities, resolveLinks } from '@/lib/airtable';
+import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/airtable';
 import { displayName, localized, cityName } from '@/lib/helpers';
 import '@/app/globals.css';
 
@@ -52,14 +53,18 @@ export default async function LocaleLayout({
   ]);
 
   const now = new Date().toISOString();
+  const venueMap = buildMap(venues);
+  const artistMap = buildMap(artists);
+  const cityMap = buildMap(cities);
+
   const searchData = {
     events: events
       .filter((e) => e.fields.start_at && e.fields.start_at >= now)
       .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
       .map((e) => {
         const tz = e.fields.timezone || 'Asia/Taipei';
-        const venue = resolveLinks(e.fields.venue_id, venues)[0];
-        const artist = resolveLinks(e.fields.primary_artist, artists)[0];
+        const venue = resolveLinks(e.fields.venue_id, venueMap)[0];
+        const artist = resolveLinks(e.fields.primary_artist, artistMap)[0];
         const d = e.fields.start_at ? new Date(e.fields.start_at) : null;
         return {
           id: e.id,
@@ -82,7 +87,7 @@ export default async function LocaleLayout({
       photoUrl: a.fields.photo_url || null,
     })),
     venues: venues.map((v) => {
-      const city = resolveLinks(v.fields.city_id, cities)[0];
+      const city = resolveLinks(v.fields.city_id, cityMap)[0];
       return {
         id: v.id,
         displayName: displayName(v.fields),

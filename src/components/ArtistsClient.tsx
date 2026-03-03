@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -155,8 +156,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             >
               <div className="flex items-center gap-4 mb-3">
                 {artist.photoUrl ? (
-                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[var(--border)]">
-                    <img src={artist.photoUrl} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[var(--border)] relative">
+                    <Image src={artist.photoUrl} alt="" fill className="object-cover" sizes="56px" />
                   </div>
                 ) : (
                   <div className="w-14 h-14 rounded-xl bg-[#1A1A1A] flex items-center justify-center text-xl shrink-0 border border-[var(--border)]">♪</div>

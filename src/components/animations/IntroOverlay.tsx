@@ -1,14 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState, useMemo } from 'react';
-import gsap from 'gsap';
+
+const EASE_OUT = 'cubic-bezier(0.33, 1, 0.68, 1)';
+const EASE_IN_OUT = 'cubic-bezier(0.45, 0, 0.55, 1)';
 
 // Ordered by sub-line priority: en > zh > ja > ko
 const ALL_LINES = [
   { text: 'Dedicated to you, who also loves jazz', lang: 'en' },
-  { text: '僅獻給，一樣喜歡爵士樂的你', lang: 'zh' },
-  { text: 'ジャズを同じように愛する、あなたへ', lang: 'ja' },
-  { text: '재즈를 사랑하는, 당신에게', lang: 'ko' },
+  { text: '\u50C5\u737B\u7D66\uFF0C\u4E00\u6A23\u559C\u6B61\u7235\u58EB\u6A02\u7684\u4F60', lang: 'zh' },
+  { text: '\u30B8\u30E3\u30BA\u3092\u540C\u3058\u3088\u3046\u306B\u611B\u3059\u308B\u3001\u3042\u306A\u305F\u3078', lang: 'ja' },
+  { text: '\uC7AC\uC988\uB97C \uC0AC\uB791\uD558\uB294, \uB2F9\uC2E0\uC5D0\uAC8C', lang: 'ko' },
 ];
 
 export default function IntroOverlay({ locale }: { locale: string }) {
@@ -23,15 +25,21 @@ export default function IntroOverlay({ locale }: { locale: string }) {
   }, [locale]);
 
   useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+
     // Already seen this session — smooth fade out the black overlay
     if (sessionStorage.getItem('jazznode-intro-seen')) {
-      gsap.to(overlayRef.current, {
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out',
-        onComplete: () => setRemoved(true),
-      });
-      return;
+      el.style.transition = `opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1)`;
+      el.style.opacity = '0';
+      const onEnd = () => setRemoved(true);
+      el.addEventListener('transitionend', onEnd, { once: true });
+      // Safety fallback in case transitionend doesn't fire
+      const fallback = setTimeout(onEnd, 800);
+      return () => {
+        el.removeEventListener('transitionend', onEnd);
+        clearTimeout(fallback);
+      };
     }
 
     sessionStorage.setItem('jazznode-intro-seen', '1');
@@ -39,58 +47,54 @@ export default function IntroOverlay({ locale }: { locale: string }) {
     // Prevent scroll during intro
     document.body.style.overflow = 'hidden';
 
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        onComplete: () => {
-          document.body.style.overflow = '';
-          setRemoved(true);
-        },
-      });
+    const lines = el.querySelectorAll<HTMLElement>('.intro-line');
+    const divider = el.querySelector<HTMLElement>('.intro-divider');
+    if (!lines.length || !divider) return;
 
-      const lines = overlayRef.current?.querySelectorAll('.intro-line');
-      const divider = overlayRef.current?.querySelector('.intro-divider');
-      if (!lines || !divider) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
-      // ─── Phase 1: Main line fades in with focus effect ───
-      tl.to(lines[0], {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 1.6,
-        ease: 'power3.out',
-      }, 0.6);
+    // Phase 1: Main line fades in with blur removal (delay 0.6s, duration 1.6s)
+    lines[0].style.transition = `opacity 1.6s ${EASE_OUT}, transform 1.6s ${EASE_OUT}, filter 1.6s ${EASE_OUT}`;
+    timers.push(setTimeout(() => {
+      lines[0].style.opacity = '1';
+      lines[0].style.transform = 'translateY(0)';
+      lines[0].style.filter = 'blur(0px)';
+    }, 600));
 
-      // ─── Phase 2: Gold divider draws in ───
-      tl.to(divider, {
-        scaleX: 1,
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power3.inOut',
-      }, 1.8);
+    // Phase 2: Gold divider draws in (delay 1.8s, duration 0.8s)
+    divider.style.transition = `transform 0.8s ${EASE_OUT}, opacity 0.8s ${EASE_OUT}`;
+    timers.push(setTimeout(() => {
+      divider.style.transform = 'scaleX(1)';
+      divider.style.opacity = '1';
+    }, 1800));
 
-      // ─── Phase 3: Translation lines stagger in ───
-      tl.to([lines[1], lines[2], lines[3]], {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 1.0,
-        ease: 'power3.out',
-        stagger: 0.25,
-      }, 2.4);
+    // Phase 3: Translation lines stagger in (delay 2.4s + stagger 0.25s, duration 1s)
+    [1, 2, 3].forEach((i, idx) => {
+      if (!lines[i]) return;
+      lines[i].style.transition = `opacity 1s ${EASE_OUT}, transform 1s ${EASE_OUT}, filter 1s ${EASE_OUT}`;
+      timers.push(setTimeout(() => {
+        lines[i].style.opacity = '1';
+        lines[i].style.transform = 'translateY(0)';
+        lines[i].style.filter = 'blur(0px)';
+      }, 2400 + idx * 250));
+    });
 
-      // ─── Phase 4: Hold ───
-
-      // ─── Phase 5: Everything fades out ───
-      tl.to(overlayRef.current, {
-        opacity: 0,
-        duration: 1.2,
-        ease: 'power2.inOut',
-      }, 5.0);
-    }, overlayRef);
+    // Phase 5: Everything fades out (delay 5.0s, duration 1.2s)
+    timers.push(setTimeout(() => {
+      el.style.transition = `opacity 1.2s ${EASE_IN_OUT}`;
+      el.style.opacity = '0';
+      const onEnd = () => {
+        document.body.style.overflow = '';
+        setRemoved(true);
+      };
+      el.addEventListener('transitionend', onEnd, { once: true });
+      // Safety fallback
+      timers.push(setTimeout(onEnd, 1400));
+    }, 5000));
 
     return () => {
       document.body.style.overflow = '';
-      ctx.revert();
+      timers.forEach(clearTimeout);
     };
   }, []);
 

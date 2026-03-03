@@ -1,7 +1,11 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+
+/** power2.out easing: 1 - (1 - t)^2 */
+function easeOutQuad(t: number) {
+  return 1 - (1 - t) * (1 - t);
+}
 
 export default function CountUp({
   end,
@@ -20,16 +24,20 @@ export default function CountUp({
     if (!el) return;
 
     let started = false;
+    let raf: number;
+
     function startCount() {
       if (started) return;
       started = true;
-      const obj = { val: 0 };
-      gsap.to(obj, {
-        val: end,
-        duration: 2,
-        ease: 'power2.out',
-        onUpdate: () => setDisplayed(Math.round(obj.val)),
-      });
+      const duration = 2000;
+      const startTime = performance.now();
+
+      function tick(now: number) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        setDisplayed(Math.round(easeOutQuad(progress) * end));
+        if (progress < 1) raf = requestAnimationFrame(tick);
+      }
+      raf = requestAnimationFrame(tick);
     }
 
     // IntersectionObserver mode: start when element scrolls into view
@@ -44,14 +52,17 @@ export default function CountUp({
         { threshold: 0.3 },
       );
       observer.observe(el);
-      return () => observer.disconnect();
+      return () => {
+        observer.disconnect();
+        if (raf) cancelAnimationFrame(raf);
+      };
     }
 
     // Hero mode: listen for hero stats visible event (fired after fade-in completes)
     const handler = () => startCount();
     window.addEventListener('hero-stats-visible', handler, { once: true });
 
-    // Fallback: if event never fires (e.g. navigated directly), start after 2.5s
+    // Fallback: if event never fires, start after 2.5s
     const fallback = setTimeout(() => {
       window.removeEventListener('hero-stats-visible', handler);
       startCount();
@@ -60,6 +71,7 @@ export default function CountUp({
     return () => {
       window.removeEventListener('hero-stats-visible', handler);
       clearTimeout(fallback);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, [end, trigger]);
 

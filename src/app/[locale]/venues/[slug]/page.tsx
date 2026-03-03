@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getBadges, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
@@ -62,7 +63,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       <div className="flex flex-col lg:flex-row gap-10">
         {photoUrl(f.photo_url, f.photo_file) ? (
           <div className="w-full lg:w-[400px] shrink-0 overflow-hidden rounded-2xl">
-            <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-auto object-cover" />
+            <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
           </div>
         ) : (
           <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl border border-[var(--border)]">
@@ -179,7 +180,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                   <Link key={a.id} href={`/${locale}/artists/${a.id}`}
                     className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
                     {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
-                      <img src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" className="w-8 h-8 rounded-full object-cover" loading="lazy" />
+                      <Image src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                     )}
                     <div>
                       <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
@@ -257,8 +258,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                       return (
                         <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                           {event.fields.poster_url && (
-                            <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl">
-                              <img src={event.fields.poster_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
+                            <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl relative">
+                              <Image src={event.fields.poster_url} alt="" fill className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
                             </div>
                           )}
                           <div className="text-xs uppercase tracking-widest text-gold mb-2">
