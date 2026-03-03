@@ -4,12 +4,26 @@ import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getBadges, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import SocialIcons from '@/components/SocialIcons';
+import CollapsibleSection from '@/components/CollapsibleSection';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
-  const venues = await getVenues();
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params;
+  const [venues, cities] = await Promise.all([getVenues(), getCities()]);
   const venue = venues.find((v) => v.id === slug);
-  return { title: venue ? displayName(venue.fields) : 'Venue' };
+  if (!venue) return { title: 'Venue' };
+  const f = venue.fields;
+  const name = displayName(f);
+  const city = f.city_id?.[0] ? cities.find((c) => c.id === f.city_id![0]) : null;
+  const cityLabel = city ? cityName(city.fields, locale) : '';
+  const desc = localized(f as Record<string, unknown>, 'description', locale);
+  const description = desc || (cityLabel ? `${name} — ${cityLabel}` : name);
+  const photo = photoUrl(f.photo_url, f.photo_file);
+  return {
+    title: name,
+    description,
+    ...(photo && { openGraph: { images: [{ url: photo }] } }),
+  };
 }
 
 export default async function VenueDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -40,19 +54,23 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   return (
     <div className="space-y-12">
       <Link href={`/${locale}/venues`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
-        ← {t('backToList')}
+        {t('backToList')}
       </Link>
 
       {/* Hero */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
-        {photoUrl(f.photo_url, f.photo_file) && (
+        {photoUrl(f.photo_url, f.photo_file) ? (
           <div className="w-full lg:w-[400px] shrink-0 overflow-hidden rounded-2xl">
             <img src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} className="w-full h-auto object-cover" />
           </div>
+        ) : (
+          <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl border border-[var(--border)]">
+            🎵
+          </div>
         )}
 
-        <div className="flex-1 space-y-5">
+        <div className="flex-1 space-y-6">
           <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
             <p className="text-xl text-[#8A8578]">{f.name_en}</p>
@@ -105,41 +123,45 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {desc && <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>}
 
           {/* Links */}
-          <div className="flex gap-4 text-sm">
-            {f.website_url && <a href={f.website_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">🌐 Website</a>}
-            {f.instagram && <a href={`https://instagram.com/${f.instagram.replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">📸 Instagram</a>}
-            {f.facebook_url && <a href={f.facebook_url} target="_blank" rel="noopener noreferrer" className="text-gold hover:text-[#E8C868] link-lift">👤 Facebook</a>}
-          </div>
+          <SocialIcons
+            websiteUrl={f.website_url}
+            instagram={f.instagram}
+            facebookUrl={f.facebook_url}
+          />
 
-          {f.address && <p className="text-sm text-[#8A8578]">📍 {f.address}</p>}
         </div>
       </div>
 
       </FadeUp>
 
       
-      {/* Bar-Hopping Map / Location */}
-      {f.lat && f.lng && (
+      {/* Location & Map */}
+      {((f.lat && f.lng) || f.address) && (
         <FadeUp stagger={0.1}>
           <section className="border-t border-[var(--border)] pt-12">
             <h2 className="font-serif text-2xl font-bold mb-8">📍 Location & Map</h2>
-            <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] relative bg-[#1A1A1A]">
-              <iframe
-                width="100%"
-                height="100%"
-                style={{ border: 0, filter: "grayscale(100%) invert(92%) contrast(83%) opacity(80%)" }}
-                loading="lazy"
-                allowFullScreen
-                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
-              ></iframe>
-              {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
-                <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
-                  <a href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`} target="_blank" rel="noreferrer" className="px-6 py-3 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors">
-                    Open in Apple Maps
-                  </a>
-                </div>
-              )}
-            </div>
+            {f.address && (
+              <p className="text-sm text-[#C4BFB3] mb-6">{f.address}</p>
+            )}
+            {f.lat && f.lng && (
+              <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] sm:h-[350px] relative bg-[#1A1A1A]">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, filter: "grayscale(100%) invert(92%) contrast(83%) opacity(80%)" }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
+                ></iframe>
+                {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
+                    <a href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`} target="_blank" rel="noreferrer" className="px-6 py-3 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors">
+                      Open in Apple Maps
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
           </section>
         </FadeUp>
       )}
@@ -208,38 +230,89 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         );
       })()}
 
-{/* Events */}
-      <FadeUp stagger={0.12}>
-      <section className="border-t border-[var(--border)] pt-12">
-        <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({venueEvents.length})</h2>
-        {venueEvents.length === 0 ? (
-          <p className="text-[#8A8578]">{t('noEvents')}</p>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {venueEvents.slice(0, 12).map((event) => {
-              const tz = event.fields.timezone || 'Asia/Taipei';
-              const artist = resolveLinks(event.fields.primary_artist, artists)[0];
-              return (
-                <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
-                  {event.fields.poster_url && (
-                    <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl">
-                      <img src={event.fields.poster_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
-                    </div>
-                  )}
-                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                    {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+{/* Upcoming Events */}
+      {(() => {
+        const now = new Date().toISOString();
+        const upcomingEvents = venueEvents
+          .filter((e) => e.fields.lifecycle_status === 'upcoming' || (!e.fields.lifecycle_status && (e.fields.start_at || '') >= now))
+          .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+        const pastEvents = venueEvents
+          .filter((e) => e.fields.lifecycle_status === 'past' || (e.fields.lifecycle_status !== 'upcoming' && (e.fields.start_at || '') < now));
+
+        return (
+          <>
+            <FadeUp stagger={0.12}>
+              <section className="border-t border-[var(--border)] pt-12">
+                <h2 className="font-serif text-2xl font-bold mb-8 flex items-center gap-3">
+                  <span className="pulse-dot" />
+                  {t('upcomingGigs')}
+                </h2>
+                {upcomingEvents.length === 0 ? (
+                  <p className="text-[#8A8578]">{t('noEvents')}</p>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {upcomingEvents.slice(0, 6).map((event) => {
+                      const tz = event.fields.timezone || 'Asia/Taipei';
+                      const artist = resolveLinks(event.fields.primary_artist, artists)[0];
+                      return (
+                        <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
+                          {event.fields.poster_url && (
+                            <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl">
+                              <img src={event.fields.poster_url} alt="" className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
+                            </div>
+                          )}
+                          <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                            {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                          </div>
+                          <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
+                            {event.fields.title || event.fields.title_local || 'Event'}
+                          </h3>
+                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {displayName(artist.fields)}</p>}
+                        </Link>
+                      );
+                    })}
                   </div>
-                  <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
-                    {event.fields.title || event.fields.title_local || 'Event'}
-                  </h3>
-                  {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {displayName(artist.fields)}</p>}
-                </Link>
-              );
-            })}
-          </div>
-        )}
-      </section>
-      </FadeUp>
+                )}
+              </section>
+            </FadeUp>
+
+            {/* Past Events */}
+            {pastEvents.length > 0 && (
+              <FadeUp>
+                <section className={upcomingEvents.length === 0 ? 'border-t border-[var(--border)] pt-12' : ''}>
+                  <CollapsibleSection
+                    title={t('pastHighlights')}
+                    count={pastEvents.length}
+                    countLabel={t('gigsCount')}
+                  >
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {pastEvents.slice(0, 12).map((event) => {
+                        const tz = event.fields.timezone || 'Asia/Taipei';
+                        const artist = resolveLinks(event.fields.primary_artist, artists)[0];
+                        return (
+                          <Link
+                            key={event.id}
+                            href={`/${locale}/events/${event.id}`}
+                            className="block p-4 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/20 transition-colors group"
+                          >
+                            <div className="text-xs text-[#8A8578] mb-1">
+                              {formatDate(event.fields.start_at, locale, tz)}
+                            </div>
+                            <h3 className="text-sm font-medium group-hover:text-gold transition-colors duration-300 line-clamp-1">
+                              {event.fields.title || event.fields.title_local || 'Event'}
+                            </h3>
+                            {artist && <p className="text-xs text-[#8A8578]/60 mt-0.5">♪ {displayName(artist.fields)}</p>}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </CollapsibleSection>
+                </section>
+              </FadeUp>
+            )}
+          </>
+        );
+      })()}
     </div>
   );
 }
