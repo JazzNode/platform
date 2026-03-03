@@ -65,7 +65,20 @@
     "manifestoL2": "在演算法淹沒真實聲音的時代，JazzNode 選擇成為那些專注於音樂本質者的推力。",
     "manifestoL3": "我們不追逐商業包裝的華麗名單，只導航那些隱藏在吧台角落、充滿靈魂與即興火花的真實現場。",
     "manifestoL4": "這是一個為追求好音樂的樂迷們，所打造的地下爵士指南。",
-    "legal": "免責聲明"
+    "legal": "免責聲明",
+    "upcomingGigs": "近期演出",
+    "pastHighlights": "過往足跡",
+    "jazzNetwork": "爵士網絡",
+    "asLeader": "帶領的計畫",
+    "asSideman": "參與的計畫",
+    "frequentCollaborators": "常合作樂手",
+    "activeHubs": "常駐出沒",
+    "globetrotter": "跨國演出者",
+    "gigsCount": "場演出",
+    "getTickets": "購票",
+    "nGigs": "{count} 場",
+    "showMore": "展開更多",
+    "showLess": "收合"
   },
   "regions": {
     "worldMap": "世界版圖",

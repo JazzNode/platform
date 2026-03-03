@@ -113,6 +113,12 @@ export interface Artist {
   youtube_url?: string;
   event_list?: string[];
   badge_list?: string[];
+  venue_list?: string[];
+  city_list?: string[];
+  as_bandleader_list?: string[];
+  as_sideman_list?: string[];
+  as_featured_guest_list?: string[];
+  lineup_list?: string[];
   is_master?: boolean;
   verification_status?: string;
   type?: string;
@@ -146,6 +152,7 @@ export interface Event {
   poster_url?: string;  // Wix mainImage URL (high-res event poster)
   photo_file?: { url: string; filename: string }[];  // legacy
   source_list?: string[];
+  lifecycle_status?: string;  // 'upcoming' | 'past' | 'cancelled' | 'unknown'
   slug?: string;
 }
 

@@ -65,7 +65,20 @@
     "manifestoL2": "アルゴリズムが本物の音をかき消すこの時代、JazzNodeは音楽の本質に向き合う人々の推進力であることを選ぶ。",
     "manifestoL3": "商業的に飾り立てられた華やかなラインナップは追わない。バーの片隅に隠れた、魂と即興の火花に満ちたリアルな現場だけを導く。",
     "manifestoL4": "これは、本当に良い音楽がわかる人のために作られた、アンダーグラウンド・ジャズ・ガイドだ。",
-    "legal": "免責事項"
+    "legal": "免責事項",
+    "upcomingGigs": "近日のライブ",
+    "pastHighlights": "過去のハイライト",
+    "jazzNetwork": "ジャズネットワーク",
+    "asLeader": "リーダー作品",
+    "asSideman": "サイドマン",
+    "frequentCollaborators": "頻繁な共演者",
+    "activeHubs": "活動拠点",
+    "globetrotter": "グローブトロッター",
+    "gigsCount": "回公演",
+    "getTickets": "チケット購入",
+    "nGigs": "{count} 回",
+    "showMore": "もっと見る",
+    "showLess": "閉じる"
   },
   "regions": {
     "worldMap": "世界地図",

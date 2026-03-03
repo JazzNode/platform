@@ -65,7 +65,20 @@
     "manifestoL2": "알고리즘이 진짜 소리를 삼키는 시대, JazzNode는 음악의 본질에 집중하는 이들의 추진력이 되기를 선택한다.",
     "manifestoL3": "화려한 상업적 라인업을 쫓지 않는다. 바 구석에 숨어 있는, 영혼과 즉흥의 불꽃으로 가득한 진짜 현장만을 안내한다.",
     "manifestoL4": "이것은 진정으로 좋은 음악을 아는 사람들을 위해 만들어진 언더그라운드 재즈 가이드다.",
-    "legal": "법적 고지"
+    "legal": "법적 고지",
+    "upcomingGigs": "다가오는 공연",
+    "pastHighlights": "과거 하이라이트",
+    "jazzNetwork": "재즈 네트워크",
+    "asLeader": "리더 프로젝트",
+    "asSideman": "사이드맨",
+    "frequentCollaborators": "자주 협업하는 뮤지션",
+    "activeHubs": "활동 거점",
+    "globetrotter": "글로브트로터",
+    "gigsCount": "회 공연",
+    "getTickets": "티켓 구매",
+    "nGigs": "{count} 회",
+    "showMore": "더 보기",
+    "showLess": "접기"
   },
   "regions": {
     "worldMap": "세계 지도",
