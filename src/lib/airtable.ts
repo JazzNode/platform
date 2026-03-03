@@ -8,6 +8,22 @@
  */
 
 import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
+
+/**
+ * Per-table revalidation intervals (seconds).
+ * These are fallback timers — primary invalidation comes from
+ * the /api/revalidate webhook endpoint via revalidateTag().
+ */
+const REVALIDATE = {
+  cities: 604800,    // 1 week  — rarely changes
+  venues: 86400,     // 1 day   — occasional updates
+  artists: 86400,    // 1 day   — occasional updates
+  events: 3600,      // 1 hour  — frequent updates
+  badges: 604800,    // 1 week  — rarely changes
+  tags: 604800,      // 1 week  — rarely changes
+  lineups: 3600,     // 1 hour  — tied to events
+} as const;
 
 const API_KEY = process.env.AIRTABLE_API_KEY!;
 const BASE_ID = process.env.AIRTABLE_BASE_ID!;
@@ -190,45 +206,72 @@ export interface Lineup {
   artist_name?: string[];   // lookup
 }
 
-export const getCities = cache(async () => {
-  const cities = await fetchTable<City>(TABLE_IDS.Cities);
-
-  // Product policy: do NOT encode company expansion/market plans in JazzNode.
-  // Keep sorting simple and data-driven (Airtable SSOT only).
-  return cities.sort((a, b) => {
-    const aName = a.fields.name_en || a.fields.name_local || '';
-    const bName = b.fields.name_en || b.fields.name_local || '';
-    return aName.localeCompare(bName);
-  });
-});
+export const getCities = cache(
+  unstable_cache(
+    async () => {
+      const cities = await fetchTable<City>(TABLE_IDS.Cities);
+      return cities.sort((a, b) => {
+        const aName = a.fields.name_en || a.fields.name_local || '';
+        const bName = b.fields.name_en || b.fields.name_local || '';
+        return aName.localeCompare(bName);
+      });
+    },
+    ['airtable-cities'],
+    { revalidate: REVALIDATE.cities, tags: ['cities'] },
+  ),
+);
 
 export interface Tag {
   name?: string;
 }
 
-export const getTags = cache(async () => {
-  return fetchTable<Tag>(TABLE_IDS.Tags);
-});
+export const getTags = cache(
+  unstable_cache(
+    async () => fetchTable<Tag>(TABLE_IDS.Tags),
+    ['airtable-tags'],
+    { revalidate: REVALIDATE.tags, tags: ['tags'] },
+  ),
+);
 
-export const getLineups = cache(async () => {
-  return fetchTable<Lineup>(TABLE_IDS.Lineups);
-});
+export const getLineups = cache(
+  unstable_cache(
+    async () => fetchTable<Lineup>(TABLE_IDS.Lineups),
+    ['airtable-lineups'],
+    { revalidate: REVALIDATE.lineups, tags: ['lineups'] },
+  ),
+);
 
-export const getVenues = cache(async () => {
-  return fetchTable<Venue>(TABLE_IDS.Venues);
-});
+export const getVenues = cache(
+  unstable_cache(
+    async () => fetchTable<Venue>(TABLE_IDS.Venues),
+    ['airtable-venues'],
+    { revalidate: REVALIDATE.venues, tags: ['venues'] },
+  ),
+);
 
-export const getArtists = cache(async () => {
-  return fetchTable<Artist>(TABLE_IDS.Artists);
-});
+export const getArtists = cache(
+  unstable_cache(
+    async () => fetchTable<Artist>(TABLE_IDS.Artists),
+    ['airtable-artists'],
+    { revalidate: REVALIDATE.artists, tags: ['artists'] },
+  ),
+);
 
-export const getEvents = cache(async () => {
-  return fetchTable<Event>(TABLE_IDS.Events);
-});
+export const getEvents = cache(
+  unstable_cache(
+    async () => fetchTable<Event>(TABLE_IDS.Events),
+    ['airtable-events'],
+    { revalidate: REVALIDATE.events, tags: ['events'] },
+  ),
+);
 
-export const getBadges = cache(async () => {
-  return fetchTable<BadgeDef>(TABLE_IDS.Badges);
-});
+export const getBadges = cache(
+  unstable_cache(
+    async () => fetchTable<BadgeDef>(TABLE_IDS.Badges),
+    ['airtable-badges'],
+    { revalidate: REVALIDATE.badges, tags: ['badges'] },
+  ),
+);
 
 // Resolve linked record IDs to objects (for build-time denormalization)
 export function resolveLinks<T>(
