@@ -60,10 +60,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     description: (locale === 'zh' ? b.fields.description_zh : locale === 'ja' ? b.fields.description_ja : locale === 'ko' ? b.fields.description_ko : b.fields.description) || b.fields.description || '',
   }));
 
-  // ── Versatility: bandleader / sideman ──
+  // ── Versatility: bandleader / sideman / featured_guest / band_member ──
   const leaderProjects = resolveLinks(f.as_bandleader_list, artists);
   const sidemanProjects = resolveLinks(f.as_sideman_list, artists);
-  const hasVersatility = leaderProjects.length > 0 || sidemanProjects.length > 0;
+  const featuredGuestProjects = resolveLinks(f.as_featured_guest_list, artists);
+  const bandMemberProjects = resolveLinks(f.as_band_member_list, artists);
+  const hasVersatility = leaderProjects.length > 0 || sidemanProjects.length > 0 || featuredGuestProjects.length > 0 || bandMemberProjects.length > 0;
 
   // ── Frequent Collaborators ──
   const artistLineups = resolveLinks(f.lineup_list, lineups);
@@ -300,6 +302,38 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asSideman')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {sidemanProjects.map((p) => (
+                          <Link
+                            key={p.id}
+                            href={`/${locale}/artists/${p.id}`}
+                            className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
+                          >
+                            {displayName(p.fields)}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {featuredGuestProjects.length > 0 && (
+                    <div>
+                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asFeaturedGuest')}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {featuredGuestProjects.map((p) => (
+                          <Link
+                            key={p.id}
+                            href={`/${locale}/artists/${p.id}`}
+                            className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
+                          >
+                            {displayName(p.fields)}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {bandMemberProjects.length > 0 && (
+                    <div>
+                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asBandMember')}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {bandMemberProjects.map((p) => (
                           <Link
                             key={p.id}
                             href={`/${locale}/artists/${p.id}`}

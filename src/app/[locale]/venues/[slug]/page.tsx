@@ -121,9 +121,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {/* Vibe Check / Practical Info */}
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
             {f.payment_method && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💳 {f.payment_method}</span>}
-            {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇹🇼 中文友善</span>}
-            {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇬🇧 英文友善</span>}
-            {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇯🇵 日文友善</span>}
+            {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 中文友善</span>}
+            {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 English Friendly</span>}
+            {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 日本語OK</span>}
           </div>
 
 {/* Badges */}

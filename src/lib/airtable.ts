@@ -139,6 +139,7 @@ export interface Artist {
   as_bandleader_list?: string[];
   as_sideman_list?: string[];
   as_featured_guest_list?: string[];
+  as_band_member_list?: string[];
   lineup_list?: string[];
   is_master?: boolean;
   verification_status?: string;
