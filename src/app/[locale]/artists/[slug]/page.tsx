@@ -194,7 +194,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               {upcomingEvents.slice(0, 6).map((event) => {
                 const tz = event.fields.timezone || 'Asia/Taipei';
                 const venue = resolveLinks(event.fields.venue_id, venues)[0];
-                const price = formatPriceBadge(event.fields.currency, event.fields.min_price, event.fields.max_price, event.fields.price_info);
+                const price = formatPriceBadge(venue?.fields.currency, event.fields.price_info);
                 return (
                   <div key={event.id} className="bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group flex flex-col">
                     <Link href={`/${locale}/events/${event.id}`} className="flex-1">
@@ -213,9 +213,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                         <p className="text-xs text-[#8A8578] mt-1">{price}</p>
                       )}
                     </Link>
-                    {event.fields.ticket_url && (
+                    {event.fields.source_url && (
                       <a
-                        href={event.fields.ticket_url}
+                        href={event.fields.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[var(--color-gold)] hover:text-[#E8C868] transition-colors"

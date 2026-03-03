@@ -82,15 +82,8 @@ export function deriveCity(address: string | undefined): string | undefined {
   return undefined;
 }
 
-/** Format price badge from currency + min/max price. Falls back to price_info. */
-export function formatPriceBadge(currency?: string, minPrice?: number, maxPrice?: number, priceInfo?: string): string | undefined {
-  if (minPrice != null) {
-    const sym = currency === 'HKD' ? 'HK$' : currency === 'TWD' ? 'NT$' : currency === 'KRW' ? '₩' : '$';
-    if (maxPrice != null && maxPrice !== minPrice) {
-      return `${sym}${minPrice} – ${sym}${maxPrice}`;
-    }
-    return `${sym}${minPrice}`;
-  }
+/** Format price badge from venue currency + price_info string. */
+export function formatPriceBadge(currency?: string, priceInfo?: string): string | undefined {
   if (!priceInfo) return undefined;
   // Fix bare "$" to "NT$" when we know it's TWD
   if (currency === 'TWD') {

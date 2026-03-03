@@ -99,9 +99,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           )}
 
           {/* Price badge */}
-          {(f.min_price != null || f.price_info) && (
+          {f.price_info && (
             <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[var(--border)] ml-4">
-              {formatPriceBadge(f.currency, f.min_price, f.max_price, f.price_info)}
+              {formatPriceBadge(venue?.fields.currency, f.price_info)}
             </span>
           )}
 
@@ -151,8 +151,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           )}
 
           {/* Ticket button — below description */}
-          {f.ticket_url && (
-            <a href={f.ticket_url} target="_blank" rel="noopener noreferrer"
+          {f.source_url && (
+            <a href={f.source_url} target="_blank" rel="noopener noreferrer"
               className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest">
               <span>{t('ticketLink')} ↗</span>
             </a>

@@ -106,6 +106,7 @@ export interface Venue {
   badge_list?: string[];
   most_frequent_performers?: string[];
   verification_status?: string;
+  currency?: string;
   slug?: string;
 }
 
@@ -165,11 +166,8 @@ export interface Event {
   lineup_list?: string[];
   primary_artist?: string[];
   tag_list?: string[];
-  ticket_url?: string;
+  source_url?: string;
   price_info?: string;
-  currency?: string;
-  min_price?: number;
-  max_price?: number;
   poster_url?: string;  // Wix mainImage URL (high-res event poster)
   photo_file?: { url: string; filename: string }[];  // legacy
   source_list?: string[];
