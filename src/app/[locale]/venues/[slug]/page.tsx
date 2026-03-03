@@ -82,7 +82,16 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             )}
           </div>
 
-          {/* Badges */}
+          
+          {/* Vibe Check / Practical Info */}
+          <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
+            {f.payment_method && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💳 {f.payment_method}</span>}
+            {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇹🇼 中文友善</span>}
+            {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇬🇧 英文友善</span>}
+            {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">🇯🇵 日文友善</span>}
+          </div>
+
+{/* Badges */}
           {venueBadges.length > 0 && (
             <div className="flex gap-2">
               {venueBadges.map((b) => (
@@ -108,7 +117,34 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       </FadeUp>
 
-      {/* Most Frequent Performers */}
+      
+      {/* Bar-Hopping Map / Location */}
+      {f.lat && f.lng && (
+        <FadeUp stagger={0.1}>
+          <section className="border-t border-[var(--border)] pt-12">
+            <h2 className="font-serif text-2xl font-bold mb-8">📍 Location & Map</h2>
+            <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] relative bg-[#1A1A1A]">
+              <iframe
+                width="100%"
+                height="100%"
+                style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(85%)" }}
+                loading="lazy"
+                allowFullScreen
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
+              ></iframe>
+              {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+                <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
+                  <a href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`} target="_blank" rel="noreferrer" className="px-6 py-3 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors">
+                    Open in Apple Maps
+                  </a>
+                </div>
+              )}
+            </div>
+          </section>
+        </FadeUp>
+      )}
+
+{/* Most Frequent Performers */}
       {(() => {
         const topPerformers = resolveLinks(f.most_frequent_performers, artists);
         if (topPerformers.length === 0) return null;
@@ -137,7 +173,42 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         );
       })()}
 
-      {/* Events */}
+      
+      {/* Series Spotlight / Jam Sessions */}
+      {(() => {
+        const jams = venueEvents.filter(e => {
+          const t = String(e.fields.title || '').toLowerCase();
+          const tl = String(e.fields.title_local || '').toLowerCase();
+          return t.includes('jam') || tl.includes('jam') || (e.fields.tag_list && Array.isArray(e.fields.tag_list) && e.fields.tag_list.includes('Jam Session'));
+        });
+        if (jams.length === 0) return null;
+        return (
+          <FadeUp stagger={0.1}>
+            <section className="border-t border-[var(--border)] pt-12">
+              <h2 className="font-serif text-2xl font-bold mb-8">🎙️ Jam Sessions</h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {jams.slice(0, 3).map((event) => {
+                  const tz = event.fields.timezone || 'Asia/Taipei';
+                  const artist = resolveLinks(event.fields.primary_artist, artists)[0];
+                  return (
+                    <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-gold/30 card-hover group">
+                      <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                        {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                      </div>
+                      <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
+                        {event.fields.title || event.fields.title_local || 'Event'}
+                      </h3>
+                      {artist && <p className="text-xs text-[#8A8578] mt-1">Host: {displayName(artist.fields)}</p>}
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          </FadeUp>
+        );
+      })()}
+
+{/* Events */}
       <FadeUp stagger={0.12}>
       <section className="border-t border-[var(--border)] pt-12">
         <h2 className="font-serif text-2xl font-bold mb-8">{t('events')} ({venueEvents.length})</h2>
