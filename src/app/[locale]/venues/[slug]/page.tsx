@@ -197,13 +197,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       })()}
 
       
-      {/* Series Spotlight / Jam Sessions */}
+      {/* Jam Sessions */}
       {(() => {
-        const jams = venueEvents.filter(e => {
-          const t = String(e.fields.title || '').toLowerCase();
-          const tl = String(e.fields.title_local || '').toLowerCase();
-          return t.includes('jam') || tl.includes('jam') || (e.fields.tag_list && Array.isArray(e.fields.tag_list) && e.fields.tag_list.includes('Jam Session'));
-        });
+        const jams = venueEvents.filter(e => e.fields.subtype === 'open_jam');
         if (jams.length === 0) return null;
         return (
           <FadeUp stagger={0.1}>
