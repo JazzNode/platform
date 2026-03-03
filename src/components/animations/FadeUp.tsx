@@ -42,7 +42,7 @@ export default function FadeUp({
           observer.disconnect();
         }
       },
-      { threshold: 0.08 },
+      { threshold: 0 },
     );
 
     observer.observe(el);
@@ -50,14 +50,19 @@ export default function FadeUp({
   }, []);
 
   // Animate stagger children when visible
+  // Cap total stagger to 1s so large lists (200+ items) don't wait 25s+
   useEffect(() => {
     if (!visible || !ref.current) return;
 
     const items = ref.current.querySelectorAll<HTMLElement>('.fade-up-item');
+    const maxTotalStagger = 1; // seconds
+    const effectiveStagger = items.length > 1
+      ? Math.min(stagger, maxTotalStagger / (items.length - 1))
+      : stagger;
     items.forEach((item, i) => {
       item.style.transition =
         'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)';
-      item.style.transitionDelay = `${delay + i * stagger}s`;
+      item.style.transitionDelay = `${delay + i * effectiveStagger}s`;
       item.style.opacity = '1';
       item.style.transform = 'translateY(0)';
     });

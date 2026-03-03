@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
@@ -31,20 +31,34 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
 
   const displayEvents = showPast ? past : upcoming;
 
+  // Pre-build lookup maps — O(n) once, avoids O(n²) from repeated resolveLinks on raw arrays
+  const venueMap = buildMap(venues);
+  const artistMap = buildMap(artists);
+  const tagMap = buildMap(tags);
+
+  // Index lineups by event id for O(1) lookup per event
+  const lineupsByEvent = new Map<string, typeof lineups>();
+  for (const l of lineups) {
+    for (const eid of l.fields.event_id || []) {
+      const arr = lineupsByEvent.get(eid);
+      if (arr) arr.push(l);
+      else lineupsByEvent.set(eid, [l]);
+    }
+  }
+
   // Serialize events for client component
   const serializedEvents = displayEvents.map((event) => {
     const tz = event.fields.timezone || 'Asia/Taipei';
-    const venue = resolveLinks(event.fields.venue_id, venues)[0];
-    const primaryArtist = resolveLinks(event.fields.primary_artist, artists)[0];
-    const eventLineups = lineups
-      .filter((l) => l.fields.event_id?.some((eid) => eid === event.id))
+    const venue = resolveLinks(event.fields.venue_id, venueMap)[0];
+    const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+    const eventLineups = (lineupsByEvent.get(event.id) || [])
       .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
     const lineupArtists = eventLineups
-      .map((l) => resolveLinks(l.fields.artist_id, artists)[0])
+      .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
       .filter(Boolean)
       .filter((a) => a.id !== primaryArtist?.id);
 
-    const eventTags = resolveLinks(event.fields.tag_list, tags)
+    const eventTags = resolveLinks(event.fields.tag_list, tagMap)
       .map((tag) => tag.fields.name)
       .filter(Boolean) as string[];
 

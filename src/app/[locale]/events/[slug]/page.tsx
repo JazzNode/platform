@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, type Event, type Venue, type Artist } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, buildMap, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import EventNav from '@/components/EventNav';
@@ -37,7 +37,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
   const f = event.fields;
   const tz = f.timezone || 'Asia/Taipei';
-  const venue = resolveLinks(f.venue_id, venues)[0];
+  const venueMap = buildMap(venues);
+  const artistMap = buildMap(artists);
+  const venue = resolveLinks(f.venue_id, venueMap)[0];
 
   // Compute prev/next events — same venue only, chronological
   const venueEventIds = new Set(venue?.fields.event_list || []);
@@ -47,7 +49,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const currentIdx = venueSorted.findIndex((e) => e.id === event.id);
   const prevEvent = currentIdx > 0 ? venueSorted[currentIdx - 1] : null;
   const nextEvent = currentIdx >= 0 && currentIdx < venueSorted.length - 1 ? venueSorted[currentIdx + 1] : null;
-  const primaryArtist = resolveLinks(f.primary_artist, artists)[0];
+  const primaryArtist = resolveLinks(f.primary_artist, artistMap)[0];
   const desc = localized(f as Record<string, unknown>, 'description', locale);
   const descShort = localized(f as Record<string, unknown>, 'description_short', locale);
 
@@ -57,7 +59,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
   const lineupArtists = eventLineups
     .map((l) => {
-      const artist = resolveLinks(l.fields.artist_id, artists)[0];
+      const artist = resolveLinks(l.fields.artist_id, artistMap)[0];
       return artist ? { artist, instruments: l.fields.instrument_list || [], role: l.fields.role } : null;
     })
     .filter(Boolean) as { artist: { id: string; fields: Artist }; instruments: string[]; role?: string }[];
@@ -218,7 +220,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         const now = new Date().toISOString();
         const sameCityEvents = events
           .filter((e) => {
-            const eVenue = resolveLinks(e.fields.venue_id, venues)[0];
+            const eVenue = resolveLinks(e.fields.venue_id, venueMap)[0];
             return eVenue && otherVenueIds.has(eVenue.id) && e.fields.start_at && e.fields.start_at >= now;
           })
           .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
@@ -233,7 +235,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sameCityEvents.map((related) => {
                 const rtz = related.fields.timezone || 'Asia/Taipei';
-                const rVenue = resolveLinks(related.fields.venue_id, venues)[0];
+                const rVenue = resolveLinks(related.fields.venue_id, venueMap)[0];
                 return (
                   <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
