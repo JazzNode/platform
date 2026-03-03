@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getBadges, getCities, resolveLinks } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks } from '@/lib/airtable';
 import { displayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
@@ -33,7 +33,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
 
-  const [venues, events, artists, badges, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities()]);
+  const [venues, events, artists, badges, cities, lineups] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities(), getLineups()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venue = venues.find((v) => v.id === slug);
 
@@ -51,6 +51,22 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   const venueEvents = resolveLinks(f.event_list, events)
     .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''));
   const venueBadges = resolveLinks(f.badge_list, badges);
+
+  // Compute frequent performers from all lineup roles
+  const venueEventIds = new Set(venueEvents.map(e => e.id));
+  const artistCounts = new Map<string, number>();
+  for (const l of lineups) {
+    if (!l.fields.event_id?.some(eid => venueEventIds.has(eid))) continue;
+    for (const aid of l.fields.artist_id || []) {
+      artistCounts.set(aid, (artistCounts.get(aid) || 0) + 1);
+    }
+  }
+  const artistMap = new Map(artists.map(a => [a.id, a]));
+  const topPerformers = [...artistCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 10)
+    .map(([id]) => artistMap.get(id))
+    .filter(Boolean) as { id: string; fields: typeof artists[number]['fields'] }[];
 
   return (
     <div className="space-y-12">
@@ -168,33 +184,29 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       )}
 
 {/* Most Frequent Performers */}
-      {(() => {
-        const topPerformers = resolveLinks(f.most_frequent_performers, artists);
-        if (topPerformers.length === 0) return null;
-        return (
-          <FadeUp stagger={0.08}>
-            <section className="border-t border-[var(--border)] pt-12">
-              <h2 className="font-serif text-2xl font-bold mb-8">{t('topPerformers') || '常駐樂手'}</h2>
-              <div className="flex flex-wrap gap-3">
-                {topPerformers.map((a) => (
-                  <Link key={a.id} href={`/${locale}/artists/${a.id}`}
-                    className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
-                    {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
-                      <Image src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+      {topPerformers.length > 0 && (
+        <FadeUp stagger={0.08}>
+          <section className="border-t border-[var(--border)] pt-12">
+            <h2 className="font-serif text-2xl font-bold mb-8">{t('topPerformers') || '常駐樂手'}</h2>
+            <div className="flex flex-wrap gap-3">
+              {topPerformers.map((a) => (
+                <Link key={a.id} href={`/${locale}/artists/${a.id}`}
+                  className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
+                  {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
+                    <Image src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                  )}
+                  <div>
+                    <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
+                    {a.fields.primary_instrument && (
+                      <span className="text-xs text-[#8A8578] ml-2">{instLabel(a.fields.primary_instrument)}</span>
                     )}
-                    <div>
-                      <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
-                      {a.fields.primary_instrument && (
-                        <span className="text-xs text-[#8A8578] ml-2">{instLabel(a.fields.primary_instrument)}</span>
-                      )}
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </section>
-          </FadeUp>
-        );
-      })()}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </FadeUp>
+      )}
 
       
       {/* Jam Sessions */}
