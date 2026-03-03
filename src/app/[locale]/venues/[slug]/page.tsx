@@ -127,7 +127,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               <iframe
                 width="100%"
                 height="100%"
-                style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(85%)" }}
+                style={{ border: 0, filter: "grayscale(100%) invert(92%) contrast(83%) opacity(80%)" }}
                 loading="lazy"
                 allowFullScreen
                 src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
