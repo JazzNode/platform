@@ -47,8 +47,11 @@ export default function Header() {
         }`}
       >
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link href={`/${locale}`} className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-gold)] group-hover:text-[var(--color-gold-bright)] transition-colors link-lift">
+          <Link href={`/${locale}`} className="flex items-center gap-2 font-serif text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-gold)] group-hover:text-[var(--color-gold-bright)] transition-colors link-lift">
             JazzNode
+            <span className="text-[9px] font-sans font-semibold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded-full border border-[var(--color-gold)]/40 text-[var(--color-gold)]/70 leading-none select-none">
+              beta
+            </span>
           </Link>
 
           {/* Desktop nav */}
