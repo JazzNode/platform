@@ -102,14 +102,14 @@ export default function MobileTabBar() {
       }}
     >
       <div
-        className="mx-3 mb-2 rounded-2xl shadow-[0_-4px_30px_rgba(0,0,0,0.4)]"
+        className="mx-3 mb-2 rounded-2xl"
         style={{
-          background: 'color-mix(in srgb, var(--card) 72%, transparent)',
+          background: 'color-mix(in srgb, var(--card) 80%, transparent)',
           backdropFilter: 'blur(24px) saturate(1.4)',
           WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-          borderColor: 'var(--border)',
-          border: '1px solid var(--border)',
-          transition: 'background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
+          border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.15)',
+          boxShadow: '0 -2px 20px rgba(var(--theme-glow-rgb, 200, 168, 78), 0.08), 0 -4px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(var(--theme-glow-rgb, 200, 168, 78), 0.06)',
+          transition: 'background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
         <div className="flex items-center justify-around py-2">
