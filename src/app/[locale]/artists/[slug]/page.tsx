@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, resolveLinks } from '@/lib/airtable';
 import { displayName, artistDisplayName, formatDate, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import BadgeDock from '@/components/BadgeDock';
@@ -119,15 +120,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       <FadeUp>
         <div className="flex flex-col md:flex-row gap-10 items-start">
           {/* Photo */}
-          {photoUrl(f.photo_url, f.photo_file) ? (
-            <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[var(--border)] relative">
-              <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={artistDisplayName(f, locale)} fill className="object-cover" sizes="192px" />
-            </div>
-          ) : (
-            <div className="w-48 h-48 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl shrink-0 border border-[var(--border)]">
-              ♪
-            </div>
-          )}
+          <ArtistPhotoUpload
+            artistId={artist.id}
+            artistName={artistDisplayName(f, locale)}
+            currentPhotoUrl={photoUrl(f.photo_url, f.photo_file)}
+            size="md"
+          />
 
           <div className="flex-1 space-y-5">
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{artistDisplayName(f, locale)}</h1>
