@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const artists = await getArtists();
   const artist = artists.find((a) => a.id === slug);
-  return { title: artist ? displayName(artist.fields) : 'Artist' };
+  return { title: artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist' };
 }
 
 export default async function ArtistDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -121,7 +121,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           {/* Photo */}
           {photoUrl(f.photo_url, f.photo_file) ? (
             <div className="w-48 h-48 rounded-2xl overflow-hidden shrink-0 border border-[var(--border)] relative">
-              <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} fill className="object-cover" sizes="192px" />
+              <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={artistDisplayName(f, locale)} fill className="object-cover" sizes="192px" />
             </div>
           ) : (
             <div className="w-48 h-48 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl shrink-0 border border-[var(--border)]">
@@ -130,7 +130,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           )}
 
           <div className="flex-1 space-y-5">
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold">{artistDisplayName(f, locale)}</h1>
             {f.name_en && f.name_local && f.name_en !== f.name_local && (
               <p className="text-xl text-[#8A8578]">{f.name_en}</p>
             )}
@@ -291,7 +291,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                             href={`/${locale}/artists/${p.id}`}
                             className="text-sm px-3 py-1.5 rounded-xl bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 hover:border-[var(--color-gold)]/40 transition-colors link-lift"
                           >
-                            {displayName(p.fields)}
+                            {artistDisplayName(p.fields, locale)}
                           </Link>
                         ))}
                       </div>
@@ -307,7 +307,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                             href={`/${locale}/artists/${p.id}`}
                             className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
                           >
-                            {displayName(p.fields)}
+                            {artistDisplayName(p.fields, locale)}
                           </Link>
                         ))}
                       </div>
@@ -323,7 +323,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                             href={`/${locale}/artists/${p.id}`}
                             className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
                           >
-                            {displayName(p.fields)}
+                            {artistDisplayName(p.fields, locale)}
                           </Link>
                         ))}
                       </div>
@@ -339,7 +339,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                             href={`/${locale}/artists/${p.id}`}
                             className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
                           >
-                            {displayName(p.fields)}
+                            {artistDisplayName(p.fields, locale)}
                           </Link>
                         ))}
                       </div>
@@ -363,7 +363,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                         {photoUrl(collab.fields.photo_url, collab.fields.photo_file) ? (
                           <img
                             src={photoUrl(collab.fields.photo_url, collab.fields.photo_file)!}
-                            alt={displayName(collab.fields)}
+                            alt={artistDisplayName(collab.fields, locale)}
                             className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
                           />
                         ) : (
@@ -373,7 +373,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                         )}
                         <div className="flex-1 min-w-0">
                           <span className="text-sm font-medium group-hover:text-gold transition-colors truncate block">
-                            {displayName(collab.fields)}
+                            {artistDisplayName(collab.fields, locale)}
                           </span>
                           <span className="text-xs text-[#8A8578]">
                             {collab.count} {t('gigsCount')}

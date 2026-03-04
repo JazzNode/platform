@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
 export async function generateMetadata() {
@@ -70,8 +70,8 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       venue_id: venue?.id || null,
       venue_name: venue ? displayName(venue.fields) : '',
       city_record_id: venue?.fields.city_id?.[0] || null,
-      primary_artist_name: primaryArtist ? displayName(primaryArtist.fields) : null,
-      sidemen: lineupArtists.map((a) => displayName(a.fields)),
+      primary_artist_name: primaryArtist ? artistDisplayName(primaryArtist.fields, locale) : null,
+      sidemen: lineupArtists.map((a) => artistDisplayName(a.fields, locale)),
       description_short: localized(event.fields as Record<string, unknown>, 'description_short', locale) || null,
       date_display: formatDate(event.fields.start_at, locale, tz),
       time_display: formatTime(event.fields.start_at, tz),

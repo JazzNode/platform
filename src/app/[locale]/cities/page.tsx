@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
-import { displayName, photoUrl, formatDate, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, photoUrl, formatDate, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
 import EventCarousel from '@/components/EventCarousel';
@@ -166,7 +166,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                           href={`/${locale}/artists/${a.id}`}
                           className="text-xs px-2.5 py-1 rounded-full bg-[var(--secondary)] text-[var(--foreground)] hover:text-gold hover:bg-gold/10 transition-colors duration-300"
                         >
-                          {displayName(a.fields)}
+                          {artistDisplayName(a.fields, locale)}
                         </Link>
                       ))}
                     </div>

@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
@@ -199,7 +199,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     <Image src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                   )}
                   <div>
-                    <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(a.fields)}</span>
+                    <span className="text-sm font-medium group-hover:text-gold transition-colors">{artistDisplayName(a.fields, locale)}</span>
                     {a.fields.primary_instrument && (
                       <span className="text-xs text-[#8A8578] ml-2">{instLabel(a.fields.primary_instrument)}</span>
                     )}
@@ -232,7 +232,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                       <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                         {event.fields.title || event.fields.title_local || 'Event'}
                       </h3>
-                      {artist && <p className="text-xs text-[#8A8578] mt-1">Host: {displayName(artist.fields)}</p>}
+                      {artist && <p className="text-xs text-[#8A8578] mt-1">Host: {artistDisplayName(artist.fields, locale)}</p>}
                     </Link>
                   );
                 })}
@@ -279,7 +279,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                           <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                             {event.fields.title || event.fields.title_local || 'Event'}
                           </h3>
-                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {displayName(artist.fields)}</p>}
+                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
                         </Link>
                       );
                     })}
@@ -313,7 +313,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                             <h3 className="text-sm font-medium group-hover:text-gold transition-colors duration-300 line-clamp-1">
                               {event.fields.title || event.fields.title_local || 'Event'}
                             </h3>
-                            {artist && <p className="text-xs text-[#8A8578]/60 mt-0.5">♪ {displayName(artist.fields)}</p>}
+                            {artist && <p className="text-xs text-[#8A8578]/60 mt-0.5">♪ {artistDisplayName(artist.fields, locale)}</p>}
                           </Link>
                         );
                       })}

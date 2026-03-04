@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, buildMap, type Event, type Venue, type Artist } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import EventNav from '@/components/EventNav';
 
@@ -93,7 +93,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           {/* Primary artist */}
           {primaryArtist && (
             <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
-              <span className="text-gold">♪</span> {displayName(primaryArtist.fields)}
+              <span className="text-gold">♪</span> {artistDisplayName(primaryArtist.fields, locale)}
               {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' && (
                 <span className="text-sm capitalize">· {primaryArtist.fields.type}</span>
               )}
@@ -176,7 +176,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                   <div className="flex items-start gap-4">
                     <div className="flex-1">
                       <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300">
-                        {displayName(artist.fields)}
+                        {artistDisplayName(artist.fields, locale)}
                       </h3>
                       <p className="text-xs uppercase tracking-widest text-gold mt-1">
                         {instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}

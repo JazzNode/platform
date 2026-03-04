@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
 import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, localized, cityName } from '@/lib/helpers';
 import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -71,7 +71,7 @@ export default async function LocaleLayout({
           title: e.fields.title || e.fields.title_local || e.fields.title_en || 'Event',
           start_at: e.fields.start_at || null,
           venue_name: venue ? displayName(venue.fields) : '',
-          primary_artist_name: artist ? displayName(artist.fields) : null,
+          primary_artist_name: artist ? artistDisplayName(artist.fields, locale) : null,
           description_short: localized(e.fields as Record<string, unknown>, 'description_short', locale) || null,
           date_display: d ? d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', { month: 'short', day: 'numeric', timeZone: tz }) : '',
           time_display: d ? d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: tz }) : '',
@@ -79,7 +79,7 @@ export default async function LocaleLayout({
       }),
     artists: artists.map((a) => ({
       id: a.id,
-      displayName: displayName(a.fields),
+      displayName: artistDisplayName(a.fields, locale),
       type: a.fields.type || null,
       primaryInstrument: a.fields.primary_instrument || null,
       countryCode: a.fields.country_code || null,

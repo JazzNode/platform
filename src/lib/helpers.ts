@@ -13,9 +13,36 @@ export function makeSlug(name: string | undefined, id: string): string {
   return `${base}-${suffix}`;
 }
 
-/** Pick the best display name from a record. */
+/** Pick the best display name from a record (venues, generic). */
 export function displayName(fields: { display_name?: string; name_local?: string; name_en?: string }): string {
   return fields.display_name || fields.name_local || fields.name_en || 'Unknown';
+}
+
+/**
+ * Locale-aware artist display name.
+ * Priority: display_name (manual override) → locale-aware fallback.
+ * If the site locale matches the artist's origin language → name_local
+ * Otherwise → name_en
+ */
+export function artistDisplayName(
+  fields: { display_name?: string; name_local?: string; name_en?: string; country_code?: string },
+  locale: string,
+): string {
+  // Manual override takes top priority
+  if (fields.display_name) return fields.display_name;
+
+  const countryToLocale: Record<string, string> = {
+    TW: 'zh', HK: 'zh', CN: 'zh',
+    JP: 'ja',
+    KR: 'ko',
+    TH: 'th',
+    ID: 'id',
+  };
+  const artistLocale = fields.country_code ? countryToLocale[fields.country_code] : null;
+  if (artistLocale === locale) {
+    return fields.name_local || fields.name_en || 'Unknown';
+  }
+  return fields.name_en || fields.name_local || 'Unknown';
 }
 
 /** Format a date string for display. */

@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getCities, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
-import { displayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
@@ -124,7 +124,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                         </p>
                       )}
                       {venue && <p>↗ {displayName(venue.fields)}</p>}
-                      {artist && <p>♪ {displayName(artist.fields)}</p>}
+                      {artist && <p>♪ {artistDisplayName(artist.fields, locale)}</p>}
                     </div>
                   </Link>
                 );

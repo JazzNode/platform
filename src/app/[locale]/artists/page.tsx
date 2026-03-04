@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import { getArtists } from '@/lib/airtable';
-import { displayName, photoUrl, localized } from '@/lib/helpers';
+import { artistDisplayName, photoUrl, localized } from '@/lib/helpers';
 import ArtistsClient from '@/components/ArtistsClient';
 
 export async function generateMetadata() {
@@ -32,12 +32,12 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
   }
 
   // Serialize for client component
-  const sorted = [...artists].sort((a, b) => displayName(a.fields).localeCompare(displayName(b.fields)));
+  const sorted = [...artists].sort((a, b) => artistDisplayName(a.fields, locale).localeCompare(artistDisplayName(b.fields, locale)));
   const serialized = sorted.map((a) => {
     const f = a.fields;
     return {
       id: a.id,
-      displayName: displayName(f),
+      displayName: artistDisplayName(f, locale),
       type: f.type || null,
       primaryInstrument: f.primary_instrument || null,
       instrumentList: (f.instrument_list || []).map((i) => i.toLowerCase()),
