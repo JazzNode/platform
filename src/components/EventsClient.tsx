@@ -355,26 +355,20 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     href={`/${locale}/events/${event.id}`}
                     className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full"
                   >
+                    {event.venue_name && (
+                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{event.venue_name}</p>
+                    )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {event.tags.includes('matinee') && '☀️ '}{event.date_display} · {event.time_display}
                     </div>
                     <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
                       {event.title}
                     </h3>
-                    <div className="text-xs text-[#8A8578] mt-2 space-y-0.5">
-                      {event.description_short && (
-                        <p className="line-clamp-2 italic">{event.description_short}</p>
-                      )}
-                      {event.venue_name && <p>📍 {event.venue_name}</p>}
-                      {event.primary_artist_name && (
-                        <p>🎵 {event.primary_artist_name}</p>
-                      )}
-                      {event.sidemen.length > 0 && (
-                        <p className="text-[#6A6560]">
-                          w/ {event.sidemen.join(', ')}
-                        </p>
-                      )}
-                    </div>
+                    {event.sidemen.length > 0 && (
+                      <p className="text-xs text-[#6A6560] mt-2">
+                        w/ {event.sidemen.join(', ')}
+                      </p>
+                    )}
                     {event.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-3">
                         {event.tags.map((tag) => (
