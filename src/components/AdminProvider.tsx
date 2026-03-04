@@ -40,22 +40,6 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
-  // Ctrl+Shift+A keyboard shortcut
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
-        e.preventDefault();
-        if (token) {
-          logout();
-        } else {
-          setShowLoginModal(true);
-        }
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, [token]);
-
   const login = useCallback(async (password: string): Promise<boolean> => {
     try {
       const res = await fetch('/api/admin/login', {
@@ -78,6 +62,22 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     setToken(null);
     localStorage.removeItem(STORAGE_KEY);
   }, []);
+
+  // Ctrl+Shift+A keyboard shortcut
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
+        e.preventDefault();
+        if (token) {
+          logout();
+        } else {
+          setShowLoginModal(true);
+        }
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [token, logout]);
 
   return (
     <AdminContext.Provider

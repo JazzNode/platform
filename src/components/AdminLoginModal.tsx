@@ -16,18 +16,24 @@ export default function AdminLoginModal() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setShowLoginModal(false);
+    setPassword('');
+    setError('');
+  }, [setShowLoginModal]);
+
   // ESC to close
   useEffect(() => {
     if (!showLoginModal) return;
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        setShowLoginModal(false);
+        handleClose();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [showLoginModal, setShowLoginModal]);
+  }, [showLoginModal, handleClose]);
 
   // Lock body scroll
   useEffect(() => {
@@ -35,14 +41,6 @@ export default function AdminLoginModal() {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [showLoginModal]);
-
-  // Reset state when closing
-  useEffect(() => {
-    if (!showLoginModal) {
-      setPassword('');
-      setError('');
-    }
   }, [showLoginModal]);
 
   const handleSubmit = useCallback(
@@ -67,7 +65,7 @@ export default function AdminLoginModal() {
           showLoginModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
-        onClick={() => setShowLoginModal(false)}
+        onClick={handleClose}
       />
 
       {/* Modal */}
