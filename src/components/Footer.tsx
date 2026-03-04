@@ -91,7 +91,7 @@ export default function Footer() {
         <div className="flex flex-col items-center">
           {/* Logo + tagline — inline on desktop, stacked on mobile */}
           <Link href={`/${locale}`} className="group flex flex-col sm:flex-row items-center sm:items-baseline gap-1.5 sm:gap-3 text-center">
-            <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode</p>
+            <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode<sup className="text-[8px] font-sans font-semibold uppercase tracking-[0.12em] text-[var(--color-gold)]/50 relative -top-3 ml-[2px] select-none">beta</sup></p>
             <span className="hidden sm:inline text-[var(--muted-foreground)] opacity-30">·</span>
             <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">
               {t('tagline')}

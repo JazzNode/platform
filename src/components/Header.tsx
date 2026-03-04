@@ -3,10 +3,11 @@
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSearch } from './SearchProvider';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
+const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
 const localeList = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 
 export default function Header() {
@@ -17,12 +18,24 @@ export default function Header() {
   const { open: openSearch } = useSearch();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Close language dropdown on outside click
+  useEffect(() => {
+    if (!langOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) setLangOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [langOpen]);
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -107,20 +120,44 @@ export default function Header() {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
-            <div className="flex items-center gap-0.5">
-              {localeList.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => switchLocale(l)}
-                  className={`px-2 py-1 text-xs tracking-wider rounded-lg transition-all duration-300 ${
-                    locale === l
-                      ? 'bg-[var(--color-gold)] text-[var(--background)] font-bold'
-                      : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-                  }`}
-                >
-                  {localeLabels[l]}
-                </button>
-              ))}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setLangOpen(!langOpen)}
+                className="flex items-center gap-1.5 px-2 py-1.5 text-xs tracking-wider rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300"
+                aria-label="Switch language"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M2 12h20" />
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                </svg>
+                <span className="font-semibold">{localeLabels[locale]}</span>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 5l3 3 3-3" />
+                </svg>
+              </button>
+              {langOpen && (
+                <div className="absolute right-0 top-full mt-2 min-w-[140px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  {localeList.map((l) => (
+                    <button
+                      key={l}
+                      onClick={() => { switchLocale(l); setLangOpen(false); }}
+                      className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
+                        locale === l
+                          ? 'text-[var(--color-gold)] font-semibold'
+                          : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
+                      }`}
+                    >
+                      <span>{localeFullNames[l]}</span>
+                      {locale === l && (
+                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
