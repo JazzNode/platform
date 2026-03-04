@@ -183,7 +183,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, [filteredEvents]);
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-12">
       <FadeUp>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
@@ -348,27 +348,26 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             <FadeUp>
               <h2 className="font-serif text-2xl font-bold mb-6 text-gold">{month}</h2>
             </FadeUp>
-            <FadeUp stagger={0.12}>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {monthEvents.map((event) => (
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {monthEvents.map((event, i) => (
+                  <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link
-                    key={event.id}
                     href={`/${locale}/events/${event.id}`}
-                    className="fade-up-item block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
+                    className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full"
                   >
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {event.tags.includes('matinee') && '☀️ '}{event.date_display} · {event.time_display}
                     </div>
-                    <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                    <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
                       {event.title}
                     </h3>
                     <div className="text-xs text-[#8A8578] mt-2 space-y-0.5">
                       {event.description_short && (
                         <p className="line-clamp-2 italic">{event.description_short}</p>
                       )}
-                      {event.venue_name && <p>↗ {event.venue_name}</p>}
+                      {event.venue_name && <p>📍 {event.venue_name}</p>}
                       {event.primary_artist_name && (
-                        <p>♪ {event.primary_artist_name}</p>
+                        <p>🎵 {event.primary_artist_name}</p>
                       )}
                       {event.sidemen.length > 0 && (
                         <p className="text-[#6A6560]">
@@ -376,10 +375,22 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                         </p>
                       )}
                     </div>
+                    {event.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {event.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </Link>
+                  </FadeUpItem>
                 ))}
               </div>
-            </FadeUp>
           </section>
         ))}
       </div>
