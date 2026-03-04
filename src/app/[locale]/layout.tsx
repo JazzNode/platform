@@ -86,23 +86,25 @@ export default async function LocaleLayout({
       bio: localized(a.fields as Record<string, unknown>, 'bio_short', locale) || null,
       photoUrl: a.fields.photo_url || null,
     })),
-    venues: venues.map((v) => {
-      const city = resolveLinks(v.fields.city_id, cityMap)[0];
-      return {
-        id: v.id,
-        displayName: displayName(v.fields),
-        cityName: city ? cityName(city.fields, locale) : '',
-        address: v.fields.address_local || v.fields.address_en || null,
-        jazz_frequency: v.fields.jazz_frequency || null,
-      };
-    }),
+    venues: venues
+      .filter((v) => v.fields.event_list && v.fields.event_list.length > 0)
+      .map((v) => {
+        const city = resolveLinks(v.fields.city_id, cityMap)[0];
+        return {
+          id: v.id,
+          displayName: displayName(v.fields),
+          cityName: city ? cityName(city.fields, locale) : '',
+          address: v.fields.address_local || v.fields.address_en || null,
+          jazz_frequency: v.fields.jazz_frequency || null,
+        };
+      }),
     cities: cities
-      .filter((c) => venues.some((v) => v.fields.city_id?.includes(c.id)))
+      .filter((c) => venues.some((v) => v.fields.city_id?.includes(c.id) && v.fields.event_list && v.fields.event_list.length > 0))
       .map((c) => ({
         id: c.id,
         citySlug: c.fields.city_id || '',
         name: cityName(c.fields, locale),
-        venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id)).length,
+        venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id) && v.fields.event_list && v.fields.event_list.length > 0).length,
       })),
   };
 

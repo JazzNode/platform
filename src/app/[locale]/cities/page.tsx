@@ -23,7 +23,8 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
   const now = new Date().toISOString();
 
   const cityStats = cities.map((city) => {
-    const cityVenues = venues.filter((v) => v.fields.city_id?.includes(city.id));
+    // Only count venues that have at least one event
+    const cityVenues = venues.filter((v) => v.fields.city_id?.includes(city.id) && v.fields.event_list && v.fields.event_list.length > 0);
     const venueIds = new Set(cityVenues.map((v) => v.id));
     const cityEvents = events.filter((e) => e.fields.venue_id?.some((vid) => venueIds.has(vid)));
     const upcomingEvents = cityEvents.filter((e) => e.fields.start_at && e.fields.start_at >= now);

@@ -80,8 +80,9 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
   });
 
   // Build city options (only cities that have venues with events)
+  const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
   const cityIdsInUse = new Set(
-    venues.flatMap((v) => v.fields.city_id || [])
+    venuesWithEvents.flatMap((v) => v.fields.city_id || [])
   );
   const cityOptions = cities
     .filter((c) => cityIdsInUse.has(c.id))
