@@ -14,7 +14,8 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const [venues, events, artists, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getCities()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
-  const activeCities = cities.filter((c) => venues.some((v) => v.fields.city_id?.includes(c.id)));
+  const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
+  const activeCities = cities.filter((c) => venuesWithEvents.some((v) => v.fields.city_id?.includes(c.id)));
 
   const now = new Date().toISOString();
   const upcoming = events
@@ -23,7 +24,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     .slice(0, 6);
 
   const venueCountsFallback = buildVenueEventCounts(events);
-  const featured = [...venues]
+  const featured = [...venuesWithEvents]
     .sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback))
     .slice(0, 6);
 
@@ -48,7 +49,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
               <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('cities')}</p>
             </Link>
             <Link href={`/${locale}/venues`} className="hero-stat-item group cursor-pointer">
-              <CountUp end={venues.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[var(--foreground)] group-hover:text-gold transition-colors duration-300" />
+              <CountUp end={venuesWithEvents.length} className="stat-number text-4xl sm:text-6xl lg:text-8xl text-[var(--foreground)] group-hover:text-gold transition-colors duration-300" />
               <p className="mt-3 text-xs sm:text-sm uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--foreground)] transition-colors duration-300">{t('venues')}</p>
             </Link>
             <Link href={`/${locale}/events`} className="hero-stat-item group cursor-pointer">
