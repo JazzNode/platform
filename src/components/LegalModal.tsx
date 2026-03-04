@@ -55,7 +55,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
       >
         <div
-          className={`w-full max-w-2xl mx-3 sm:mx-auto mt-4 sm:mt-[8vh] rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden transition-all duration-300 ${
+          className={`relative w-full max-w-2xl mx-3 sm:mx-auto mt-4 sm:mt-[8vh] rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden transition-all duration-300 ${
             isOpen ? 'translate-y-0 scale-100' : '-translate-y-4 scale-[0.98]'
           }`}
           style={{
@@ -66,29 +66,24 @@ export default function LegalModal({ isOpen, onClose }: Props) {
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
-            <h2 className="font-serif text-lg font-bold text-gold">
-              Disclaimer / 免責聲明
-            </h2>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-gold)]/10 transition-all duration-200"
-              aria-label="Close"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-            </button>
-          </div>
+          {/* Close button */}
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--color-gold)]/10 transition-all duration-200"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18" />
+              <path d="m6 6 12 12" />
+            </svg>
+          </button>
 
           {/* Scrollable content */}
-          <div className="overflow-y-auto px-6 py-6 space-y-8" style={{ maxHeight: 'min(calc(80vh - 64px), 636px)' }}>
+          <div className="overflow-y-auto px-6 py-6 space-y-8" style={{ maxHeight: 'min(80vh, 700px)' }}>
 
             {/* ── English ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">English</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">Disclaimer</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
@@ -114,7 +109,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
             {/* ── 繁體中文 ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">繁體中文</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">免責聲明</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
@@ -140,7 +135,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
             {/* ── 日本語 ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">日本語</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">免責事項</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
@@ -166,7 +161,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
             {/* ── 한국어 ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">한국어</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">면책 조항</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
@@ -192,7 +187,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
             {/* ── ภาษาไทย ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">ภาษาไทย</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">ข้อจำกัดความรับผิดชอบ</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
@@ -218,7 +213,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
 
             {/* ── Bahasa Indonesia ── */}
             <section>
-              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">Bahasa Indonesia</h3>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">Sanggahan</h3>
 
               <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
                 <div>
