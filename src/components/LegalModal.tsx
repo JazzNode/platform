@@ -53,6 +53,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
           isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         style={{ paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)' }}
+        onClick={handleBackdropClick}
       >
         <div
           className={`relative w-full max-w-2xl mx-3 sm:mx-auto mt-4 sm:mt-[8vh] rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden transition-all duration-300 ${
