@@ -17,7 +17,6 @@ export default function Header() {
   const router = useRouter();
   const { open: openSearch } = useSearch();
   const [scrolled, setScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const langRefDesktop = useRef<HTMLDivElement>(null);
   const langRefMobile = useRef<HTMLDivElement>(null);
@@ -41,17 +40,10 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, [langOpen]);
 
-  // Lock body scroll when menu is open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [menuOpen]);
-
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
     segments[1] = newLocale;
     router.push(segments.join('/'));
-    setMenuOpen(false);
   }
 
   return (
@@ -187,52 +179,9 @@ export default function Header() {
                 </div>
               )}
             </div>
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="relative w-10 h-10 flex flex-col items-center justify-center group"
-              aria-label="Toggle menu"
-            >
-              <div className="relative w-5 h-4 flex flex-col justify-between items-center overflow-hidden">
-                <span
-                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-300 transform origin-center ${
-                    menuOpen ? 'rotate-45 translate-y-[7px]' : 'translate-y-0'
-                  }`}
-                />
-                <span
-                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-200 ${
-                    menuOpen ? 'opacity-0 -translate-x-full' : 'opacity-100'
-                  }`}
-                />
-                <span
-                  className={`block w-5 h-0.5 bg-[var(--foreground)] transition-all duration-300 transform origin-center ${
-                    menuOpen ? '-rotate-45 -translate-y-[7px]' : 'translate-y-0'
-                  }`}
-                />
-              </div>
-            </button>
           </div>
         </div>
       </header>
-
-      {/* Mobile fullscreen menu */}
-      <div
-        className={`fixed inset-0 z-40 bg-[var(--background)]/98 backdrop-blur-2xl flex flex-col items-center justify-center gap-8 transition-all duration-400 md:hidden ${
-          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <Link href={`/${locale}/cities`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
-          {t('cities')}
-        </Link>
-        <Link href={`/${locale}/venues`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
-          {t('venues')}
-        </Link>
-        <Link href={`/${locale}/events`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
-          {t('events')}
-        </Link>
-        <Link href={`/${locale}/artists`} onClick={() => setMenuOpen(false)} className="text-2xl font-serif uppercase tracking-widest text-[#F0EDE6] hover:text-gold transition-colors">
-          {t('artists')}
-        </Link>
-      </div>
     </>
   );
 }
