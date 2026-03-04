@@ -69,7 +69,7 @@ export default function LegalModal({ isOpen, onClose }: Props) {
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border)]">
             <h2 className="font-serif text-lg font-bold text-gold">
-              Legal / 免責聲明
+              Disclaimer / 免責聲明
             </h2>
             <button
               onClick={onClose}
@@ -156,6 +156,84 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                   <p>もしあなたがアーティストや会場の運営者で、JazzNodeへの掲載を希望されない場合、または情報の訂正が必要な場合は、{' '}
                     <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
                     {' '}までご連絡ください。24時間以内に無条件で修正または削除いたします。
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-t border-gold/20" />
+
+            {/* ── 한국어 ── */}
+            <section>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">한국어</h3>
+
+              <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. 재즈는 즉흥이고, 라이브도 마찬가지입니다</h4>
+                  <p>라인업은 바뀌고 일정은 변경됩니다. 저희는 국경을 넘어 정확한 정보를 전달하기 위해 최선을 다하고 있지만(일부 번역에는 AI를 활용하고 있습니다), 출발 전에 반드시 공식 공연장이나 티켓 사이트에서 다시 한번 확인해 주세요. 공연이 취소되거나 가격이 변동되더라도, 저희 탓은 하지 말아 주세요.</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. 창작자에 대한 깊은 존경</h4>
+                  <p>이곳에 소개된 아름다운 포스터, 공연장 사진, 홍보 문구의 저작권은 전적으로 원작자, 아티스트 또는 공연장에 귀속됩니다. 저희는 순수하게 음악에 대한 사랑으로, 여러분의 공연장을 열정적인 관객들로 가득 채우기 위해 이를 소개하고 있습니다.</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 당신의 음악, 당신의 규칙</h4>
+                  <p>아티스트나 공연장 관계자로서 플랫폼에 게재되는 것을 원치 않으시거나, 잘못된 정보를 발견하셨다면{' '}
+                    <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
+                    으로 연락해 주세요. 24시간 이내에 무조건 수정하거나 삭제해 드립니다. 어떠한 질문도 하지 않겠습니다.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-t border-gold/20" />
+
+            {/* ── ภาษาไทย ── */}
+            <section>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">ภาษาไทย</h3>
+
+              <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. แจ๊สคือการด้นสด และการแสดงสดก็เช่นกัน</h4>
+                  <p>ไลน์อัพอาจเปลี่ยนแปลงและตารางเวลาอาจปรับเปลี่ยนได้ เราพยายามอย่างเต็มที่ในการรวบรวมข้อมูลข้ามพรมแดนให้ถูกต้อง (บางครั้งใช้ AI ช่วยแปลเพื่อเชื่อมช่องว่างทางภาษา) แต่กรุณาตรวจสอบกับสถานที่จัดงานหรือเว็บไซต์จำหน่ายบัตรอย่างเป็นทางการอีกครั้งก่อนออกเดินทาง หากการแสดงถูกยกเลิกหรือราคาเปลี่ยนแปลง กรุณาอย่าโทษผู้ส่งสาร</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. ด้วยความเคารพอย่างสูงต่อผู้สร้างสรรค์</h4>
+                  <p>โปสเตอร์ที่สวยงาม ภาพถ่ายสถานที่ และข้อความประชาสัมพันธ์ที่คุณเห็นในที่นี้เป็นลิขสิทธิ์ของผู้สร้างสรรค์ ศิลปิน หรือสถานที่จัดงานทั้งหมด เรานำเสนอเนื้อหาเหล่านี้ด้วยความรักในดนตรี และเพื่อช่วยเติมเต็มห้องแสดงของคุณด้วยผู้ฟังที่หลงใหล</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. ดนตรีของคุณ กฎของคุณ</h4>
+                  <p>หากคุณเป็นศิลปินหรือเจ้าของสถานที่และไม่ต้องการให้ข้อมูลปรากฏบนแพลตฟอร์มของเรา หรือพบข้อผิดพลาด เพียงส่งข้อความมาที่{' '}
+                    <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
+                    {' '}เราจะอัปเดตหรือลบโปรไฟล์ของคุณโดยไม่มีเงื่อนไขภายใน 24 ชั่วโมง ไม่ถามคำถามใดๆ
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Divider */}
+            <hr className="border-t border-gold/20" />
+
+            {/* ── Bahasa Indonesia ── */}
+            <section>
+              <h3 className="font-serif text-sm font-bold uppercase tracking-widest text-gold mb-4">Bahasa Indonesia</h3>
+
+              <div className="space-y-4 text-sm leading-relaxed text-[var(--muted-foreground)]">
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">1. Jazz Itu Spontan, Begitu Juga Pertunjukan Langsung</h4>
+                  <p>Lineup bisa berubah dan jadwal bisa bergeser. Kami berusaha semaksimal mungkin menyajikan informasi lintas negara yang akurat (terkadang menggunakan AI untuk menjembatani perbedaan bahasa), namun harap periksa kembali di situs resmi venue atau tiket sebelum berangkat. Jika pertunjukan dibatalkan atau harga berubah, tolong jangan salahkan sang pembawa pesan.</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">2. Penghormatan Mendalam untuk Para Kreator</h4>
+                  <p>Poster-poster indah, foto venue, dan teks promosi yang Anda lihat di sini sepenuhnya milik kreator asli, artis, atau venue. Kami menampilkannya murni karena kecintaan kami pada musik dan untuk membantu mengisi ruangan Anda dengan pendengar yang penuh semangat.</p>
+                </div>
+                <div>
+                  <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. Musik Anda, Aturan Anda</h4>
+                  <p>Jika Anda seorang artis atau pemilik venue dan tidak ingin ditampilkan di platform kami, atau jika Anda menemukan kesalahan, cukup kirim pesan ke{' '}
+                    <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>
+                    . Kami akan memperbarui atau menghapus profil Anda tanpa syarat dalam 24 jam. Tanpa pertanyaan.
                   </p>
                 </div>
               </div>
