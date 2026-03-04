@@ -56,8 +56,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const badgeItems = artistBadges.map((b) => ({
     id: b.id,
     badgeId: b.fields.badge_id,
-    name: (locale === 'zh' ? b.fields.name_zh : locale === 'ja' ? b.fields.name_ja : locale === 'ko' ? b.fields.name_ko : b.fields.name_en) || b.fields.name_en || '',
-    description: (locale === 'zh' ? b.fields.description_zh : locale === 'ja' ? b.fields.description_ja : locale === 'ko' ? b.fields.description_ko : b.fields.description) || b.fields.description || '',
+    name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
+    description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en || '',
   }));
 
   // ── Versatility: bandleader / sideman / featured_guest / band_member ──

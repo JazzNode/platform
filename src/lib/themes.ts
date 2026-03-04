@@ -11,6 +11,8 @@ export interface Theme {
   label_zh: string;    // display name (中文)
   label_ja: string;    // display name (日本語)
   label_ko: string;    // display name (한국어)
+  label_th: string;    // display name (ภาษาไทย)
+  label_id: string;    // display name (Bahasa Indonesia)
   emoji: string;       // quick visual identifier
   // Backgrounds
   bg: string;
@@ -37,6 +39,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '午夜金',
     label_ja: 'ミッドナイトゴールド',
     label_ko: '미드나잇 골드',
+    label_th: 'ทองเที่ยงคืน',
+    label_id: 'Emas Tengah Malam',
     emoji: '🌙',
     bg: '#0A0A0A',
     card: '#111111',
@@ -56,6 +60,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '翠霧',
     label_ja: '翡翠の霧',
     label_ko: '비취 안개',
+    label_th: 'หมอกหยก',
+    label_id: 'Kabut Giok',
     emoji: '🍃',
     bg: '#061210',
     card: '#0C1A18',
@@ -75,6 +81,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '霓虹夜',
     label_ja: 'ネオンノワール',
     label_ko: '네온 누아르',
+    label_th: 'นีออนนัวร์',
+    label_id: 'Neon Noir',
     emoji: '🔴',
     bg: '#120606',
     card: '#1A0C0C',
@@ -94,6 +102,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '靛雨',
     label_ja: 'インディゴレイン',
     label_ko: '인디고 레인',
+    label_th: 'ฝนคราม',
+    label_id: 'Hujan Indigo',
     emoji: '🌧',
     bg: '#06061A',
     card: '#0E0E24',
@@ -113,6 +123,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '蘭花金',
     label_ja: 'オーキッドゴールド',
     label_ko: '오키드 골드',
+    label_th: 'กล้วยไม้ทอง',
+    label_id: 'Anggrek Emas',
     emoji: '🌸',
     bg: '#140612',
     card: '#1F0C1C',
@@ -132,6 +144,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '赤道夕陽',
     label_ja: 'エキエーターサンセット',
     label_ko: '적도의 석양',
+    label_th: 'อาทิตย์ตกเส้นศูนย์สูตร',
+    label_id: 'Matahari Terbenam Khatulistiwa',
     emoji: '☀️',
     bg: '#0F0B06',
     card: '#1A130C',
@@ -151,6 +165,8 @@ export const themes: Record<string, Theme> = {
     label_zh: '雅加達大地',
     label_ja: 'ジャカルタグラウンド',
     label_ko: '자카르타 그라운드',
+    label_th: 'จาการ์ตากราวด์',
+    label_id: 'Jakarta Ground',
     emoji: '🪵',
     bg: '#0F0906',
     card: '#1A120C',

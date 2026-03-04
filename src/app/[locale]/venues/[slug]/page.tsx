@@ -124,6 +124,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 中文友善</span>}
             {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 English Friendly</span>}
             {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 日本語OK</span>}
+            {f.friendly_ko && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 한국어 가능</span>}
+            {f.friendly_th && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 ภาษาไทย</span>}
+            {f.friendly_id && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 Bahasa Indonesia</span>}
           </div>
 
 {/* Badges */}
@@ -131,7 +134,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <div className="flex gap-2">
               {venueBadges.map((b) => (
                 <span key={b.id} className="text-xs px-3 py-1.5 rounded-xl bg-[#1A1A1A] text-gold border border-gold/20">
-                  {locale === 'zh' ? b.fields.name_zh : locale === 'ja' ? b.fields.name_ja : locale === 'ko' ? b.fields.name_ko : b.fields.name_en}
+                  {localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en}
                 </span>
               ))}
             </div>

@@ -6,7 +6,7 @@
 export function makeSlug(name: string | undefined, id: string): string {
   const base = (name || 'untitled')
     .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af]+/g, '-')
+    .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0E00-\u0E7F]+/g, '-')
     .replace(/^-|-$/g, '');
   // Use last 6 chars of Airtable record ID for uniqueness
   const suffix = id.slice(-6);
@@ -22,7 +22,8 @@ export function displayName(fields: { display_name?: string; name_local?: string
 export function formatDate(iso: string | undefined, locale: string = 'en', timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';
   const d = new Date(iso);
-  return d.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US', {
+  const localeMap: Record<string, string> = { zh: 'zh-TW', ja: 'ja-JP', ko: 'ko-KR', th: 'th-TH', id: 'id-ID' };
+  return d.toLocaleDateString(localeMap[locale] || 'en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -49,10 +50,12 @@ export function localized(
   locale: string,
 ): string | undefined {
   const suffixMap: Record<string, string[]> = {
-    en: ['_en', '_zh', '_ja', '_ko'],
-    zh: ['_zh', '_en', '_ja', '_ko'],
-    ja: ['_ja', '_en', '_zh', '_ko'],
-    ko: ['_ko', '_en', '_zh', '_ja'],
+    en: ['_en', '_zh', '_ja', '_ko', '_th', '_id'],
+    zh: ['_zh', '_en', '_ja', '_ko', '_th', '_id'],
+    ja: ['_ja', '_en', '_zh', '_ko', '_th', '_id'],
+    ko: ['_ko', '_en', '_zh', '_ja', '_th', '_id'],
+    th: ['_th', '_en', '_zh', '_ja', '_ko', '_id'],
+    id: ['_id', '_en', '_zh', '_ja', '_ko', '_th'],
   };
   for (const suffix of (suffixMap[locale] || suffixMap.en)) {
     const val = fields[`${prefix}${suffix}`];
@@ -63,7 +66,7 @@ export function localized(
 
 /** Pick a localized city name. Uses localized() with name_local fallback. */
 export function cityName(
-  fields: { name_en?: string; name_zh?: string; name_ja?: string; name_ko?: string; name_local?: string },
+  fields: { name_en?: string; name_zh?: string; name_ja?: string; name_ko?: string; name_th?: string; name_id?: string; name_local?: string },
   locale: string,
 ): string {
   return localized(fields as Record<string, unknown>, 'name', locale)
@@ -93,5 +96,5 @@ export function formatPriceBadge(currency?: string, priceInfo?: string): string 
 }
 
 /** Supported locales. */
-export const locales = ['en', 'zh', 'ja', 'ko'] as const;
+export const locales = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 export type Locale = (typeof locales)[number];

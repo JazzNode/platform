@@ -89,7 +89,9 @@
     "HK": "Hong Kong",
     "MY": "Malaysia",
     "ID": "Indonesia",
-    "KR": "South Korea"
+    "KR": "South Korea",
+    "TH": "Thailand",
+    "SG": "Singapore"
   },
   "instruments": {
     "piano": "Piano",

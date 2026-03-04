@@ -88,13 +88,22 @@ export interface Venue {
   description_en?: string;
   description_ja?: string;
   description_ko?: string;
+  description_th?: string;
+  description_id?: string;
+  friendly_en?: boolean;
+  friendly_zh?: boolean;
+  friendly_ja?: boolean;
+  friendly_ko?: boolean;
+  friendly_th?: boolean;
+  friendly_id?: boolean;
+  payment_method?: string[];
   city_id?: string[];       // linked Cities records
   country_code?: string;
   address?: string;           // legacy
   address_local?: string;
   address_en?: string;
-  latitude?: number;
-  longitude?: number;
+  lat?: number;
+  lng?: number;
   website_url?: string;
   instagram?: string;
   facebook_url?: string;
@@ -117,10 +126,14 @@ export interface Artist {
   bio_short_zh?: string;
   bio_short_ja?: string;
   bio_short_ko?: string;
-  description_zh?: string;
-  description_en?: string;
-  description_ja?: string;
-  description_ko?: string;
+  bio_en?: string;
+  bio_zh?: string;
+  bio_ja?: string;
+  bio_ko?: string;
+  bio_th?: string;
+  bio_id?: string;
+  bio_short_th?: string;
+  bio_short_id?: string;
   country_code?: string;
   primary_instrument?: string;
   instrument_list?: string[];
@@ -155,10 +168,14 @@ export interface Event {
   description_zh?: string;
   description_ja?: string;
   description_ko?: string;
+  description_th?: string;
+  description_id?: string;
   description_short_en?: string;
   description_short_zh?: string;
   description_short_ja?: string;
   description_short_ko?: string;
+  description_short_th?: string;
+  description_short_id?: string;
   start_at?: string;
   end_at?: string;
   timezone?: string;        // e.g. "Asia/Taipei"
@@ -182,11 +199,15 @@ export interface BadgeDef {
   name_zh?: string;
   name_ja?: string;
   name_ko?: string;
-  description?: string;
+  name_th?: string;
+  name_id?: string;
+  description_en?: string;
   description_zh?: string;
   description_ja?: string;
   description_ko?: string;
-  icon?: string;
+  description_th?: string;
+  description_id?: string;
+  icon_url?: string;
 }
 
 export interface City {
@@ -196,6 +217,8 @@ export interface City {
   name_zh?: string;
   name_ja?: string;
   name_ko?: string;
+  name_th?: string;
+  name_id?: string;
   country_code?: string;
   timezone?: string;
 }

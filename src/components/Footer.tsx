@@ -33,6 +33,8 @@ function ThemePicker() {
     if (locale === 'zh') return t.label_zh;
     if (locale === 'ja') return t.label_ja;
     if (locale === 'ko') return t.label_ko;
+    if (locale === 'th') return t.label_th;
+    if (locale === 'id') return t.label_id;
     return t.label;
   };
 
