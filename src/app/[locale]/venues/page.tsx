@@ -12,13 +12,16 @@ export async function generateMetadata() {
 export default async function VenuesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
+  const tRegions = await getTranslations('regions');
 
   const [venues, events, cities] = await Promise.all([getVenues(), getEvents(), getCities()]);
 
   // Serialize venues
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venueCountsFallback = buildVenueEventCounts(events);
-  const sorted = [...venues].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
+  // Only show venues that have at least one event
+  const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
+  const sorted = [...venuesWithEvents].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
 
   const serializedVenues = sorted.map((venue) => {
     const f = venue.fields;
@@ -35,21 +38,32 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
     };
   });
 
-  // Build city options (only cities that have venues)
-  const cityIdsInUse = new Set(venues.flatMap((v) => v.fields.city_id || []));
+  // Build city options with countryCode (only cities that have venues with events)
+  const cityIdsInUse = new Set(venuesWithEvents.flatMap((v) => v.fields.city_id || []));
   const cityOptions = cities
     .filter((c) => cityIdsInUse.has(c.id))
     .map((c) => ({
       recordId: c.id,
+      citySlug: c.fields.city_id || '',
       label: cityName(c.fields, locale),
+      countryCode: c.fields.country_code || '',
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
+
+  // Build region labels from i18n
+  const regionCodes = [...new Set(cityOptions.map((c) => c.countryCode).filter(Boolean))];
+  const regionLabels: Record<string, string> = {};
+  for (const code of regionCodes) {
+    try { regionLabels[code] = tRegions(code as 'TW' | 'JP' | 'HK'); } catch { regionLabels[code] = code; }
+  }
 
   return (
     <VenuesClient
       venues={serializedVenues}
       cities={cityOptions}
       locale={locale}
+      regionLabels={regionLabels}
+      worldMapLabel={tRegions('worldMap')}
       labels={{
         venues: t('venues'),
         allCities: t('allCities'),

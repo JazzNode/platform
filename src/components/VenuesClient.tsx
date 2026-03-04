@@ -18,13 +18,17 @@ interface SerializedVenue {
 
 interface CityOption {
   recordId: string;
+  citySlug: string;
   label: string;
+  countryCode: string;
 }
 
 interface Props {
   venues: SerializedVenue[];
   cities: CityOption[];
   locale: string;
+  regionLabels: Record<string, string>;
+  worldMapLabel: string;
   labels: {
     venues: string;
     allCities: string;
@@ -32,16 +36,55 @@ interface Props {
   };
 }
 
-export default function VenuesClient({ venues, cities, locale, labels }: Props) {
-  const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+// Shared pill base: visual stays compact, but an invisible ::after pseudo-element
+// extends the touch target to 44px minimum (Apple/Google HIG recommendation).
+const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-  const toggleCity = useCallback((recordId: string) => {
-    setSelectedCities((prev) => {
-      const next = new Set(prev);
-      if (next.has(recordId)) next.delete(recordId);
-      else next.add(recordId);
-      return next;
-    });
+export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  // Group cities by country code
+  const regionGroups = useMemo(() => {
+    const map: Record<string, CityOption[]> = {};
+    for (const c of cities) {
+      const code = c.countryCode;
+      if (!code) continue;
+      if (!map[code]) map[code] = [];
+      map[code].push(c);
+    }
+    return map;
+  }, [cities]);
+
+  // Stable region order
+  const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
+
+  // Derive selectedCities set for filtering
+  const selectedCities = useMemo(() => {
+    if (selectedCity) return new Set([selectedCity]);
+    if (activeRegion && regionGroups[activeRegion]) {
+      return new Set(regionGroups[activeRegion].map((c) => c.recordId));
+    }
+    return new Set<string>();
+  }, [selectedCity, activeRegion, regionGroups]);
+
+  const handleRegionClick = useCallback((code: string) => {
+    if (activeRegion === code) {
+      setActiveRegion(null);
+      setSelectedCity(null);
+      return;
+    }
+    setActiveRegion(code);
+    setSelectedCity(null);
+  }, [activeRegion]);
+
+  const handleCityClick = useCallback((recordId: string) => {
+    setSelectedCity((prev) => prev === recordId ? null : recordId);
+  }, []);
+
+  const handleWorldMapClick = useCallback(() => {
+    setActiveRegion(null);
+    setSelectedCity(null);
   }, []);
 
   const filteredVenues = useMemo(() => {
@@ -50,8 +93,8 @@ export default function VenuesClient({ venues, cities, locale, labels }: Props) 
   }, [venues, selectedCities]);
 
   const filterKey = useMemo(() => {
-    return [...selectedCities].sort().join(',');
-  }, [selectedCities]);
+    return `${activeRegion}_${selectedCity}`;
+  }, [activeRegion, selectedCity]);
 
   return (
     <div className="space-y-12">
@@ -64,33 +107,79 @@ export default function VenuesClient({ venues, cities, locale, labels }: Props) 
         </div>
       </FadeUp>
 
-      {/* City filter */}
+      {/* Geographic hierarchy: World Map │ Region › Cities */}
       <div className="space-y-3">
         <FadeUpItem delay={100}>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
+          {/* World Map pill */}
           <button
-            onClick={() => setSelectedCities(new Set())}
-            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-              selectedCities.size === 0
+            onClick={handleWorldMapClick}
+            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+              !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
                 : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
-            {labels.allCities}
+            {worldMapLabel}
           </button>
-          {cities.map((city) => (
-            <button
-              key={city.recordId}
-              onClick={() => toggleCity(city.recordId)}
-              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-                selectedCities.has(city.recordId)
-                  ? 'bg-gold/20 border-gold text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
-              }`}
-            >
-              {city.label}
-            </button>
-          ))}
+
+          {/* Region pills */}
+          {regionOrder.map((code, regionIdx) => {
+            const isActive = activeRegion === code;
+            const citiesInRegion = regionGroups[code] || [];
+
+            // Hide non-active regions when a region is drilled into
+            if (activeRegion && !isActive) return null;
+
+            return (
+              <span key={`${code}-${activeRegion || 'w'}`} className="contents">
+                {/* Separator */}
+                {isActive && (
+                  <span
+                    className="text-gold/40 text-xs select-none mx-0.5"
+                    style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+                  >│</span>
+                )}
+
+                {/* Region pill */}
+                <button
+                  onClick={() => handleRegionClick(code)}
+                  style={{ animation: `geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${regionIdx * 0.04}s both` }}
+                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+                    isActive
+                      ? 'bg-gold/20 border-gold text-gold'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                  }`}
+                >
+                  {regionLabels[code] || code}
+                </button>
+
+                {/* City sub-pills — show when region is active (skip if single city with same name as region) */}
+                {isActive && !(citiesInRegion.length === 1 && citiesInRegion[0].label === (regionLabels[code] || code)) && (
+                  <>
+                    <span
+                      className="text-gold/40 text-xs select-none mx-0.5"
+                      style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both' }}
+                    >›</span>
+                    {citiesInRegion.map((city, i) => (
+                      <button
+                        key={city.recordId}
+                        onClick={() => handleCityClick(city.recordId)}
+                        style={{ animation: `geo-pill-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${(i + 1) * 0.07}s both` }}
+                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                          selectedCity === city.recordId
+                            ? 'bg-gold/15 border-gold/70 text-gold'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
+                        }`}
+                      >
+                        {city.label}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </span>
+            );
+          })}
         </div>
         </FadeUpItem>
       </div>
