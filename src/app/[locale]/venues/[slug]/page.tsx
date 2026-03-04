@@ -211,7 +211,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       
       {/* Jam Sessions */}
       {(() => {
-        const jams = venueEvents.filter(e => e.fields.subtype === 'open_jam');
+        const jams = venueEvents.filter(e => e.fields.subtype === 'jam_session');
         if (jams.length === 0) return null;
         return (
           <FadeUp stagger={0.1}>

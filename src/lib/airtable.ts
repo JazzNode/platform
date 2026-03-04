@@ -171,7 +171,7 @@ export interface Event {
   poster_url?: string;  // Wix mainImage URL (high-res event poster)
   photo_file?: { url: string; filename: string }[];  // legacy
   source_list?: string[];
-  subtype?: string;           // 'standard_show' | 'open_jam' | 'showcase' | 'workshop'
+  subtype?: string;           // 'standard_show' | 'jam_session' | 'showcase' | 'workshop'
   lifecycle_status?: string;  // 'upcoming' | 'past' | 'cancelled' | 'unknown'
   slug?: string;
 }
