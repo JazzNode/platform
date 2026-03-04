@@ -1,7 +1,11 @@
 'use client';
 
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
+
+const subscribe = () => () => {};
+const getSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 interface Props {
   isOpen: boolean;
@@ -9,8 +13,7 @@ interface Props {
 }
 
 export default function LegalModal({ isOpen, onClose }: Props) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // ESC to close
   useEffect(() => {
