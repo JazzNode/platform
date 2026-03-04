@@ -43,7 +43,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   // Ctrl+Shift+A keyboard shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'A') {
+      if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
         e.preventDefault();
         if (token) {
           logout();
