@@ -1,18 +1,21 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getCities, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resolveLinks, buildMap, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
 import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
+import FadeUpItem from '@/components/animations/FadeUpItem';
 import ManifestoReveal from '@/components/animations/ManifestoReveal';
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
 
-  const [venues, events, artists, cities] = await Promise.all([getVenues(), getEvents(), getArtists(), getCities()]);
+  const [venues, events, artists, cities, lineups, tags] = await Promise.all([
+    getVenues(), getEvents(), getArtists(), getCities(), getLineups(), getTags().catch(() => []),
+  ]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
   const activeCities = cities.filter((c) => venuesWithEvents.some((v) => v.fields.city_id?.includes(c.id)));
@@ -21,7 +24,21 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const upcoming = events
     .filter((e) => e.fields.start_at && e.fields.start_at >= now)
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-    .slice(0, 6);
+    .slice(0, 9);
+
+  // Pre-build lookup maps for upcoming event enrichment
+  const artistMap = buildMap(artists);
+  const tagMap = buildMap(tags);
+
+  // Index lineups by event id
+  const lineupsByEvent = new Map<string, typeof lineups>();
+  for (const l of lineups) {
+    for (const eid of l.fields.event_id || []) {
+      const arr = lineupsByEvent.get(eid);
+      if (arr) arr.push(l);
+      else lineupsByEvent.set(eid, [l]);
+    }
+  }
 
   const venueCountsFallback = buildVenueEventCounts(events);
   const featured = [...venuesWithEvents]
@@ -104,34 +121,56 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         {upcoming.length === 0 ? (
           <p className="text-[#8A8578]">{t('noEvents')}</p>
         ) : (
-          <FadeUp stagger={0.15}>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {upcoming.map((event) => {
-                const tz = event.fields.timezone || 'Asia/Taipei';
-                const venue = resolveLinks(event.fields.venue_id, venues)[0];
-                const artist = resolveLinks(event.fields.primary_artist, artists)[0];
-                return (
-                  <Link key={event.id} href={`/${locale}/events/${event.id}`} className="fade-up-item block bg-[var(--card)] p-6 card-hover group border border-[var(--border)]">
-                    <div className="text-xs uppercase tracking-widest text-gold mb-3">
-                      {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {upcoming.map((event, i) => {
+              const tz = event.fields.timezone || 'Asia/Taipei';
+              const venue = resolveLinks(event.fields.venue_id, venues)[0];
+              const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+              const eventLineups = (lineupsByEvent.get(event.id) || [])
+                .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+              const sidemen = eventLineups
+                .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+                .filter(Boolean)
+                .filter((a) => a.id !== primaryArtist?.id)
+                .map((a) => artistDisplayName(a.fields, locale));
+              const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+                .map((tag) => tag.fields.name)
+                .filter(Boolean) as string[];
+
+              return (
+                <FadeUpItem key={event.id} delay={(i % 3) * 60} className={i >= 6 ? 'hidden sm:block' : undefined}>
+                <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
+                  {venue && (
+                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                  )}
+                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                    {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                  </div>
+                  <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                    {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                  </h3>
+                  {sidemen.length > 0 && (
+                    <p className="text-xs text-[#6A6560] mt-2">
+                      w/ {sidemen.join(', ')}
+                    </p>
+                  )}
+                  {eventTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {eventTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                        >
+                          {tag}
+                        </span>
+                      ))}
                     </div>
-                    <h3 className="font-serif text-xl font-bold leading-tight mb-3 group-hover:text-gold transition-colors duration-300">
-                      {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
-                    </h3>
-                    <div className="text-sm text-[#8A8578] space-y-1">
-                      {localized(event.fields as Record<string, unknown>, 'description_short', locale) && (
-                        <p className="text-xs leading-relaxed line-clamp-2">
-                          {localized(event.fields as Record<string, unknown>, 'description_short', locale)}
-                        </p>
-                      )}
-                      {venue && <p>↗ {displayName(venue.fields)}</p>}
-                      {artist && <p>♪ {artistDisplayName(artist.fields, locale)}</p>}
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </FadeUp>
+                  )}
+                </Link>
+                </FadeUpItem>
+              );
+            })}
+          </div>
         )}
       </section>
 

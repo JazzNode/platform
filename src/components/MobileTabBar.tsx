@@ -104,11 +104,11 @@ export default function MobileTabBar() {
       <div
         className="mx-3 mb-2 rounded-2xl"
         style={{
-          background: 'color-mix(in srgb, var(--card) 80%, transparent)',
-          backdropFilter: 'blur(24px) saturate(1.4)',
-          WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
-          border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.15)',
-          boxShadow: '0 -2px 20px rgba(var(--theme-glow-rgb, 200, 168, 78), 0.08), 0 -4px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(var(--theme-glow-rgb, 200, 168, 78), 0.06)',
+          background: 'rgba(var(--theme-glow-rgb, 200, 168, 78), 0.18)',
+          backdropFilter: 'blur(28px) saturate(1.8)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
+          border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.08)',
+          boxShadow: '0 -4px 20px rgba(0,0,0,0.4)',
           transition: 'background-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.6s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
