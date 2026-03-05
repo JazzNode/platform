@@ -202,11 +202,14 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
               <Link
                 key={venue.id}
                 href={`/${locale}/venues/${venue.id}`}
-                className={`fade-up-item block p-6 rounded-2xl border card-hover group relative transition-colors duration-300 ${
+                className={`fade-up-item block p-6 rounded-2xl border card-hover group relative transition-all duration-300 ${
                   followed
-                    ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                    ? 'bg-[rgba(var(--theme-glow-rgb),0.06)] border-[rgba(var(--theme-glow-rgb),0.35)]'
                     : 'bg-[var(--card)] border-[var(--border)]'
                 }`}
+                style={followed ? {
+                  boxShadow: 'inset 0 0 0 1px rgba(var(--theme-glow-rgb), 0.25), 0 0 24px -4px rgba(var(--theme-glow-rgb), 0.25)',
+                } : undefined}
               >
                 <div className="absolute top-3 right-3 z-10">
                   <FollowButton itemType="venue" itemId={venue.id} glass />
