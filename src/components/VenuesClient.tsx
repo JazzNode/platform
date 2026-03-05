@@ -206,7 +206,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 style={{
                   backgroundColor: followed ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
                   borderColor: followed ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
-                  transition: 'background-color 0.6s ease, border-color 0.6s ease',
+                  transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
                 }}
               >
                 <div className="absolute top-3 right-3 z-10">
