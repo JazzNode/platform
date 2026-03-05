@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import FollowButton from '@/components/FollowButton';
 
 interface SerializedArtist {
   id: string;
@@ -152,8 +153,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link
               href={`/${locale}/artists/${artist.id}`}
-              className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group h-full"
+              className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group h-full relative"
             >
+              <div className="absolute top-3 right-3 z-10">
+                <FollowButton itemType="artist" itemId={artist.id} />
+              </div>
               <div className="flex items-center gap-4 mb-3">
                 {artist.photoUrl ? (
                   <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[var(--border)] relative">

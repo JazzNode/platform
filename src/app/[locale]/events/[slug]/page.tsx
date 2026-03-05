@@ -6,6 +6,7 @@ import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, 
 import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import EventNav from '@/components/EventNav';
+import BookmarkButton from '@/components/BookmarkButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -86,9 +87,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         {/* Info */}
         <div className="flex-1 space-y-6">
           {/* Title */}
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
-            {f.title || f.title_local || f.title_en || 'Untitled Event'}
-          </h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
+              {f.title || f.title_local || f.title_en || 'Untitled Event'}
+            </h1>
+            <BookmarkButton itemId={event.id} variant="full" />
+          </div>
 
           {/* Primary artist */}
           {primaryArtist && (

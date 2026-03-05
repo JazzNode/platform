@@ -8,6 +8,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
+import FollowButton from '@/components/FollowButton';
 import BadgeDock from '@/components/BadgeDock';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -128,7 +129,10 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           />
 
           <div className="flex-1 space-y-5">
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold">{artistDisplayName(f, locale)}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="font-serif text-4xl sm:text-5xl font-bold">{artistDisplayName(f, locale)}</h1>
+              <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+            </div>
             {f.name_en && f.name_local && f.name_en !== f.name_local && (
               <p className="text-xl text-[#8A8578]">{f.name_en}</p>
             )}

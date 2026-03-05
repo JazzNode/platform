@@ -11,6 +11,7 @@ import AdminProvider from '@/components/AdminProvider';
 import AdminLoginModal from '@/components/AdminLoginModal';
 import AdminBadge from '@/components/AdminBadge';
 import AuthProvider from '@/components/AuthProvider';
+import FavoritesProvider from '@/components/FavoritesProvider';
 import AuthModal from '@/components/AuthModal';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
@@ -120,6 +121,7 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <SearchProvider data={searchData}>
               <AuthProvider>
+              <FavoritesProvider>
                 <AdminProvider>
                   <Header />
                   <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8">{children}</main>
@@ -131,6 +133,7 @@ export default async function LocaleLayout({
                   <AdminBadge />
                   <AuthModal />
                 </AdminProvider>
+              </FavoritesProvider>
               </AuthProvider>
             </SearchProvider>
           </ThemeProvider>

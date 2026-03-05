@@ -80,7 +80,11 @@
     "getTickets": "Get Tickets",
     "nGigs": "{count} gigs",
     "showMore": "Show more",
-    "showLess": "Show less"
+    "showLess": "Show less",
+    "follow": "Follow",
+    "following": "Following",
+    "bookmark": "Save",
+    "bookmarked": "Saved"
   },
   "auth": {
     "signIn": "Sign In",

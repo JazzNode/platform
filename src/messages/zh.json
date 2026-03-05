@@ -80,7 +80,11 @@
     "getTickets": "購票",
     "nGigs": "{count} 場",
     "showMore": "展開更多",
-    "showLess": "收合"
+    "showLess": "收合",
+    "follow": "追蹤",
+    "following": "已追蹤",
+    "bookmark": "收藏",
+    "bookmarked": "已收藏"
   },
   "auth": {
     "signIn": "登入",

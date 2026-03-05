@@ -7,6 +7,7 @@ import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, local
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
+import FollowButton from '@/components/FollowButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -88,7 +89,10 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         )}
 
         <div className="flex-1 space-y-6">
-          <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
+            <FollowButton itemType="venue" itemId={venue.id} variant="full" />
+          </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
             <p className="text-xl text-[#8A8578]">{f.name_en}</p>
           )}

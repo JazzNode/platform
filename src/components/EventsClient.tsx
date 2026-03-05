@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import BookmarkButton from '@/components/BookmarkButton';
 
 
 interface SerializedEvent {
@@ -353,8 +354,11 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                   <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link
                     href={`/${locale}/events/${event.id}`}
-                    className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full"
+                    className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full relative"
                   >
+                    <div className="absolute top-3 right-3 z-10">
+                      <BookmarkButton itemId={event.id} />
+                    </div>
                     {event.venue_name && (
                       <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{event.venue_name}</p>
                     )}

@@ -80,7 +80,11 @@
     "getTickets": "ซื้อบัตร",
     "nGigs": "{count} การแสดง",
     "showMore": "แสดงเพิ่มเติม",
-    "showLess": "แสดงน้อยลง"
+    "showLess": "แสดงน้อยลง",
+    "follow": "ติดตาม",
+    "following": "กำลังติดตาม",
+    "bookmark": "บันทึก",
+    "bookmarked": "บันทึกแล้ว"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",

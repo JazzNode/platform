@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import FollowButton from '@/components/FollowButton';
 
 interface SerializedVenue {
   id: string;
@@ -197,8 +198,11 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
               <Link
                 key={venue.id}
                 href={`/${locale}/venues/${venue.id}`}
-                className="fade-up-item block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group"
+                className="fade-up-item block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group relative"
               >
+                <div className="absolute top-3 right-3 z-10">
+                  <FollowButton itemType="venue" itemId={venue.id} />
+                </div>
                 {venue.photoUrl && (
                   <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl">
                     <img

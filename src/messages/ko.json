@@ -80,7 +80,11 @@
     "getTickets": "티켓 구매",
     "nGigs": "{count} 회",
     "showMore": "더 보기",
-    "showLess": "접기"
+    "showLess": "접기",
+    "follow": "팔로우",
+    "following": "팔로잉",
+    "bookmark": "저장",
+    "bookmarked": "저장됨"
   },
   "auth": {
     "signIn": "로그인",
