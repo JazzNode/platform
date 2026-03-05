@@ -194,15 +194,14 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
           </FadeUp>
         )}
 
-        <FadeUp stagger={0.15}>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVenues.map((venue) => {
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredVenues.map((venue, i) => {
               const followed = isFavorite('venue', venue.id);
               return (
+              <FadeUpItem key={venue.id} delay={(i % 3) * 60}>
               <Link
-                key={venue.id}
                 href={`/${locale}/venues/${venue.id}`}
-                className="fade-up-item block p-6 rounded-2xl border card-hover group relative"
+                className="block p-6 rounded-2xl border card-hover group relative h-full"
                 style={{
                   backgroundColor: followed ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
                   borderColor: followed ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
@@ -236,10 +235,10 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   </p>
                 )}
               </Link>
+              </FadeUpItem>
               );
             })}
           </div>
-        </FadeUp>
       </div>
     </div>
   );
