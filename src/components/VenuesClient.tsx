@@ -204,7 +204,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 href={`/${locale}/venues/${venue.id}`}
                 className={`fade-up-item block p-6 rounded-2xl border card-hover group relative transition-colors duration-300 ${
                   followed
-                    ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                    ? 'bg-[rgba(var(--theme-glow-rgb),0.14)] border-[rgba(var(--theme-glow-rgb),0.22)]'
                     : 'bg-[var(--card)] border-[var(--border)]'
                 }`}
               >
