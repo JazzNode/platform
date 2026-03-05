@@ -99,6 +99,25 @@
     "weakPassword": "Kata sandi harus minimal 6 karakter.",
     "genericError": "Terjadi kesalahan. Silakan coba lagi."
   },
+  "profile": {
+    "settings": "Pengaturan Profil",
+    "displayName": "Nama Tampilan",
+    "displayNamePlaceholder": "Nama Anda",
+    "username": "Nama Pengguna",
+    "usernamePlaceholder": "your_username",
+    "usernameHint": "Huruf kecil, angka, dan garis bawah. 3–30 karakter.",
+    "usernameInvalid": "Harus 3–30 karakter: huruf kecil, angka, atau garis bawah.",
+    "usernameTaken": "Nama pengguna sudah digunakan.",
+    "bio": "Bio",
+    "bioPlaceholder": "Ceritakan tentang diri Anda...",
+    "website": "Situs Web",
+    "save": "Simpan",
+    "saved": "Tersimpan!",
+    "avatarUpload": "Klik untuk ubah foto",
+    "viewPublicProfile": "Lihat profil publik",
+    "memberSince": "Anggota sejak {date}",
+    "notFound": "Pengguna tidak ditemukan."
+  },
   "regions": {
     "worldMap": "Peta Dunia",
     "TW": "Taiwan",

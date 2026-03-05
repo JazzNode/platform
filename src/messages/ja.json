@@ -99,6 +99,25 @@
     "weakPassword": "パスワードは6文字以上にしてください。",
     "genericError": "エラーが発生しました。もう一度お試しください。"
   },
+  "profile": {
+    "settings": "プロフィール設定",
+    "displayName": "表示名",
+    "displayNamePlaceholder": "あなたの名前",
+    "username": "ユーザー名",
+    "usernamePlaceholder": "your_username",
+    "usernameHint": "小文字の英数字とアンダースコア。3〜30文字。",
+    "usernameInvalid": "3〜30文字の小文字英数字またはアンダースコアで入力してください。",
+    "usernameTaken": "このユーザー名は既に使用されています。",
+    "bio": "自己紹介",
+    "bioPlaceholder": "自己紹介を書いてください...",
+    "website": "ウェブサイト",
+    "save": "保存",
+    "saved": "保存しました！",
+    "avatarUpload": "クリックして写真を変更",
+    "viewPublicProfile": "公開プロフィールを見る",
+    "memberSince": "{date}から参加",
+    "notFound": "ユーザーが見つかりません。"
+  },
   "regions": {
     "worldMap": "世界地図",
     "TW": "台湾",

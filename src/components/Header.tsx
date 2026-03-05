@@ -29,7 +29,7 @@ export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const { open: openSearch } = useSearch();
-  const { user, loading: authLoading, signOut, setShowAuthModal } = useAuth();
+  const { user, profile, loading: authLoading, signOut, setShowAuthModal } = useAuth();
   const { isAdmin } = useAdmin();
   const [scrolled, setScrolled] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
@@ -76,12 +76,8 @@ export default function Header() {
   }, [showComingSoon]);
 
   const handleUserIconClick = useCallback(() => {
-    if (isAdmin) {
-      setShowAuthModal(true);
-    } else {
-      setShowComingSoon(true);
-    }
-  }, [isAdmin, setShowAuthModal]);
+    setShowAuthModal(true);
+  }, [setShowAuthModal]);
 
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
@@ -129,10 +125,14 @@ export default function Header() {
       <div ref={mobile ? undefined : userMenuRef} className="relative">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
-          className="w-7 h-7 rounded-full bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
+          className="w-7 h-7 rounded-full overflow-hidden bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
           aria-label="User menu"
         >
-          {userInitial}
+          {profile?.avatar_url ? (
+            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+          ) : (
+            userInitial
+          )}
         </button>
         {userMenuOpen && !mobile && (
           <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">

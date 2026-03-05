@@ -99,6 +99,25 @@
     "weakPassword": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
     "genericError": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง"
   },
+  "profile": {
+    "settings": "ตั้งค่าโปรไฟล์",
+    "displayName": "ชื่อที่แสดง",
+    "displayNamePlaceholder": "ชื่อของคุณ",
+    "username": "ชื่อผู้ใช้",
+    "usernamePlaceholder": "your_username",
+    "usernameHint": "ตัวพิมพ์เล็ก ตัวเลข และขีดล่าง 3–30 ตัวอักษร",
+    "usernameInvalid": "ต้องเป็น 3–30 ตัวอักษร: ตัวพิมพ์เล็ก ตัวเลข หรือขีดล่าง",
+    "usernameTaken": "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
+    "bio": "เกี่ยวกับ",
+    "bioPlaceholder": "แนะนำตัวเอง...",
+    "website": "เว็บไซต์",
+    "save": "บันทึก",
+    "saved": "บันทึกแล้ว!",
+    "avatarUpload": "คลิกเพื่อเปลี่ยนรูป",
+    "viewPublicProfile": "ดูโปรไฟล์สาธารณะ",
+    "memberSince": "สมาชิกตั้งแต่ {date}",
+    "notFound": "ไม่พบผู้ใช้"
+  },
   "regions": {
     "worldMap": "แผนที่โลก",
     "TW": "ไต้หวัน",

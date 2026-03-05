@@ -99,6 +99,25 @@
     "weakPassword": "Password must be at least 6 characters.",
     "genericError": "Something went wrong. Please try again."
   },
+  "profile": {
+    "settings": "Profile Settings",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your name",
+    "username": "Username",
+    "usernamePlaceholder": "your_username",
+    "usernameHint": "Lowercase letters, numbers, and underscores. 3–30 characters.",
+    "usernameInvalid": "Must be 3–30 characters: lowercase letters, numbers, or underscores.",
+    "usernameTaken": "This username is already taken.",
+    "bio": "Bio",
+    "bioPlaceholder": "Tell us about yourself...",
+    "website": "Website",
+    "save": "Save",
+    "saved": "Saved!",
+    "avatarUpload": "Click to change your photo",
+    "viewPublicProfile": "View public profile",
+    "memberSince": "Member since {date}",
+    "notFound": "User not found."
+  },
   "regions": {
     "worldMap": "World Map",
     "TW": "Taiwan",

@@ -4,13 +4,26 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
 
+export interface UserProfile {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+  website: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface AuthContextType {
   user: User | null;
+  profile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
 }
@@ -19,8 +32,23 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const fetchProfile = useCallback(async (userId: string) => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    if (data) setProfile(data as UserProfile);
+  }, []);
+
+  const refreshProfile = useCallback(async () => {
+    if (user) await fetchProfile(user.id);
+  }, [user, fetchProfile]);
 
   useEffect(() => {
     const supabase = createClient();
@@ -28,16 +56,23 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     // Get initial session
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
+      if (user) fetchProfile(user.id);
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      const newUser = session?.user ?? null;
+      setUser(newUser);
+      if (newUser) {
+        fetchProfile(newUser.id);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const supabase = createClient();
@@ -72,11 +107,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const supabase = createClient();
     await supabase.auth.signOut();
     setUser(null);
+    setProfile(null);
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, signIn, signUp, signInWithGoogle, signOut, showAuthModal, setShowAuthModal }}
+      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, showAuthModal, setShowAuthModal }}
     >
       {children}
     </AuthContext.Provider>
