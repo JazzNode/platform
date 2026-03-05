@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
@@ -10,6 +10,7 @@ import FadeUp from '@/components/animations/FadeUp';
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
+  const locale = useLocale();
   const router = useRouter();
   const { user, profile, loading, refreshProfile, setShowAuthModal } = useAuth();
 
@@ -278,7 +279,7 @@ export default function ProfilePage() {
 
             {profile?.username && (
               <a
-                href={`/user/${profile.username}`}
+                href={`/${locale}/user/${profile.username}`}
                 className="text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors link-lift"
               >
                 {t('viewPublicProfile')} →
