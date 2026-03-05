@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/ThemeProvider';
 import { themes, themeOrder, type Theme } from '@/lib/themes';
 import LegalModal from '@/components/LegalModal';
+import { useAdmin } from '@/components/AdminProvider';
 
 function SoundWave() {
   const { theme } = useTheme();
@@ -73,10 +74,39 @@ function ThemePicker() {
   );
 }
 
+const ADMIN_TAP_COUNT = 7;
+const ADMIN_TAP_WINDOW_MS = 2000;
+
 export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('common');
   const [legalOpen, setLegalOpen] = useState(false);
+  const { toggleAdmin } = useAdmin();
+  const tapCountRef = useRef(0);
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  useEffect(() => {
+    return () => { if (tapTimerRef.current) clearTimeout(tapTimerRef.current); };
+  }, []);
+
+  const handleLogoTap = useCallback((e: React.MouseEvent) => {
+    tapCountRef.current += 1;
+
+    // Prevent navigation after 1st rapid tap so user stays on page
+    if (tapCountRef.current > 1) e.preventDefault();
+
+    if (tapTimerRef.current) clearTimeout(tapTimerRef.current);
+
+    if (tapCountRef.current >= ADMIN_TAP_COUNT) {
+      tapCountRef.current = 0;
+      toggleAdmin();
+      return;
+    }
+
+    tapTimerRef.current = setTimeout(() => {
+      tapCountRef.current = 0;
+    }, ADMIN_TAP_WINDOW_MS);
+  }, [toggleAdmin]);
 
   const navLinks = [
     { key: 'cities', href: `/${locale}/cities` },
@@ -90,7 +120,7 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col items-center">
           {/* Logo + tagline — inline on desktop, stacked on mobile */}
-          <Link href={`/${locale}`} className="group flex flex-col sm:flex-row items-center sm:items-baseline gap-1.5 sm:gap-3 text-center">
+          <Link href={`/${locale}`} onClick={handleLogoTap} className="group flex flex-col sm:flex-row items-center sm:items-baseline gap-1.5 sm:gap-3 text-center">
             <p className="font-serif text-xl text-gold font-bold group-hover:text-[var(--color-gold-bright)] transition-colors">JazzNode<sup className="text-[8px] font-sans font-semibold uppercase tracking-[0.12em] text-[var(--color-gold)]/50 relative -top-3 ml-[2px] select-none">beta</sup></p>
             <span className="hidden sm:inline text-[var(--muted-foreground)] opacity-30">·</span>
             <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground,#8A8578)]">

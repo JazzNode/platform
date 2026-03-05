@@ -7,6 +7,7 @@ interface AdminContextType {
   token: string | null;
   login: (password: string) => Promise<boolean>;
   logout: () => void;
+  toggleAdmin: () => void;
   showLoginModal: boolean;
   setShowLoginModal: (show: boolean) => void;
 }
@@ -38,21 +39,25 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     }
   }, []);
 
+  const toggleAdmin = useCallback(() => {
+    if (token) {
+      logout();
+    } else {
+      setShowLoginModal(true);
+    }
+  }, [token, logout]);
+
   // Ctrl+Shift+A keyboard shortcut
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
         e.preventDefault();
-        if (token) {
-          logout();
-        } else {
-          setShowLoginModal(true);
-        }
+        toggleAdmin();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [token, logout]);
+  }, [toggleAdmin]);
 
   const login = useCallback(async (password: string): Promise<boolean> => {
     try {
@@ -86,6 +91,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         token,
         login,
         logout,
+        toggleAdmin,
         showLoginModal,
         setShowLoginModal,
       }}
