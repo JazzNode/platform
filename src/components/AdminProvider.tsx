@@ -1,66 +1,46 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, useCallback } from 'react';
-
-const STORAGE_KEY = 'jazznode-admin-token';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import AdminLoginModal from './AdminLoginModal';
 
 interface AdminContextType {
   isAdmin: boolean;
   token: string | null;
   login: (password: string) => Promise<boolean>;
   logout: () => void;
-  showLoginModal: boolean;
-  setShowLoginModal: (show: boolean) => void;
 }
 
-const AdminContext = createContext<AdminContextType>({
-  isAdmin: false,
-  token: null,
-  login: async () => false,
-  logout: () => {},
-  showLoginModal: false,
-  setShowLoginModal: () => {},
-});
-
-export function useAdmin() {
-  return useContext(AdminContext);
-}
+const AdminContext = createContext<AdminContextType | null>(null);
+const STORAGE_KEY = 'jazznode_admin_token';
 
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
+  // Initialize state synchronously using a function to avoid the useEffect warning
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        return localStorage.getItem(STORAGE_KEY);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  });
+  
+  const [isMounted, setIsMounted] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  // Restore token from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setToken(saved);
-    } catch {
-      /* SSR or storage unavailable */
-    }
-  }, []);
-
-  const login = useCallback(async (password: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) return false;
-      const { token: jwt } = await res.json();
-      setToken(jwt);
-      localStorage.setItem(STORAGE_KEY, jwt);
-      setShowLoginModal(false);
-      return true;
-    } catch {
-      return false;
-    }
-  }, []);
 
   const logout = useCallback(() => {
     setToken(null);
-    localStorage.removeItem(STORAGE_KEY);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
   }, []);
 
   // Ctrl+Shift+A keyboard shortcut
@@ -79,6 +59,33 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     return () => window.removeEventListener('keydown', handler);
   }, [token, logout]);
 
+  const login = useCallback(async (password: string): Promise<boolean> => {
+    try {
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setToken(data.token);
+        try {
+          localStorage.setItem(STORAGE_KEY, data.token);
+        } catch {
+          /* ignore */
+        }
+        setShowLoginModal(false);
+        return true;
+      }
+    } catch (err) {
+      console.error('Login error', err);
+    }
+    return false;
+  }, []);
+
+  if (!isMounted) return <>{children}</>;
+
   return (
     <AdminContext.Provider
       value={{
@@ -86,11 +93,21 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         token,
         login,
         logout,
-        showLoginModal,
-        setShowLoginModal,
       }}
     >
       {children}
+      {showLoginModal && (
+        <AdminLoginModal
+          onClose={() => setShowLoginModal(false)}
+          onLogin={login}
+        />
+      )}
     </AdminContext.Provider>
   );
+}
+
+export function useAdmin() {
+  const ctx = useContext(AdminContext);
+  if (!ctx) throw new Error('useAdmin must be used within AdminProvider');
+  return ctx;
 }
