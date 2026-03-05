@@ -358,11 +358,12 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                   <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link
                     href={`/${locale}/events/${event.id}`}
-                    className={`block p-6 rounded-2xl border card-hover group h-full relative transition-colors duration-300 ${
-                      bookmarked
-                        ? 'bg-[rgba(var(--theme-glow-rgb),0.14)] border-[rgba(var(--theme-glow-rgb),0.22)]'
-                        : 'bg-[var(--card)] border-[var(--border)]'
-                    }`}
+                    className="block p-6 rounded-2xl border card-hover group h-full relative"
+                    style={{
+                      backgroundColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
+                      borderColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
+                      transition: 'background-color 0.6s ease, border-color 0.6s ease',
+                    }}
                   >
                     <div className="absolute top-3 right-3 z-10">
                       <BookmarkButton itemId={event.id} />
