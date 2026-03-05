@@ -157,14 +157,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link
               href={`/${locale}/artists/${artist.id}`}
-              className={`block p-5 rounded-2xl border card-hover group h-full relative transition-all duration-300 ${
+              className={`block p-5 rounded-2xl border card-hover group h-full relative transition-colors duration-300 ${
                 followed
-                  ? 'bg-[rgba(var(--theme-glow-rgb),0.06)] border-[rgba(var(--theme-glow-rgb),0.35)]'
+                  ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
                   : 'bg-[var(--card)] border-[var(--border)]'
               }`}
-              style={followed ? {
-                boxShadow: 'inset 0 0 0 1px rgba(var(--theme-glow-rgb), 0.25), 0 0 24px -4px rgba(var(--theme-glow-rgb), 0.25)',
-              } : undefined}
             >
               <div className="absolute top-3 right-3 z-10">
                 <FollowButton itemType="artist" itemId={artist.id} />
