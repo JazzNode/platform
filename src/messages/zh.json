@@ -97,7 +97,8 @@
     "invalidCredentials": "電子信箱或密碼不正確。",
     "emailInUse": "此信箱已被註冊。",
     "weakPassword": "密碼需至少 6 個字元。",
-    "genericError": "發生錯誤，請稍後再試。"
+    "genericError": "發生錯誤，請稍後再試。",
+    "profile": "個人檔案"
   },
   "profile": {
     "settings": "個人設定",
@@ -139,7 +140,7 @@
     "trombone": "長號",
     "vocals": "人聲",
     "flute": "長笛",
-    "vibraphone": "顫音琴",
+    "vibraphone": "顫音琴 (鐵琴)",
     "violin": "小提琴",
     "cello": "大提琴",
     "viola": "中提琴",

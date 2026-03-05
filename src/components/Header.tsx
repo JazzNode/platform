@@ -76,8 +76,12 @@ export default function Header() {
   }, [showComingSoon]);
 
   const handleUserIconClick = useCallback(() => {
-    setShowAuthModal(true);
-  }, [setShowAuthModal]);
+    if (isAdmin) {
+      setShowAuthModal(true);
+    } else {
+      setShowComingSoon(true);
+    }
+  }, [isAdmin, setShowAuthModal]);
 
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
@@ -139,6 +143,16 @@ export default function Header() {
             <div className="px-4 py-2 border-b border-[var(--border)]">
               <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
             </div>
+            <button
+              onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M20 21a8 8 0 0 0-16 0" />
+              </svg>
+              {tAuth('profile')}
+            </button>
             <button
               onClick={() => { signOut(); setUserMenuOpen(false); }}
               className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
@@ -264,6 +278,16 @@ export default function Header() {
                   <div className="px-4 py-2 border-b border-[var(--border)]">
                     <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
                   </div>
+                  <button
+                    onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="8" r="4" />
+                      <path d="M20 21a8 8 0 0 0-16 0" />
+                    </svg>
+                    {tAuth('profile')}
+                  </button>
                   <button
                     onClick={() => { signOut(); setUserMenuOpen(false); }}
                     className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"

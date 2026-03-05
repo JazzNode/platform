@@ -97,7 +97,8 @@
     "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
     "emailInUse": "このメールアドレスは既に登録されています。",
     "weakPassword": "パスワードは6文字以上にしてください。",
-    "genericError": "エラーが発生しました。もう一度お試しください。"
+    "genericError": "エラーが発生しました。もう一度お試しください。",
+    "profile": "プロフィール"
   },
   "profile": {
     "settings": "プロフィール設定",

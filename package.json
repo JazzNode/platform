@@ -23,6 +23,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "sharp": "^0.34.5",
+    "smartcrop": "^2.0.5",
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {

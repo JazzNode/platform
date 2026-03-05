@@ -97,7 +97,8 @@
     "invalidCredentials": "Email atau kata sandi salah.",
     "emailInUse": "Email ini sudah terdaftar.",
     "weakPassword": "Kata sandi harus minimal 6 karakter.",
-    "genericError": "Terjadi kesalahan. Silakan coba lagi."
+    "genericError": "Terjadi kesalahan. Silakan coba lagi.",
+    "profile": "Profil"
   },
   "profile": {
     "settings": "Pengaturan Profil",

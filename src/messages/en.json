@@ -97,7 +97,8 @@
     "invalidCredentials": "Invalid email or password.",
     "emailInUse": "This email is already registered.",
     "weakPassword": "Password must be at least 6 characters.",
-    "genericError": "Something went wrong. Please try again."
+    "genericError": "Something went wrong. Please try again.",
+    "profile": "Profile"
   },
   "profile": {
     "settings": "Profile Settings",
