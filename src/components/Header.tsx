@@ -149,7 +149,8 @@ export default function Header() {
               {t('artists')}
             </Link>
 
-            {/* Search */}
+            {/* Search + User + Language group */}
+            <div className="flex items-center gap-3 ml-auto border-l border-[var(--border)] pl-6">
             <button
               onClick={openSearch}
               className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)] group"
@@ -161,10 +162,9 @@ export default function Header() {
               </svg>
             </button>
 
-            {/* User */}
             <UserButton />
 
-            <div ref={langRefDesktop} className="relative ml-6 border-l border-[var(--border)] pl-6">
+            <div ref={langRefDesktop} className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
                 className="flex items-center gap-1.5 px-2 py-1.5 text-xs tracking-wider rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300"
@@ -202,6 +202,7 @@ export default function Header() {
                   ))}
                 </div>
               )}
+            </div>
             </div>
           </nav>
 
