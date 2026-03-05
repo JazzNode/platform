@@ -360,7 +360,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     href={`/${locale}/events/${event.id}`}
                     className={`block p-6 rounded-2xl border card-hover group h-full relative transition-colors duration-300 ${
                       bookmarked
-                        ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                        ? 'bg-[rgba(var(--theme-glow-rgb),0.14)] border-[rgba(var(--theme-glow-rgb),0.22)]'
                         : 'bg-[var(--card)] border-[var(--border)]'
                     }`}
                   >
