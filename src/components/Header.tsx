@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearch } from './SearchProvider';
 import { useAuth } from './AuthProvider';
+import { useAdmin } from './AdminProvider';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
@@ -29,7 +30,9 @@ export default function Header() {
   const router = useRouter();
   const { open: openSearch } = useSearch();
   const { user, loading: authLoading, signOut, setShowAuthModal } = useAuth();
+  const { isAdmin } = useAdmin();
   const [scrolled, setScrolled] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const langRefDesktop = useRef<HTMLDivElement>(null);
@@ -65,6 +68,21 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, [userMenuOpen]);
 
+  // Auto-dismiss "coming soon" toast
+  useEffect(() => {
+    if (!showComingSoon) return;
+    const timer = setTimeout(() => setShowComingSoon(false), 2500);
+    return () => clearTimeout(timer);
+  }, [showComingSoon]);
+
+  const handleUserIconClick = useCallback(() => {
+    if (isAdmin) {
+      setShowAuthModal(true);
+    } else {
+      setShowComingSoon(true);
+    }
+  }, [isAdmin, setShowAuthModal]);
+
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
     segments[1] = newLocale;
@@ -79,13 +97,31 @@ export default function Header() {
 
     if (!user) {
       return (
-        <button
-          onClick={() => setShowAuthModal(true)}
-          className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)]"
-          aria-label="Sign in"
-        >
-          <UserIcon className="w-[18px] h-[18px]" />
-        </button>
+        <div className="relative">
+          <button
+            onClick={handleUserIconClick}
+            className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)]"
+            aria-label="Sign in"
+          >
+            <UserIcon className="w-[18px] h-[18px]" />
+          </button>
+          <div
+            className={`absolute right-0 top-full mt-2 transition-all duration-300 z-50 ${
+              showComingSoon
+                ? 'opacity-100 translate-y-0'
+                : 'opacity-0 -translate-y-1 pointer-events-none'
+            }`}
+          >
+            <div className="px-4 py-2 rounded-xl border border-[var(--border)] shadow-xl text-sm font-medium tracking-wide whitespace-nowrap"
+              style={{
+                background: 'color-mix(in srgb, var(--background) 92%, transparent)',
+                backdropFilter: 'blur(20px)',
+              }}
+            >
+              <span className="text-[var(--color-gold)]">Coming soon!</span>
+            </div>
+          </div>
+        </div>
       );
     }
 
@@ -285,6 +321,7 @@ export default function Header() {
           </div>
         </div>
       </header>
+
     </>
   );
 }
