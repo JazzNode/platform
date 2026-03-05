@@ -108,7 +108,7 @@ export default function AuthModal() {
         }`}
       >
         <div
-          className={`w-full max-w-sm mx-4 rounded-2xl border border-[var(--border)] shadow-2xl transition-all duration-300 overflow-hidden ${
+          className={`relative w-full max-w-sm mx-4 rounded-2xl border border-[var(--border)] shadow-2xl transition-all duration-300 overflow-hidden ${
             showAuthModal ? 'translate-y-0 scale-100' : '-translate-y-4 scale-[0.98]'
           }`}
           style={{
