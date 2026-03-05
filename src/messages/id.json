@@ -124,7 +124,11 @@
     "cropCancel": "Batal",
     "viewPublicProfile": "Lihat profil publik",
     "memberSince": "Anggota sejak {date}",
-    "notFound": "Pengguna tidak ditemukan."
+    "notFound": "Pengguna tidak ditemukan.",
+    "follows": "Mengikuti",
+    "bookmarks": "Tersimpan",
+    "noFollows": "Belum mengikuti artis atau venue.",
+    "noBookmarks": "Belum ada acara yang disimpan."
   },
   "regions": {
     "worldMap": "Peta Dunia",

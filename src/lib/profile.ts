@@ -11,6 +11,15 @@ export interface Profile {
   updated_at: string;
 }
 
+export async function getPublicFavorites(userId: string): Promise<{ item_type: string; item_id: string }[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('favorites')
+    .select('item_type, item_id')
+    .eq('user_id', userId);
+  return data || [];
+}
+
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

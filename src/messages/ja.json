@@ -124,7 +124,11 @@
     "cropCancel": "キャンセル",
     "viewPublicProfile": "公開プロフィールを見る",
     "memberSince": "{date}から参加",
-    "notFound": "ユーザーが見つかりません。"
+    "notFound": "ユーザーが見つかりません。",
+    "follows": "フォロー中",
+    "bookmarks": "保存済み",
+    "noFollows": "アーティストや会場をまだフォローしていません。",
+    "noBookmarks": "保存したイベントはまだありません。"
   },
   "regions": {
     "worldMap": "世界地図",

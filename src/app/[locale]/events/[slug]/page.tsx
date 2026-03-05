@@ -7,6 +7,7 @@ import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, local
 import FadeUp from '@/components/animations/FadeUp';
 import EventNav from '@/components/EventNav';
 import BookmarkButton from '@/components/BookmarkButton';
+import FavoriteHighlight from '@/components/FavoriteHighlight';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -72,6 +73,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         {t('backToList')}
       </Link>
 
+      <FavoriteHighlight itemType="event" itemId={event.id}>
       {/* Hero section */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
@@ -259,6 +261,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           </FadeUp>
         );
       })()}
+      </FavoriteHighlight>
     </div>
   );
 }

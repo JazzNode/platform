@@ -124,7 +124,11 @@
     "cropCancel": "Cancel",
     "viewPublicProfile": "View public profile",
     "memberSince": "Member since {date}",
-    "notFound": "User not found."
+    "notFound": "User not found.",
+    "follows": "Following",
+    "bookmarks": "Saved",
+    "noFollows": "Not following any artists or venues yet.",
+    "noBookmarks": "No saved events yet."
   },
   "regions": {
     "worldMap": "World Map",

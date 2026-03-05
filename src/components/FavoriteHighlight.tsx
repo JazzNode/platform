@@ -1,0 +1,34 @@
+'use client';
+
+import { useAuth } from './AuthProvider';
+import { useFavorites } from './FavoritesProvider';
+
+interface FavoriteHighlightProps {
+  itemType: 'artist' | 'venue' | 'event';
+  itemId: string;
+  children: React.ReactNode;
+}
+
+/**
+ * Wraps detail page content with a subtle theme-colored background tint
+ * when the current user has followed/bookmarked the item.
+ */
+export default function FavoriteHighlight({ itemType, itemId, children }: FavoriteHighlightProps) {
+  const { user } = useAuth();
+  const { isFavorite } = useFavorites();
+  const active = user ? isFavorite(itemType, itemId) : false;
+
+  return (
+    <div
+      className={`transition-all duration-500 ${
+        active ? 'rounded-3xl p-6 -m-6' : ''
+      }`}
+      style={active ? {
+        background: 'rgba(var(--theme-glow-rgb), 0.04)',
+        border: '1px solid rgba(var(--theme-glow-rgb), 0.08)',
+      } : undefined}
+    >
+      {children}
+    </div>
+  );
+}

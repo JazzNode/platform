@@ -5,6 +5,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
+import { useFavorites } from '@/components/FavoritesProvider';
 
 
 interface SerializedEvent {
@@ -65,6 +66,7 @@ interface Props {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, labels }: Props) {
+  const { isFavorite } = useFavorites();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -350,11 +352,17 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               <h2 className="font-serif text-2xl font-bold mb-6 text-gold">{month}</h2>
             </FadeUp>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {monthEvents.map((event, i) => (
+                {monthEvents.map((event, i) => {
+                  const bookmarked = isFavorite('event', event.id);
+                  return (
                   <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link
                     href={`/${locale}/events/${event.id}`}
-                    className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full relative"
+                    className={`block p-6 rounded-2xl border card-hover group h-full relative transition-colors duration-300 ${
+                      bookmarked
+                        ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                        : 'bg-[var(--card)] border-[var(--border)]'
+                    }`}
                   >
                     <div className="absolute top-3 right-3 z-10">
                       <BookmarkButton itemId={event.id} />
@@ -387,7 +395,8 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     )}
                   </Link>
                   </FadeUpItem>
-                ))}
+                  );
+                })}
               </div>
           </section>
         ))}

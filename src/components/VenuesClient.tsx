@@ -5,6 +5,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
+import { useFavorites } from '@/components/FavoritesProvider';
 
 interface SerializedVenue {
   id: string;
@@ -42,6 +43,7 @@ interface Props {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
+  const { isFavorite } = useFavorites();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
@@ -194,14 +196,20 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
 
         <FadeUp stagger={0.15}>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredVenues.map((venue) => (
+            {filteredVenues.map((venue) => {
+              const followed = isFavorite('venue', venue.id);
+              return (
               <Link
                 key={venue.id}
                 href={`/${locale}/venues/${venue.id}`}
-                className="fade-up-item block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group relative"
+                className={`fade-up-item block p-6 rounded-2xl border card-hover group relative transition-colors duration-300 ${
+                  followed
+                    ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                    : 'bg-[var(--card)] border-[var(--border)]'
+                }`}
               >
                 <div className="absolute top-3 right-3 z-10">
-                  <FollowButton itemType="venue" itemId={venue.id} />
+                  <FollowButton itemType="venue" itemId={venue.id} glass />
                 </div>
                 {venue.photoUrl && (
                   <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl">
@@ -227,7 +235,8 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   </p>
                 )}
               </Link>
-            ))}
+              );
+            })}
           </div>
         </FadeUp>
       </div>

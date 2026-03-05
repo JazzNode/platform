@@ -6,6 +6,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
+import { useFavorites } from '@/components/FavoritesProvider';
 
 interface SerializedArtist {
   id: string;
@@ -36,6 +37,7 @@ interface Props {
 }
 
 export default function ArtistsClient({ artists, instruments, instrumentNames = {}, locale, labels }: Props) {
+  const { isFavorite } = useFavorites();
   const instLabel = (key: string) => instrumentNames[key] || key;
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -149,11 +151,17 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredArtists.map((artist, i) => (
+          {filteredArtists.map((artist, i) => {
+            const followed = isFavorite('artist', artist.id);
+            return (
             <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link
               href={`/${locale}/artists/${artist.id}`}
-              className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group h-full relative"
+              className={`block p-5 rounded-2xl border card-hover group h-full relative transition-colors duration-300 ${
+                followed
+                  ? 'bg-[rgba(var(--theme-glow-rgb),0.08)] border-[rgba(var(--theme-glow-rgb),0.18)]'
+                  : 'bg-[var(--card)] border-[var(--border)]'
+              }`}
             >
               <div className="absolute top-3 right-3 z-10">
                 <FollowButton itemType="artist" itemId={artist.id} />
@@ -184,7 +192,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               </div>
             </Link>
             </FadeUpItem>
-          ))}
+            );
+          })}
         </div>
     </div>
   );

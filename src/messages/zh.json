@@ -124,7 +124,11 @@
     "cropCancel": "取消",
     "viewPublicProfile": "查看公開頁面",
     "memberSince": "加入於 {date}",
-    "notFound": "找不到此用戶。"
+    "notFound": "找不到此用戶。",
+    "follows": "追蹤",
+    "bookmarks": "收藏",
+    "noFollows": "尚未追蹤任何藝人或場地。",
+    "noBookmarks": "尚未收藏任何活動。"
   },
   "regions": {
     "worldMap": "世界版圖",

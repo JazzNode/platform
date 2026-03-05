@@ -8,6 +8,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
+import FavoriteHighlight from '@/components/FavoriteHighlight';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -75,6 +76,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         {t('backToList')}
       </Link>
 
+      <FavoriteHighlight itemType="venue" itemId={venue.id}>
       {/* Hero */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
@@ -329,6 +331,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           </>
         );
       })()}
+      </FavoriteHighlight>
     </div>
   );
 }
