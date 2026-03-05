@@ -115,6 +115,9 @@
     "save": "保存",
     "saved": "保存しました！",
     "avatarUpload": "クリックして写真を変更",
+    "cropTitle": "写真を切り抜き",
+    "cropConfirm": "確定",
+    "cropCancel": "キャンセル",
     "viewPublicProfile": "公開プロフィールを見る",
     "memberSince": "{date}から参加",
     "notFound": "ユーザーが見つかりません。"

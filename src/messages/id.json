@@ -115,6 +115,9 @@
     "save": "Simpan",
     "saved": "Tersimpan!",
     "avatarUpload": "Klik untuk ubah foto",
+    "cropTitle": "Potong Foto",
+    "cropConfirm": "Konfirmasi",
+    "cropCancel": "Batal",
     "viewPublicProfile": "Lihat profil publik",
     "memberSince": "Anggota sejak {date}",
     "notFound": "Pengguna tidak ditemukan."

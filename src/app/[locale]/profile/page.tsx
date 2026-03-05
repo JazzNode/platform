@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
+import AvatarCropModal from '@/components/AvatarCropModal';
 import FadeUp from '@/components/animations/FadeUp';
 
 export default function ProfilePage() {
@@ -24,6 +25,8 @@ export default function ProfilePage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Populate form from profile
@@ -90,18 +93,39 @@ export default function ProfilePage() {
     if (!uploading) fileInputRef.current?.click();
   }, [uploading]);
 
-  const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
+    setUploadError(null);
     const objectUrl = URL.createObjectURL(file);
-    setAvatarPreview(objectUrl);
+    setCropImageSrc(objectUrl);
+    setCropModalOpen(true);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, []);
+
+  const handleCropClose = useCallback(() => {
+    setCropModalOpen(false);
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+  }, [cropImageSrc]);
+
+  const handleCropComplete = useCallback(async (blob: Blob) => {
+    setCropModalOpen(false);
+    if (cropImageSrc) {
+      URL.revokeObjectURL(cropImageSrc);
+      setCropImageSrc(null);
+    }
+
+    const previewUrl = URL.createObjectURL(blob);
+    setAvatarPreview(previewUrl);
     setUploading(true);
     setUploadError(null);
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', blob, 'avatar.webp');
 
       const res = await fetch('/api/profile/upload-avatar', {
         method: 'POST',
@@ -117,12 +141,11 @@ export default function ProfilePage() {
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : 'Upload failed');
       setAvatarPreview(null);
-      URL.revokeObjectURL(objectUrl);
+      URL.revokeObjectURL(previewUrl);
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
     }
-  }, [refreshProfile]);
+  }, [cropImageSrc, refreshProfile]);
 
   if (loading || !user) {
     return (
@@ -288,6 +311,15 @@ export default function ProfilePage() {
           </div>
         </div>
       </FadeUp>
+
+      {cropImageSrc && (
+        <AvatarCropModal
+          imageSrc={cropImageSrc}
+          open={cropModalOpen}
+          onClose={handleCropClose}
+          onComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 }

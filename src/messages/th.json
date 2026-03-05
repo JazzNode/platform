@@ -115,6 +115,9 @@
     "save": "บันทึก",
     "saved": "บันทึกแล้ว!",
     "avatarUpload": "คลิกเพื่อเปลี่ยนรูป",
+    "cropTitle": "ครอปรูปภาพ",
+    "cropConfirm": "ยืนยัน",
+    "cropCancel": "ยกเลิก",
     "viewPublicProfile": "ดูโปรไฟล์สาธารณะ",
     "memberSince": "สมาชิกตั้งแต่ {date}",
     "notFound": "ไม่พบผู้ใช้"

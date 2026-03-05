@@ -115,6 +115,9 @@
     "save": "儲存",
     "saved": "已儲存！",
     "avatarUpload": "點擊更換照片",
+    "cropTitle": "裁切照片",
+    "cropConfirm": "確認",
+    "cropCancel": "取消",
     "viewPublicProfile": "查看公開頁面",
     "memberSince": "加入於 {date}",
     "notFound": "找不到此用戶。"

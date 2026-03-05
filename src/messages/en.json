@@ -115,6 +115,9 @@
     "save": "Save",
     "saved": "Saved!",
     "avatarUpload": "Click to change your photo",
+    "cropTitle": "Crop Photo",
+    "cropConfirm": "Confirm",
+    "cropCancel": "Cancel",
     "viewPublicProfile": "View public profile",
     "memberSince": "Member since {date}",
     "notFound": "User not found."
