@@ -106,6 +106,7 @@ export default function AuthModal() {
         className={`fixed inset-0 z-[71] flex items-center justify-center transition-all duration-300 ${
           showAuthModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
+        onClick={handleClose}
       >
         <div
           className={`relative w-full max-w-sm mx-4 rounded-2xl border border-[var(--border)] shadow-2xl transition-all duration-300 overflow-hidden ${
