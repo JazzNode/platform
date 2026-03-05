@@ -10,6 +10,8 @@ import SearchProvider from '@/components/SearchProvider';
 import AdminProvider from '@/components/AdminProvider';
 import AdminLoginModal from '@/components/AdminLoginModal';
 import AdminBadge from '@/components/AdminBadge';
+import AuthProvider from '@/components/AuthProvider';
+import AuthModal from '@/components/AuthModal';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
@@ -117,16 +119,19 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <SearchProvider data={searchData}>
-              <AdminProvider>
-                <Header />
-                <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8">{children}</main>
-                <Footer />
-                <MobileTabBar />
-                <SearchOverlay />
-                <IntroOverlay locale={locale} />
-                <AdminLoginModal />
-                <AdminBadge />
-              </AdminProvider>
+              <AuthProvider>
+                <AdminProvider>
+                  <Header />
+                  <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8">{children}</main>
+                  <Footer />
+                  <MobileTabBar />
+                  <SearchOverlay />
+                  <IntroOverlay locale={locale} />
+                  <AdminLoginModal />
+                  <AdminBadge />
+                  <AuthModal />
+                </AdminProvider>
+              </AuthProvider>
             </SearchProvider>
           </ThemeProvider>
         </NextIntlClientProvider>

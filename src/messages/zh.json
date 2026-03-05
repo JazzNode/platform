@@ -82,6 +82,23 @@
     "showMore": "展開更多",
     "showLess": "收合"
   },
+  "auth": {
+    "signIn": "登入",
+    "signUp": "註冊",
+    "signOut": "登出",
+    "email": "電子信箱",
+    "password": "密碼",
+    "orContinueWith": "或",
+    "signInWithGoogle": "使用 Google 繼續",
+    "createAccount": "建立帳號",
+    "checkEmailTitle": "請查收信箱",
+    "checkEmailMessage": "我們已將確認連結寄到您的信箱，請點擊連結啟用帳號。",
+    "close": "關閉",
+    "invalidCredentials": "電子信箱或密碼不正確。",
+    "emailInUse": "此信箱已被註冊。",
+    "weakPassword": "密碼需至少 6 個字元。",
+    "genericError": "發生錯誤，請稍後再試。"
+  },
   "regions": {
     "worldMap": "世界版圖",
     "TW": "台灣",

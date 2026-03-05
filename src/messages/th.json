@@ -82,6 +82,23 @@
     "showMore": "แสดงเพิ่มเติม",
     "showLess": "แสดงน้อยลง"
   },
+  "auth": {
+    "signIn": "เข้าสู่ระบบ",
+    "signUp": "สมัครสมาชิก",
+    "signOut": "ออกจากระบบ",
+    "email": "อีเมล",
+    "password": "รหัสผ่าน",
+    "orContinueWith": "หรือ",
+    "signInWithGoogle": "ดำเนินการต่อด้วย Google",
+    "createAccount": "สร้างบัญชี",
+    "checkEmailTitle": "ตรวจสอบอีเมลของคุณ",
+    "checkEmailMessage": "เราได้ส่งลิงก์ยืนยันไปยังอีเมลของคุณแล้ว กรุณาคลิกลิงก์เพื่อเปิดใช้งานบัญชี",
+    "close": "ปิด",
+    "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
+    "emailInUse": "อีเมลนี้ถูกลงทะเบียนแล้ว",
+    "weakPassword": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    "genericError": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง"
+  },
   "regions": {
     "worldMap": "แผนที่โลก",
     "TW": "ไต้หวัน",

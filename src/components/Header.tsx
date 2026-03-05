@@ -5,21 +5,36 @@ import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useSearch } from './SearchProvider';
+import { useAuth } from './AuthProvider';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
 const localeList = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 
+/* User icon (outline) for logged-out state */
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M20 21a8 8 0 0 0-16 0" />
+    </svg>
+  );
+}
+
 export default function Header() {
   const t = useTranslations('common');
+  const tAuth = useTranslations('auth');
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const { open: openSearch } = useSearch();
+  const { user, loading: authLoading, signOut, setShowAuthModal } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const langRefDesktop = useRef<HTMLDivElement>(null);
   const langRefMobile = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -40,10 +55,69 @@ export default function Header() {
     return () => document.removeEventListener('mousedown', handler);
   }, [langOpen]);
 
+  // Close user menu on outside click
+  useEffect(() => {
+    if (!userMenuOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (!userMenuRef.current?.contains(e.target as Node)) setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [userMenuOpen]);
+
   function switchLocale(newLocale: string) {
     const segments = pathname.split('/');
     segments[1] = newLocale;
     router.push(segments.join('/'));
+  }
+
+  const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
+
+  /* Shared user button for desktop & mobile */
+  function UserButton({ mobile }: { mobile?: boolean }) {
+    if (authLoading) return null;
+
+    if (!user) {
+      return (
+        <button
+          onClick={() => setShowAuthModal(true)}
+          className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)]"
+          aria-label="Sign in"
+        >
+          <UserIcon className="w-[18px] h-[18px]" />
+        </button>
+      );
+    }
+
+    return (
+      <div ref={mobile ? undefined : userMenuRef} className="relative">
+        <button
+          onClick={() => setUserMenuOpen(!userMenuOpen)}
+          className="w-7 h-7 rounded-full bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
+          aria-label="User menu"
+        >
+          {userInitial}
+        </button>
+        {userMenuOpen && !mobile && (
+          <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+            <div className="px-4 py-2 border-b border-[var(--border)]">
+              <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
+            </div>
+            <button
+              onClick={() => { signOut(); setUserMenuOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+              {tAuth('signOut')}
+            </button>
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (
@@ -87,6 +161,9 @@ export default function Header() {
               </svg>
             </button>
 
+            {/* User */}
+            <UserButton />
+
             <div ref={langRefDesktop} className="relative ml-6 border-l border-[var(--border)] pl-6">
               <button
                 onClick={() => setLangOpen(!langOpen)}
@@ -128,7 +205,7 @@ export default function Header() {
             </div>
           </nav>
 
-          {/* Mobile: search + locale switcher + hamburger */}
+          {/* Mobile: search + user + locale switcher */}
           <div className="md:hidden flex items-center gap-2">
             <button
               onClick={openSearch}
@@ -140,6 +217,31 @@ export default function Header() {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
+
+            {/* User (mobile) */}
+            <div ref={userMenuRef} className="relative">
+              <UserButton mobile />
+              {/* Mobile user menu — rendered here so ref catches outside clicks */}
+              {user && userMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                  <div className="px-4 py-2 border-b border-[var(--border)]">
+                    <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { signOut(); setUserMenuOpen(false); }}
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    {tAuth('signOut')}
+                  </button>
+                </div>
+              )}
+            </div>
+
             <div ref={langRefMobile} className="relative">
               <button
                 onClick={() => setLangOpen(!langOpen)}
