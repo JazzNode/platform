@@ -1,13 +1,14 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import AdminLoginModal from './AdminLoginModal';
 
 interface AdminContextType {
   isAdmin: boolean;
   token: string | null;
   login: (password: string) => Promise<boolean>;
   logout: () => void;
+  showLoginModal: boolean;
+  setShowLoginModal: (show: boolean) => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -26,7 +27,6 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     return null;
   });
   
-  const [isMounted, setIsMounted] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const logout = useCallback(() => {
@@ -36,11 +36,6 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     } catch {
       /* ignore */
     }
-  }, []);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setIsMounted(true);
   }, []);
 
   // Ctrl+Shift+A keyboard shortcut
@@ -84,8 +79,6 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     return false;
   }, []);
 
-  if (!isMounted) return <>{children}</>;
-
   return (
     <AdminContext.Provider
       value={{
@@ -93,15 +86,11 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         token,
         login,
         logout,
+        showLoginModal,
+        setShowLoginModal,
       }}
     >
       {children}
-      {showLoginModal && (
-        <AdminLoginModal
-          onClose={() => setShowLoginModal(false)}
-          onLogin={login}
-        />
-      )}
     </AdminContext.Provider>
   );
 }
