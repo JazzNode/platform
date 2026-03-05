@@ -10,6 +10,8 @@ interface FavoritesContextType {
   isFavorite: (type: ItemType, id: string) => boolean;
   toggleFavorite: (type: ItemType, id: string) => Promise<void>;
   loading: boolean;
+  /** Increments when the jazz cat easter egg should fire 🐱 */
+  catEggTrigger: number;
 }
 
 const FavoritesContext = createContext<FavoritesContextType | null>(null);
@@ -18,6 +20,7 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
   const { user } = useAuth();
   const [keys, setKeys] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
+  const [catEggTrigger, setCatEggTrigger] = useState(0);
 
   // Fetch all favorites on login
   useEffect(() => {
@@ -91,6 +94,15 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
             next.delete(key);
             return next;
           });
+        } else if (type === 'artist') {
+          // 🐱 Jazz cat easter egg: count artist follows after successful add
+          setKeys((current) => {
+            const artistCount = Array.from(current).filter((k) => k.startsWith('artist:')).length;
+            if (artistCount === 10) {
+              setCatEggTrigger((n) => n + 1);
+            }
+            return current; // no mutation, just reading
+          });
         }
       }
     },
@@ -98,7 +110,7 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
   );
 
   return (
-    <FavoritesContext.Provider value={{ isFavorite, toggleFavorite, loading }}>
+    <FavoritesContext.Provider value={{ isFavorite, toggleFavorite, loading, catEggTrigger }}>
       {children}
     </FavoritesContext.Provider>
   );

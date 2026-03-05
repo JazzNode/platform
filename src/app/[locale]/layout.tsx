@@ -13,6 +13,7 @@ import AdminBadge from '@/components/AdminBadge';
 import AuthProvider from '@/components/AuthProvider';
 import FavoritesProvider from '@/components/FavoritesProvider';
 import AuthModal from '@/components/AuthModal';
+import CatEasterEgg from '@/components/CatEasterEgg';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
@@ -132,6 +133,7 @@ export default async function LocaleLayout({
                   <AdminLoginModal />
                   <AdminBadge />
                   <AuthModal />
+                  <CatEasterEgg />
                 </AdminProvider>
               </FavoritesProvider>
               </AuthProvider>
