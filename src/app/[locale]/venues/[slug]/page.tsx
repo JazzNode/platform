@@ -251,6 +251,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 {/* Upcoming Events */}
       {(() => {
         const now = new Date().toISOString();
+        const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const weeklyJams = venueEvents
+          .filter((e) => {
+            if (e.fields.subtype !== 'jam_session') return false;
+            if (!e.fields.start_at || e.fields.start_at < now || e.fields.start_at > sevenDaysLater) return false;
+            return true;
+          })
+          .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
         const upcomingEvents = venueEvents
           .filter((e) => e.fields.lifecycle_status === 'upcoming' || (!e.fields.lifecycle_status && (e.fields.start_at || '') >= now))
           .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
@@ -261,10 +269,15 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <>
             <FadeUp stagger={0.12}>
               <section className="border-t border-[var(--border)] pt-12">
-                <h2 className="font-serif text-2xl font-bold mb-8 flex items-center gap-3">
-                  <span className="pulse-dot" />
-                  {t('upcomingGigs')}
-                </h2>
+                <div className="flex items-end justify-between mb-8 border-b border-[var(--border)] pb-6">
+                  <h2 className="font-serif text-2xl font-bold flex items-center gap-3">
+                    <span className="pulse-dot" />
+                    {t('upcomingGigs')}
+                  </h2>
+                  <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                    {t('viewAll')} →
+                  </Link>
+                </div>
                 {upcomingEvents.length === 0 ? (
                   <p className="text-[#8A8578]">{t('noEvents')}</p>
                 ) : (
@@ -293,6 +306,37 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 )}
               </section>
             </FadeUp>
+
+            {/* Weekly Open Jam */}
+            {weeklyJams.length > 0 && (
+              <FadeUp stagger={0.12}>
+                <section className="border-t border-[var(--border)] pt-12">
+                  <div className="flex items-end justify-between mb-8 border-b border-[var(--border)] pb-6">
+                    <h2 className="font-serif text-2xl font-bold">{t('weeklyJam')}</h2>
+                    <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                      {t('viewAll')} →
+                    </Link>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {weeklyJams.map((event) => {
+                      const tz = event.fields.timezone || 'Asia/Taipei';
+                      const artist = resolveLinks(event.fields.primary_artist, artists)[0];
+                      return (
+                        <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-gold/30 card-hover group">
+                          <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                            {formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                          </div>
+                          <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
+                            {event.fields.title || event.fields.title_local || 'Event'}
+                          </h3>
+                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </section>
+              </FadeUp>
+            )}
 
             {/* Past Events */}
             {pastEvents.length > 0 && (
