@@ -3,6 +3,25 @@
 import { useEffect, useState } from 'react';
 import { useFavorites } from './FavoritesProvider';
 
+const MOBILE_BREAKPOINT = 640;
+
+/** Check if user prefers reduced motion */
+function prefersReducedMotion() {
+  return typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+  return mobile;
+}
+
 /**
  * 🐱🎷 Jazz Cat Easter Egg
  *
@@ -15,25 +34,42 @@ export default function CatEasterEgg() {
   const { catEggTrigger: trigger } = useFavorites();
   const [visible, setVisible] = useState(false);
   const [stretching, setStretching] = useState(false);
+  const isMobile = useIsMobile();
+
+  // Mobile: shorter distance → faster timing (9s). Desktop: 13s.
+  const totalDuration = isMobile ? 9 : 13;
+  const stretchStart = Math.round(totalDuration * 0.35 * 1000);
+  const stretchEnd = Math.round(totalDuration * 0.58 * 1000);
+  const hideTime = totalDuration * 1000 + 500;
 
   useEffect(() => {
     if (trigger === 0) return;
+
+    const reduced = prefersReducedMotion();
     setVisible(true);
     setStretching(false);
 
-    // 13s total: walk-in (0–35%) → stretch (35–58%) → walk-out (58–100%)
-    const t1 = setTimeout(() => setStretching(true), 4550);
-    const t2 = setTimeout(() => setStretching(false), 7540);
-    const t3 = setTimeout(() => setVisible(false), 13500);
+    if (reduced) {
+      // Just show the cat sitting at center, then fade out
+      const t = setTimeout(() => setVisible(false), 3500);
+      return () => clearTimeout(t);
+    }
+
+    const t1 = setTimeout(() => setStretching(true), stretchStart);
+    const t2 = setTimeout(() => setStretching(false), stretchEnd);
+    const t3 = setTimeout(() => setVisible(false), hideTime);
 
     return () => {
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
     };
-  }, [trigger]);
+  }, [trigger, stretchStart, stretchEnd, hideTime]);
 
   if (!visible) return null;
+
+  const reduced = prefersReducedMotion();
+  const stretchDur = `${((stretchEnd - stretchStart) / 1000).toFixed(2)}s`;
 
   // Walking animations
   const walkBounce = 'cat-bounce 0.5s ease-in-out infinite';
@@ -44,28 +80,42 @@ export default function CatEasterEgg() {
   const walkBackLegDelay = 'cat-leg-back 0.5s ease-in-out infinite 0.25s';
 
   // Stretch animations
-  const stretchBody = 'cat-stretch 2.99s ease-in-out forwards';
-  const stretchTail = 'cat-stretch-tail 2.99s ease-in-out forwards';
-  const stretchFront = 'cat-stretch-front 2.99s ease-in-out forwards';
-  const stretchBack = 'cat-stretch-back 2.99s ease-in-out forwards';
+  const stretchBody = `cat-stretch ${stretchDur} ease-in-out forwards`;
+  const stretchTail = `cat-stretch-tail ${stretchDur} ease-in-out forwards`;
+  const stretchFront = `cat-stretch-front ${stretchDur} ease-in-out forwards`;
+  const stretchBack = `cat-stretch-back ${stretchDur} ease-in-out forwards`;
+
+  // Walk animation name based on context
+  const walkAnim = reduced
+    ? 'cat-walk-reduced 3.5s ease-in-out forwards'
+    : isMobile
+      ? `cat-walk-mobile ${totalDuration}s ease-in-out forwards`
+      : `cat-walk ${totalDuration}s ease-in-out forwards`;
+
+  // SVG dimensions: smaller on mobile
+  const svgW = isMobile ? 70 : 100;
+  const svgH = isMobile ? 42 : 60;
 
   return (
     <div
-      className="fixed bottom-4 left-0 z-[9999] pointer-events-none"
-      style={{ animation: 'cat-walk 13s ease-in-out forwards' }}
+      className="fixed left-0 z-[9999] pointer-events-none bottom-4 sm:bottom-4"
+      style={{
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+        animation: walkAnim,
+      }}
     >
-      {/* Bounce wrapper — only active while walking */}
-      <div style={{ animation: stretching ? 'none' : walkBounce }}>
+      {/* Bounce wrapper — disabled during stretch & reduced motion */}
+      <div style={{ animation: stretching || reduced ? 'none' : walkBounce }}>
         {/* Stretch wrapper — active during stretch phase */}
         <div
           style={{
-            animation: stretching ? stretchBody : 'none',
+            animation: stretching && !reduced ? stretchBody : 'none',
             transformOrigin: '30% 90%',
           }}
         >
           <svg
-            width="100"
-            height="60"
+            width={svgW}
+            height={svgH}
             viewBox="0 0 100 60"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +125,7 @@ export default function CatEasterEgg() {
             <g
               style={{
                 transformOrigin: '20px 26px',
-                animation: stretching ? stretchTail : walkTail,
+                animation: reduced ? 'none' : stretching ? stretchTail : walkTail,
               }}
             >
               <path
@@ -181,7 +231,7 @@ export default function CatEasterEgg() {
             <g
               style={{
                 transformOrigin: '54px 35px',
-                animation: stretching ? stretchFront : walkFrontLeg,
+                animation: reduced ? 'none' : stretching ? stretchFront : walkFrontLeg,
               }}
             >
               <line
@@ -198,7 +248,7 @@ export default function CatEasterEgg() {
             <g
               style={{
                 transformOrigin: '50px 35px',
-                animation: stretching ? stretchFront : walkFrontLegDelay,
+                animation: reduced ? 'none' : stretching ? stretchFront : walkFrontLegDelay,
               }}
             >
               <line
@@ -217,7 +267,7 @@ export default function CatEasterEgg() {
             <g
               style={{
                 transformOrigin: '32px 34px',
-                animation: stretching ? stretchBack : walkBackLeg,
+                animation: reduced ? 'none' : stretching ? stretchBack : walkBackLeg,
               }}
             >
               <line
@@ -234,7 +284,7 @@ export default function CatEasterEgg() {
             <g
               style={{
                 transformOrigin: '28px 34px',
-                animation: stretching ? stretchBack : walkBackLegDelay,
+                animation: reduced ? 'none' : stretching ? stretchBack : walkBackLegDelay,
               }}
             >
               <line

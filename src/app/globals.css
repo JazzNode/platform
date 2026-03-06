@@ -391,6 +391,13 @@ body {
   100% { transform: translateX(calc(100vw + 120px)); }
 }
 
+@keyframes cat-walk-mobile {
+  0%   { transform: translateX(-80px); }
+  35%  { transform: translateX(calc(50vw - 35px)); }
+  58%  { transform: translateX(calc(50vw - 35px)); }
+  100% { transform: translateX(calc(100vw + 80px)); }
+}
+
 @keyframes cat-bounce {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-3px); }
@@ -441,6 +448,14 @@ body {
   45%  { transform: rotate(5deg); }
   70%  { transform: rotate(2deg); }
   100% { transform: rotate(0deg); }
+}
+
+/* Reduced motion: skip walk/stretch, just fade in and out */
+@keyframes cat-walk-reduced {
+  0%   { opacity: 0; transform: translateX(calc(50vw - 50px)); }
+  15%  { opacity: 1; transform: translateX(calc(50vw - 50px)); }
+  85%  { opacity: 1; transform: translateX(calc(50vw - 50px)); }
+  100% { opacity: 0; transform: translateX(calc(50vw - 50px)); }
 }
 
 /* ─── Follow/Bookmark toggle animations ─── */
