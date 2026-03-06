@@ -2,9 +2,10 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, resolveLinks } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
+import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
+import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
@@ -24,8 +25,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
 
-  const [artists, events, venues, badges, lineups, cities] = await Promise.all([
-    getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(),
+  const [artists, events, venues, badges, lineups, cities, tags] = await Promise.all([
+    getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(), getTags().catch(() => []),
   ]);
   const artist = artists.find((a) => a.id === slug);
 
@@ -52,6 +53,18 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || '')); // soonest first
   const pastEvents = allEvents
     .filter((e) => e.fields.lifecycle_status === 'past' || (e.fields.lifecycle_status !== 'upcoming' && (e.fields.start_at || '') < now));
+
+  // ── Lookup maps for event enrichment ──
+  const artistMap = buildMap(artists);
+  const tagMap = buildMap(tags);
+  const lineupsByEvent = new Map<string, typeof lineups>();
+  for (const l of lineups) {
+    for (const eid of l.fields.event_id || []) {
+      const arr = lineupsByEvent.get(eid);
+      if (arr) arr.push(l);
+      else lineupsByEvent.set(eid, [l]);
+    }
+  }
 
   // ── Badges ──
   const artistBadges = resolveLinks(f.badge_list, badges);
@@ -311,39 +324,56 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               {t('upcomingGigs')}
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {upcomingEvents.slice(0, 6).map((event) => {
+              {upcomingEvents.slice(0, 6).map((event, i) => {
                 const tz = event.fields.timezone || 'Asia/Taipei';
                 const venue = resolveLinks(event.fields.venue_id, venues)[0];
-                const price = formatPriceBadge(venue?.fields.currency, event.fields.price_info);
+                const eventLineups = (lineupsByEvent.get(event.id) || [])
+                  .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+                const sidemen = eventLineups
+                  .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+                  .filter(Boolean)
+                  .filter((a) => a.id !== artist.id)
+                  .map((a) => artistDisplayName(a.fields, locale));
+                const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+                  .map((tag) => tag.fields.name)
+                  .filter(Boolean) as string[];
+
                 return (
-                  <div key={event.id} className="bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group flex flex-col">
-                    <Link href={`/${locale}/events/${event.id}`} className="flex-1">
-                      <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                        {formatDate(event.fields.start_at, locale, tz)}
-                      </div>
-                      <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
-                        {event.fields.title || event.fields.title_local || 'Event'}
-                      </h3>
-                      {venue && (
-                        <p className="text-xs text-[#8A8578] mt-1">
-                          {displayName(venue.fields)}
-                        </p>
-                      )}
-                      {price && (
-                        <p className="text-xs text-[#8A8578] mt-1">{price}</p>
-                      )}
-                    </Link>
-                    {event.fields.source_url && (
-                      <a
-                        href={event.fields.source_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[var(--color-gold)] hover:text-[#E8C868] transition-colors"
-                      >
-                        {t('getTickets')} ↗
-                      </a>
+                  <FadeUpItem key={event.id} delay={(i % 3) * 60}>
+                  <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
+                    {venue && (
+                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
                     )}
-                  </div>
+                    <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                      {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                    </div>
+                    <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                      {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                    </h3>
+                    {sidemen.length > 0 && (
+                      <p className="text-xs text-[#6A6560] mt-2">
+                        w/ {sidemen.join(', ')}
+                      </p>
+                    )}
+                    {eventTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {eventTags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    {event.fields.source_url && (
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gold group-hover:text-[#E8C868] transition-colors">
+                        {t('getTickets')} ↗
+                      </span>
+                    )}
+                  </Link>
+                  </FadeUpItem>
                 );
               })}
             </div>
