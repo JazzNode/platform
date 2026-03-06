@@ -53,7 +53,10 @@ export function artistDisplayName(
   // Detect language from name_local text content
   if (fields.name_local) {
     const detectedLocale = detectTextLocale(fields.name_local);
-    if (detectedLocale === locale) {
+    // Chinese and Japanese share CJK ideographs, so treat zh/ja as interchangeable
+    const cjkLocales = ['zh', 'ja'];
+    const isCjkMatch = detectedLocale && cjkLocales.includes(detectedLocale) && cjkLocales.includes(locale);
+    if (detectedLocale === locale || isCjkMatch) {
       return fields.name_local;
     }
   }
