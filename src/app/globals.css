@@ -385,8 +385,10 @@ body {
 
 /* ─── 🐱 Jazz Cat Easter Egg ─── */
 @keyframes cat-walk {
-  0%   { transform: translateX(-100px); }
-  100% { transform: translateX(calc(100vw + 100px)); }
+  0%   { transform: translateX(-120px); }
+  35%  { transform: translateX(calc(50vw - 50px)); }
+  58%  { transform: translateX(calc(50vw - 50px)); }
+  100% { transform: translateX(calc(100vw + 120px)); }
 }
 
 @keyframes cat-bounce {
@@ -407,6 +409,38 @@ body {
 @keyframes cat-leg-back {
   0%, 100% { transform: rotate(12deg); }
   50%      { transform: rotate(-12deg); }
+}
+
+@keyframes cat-stretch {
+  0%   { transform: rotate(0deg) translateY(0); }
+  20%  { transform: rotate(6deg) translateY(2px); }
+  45%  { transform: rotate(-4deg) translateY(-3px); }
+  70%  { transform: rotate(1deg) translateY(0); }
+  100% { transform: rotate(0deg) translateY(0); }
+}
+
+@keyframes cat-stretch-tail {
+  0%   { transform: rotate(0deg); }
+  25%  { transform: rotate(-35deg); }
+  50%  { transform: rotate(-30deg); }
+  80%  { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes cat-stretch-front {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(-20deg); }
+  45%  { transform: rotate(-25deg); }
+  70%  { transform: rotate(-5deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes cat-stretch-back {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(8deg); }
+  45%  { transform: rotate(5deg); }
+  70%  { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
 }
 
 /* ─── Follow/Bookmark toggle animations ─── */
