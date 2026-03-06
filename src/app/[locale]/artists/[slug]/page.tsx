@@ -158,12 +158,20 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     }
 
     // Resolve to artist records; pick the most frequent role per member
-    for (const [id, data] of [...memberAgg.entries()].sort((a, b) => b[1].count - a[1].count)) {
+    for (const [id, data] of memberAgg) {
       const a = artists.find((x) => x.id === id);
       if (!a || a.fields.type !== 'person') continue;
       const topRole = [...data.roles.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
       groupMembers.push({ id, fields: a.fields, role: topRole, instruments: [...data.instruments] });
     }
+    // Sort: bandleader first, then is_master, then alphabetical
+    groupMembers.sort((a, b) => {
+      if (a.role === 'bandleader' !== (b.role === 'bandleader')) return a.role === 'bandleader' ? -1 : 1;
+      if (!!a.fields.is_master !== !!b.fields.is_master) return a.fields.is_master ? -1 : 1;
+      const nameA = a.fields.name_en || a.fields.name_local || '';
+      const nameB = b.fields.name_en || b.fields.name_local || '';
+      return nameA.localeCompare(nameB, 'zh-Hant');
+    });
   }
 
   const hasNetwork = hasVersatility || topCollaborators.length > 0;
