@@ -84,7 +84,9 @@
     "follow": "フォロー",
     "following": "フォロー中",
     "bookmark": "保存",
-    "bookmarked": "保存済み"
+    "bookmarked": "保存済み",
+    "members": "メンバー",
+    "bandleader": "リーダー"
   },
   "auth": {
     "signIn": "ログイン",

@@ -84,7 +84,9 @@
     "follow": "Ikuti",
     "following": "Mengikuti",
     "bookmark": "Simpan",
-    "bookmarked": "Tersimpan"
+    "bookmarked": "Tersimpan",
+    "members": "Anggota",
+    "bandleader": "Pemimpin"
   },
   "auth": {
     "signIn": "Masuk",

@@ -108,6 +108,64 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const distinctCountries = new Set(artistCities.map((c) => c.fields.country_code).filter(Boolean));
   const isGlobetrotter = distinctCountries.size >= 3;
 
+  // ── Group/Big Band Members (reverse lookup via lineups) ──
+  const isGroupType = f.type === 'group' || f.type === 'big band';
+  const groupMembers: { id: string; fields: typeof f; role: string; instruments: string[] }[] = [];
+  if (isGroupType) {
+    type MemberAgg = Map<string, { roles: Map<string, number>; instruments: Set<string>; count: number }>;
+    const memberAgg: MemberAgg = new Map();
+
+    const addToAgg = (aid: string, role: string | undefined, instruments: string[]) => {
+      if (aid === artist.id) return;
+      const existing = memberAgg.get(aid) || { roles: new Map(), instruments: new Set(), count: 0 };
+      if (role) existing.roles.set(role, (existing.roles.get(role) || 0) + 1);
+      for (const inst of instruments) existing.instruments.add(inst);
+      existing.count++;
+      memberAgg.set(aid, existing);
+    };
+
+    // Strategy 1: collect event IDs from both event_list and lineup_list
+    const groupEventIds = new Set(f.event_list || []);
+    const groupLineups = resolveLinks(f.lineup_list, lineups);
+    for (const gl of groupLineups) {
+      for (const eid of gl.fields.event_id || []) groupEventIds.add(eid);
+    }
+
+    // Find all lineups for the group's events
+    if (groupEventIds.size > 0) {
+      for (const lineup of lineups) {
+        const lEventIds = lineup.fields.event_id || [];
+        if (!lEventIds.some((eid) => groupEventIds.has(eid))) continue;
+        for (const aid of lineup.fields.artist_id || []) {
+          addToAgg(aid, lineup.fields.role, lineup.fields.instrument_list || []);
+        }
+      }
+    }
+
+    // Strategy 2 (fallback): find person artists whose as_*_list contains this group's ID
+    if (memberAgg.size === 0) {
+      for (const a of artists) {
+        if (a.id === artist.id || a.fields.type !== 'person') continue;
+        const roles: string[] = [];
+        if (a.fields.as_bandleader_list?.includes(artist.id)) roles.push('bandleader');
+        if (a.fields.as_sideman_list?.includes(artist.id)) roles.push('sideman');
+        if (a.fields.as_band_member_list?.includes(artist.id)) roles.push('band_member');
+        if (a.fields.as_featured_guest_list?.includes(artist.id)) roles.push('featured_guest');
+        if (roles.length > 0) {
+          for (const r of roles) addToAgg(a.id, r, a.fields.primary_instrument ? [a.fields.primary_instrument] : []);
+        }
+      }
+    }
+
+    // Resolve to artist records; pick the most frequent role per member
+    for (const [id, data] of [...memberAgg.entries()].sort((a, b) => b[1].count - a[1].count)) {
+      const a = artists.find((x) => x.id === id);
+      if (!a || a.fields.type !== 'person') continue;
+      const topRole = [...data.roles.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || '';
+      groupMembers.push({ id, fields: a.fields, role: topRole, instruments: [...data.instruments] });
+    }
+  }
+
   const hasNetwork = hasVersatility || topCollaborators.length > 0;
   const hasHubs = artistVenues.length > 0 || artistCities.length > 0;
 
@@ -185,6 +243,56 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </div>
         </div>
       </FadeUp>
+
+      {/* ═══ Members (group / big band only) ═══ */}
+      {isGroupType && groupMembers.length > 0 && (
+        <FadeUp>
+          <section className="border-t border-[var(--border)] pt-12">
+            <h2 className="font-serif text-2xl font-bold mb-8">{t('members')}</h2>
+            <div className="space-y-2">
+              {groupMembers.map((member) => (
+                <Link
+                  key={member.id}
+                  href={`/${locale}/artists/${member.id}`}
+                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--card)] transition-colors group"
+                >
+                  {photoUrl(member.fields.photo_url, member.fields.photo_file) ? (
+                    <img
+                      src={photoUrl(member.fields.photo_url, member.fields.photo_file)!}
+                      alt={artistDisplayName(member.fields, locale)}
+                      className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-[var(--card)] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">
+                      ♪
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm font-medium group-hover:text-gold transition-colors truncate block">
+                      {artistDisplayName(member.fields, locale)}
+                    </span>
+                    {member.instruments.length > 0 && (
+                      <span className="text-xs text-[#8A8578]">
+                        {member.instruments.map((i) => instLabel(i)).join(', ')}
+                      </span>
+                    )}
+                  </div>
+                  {member.role === 'bandleader' && (
+                    <span className="text-xs px-2 py-0.5 rounded-lg bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 shrink-0">
+                      {t('bandleader')}
+                    </span>
+                  )}
+                  {member.fields.primary_instrument && member.instruments.length === 0 && (
+                    <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[#8A8578] shrink-0">
+                      {instLabel(member.fields.primary_instrument)}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </section>
+        </FadeUp>
+      )}
 
       {/* ═══ Upcoming Gigs ═══ */}
       {upcomingEvents.length > 0 && (

@@ -84,7 +84,9 @@
     "follow": "ติดตาม",
     "following": "กำลังติดตาม",
     "bookmark": "บันทึก",
-    "bookmarked": "บันทึกแล้ว"
+    "bookmarked": "บันทึกแล้ว",
+    "members": "สมาชิก",
+    "bandleader": "หัวหน้าวง"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",

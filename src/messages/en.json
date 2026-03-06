@@ -84,7 +84,9 @@
     "follow": "Follow",
     "following": "Following",
     "bookmark": "Save",
-    "bookmarked": "Saved"
+    "bookmarked": "Saved",
+    "members": "Members",
+    "bandleader": "Leader"
   },
   "auth": {
     "signIn": "Sign In",
