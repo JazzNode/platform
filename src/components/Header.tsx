@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { usePathname, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearch } from './SearchProvider';
 import { useAuth } from './AuthProvider';
 import { useAdmin } from './AdminProvider';
+import { usePathname, useRouter } from '@/i18n/navigation';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
@@ -27,6 +28,7 @@ export default function Header() {
   const tAuth = useTranslations('auth');
   const locale = useLocale();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
   const { open: openSearch } = useSearch();
   const { user, profile, loading: authLoading, signOut, setShowAuthModal } = useAuth();
@@ -87,10 +89,31 @@ export default function Header() {
     }
   }, [isAdmin, setShowAuthModal]);
 
+  const currentQuery = useCallback(() => {
+    const query: Record<string, string | string[]> = {};
+
+    searchParams.forEach((value, key) => {
+      const existing = query[key];
+      if (existing === undefined) {
+        query[key] = value;
+      } else if (Array.isArray(existing)) {
+        query[key] = [...existing, value];
+      } else {
+        query[key] = [existing, value];
+      }
+    });
+
+    return query;
+  }, [searchParams]);
+
   function switchLocale(newLocale: string) {
-    const segments = pathname.split('/');
-    segments[1] = newLocale;
-    router.push(segments.join('/'));
+    router.replace(
+      {
+        pathname,
+        query: currentQuery(),
+      },
+      { locale: newLocale }
+    );
   }
 
   const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
