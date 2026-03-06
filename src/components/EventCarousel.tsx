@@ -72,22 +72,14 @@ export default function EventCarousel({
             : phase === 'entering'
               ? 'opacity-0 translate-y-2'
               : 'opacity-100 translate-y-0';
-          const dividerClass = phase === 'visible' ? 'opacity-100' : 'opacity-0';
-          const dividerDelay = slideIndex === 0 ? '0ms' : phase === 'visible' ? '170ms' : '20ms';
 
           return (
             <Link
               key={`${event.date}-${event.title}-${slideIndex}`}
               href={event.href}
-              className={`group/event block transition-all duration-[420ms] ease-out ${phaseClass} ${slideIndex === 0 ? '' : 'mt-3 pt-3'}`}
+              className={`group/event block transition-all duration-[420ms] ease-out ${phaseClass} ${slideIndex === 0 ? '' : 'mt-2.5'}`}
               style={{ transitionDelay }}
             >
-              {slideIndex > 0 && (
-                <div
-                  className={`mb-3 h-px bg-[var(--border)]/60 transition-opacity duration-300 ${dividerClass}`}
-                  style={{ transitionDelay: dividerDelay }}
-                />
-              )}
               <p className="text-xs uppercase tracking-[0.22em] text-gold transition-colors duration-300 group-hover/event:text-[var(--color-gold-bright)]">
                 {label} · {event.date}
               </p>
