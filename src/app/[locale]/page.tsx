@@ -21,7 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const activeCities = cities.filter((c) => venuesWithEvents.some((v) => v.fields.city_id?.includes(c.id)));
 
   const now = new Date().toISOString();
-  const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysLater = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const upcoming = events
     .filter((e) => e.fields.start_at && e.fields.start_at >= now)
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))

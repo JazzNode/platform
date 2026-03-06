@@ -25,6 +25,7 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
   // Fetch all favorites on login
   useEffect(() => {
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setKeys(new Set());
       return;
     }

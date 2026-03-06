@@ -251,7 +251,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 {/* Upcoming Events */}
       {(() => {
         const now = new Date().toISOString();
-        const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+        const sevenDaysLater = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
         const weeklyJams = venueEvents
           .filter((e) => {
             if (e.fields.subtype !== 'jam_session') return false;

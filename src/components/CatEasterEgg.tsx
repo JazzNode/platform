@@ -46,12 +46,18 @@ export default function CatEasterEgg() {
     if (trigger === 0) return;
 
     const reduced = prefersReducedMotion();
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStretching(false);
 
     if (reduced) {
       // Just show the cat sitting at center, then fade out
-      const t = setTimeout(() => setVisible(false), 3500);
+      const t = setTimeout(() => {
+        setVisible(false);
+      }, 3500);
       return () => clearTimeout(t);
     }
 
