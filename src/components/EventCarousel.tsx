@@ -79,7 +79,7 @@ export default function EventCarousel({
             <Link
               key={`${event.date}-${event.title}-${slideIndex}`}
               href={event.href}
-              className={`group/event block transition-all duration-[420ms] ease-out ${phaseClass} ${slideIndex === 0 ? '' : 'mt-3 pt-3'}`}
+              className={`group block transition-all duration-[420ms] ease-out ${phaseClass} ${slideIndex === 0 ? '' : 'mt-3 pt-3'}`}
               style={{ transitionDelay }}
             >
               {slideIndex > 0 && (
@@ -88,10 +88,10 @@ export default function EventCarousel({
                   style={{ transitionDelay: dividerDelay }}
                 />
               )}
-              <p className="text-xs uppercase tracking-[0.22em] text-gold transition-colors duration-300 group-hover/event:text-[var(--color-gold-bright)]">
+              <p className="text-xs uppercase tracking-[0.22em] text-gold transition-colors duration-300 group-hover:text-[var(--color-gold-bright)]">
                 {label} · {event.date}
               </p>
-              <p className="text-sm text-[var(--foreground)] truncate transition-colors duration-300 group-hover/event:text-gold">
+              <p className="text-sm text-[var(--foreground)] truncate transition-colors duration-300 group-hover:text-gold">
                 {event.title}
               </p>
             </Link>
