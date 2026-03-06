@@ -37,7 +37,8 @@ export default function Header() {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const langRefDesktop = useRef<HTMLDivElement>(null);
   const langRefMobile = useRef<HTMLDivElement>(null);
-  const userMenuRef = useRef<HTMLDivElement>(null);
+  const userMenuRefDesktop = useRef<HTMLDivElement>(null);
+  const userMenuRefMobile = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 80);
@@ -62,7 +63,10 @@ export default function Header() {
   useEffect(() => {
     if (!userMenuOpen) return;
     const handler = (e: MouseEvent) => {
-      if (!userMenuRef.current?.contains(e.target as Node)) setUserMenuOpen(false);
+      const t = e.target as Node;
+      if (!userMenuRefDesktop.current?.contains(t) && !userMenuRefMobile.current?.contains(t)) {
+        setUserMenuOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -91,8 +95,9 @@ export default function Header() {
 
   const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
 
-  /* Shared user button for desktop & mobile */
-  function UserButton({ mobile }: { mobile?: boolean }) {
+  /* Shared user button render helper — called as function, NOT as <Component />,
+     to avoid unmount/remount on every Header re-render */
+  function renderUserButton(mobile?: boolean) {
     if (authLoading) return null;
 
     if (!user) {
@@ -126,7 +131,7 @@ export default function Header() {
     }
 
     return (
-      <div ref={mobile ? undefined : userMenuRef} className="relative">
+      <div ref={mobile ? undefined : userMenuRefDesktop} className="relative">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
           className="w-7 h-7 rounded-full overflow-hidden bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
@@ -212,7 +217,7 @@ export default function Header() {
               </svg>
             </button>
 
-            <UserButton />
+            {renderUserButton()}
 
             <div ref={langRefDesktop} className="relative">
               <button
@@ -270,8 +275,8 @@ export default function Header() {
             </button>
 
             {/* User (mobile) */}
-            <div ref={userMenuRef} className="relative">
-              <UserButton mobile />
+            <div ref={userMenuRefMobile} className="relative">
+              {renderUserButton(true)}
               {/* Mobile user menu — rendered here so ref catches outside clicks */}
               {user && userMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
