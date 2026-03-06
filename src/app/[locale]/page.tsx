@@ -21,6 +21,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   const activeCities = cities.filter((c) => venuesWithEvents.some((v) => v.fields.city_id?.includes(c.id)));
 
   const now = new Date().toISOString();
+  const sevenDaysLater = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
   const upcoming = events
     .filter((e) => e.fields.start_at && e.fields.start_at >= now)
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
@@ -29,6 +30,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   // Pre-build lookup maps for upcoming event enrichment
   const artistMap = buildMap(artists);
   const tagMap = buildMap(tags);
+
+  // Filter jam sessions within the next 7 days
+  const weeklyJams = events
+    .filter((e) => {
+      if (!e.fields.start_at || e.fields.start_at < now || e.fields.start_at > sevenDaysLater) return false;
+      const eventTags = resolveLinks(e.fields.tag_list, tagMap).map((t) => t.fields.name?.toLowerCase());
+      return eventTags.includes('jam session');
+    })
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
 
   // Index lineups by event id
   const lineupsByEvent = new Map<string, typeof lineups>();
@@ -173,6 +183,70 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         )}
       </section>
+
+      {/* ─── Weekly Open Jam ─── */}
+      {weeklyJams.length > 0 && (
+        <section>
+          <FadeUp>
+            <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold">{t('weeklyJam')}</h2>
+              <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                {t('viewAll')} →
+              </Link>
+            </div>
+          </FadeUp>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {weeklyJams.map((event, i) => {
+              const tz = event.fields.timezone || 'Asia/Taipei';
+              const venue = resolveLinks(event.fields.venue_id, venues)[0];
+              const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+              const eventLineups = (lineupsByEvent.get(event.id) || [])
+                .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+              const sidemen = eventLineups
+                .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+                .filter(Boolean)
+                .filter((a) => a.id !== primaryArtist?.id)
+                .map((a) => artistDisplayName(a.fields, locale));
+              const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+                .map((tag) => tag.fields.name)
+                .filter(Boolean) as string[];
+
+              return (
+                <FadeUpItem key={event.id} delay={(i % 3) * 60}>
+                <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
+                  {venue && (
+                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                  )}
+                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                    {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
+                  </div>
+                  <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                    {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                  </h3>
+                  {sidemen.length > 0 && (
+                    <p className="text-xs text-[#6A6560] mt-2">
+                      w/ {sidemen.join(', ')}
+                    </p>
+                  )}
+                  {eventTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mt-3">
+                      {eventTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </Link>
+                </FadeUpItem>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* ─── Venues ─── */}
       <section>

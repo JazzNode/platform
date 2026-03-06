@@ -24,24 +24,40 @@ export function displayName(fields: { display_name?: string; name_local?: string
  * If the site locale matches the artist's origin language → name_local
  * Otherwise → name_en
  */
+/**
+ * Detect the likely locale of a text string based on Unicode character ranges.
+ * Returns null if the language cannot be determined (e.g. Latin script like Indonesian).
+ * Note: Japanese names written purely in kanji (e.g. 田中太郎) will be detected as 'zh'
+ * since CJK ideographs are shared between Chinese and Japanese.
+ */
+export function detectTextLocale(text: string): string | null {
+  // Japanese-specific: Hiragana (ぁ-ゟ) or Katakana (゠-ヿ)
+  if (/[\u3040-\u309f\u30a0-\u30ff]/.test(text)) return 'ja';
+  // Korean: Hangul syllables (가-힣) or Jamo (ᄀ-ᇿ, ㄱ-ㆎ)
+  if (/[\uac00-\ud7af\u1100-\u11ff\u3130-\u318f]/.test(text)) return 'ko';
+  // Thai script (ก-๛)
+  if (/[\u0e00-\u0e7f]/.test(text)) return 'th';
+  // CJK Ideographs — likely Chinese (checked after Japanese)
+  if (/[\u4e00-\u9fff\u3400-\u4dbf]/.test(text)) return 'zh';
+  // Latin or other scripts — cannot determine
+  return null;
+}
+
 export function artistDisplayName(
-  fields: { display_name?: string; name_local?: string; name_en?: string; country_code?: string },
+  fields: { display_name?: string; name_local?: string; name_en?: string },
   locale: string,
 ): string {
   // Manual override takes top priority
   if (fields.display_name) return fields.display_name;
 
-  const countryToLocale: Record<string, string> = {
-    TW: 'zh', HK: 'zh', CN: 'zh',
-    JP: 'ja',
-    KR: 'ko',
-    TH: 'th',
-    ID: 'id',
-  };
-  const artistLocale = fields.country_code ? countryToLocale[fields.country_code] : null;
-  if (artistLocale === locale) {
-    return fields.name_local || fields.name_en || 'Unknown';
+  // Detect language from name_local text content
+  if (fields.name_local) {
+    const detectedLocale = detectTextLocale(fields.name_local);
+    if (detectedLocale === locale) {
+      return fields.name_local;
+    }
   }
+
   return fields.name_en || fields.name_local || 'Unknown';
 }
 
