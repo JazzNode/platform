@@ -31,13 +31,14 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
 
-    // Upcoming event slides (up to 5, pre-serialized for client carousel)
+    // Upcoming event slides (up to 6, grouped into pairs in the client carousel)
     const upcomingSlides = [...upcomingEvents]
       .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-      .slice(0, 5)
+      .slice(0, 6)
       .map((e) => ({
         date: formatDate(e.fields.start_at, locale, e.fields.timezone || city.fields.timezone || 'Asia/Taipei'),
         title: e.fields.title || e.fields.title_local || e.fields.title_en || 'Event',
+        href: `/${locale}/events/${e.id}`,
       }));
 
     // Venue photos (up to 3)
