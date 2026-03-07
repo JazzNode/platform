@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTranslations } from 'next-intl';
 import { useAdmin } from './AdminProvider';
 
 interface EditableContentProps {
@@ -30,6 +31,7 @@ export default function EditableContent({
 }: EditableContentProps) {
   const { isAdmin, token } = useAdmin();
   const router = useRouter();
+  const t = useTranslations('admin');
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(content || '');
   const [saving, setSaving] = useState(false);
@@ -88,13 +90,13 @@ export default function EditableContent({
       }
 
       if (data.translationFailed) {
-        setWarning('Content saved. Translation failed — other languages were not updated.');
+        setWarning(t('translationFailed'));
       }
 
       setEditing(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed');
+      setError(err instanceof Error ? err.message : t('updateFailed'));
     } finally {
       setSaving(false);
     }
@@ -129,12 +131,12 @@ export default function EditableContent({
           rows={10}
           className="w-full rounded-xl bg-[var(--card)] border border-[var(--border)] p-4 text-sm text-[#F0EDE6] focus:border-[var(--color-gold)]/50 focus:ring-1 focus:ring-[var(--color-gold)]/30 outline-none resize-y font-sans leading-relaxed"
           disabled={saving}
-          placeholder="Enter content..."
+          placeholder={t('enterContent')}
         />
         {saving && (
           <div className="flex items-center gap-2 text-sm text-[var(--color-gold)]">
             <span className="inline-block w-4 h-4 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
-            Translating to 6 languages...
+            {t('translating')}
           </div>
         )}
         {error && <p className="text-xs text-red-400">{error}</p>}
@@ -145,7 +147,7 @@ export default function EditableContent({
             disabled={saving || !draft.trim()}
             className="px-4 py-2 rounded-lg bg-[var(--color-gold)] text-[#0A0A0A] text-sm font-bold disabled:opacity-50 hover:brightness-110 transition-all"
           >
-            {saving ? 'Saving...' : 'Save & Translate'}
+            {saving ? t('saving') : t('saveAndTranslate')}
           </button>
           <button
             onClick={() => {
@@ -157,7 +159,7 @@ export default function EditableContent({
             disabled={saving}
             className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm text-[#8A8578] disabled:opacity-50 hover:text-[#F0EDE6] transition-colors"
           >
-            Cancel
+            {t('cancel')}
           </button>
         </div>
       </div>
@@ -187,14 +189,14 @@ export default function EditableContent({
           onClick={() => { setEditing(true); setDraft(''); }}
           className="w-full py-4 rounded-xl border border-dashed border-[var(--color-gold)]/30 text-sm text-[var(--color-gold)]/60 hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/50 transition-colors"
         >
-          + Click to add {fieldPrefix === 'bio' ? 'bio' : 'description'}
+          {fieldPrefix === 'bio' ? t('addBio') : t('addDescription')}
         </button>
       )}
       {hasContent && (
         <button
           onClick={() => { setEditing(true); setDraft(content || ''); }}
           className="absolute -top-2 -right-2 opacity-0 group-hover/edit:opacity-100 transition-opacity p-1.5 rounded-lg bg-[var(--color-gold)]/20 text-[var(--color-gold)] border border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/30"
-          title="Edit content"
+          title={t('editContent')}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />

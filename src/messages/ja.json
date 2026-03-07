@@ -177,5 +177,17 @@
     "tabla": "タブラ",
     "shakuhachi": "尺八",
     "kora": "コラ"
+  },
+  "admin": {
+    "saveAndTranslate": "保存して翻訳",
+    "saving": "保存中...",
+    "cancel": "キャンセル",
+    "translating": "6言語に翻訳中...",
+    "enterContent": "内容を入力...",
+    "addBio": "+ クリックしてバイオを追加",
+    "addDescription": "+ クリックして説明を追加",
+    "editContent": "内容を編集",
+    "translationFailed": "内容は保存されましたが、翻訳に失敗しました。他の言語は更新されていません。",
+    "updateFailed": "更新に失敗しました"
   }
 }

@@ -177,5 +177,17 @@
     "tabla": "타블라",
     "shakuhachi": "샤쿠하치",
     "kora": "코라"
+  },
+  "admin": {
+    "saveAndTranslate": "저장 및 번역",
+    "saving": "저장 중...",
+    "cancel": "취소",
+    "translating": "6개 언어로 번역 중...",
+    "enterContent": "내용을 입력하세요...",
+    "addBio": "+ 클릭하여 바이오 추가",
+    "addDescription": "+ 클릭하여 설명 추가",
+    "editContent": "내용 편집",
+    "translationFailed": "내용이 저장되었지만 번역에 실패했습니다. 다른 언어는 업데이트되지 않았습니다.",
+    "updateFailed": "업데이트 실패"
   }
 }

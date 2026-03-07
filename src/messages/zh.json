@@ -177,5 +177,17 @@
     "tabla": "塔布拉鼓",
     "shakuhachi": "尺八",
     "kora": "科拉琴"
+  },
+  "admin": {
+    "saveAndTranslate": "儲存並翻譯",
+    "saving": "儲存中...",
+    "cancel": "取消",
+    "translating": "正在翻譯為 6 種語言...",
+    "enterContent": "輸入內容...",
+    "addBio": "+ 點擊新增簡介",
+    "addDescription": "+ 點擊新增描述",
+    "editContent": "編輯內容",
+    "translationFailed": "內容已儲存，但翻譯失敗 — 其他語言未更新。",
+    "updateFailed": "更新失敗"
   }
 }

@@ -177,5 +177,17 @@
     "tabla": "Tabla",
     "shakuhachi": "Shakuhachi",
     "kora": "Kora"
+  },
+  "admin": {
+    "saveAndTranslate": "Save & Translate",
+    "saving": "Saving...",
+    "cancel": "Cancel",
+    "translating": "Translating to 6 languages...",
+    "enterContent": "Enter content...",
+    "addBio": "+ Click to add bio",
+    "addDescription": "+ Click to add description",
+    "editContent": "Edit content",
+    "translationFailed": "Content saved. Translation failed — other languages were not updated.",
+    "updateFailed": "Update failed"
   }
 }

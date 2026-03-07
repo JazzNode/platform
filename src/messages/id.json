@@ -177,5 +177,17 @@
     "tabla": "Tabla",
     "shakuhachi": "Shakuhachi",
     "kora": "Kora"
+  },
+  "admin": {
+    "saveAndTranslate": "Simpan & Terjemahkan",
+    "saving": "Menyimpan...",
+    "cancel": "Batal",
+    "translating": "Menerjemahkan ke 6 bahasa...",
+    "enterContent": "Masukkan konten...",
+    "addBio": "+ Klik untuk menambah bio",
+    "addDescription": "+ Klik untuk menambah deskripsi",
+    "editContent": "Edit konten",
+    "translationFailed": "Konten tersimpan. Terjemahan gagal — bahasa lain belum diperbarui.",
+    "updateFailed": "Pembaruan gagal"
   }
 }
