@@ -23,6 +23,22 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
   const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
   const sorted = [...venuesWithEvents].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
 
+  // Build a set of venue IDs that have a jam session within the next 7 days
+  const now = new Date();
+  const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const venuesWithUpcomingJam = new Set<string>();
+  for (const e of events) {
+    if (e.fields.subtype !== 'jam_session') continue;
+    const start = e.fields.start_at;
+    if (!start) continue;
+    const d = new Date(start);
+    if (d >= now && d <= sevenDaysLater) {
+      for (const vid of e.fields.venue_id || []) {
+        venuesWithUpcomingJam.add(vid);
+      }
+    }
+  }
+
   const serializedVenues = sorted.map((venue) => {
     const f = venue.fields;
     const cityFields = f.city_id?.[0] ? cityMap.get(f.city_id[0]) : null;
@@ -35,6 +51,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       eventCount: venueEventCount(venue, venueCountsFallback),
       jazzFrequency: f.jazz_frequency || null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
+      hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
     };
   });
 

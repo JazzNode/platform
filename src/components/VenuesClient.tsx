@@ -16,6 +16,7 @@ interface SerializedVenue {
   eventCount: number;
   jazzFrequency: string | null;
   description: string | null;
+  hasUpcomingJam?: boolean;
 }
 
 interface CityOption {
@@ -212,14 +213,24 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   <FollowButton itemType="venue" itemId={venue.id} glass />
                 </div>
                 {venue.photoUrl && (
-                  <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl">
+                  <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl relative">
                     <img
                       src={venue.photoUrl}
                       alt={venue.displayName}
                       className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
                       loading="lazy"
                     />
+                    {venue.hasUpcomingJam && (
+                      <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">
+                        🎷 本週有 Jam Session
+                      </span>
+                    )}
                   </div>
+                )}
+                {!venue.photoUrl && venue.hasUpcomingJam && (
+                  <span className="inline-block mb-3 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18]">
+                    🎷 本週有 Jam Session
+                  </span>
                 )}
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                   {venue.displayName}
