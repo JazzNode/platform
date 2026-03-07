@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
@@ -378,7 +378,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                     </div>
                     <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                      {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                      {eventTitle(event.fields, locale)}
                     </h3>
                     {sidemen.length > 0 && (
                       <p className="text-xs text-[#6A6560] mt-2">
@@ -437,7 +437,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                         {formatDate(event.fields.start_at, locale, tz)}
                       </div>
                       <h3 className="text-sm font-medium group-hover:text-gold transition-colors duration-300 line-clamp-1">
-                        {event.fields.title || event.fields.title_local || 'Event'}
+                        {eventTitle(event.fields, locale)}
                       </h3>
                       {venue && <p className="text-xs text-[#8A8578]/60 mt-0.5">{displayName(venue.fields)}</p>}
                     </Link>

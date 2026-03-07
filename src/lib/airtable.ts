@@ -161,9 +161,8 @@ export interface Artist {
 }
 
 export interface Event {
-  title?: string;           // main title from scraper
-  title_en?: string;        // override
-  title_local?: string;     // override
+  title_local?: string;     // original-language title (CJK, Thai, Korean, etc.)
+  title_en?: string;        // English title (from ingest or content_generator translation)
   description_en?: string;
   description_zh?: string;
   description_ja?: string;

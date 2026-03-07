@@ -81,6 +81,53 @@ export function artistDisplayNameField(
   return 'name_en';
 }
 
+/**
+ * Locale-aware event title display.
+ * If title_local matches site locale (incl. zh/ja CJK interchangeable) → title_local
+ * Otherwise → title_en
+ * Indonesian (id) locale: detectTextLocale returns null for Latin → falls back to title_en
+ */
+export function eventTitle(
+  fields: { title_local?: string; title_en?: string },
+  locale: string,
+): string {
+  if (fields.title_local) {
+    const detectedLocale = detectTextLocale(fields.title_local);
+    const cjkLocales = ['zh', 'ja'];
+    const isCjkMatch = detectedLocale && cjkLocales.includes(detectedLocale) && cjkLocales.includes(locale);
+    if (detectedLocale === locale || isCjkMatch) {
+      return fields.title_local;
+    }
+  }
+  return fields.title_en || fields.title_local || 'Untitled';
+}
+
+/** Return which field eventTitle() resolves to. Used by EditableName for god mode. */
+export function eventTitleField(
+  fields: { title_local?: string; title_en?: string },
+  locale: string,
+): 'title_local' | 'title_en' {
+  if (fields.title_local) {
+    const detectedLocale = detectTextLocale(fields.title_local);
+    const cjkLocales = ['zh', 'ja'];
+    const isCjkMatch = detectedLocale && cjkLocales.includes(detectedLocale) && cjkLocales.includes(locale);
+    if (detectedLocale === locale || isCjkMatch) return 'title_local';
+  }
+  if (fields.title_en) return 'title_en';
+  if (fields.title_local) return 'title_local';
+  return 'title_en';
+}
+
+/** Get event subtitle (title_en) for detail page if both exist and differ. */
+export function eventSubtitle(
+  fields: { title_local?: string; title_en?: string },
+): string | null {
+  if (fields.title_local && fields.title_en && fields.title_local !== fields.title_en) {
+    return fields.title_en;
+  }
+  return null;
+}
+
 /** Format a date string for display. */
 export function formatDate(iso: string | undefined, locale: string = 'en', timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';

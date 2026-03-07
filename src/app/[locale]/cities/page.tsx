@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
-import { artistDisplayName, photoUrl, formatDate, cityName } from '@/lib/helpers';
+import { artistDisplayName, photoUrl, formatDate, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
 import EventCarousel from '@/components/EventCarousel';
@@ -37,7 +37,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
       .slice(0, 5)
       .map((e) => ({
         date: formatDate(e.fields.start_at, locale, e.fields.timezone || city.fields.timezone || 'Asia/Taipei'),
-        title: e.fields.title || e.fields.title_local || e.fields.title_en || 'Event',
+        title: eventTitle(e.fields, locale),
       }));
 
     // Venue photos (up to 3)

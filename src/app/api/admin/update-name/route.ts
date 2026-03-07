@@ -6,7 +6,7 @@ import { TABLE_IDS } from '@/lib/airtable';
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID!;
 
-const ALLOWED_FIELDS = ['name_local', 'name_en', 'display_name'] as const;
+const ALLOWED_FIELDS = ['name_local', 'name_en', 'display_name', 'title_local', 'title_en'] as const;
 
 const ENTITY_TABLE: Record<string, string> = {
   artist: TABLE_IDS.Artists,

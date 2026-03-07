@@ -3,18 +3,19 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, buildMap, type Event, type Venue, type Artist } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
+import { displayName, artistDisplayName, eventTitle, eventTitleField, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
+import EditableName from '@/components/EditableName';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const events = await getEvents();
   const event = events.find((e) => e.id === slug);
-  const title = event?.fields.title || event?.fields.title_local || 'Event';
+  const title = event ? eventTitle(event.fields, 'en') : 'Event';
   return { title };
 }
 
@@ -82,6 +83,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       </Link>
 
       <FavoriteHighlight itemType="event" itemId={event.id}>
+      <div className="space-y-12">
       {/* Hero section */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
@@ -89,7 +91,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         {f.poster_url && (
           <div className="w-full lg:w-[400px] shrink-0">
             <div className="overflow-hidden rounded-2xl">
-              <Image src={f.poster_url} alt={f.title || ''} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
+              <Image src={f.poster_url} alt={eventTitle(f, locale)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
             </div>
           </div>
         )}
@@ -98,9 +100,26 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         <div className="flex-1 space-y-6">
           {/* Title */}
           <div className="flex items-start justify-between gap-4">
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold leading-tight">
-              {f.title || f.title_local || f.title_en || 'Untitled Event'}
-            </h1>
+            <div className="space-y-2">
+              <EditableName
+                entityType="event"
+                entityId={event.id}
+                field={f.title_local ? 'title_local' : 'title_en'}
+                value={f.title_local || f.title_en || 'Untitled Event'}
+                className="font-serif text-4xl sm:text-5xl font-bold leading-tight"
+                tag="h1"
+              />
+              {eventSubtitle(f) && (
+                <EditableName
+                  entityType="event"
+                  entityId={event.id}
+                  field="title_en"
+                  value={eventSubtitle(f)!}
+                  className="text-xl text-[#8A8578]"
+                  tag="p"
+                />
+              )}
+            </div>
             <BookmarkButton itemId={event.id} variant="full" />
           </div>
 
@@ -190,7 +209,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               return (
                 <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                   <div className="flex items-start gap-4">
-                    <div className="flex-1">
+                    {/* Artist avatar */}
+                    {photoUrl(artist.fields.photo_url, artist.fields.photo_file) ? (
+                      <img
+                        src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!}
+                        alt={artistDisplayName(artist.fields, locale)}
+                        className="w-14 h-14 rounded-full object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-[var(--bg)] flex items-center justify-center text-lg shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
+                        ♪
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
                       <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300">
                         {artistDisplayName(artist.fields, locale)}
                       </h3>
@@ -217,9 +248,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       {/* ─── Prev / Next Navigation ─── */}
       <RecordNav
         prevHref={prevEvent ? `/${locale}/events/${prevEvent.id}` : null}
-        prevTitle={prevEvent ? (prevEvent.fields.title || prevEvent.fields.title_local || 'Event') : null}
+        prevTitle={prevEvent ? eventTitle(prevEvent.fields, locale) : null}
         nextHref={nextEvent ? `/${locale}/events/${nextEvent.id}` : null}
-        nextTitle={nextEvent ? (nextEvent.fields.title || nextEvent.fields.title_local || 'Event') : null}
+        nextTitle={nextEvent ? eventTitle(nextEvent.fields, locale) : null}
         prevLabel={t('prevEvent')}
         nextLabel={t('nextEvent')}
       />
@@ -260,7 +291,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                       {formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
                     </div>
                     <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                      {related.fields.title || related.fields.title_local || 'Event'}
+                      {eventTitle(related.fields, locale)}
                     </h3>
                     {rVenue && (
                       <p className="text-xs text-[#8A8578] mt-2">↗ {displayName(rVenue.fields)}</p>
@@ -273,6 +304,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           </FadeUp>
         );
       })()}
+      </div>
       </FavoriteHighlight>
     </div>
   );

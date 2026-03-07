@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resolveLinks, buildMap, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName, eventTitle } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import FadeUp from '@/components/animations/FadeUp';
@@ -158,7 +158,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                     {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                   </div>
                   <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                    {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                    {eventTitle(event.fields, locale)}
                   </h3>
                   {sidemen.length > 0 && (
                     <p className="text-xs text-[#6A6560] mt-2">
@@ -223,7 +223,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                     {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
                   </div>
                   <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                    {event.fields.title || event.fields.title_local || event.fields.title_en || 'Untitled'}
+                    {eventTitle(event.fields, locale)}
                   </h3>
                   {sidemen.length > 0 && (
                     <p className="text-xs text-[#6A6560] mt-2">

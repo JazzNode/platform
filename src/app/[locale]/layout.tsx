@@ -18,7 +18,7 @@ import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
 import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, localized, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, localized, cityName, eventTitle, eventTitleField } from '@/lib/helpers';
 import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -75,7 +75,10 @@ export default async function LocaleLayout({
         const d = e.fields.start_at ? new Date(e.fields.start_at) : null;
         return {
           id: e.id,
-          title: e.fields.title || e.fields.title_local || e.fields.title_en || 'Event',
+          title: eventTitle(e.fields, locale),
+          title_alt: e.fields.title_en && e.fields.title_local && e.fields.title_en !== e.fields.title_local
+            ? (eventTitleField(e.fields, locale) === 'title_local' ? e.fields.title_en : e.fields.title_local)
+            : null,
           start_at: e.fields.start_at || null,
           venue_name: venue ? displayName(venue.fields) : '',
           primary_artist_name: artist ? artistDisplayName(artist.fields, locale) : null,

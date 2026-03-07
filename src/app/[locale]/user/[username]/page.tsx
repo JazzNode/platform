@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getProfileByUsername, getPublicFavorites } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, photoUrl, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, photoUrl, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
@@ -244,7 +244,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       {dateStr} · {timeStr}
                     </div>
                     <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                      {f.title || f.title_local || f.title_en || 'Event'}
+                      {eventTitle(f, locale)}
                     </h3>
                   </Link>
                 );

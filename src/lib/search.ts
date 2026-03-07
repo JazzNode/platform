@@ -6,6 +6,7 @@
 export interface SearchableEvent {
   id: string;
   title: string;
+  title_alt: string | null; // secondary title for cross-language search
   start_at: string | null;
   venue_name: string;
   primary_artist_name: string | null;
@@ -87,6 +88,7 @@ export function search(
     for (const e of data.events) {
       const score = Math.max(
         matchScore(q, e.title) * 1.5,
+        matchScore(q, e.title_alt) * 1.3,
         matchScore(q, e.primary_artist_name) * 1.2,
         matchScore(q, e.venue_name),
         matchScore(q, e.description_short) * 0.5,

@@ -7,8 +7,8 @@ import { useAdmin } from './AdminProvider';
 interface EditableNameProps {
   entityType: 'artist' | 'event' | 'venue';
   entityId: string;
-  /** The Airtable field to update (name_local, name_en, or display_name) */
-  field: 'name_local' | 'name_en' | 'display_name';
+  /** The Airtable field to update */
+  field: 'name_local' | 'name_en' | 'display_name' | 'title_local' | 'title_en';
   value: string;
   className?: string;
   /** HTML tag to render */
