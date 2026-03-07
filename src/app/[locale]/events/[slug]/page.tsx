@@ -8,6 +8,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import EventNav from '@/components/EventNav';
 import BookmarkButton from '@/components/BookmarkButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
+import EditableContent from '@/components/EditableContent';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -157,13 +158,15 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           </div>
 
           {/* Description */}
-          {(desc || descShort) && (
-            <div className="border-t border-[var(--border)] pt-6">
-              <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">
-                {desc || descShort}
-              </p>
-            </div>
-          )}
+          <EditableContent
+            entityType="event"
+            entityId={event.id}
+            fieldPrefix="description"
+            locale={locale}
+            content={desc || descShort}
+            contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
+            wrapperClassName="border-t border-[var(--border)] pt-6"
+          />
 
           {/* Ticket button — below description */}
           {f.source_url && (

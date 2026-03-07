@@ -9,6 +9,7 @@ import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
+import EditableContent from '@/components/EditableContent';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -146,7 +147,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             </div>
           )}
 
-          {desc && <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>}
+          <EditableContent
+            entityType="venue"
+            entityId={venue.id}
+            fieldPrefix="description"
+            locale={locale}
+            content={desc}
+            contentClassName="text-[#C4BFB3] leading-relaxed"
+          />
 
           {/* Links */}
           <SocialIcons

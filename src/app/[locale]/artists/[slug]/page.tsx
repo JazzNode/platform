@@ -11,6 +11,7 @@ import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import BadgeDock from '@/components/BadgeDock';
+import EditableContent from '@/components/EditableContent';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -241,12 +242,17 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
             </div>
 
             {/* Bio */}
-            {bioShort && <p className="text-[#F0EDE6] font-medium text-lg leading-relaxed">{bioShort}</p>}
-            {bioFull && (
-              <div className="border-t border-[var(--border)] pt-5">
-                <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">{bioFull}</p>
-              </div>
-            )}
+            <EditableContent
+              entityType="artist"
+              entityId={artist.id}
+              fieldPrefix="bio"
+              locale={locale}
+              content={bioFull}
+              shortContent={bioShort}
+              contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
+              shortContentClassName="text-[#F0EDE6] font-medium text-lg leading-relaxed"
+              wrapperClassName="border-t border-[var(--border)] pt-5"
+            />
             {!bioFull && desc && (
               <div className="border-t border-[var(--border)] pt-5">
                 <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>
