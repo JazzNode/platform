@@ -10,19 +10,38 @@ interface AdminContextType {
   toggleAdmin: () => void;
   showLoginModal: boolean;
   setShowLoginModal: (show: boolean) => void;
+  /** Call when an API returns 401 to clear token and prompt re-login */
+  handleUnauthorized: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
 const STORAGE_KEY = 'jazznode_admin_token';
 
+/** Decode JWT payload and check if it's expired */
+function isTokenExpired(token: string): boolean {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return true;
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return true;
+    // Add 60s buffer so we don't use a token that's about to expire
+    return Date.now() >= (payload.exp - 60) * 1000;
+  } catch {
+    return true;
+  }
+}
+
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
-  // Initialize state synchronously using a function to avoid the useEffect warning
+  // Initialize state synchronously; discard expired tokens immediately
   const [token, setToken] = useState<string | null>(() => {
     if (typeof window !== 'undefined') {
       try {
-        return localStorage.getItem(STORAGE_KEY);
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored && !isTokenExpired(stored)) return stored;
+        // Clean up expired token
+        if (stored) localStorage.removeItem(STORAGE_KEY);
       } catch {
-        return null;
+        /* ignore */
       }
     }
     return null;
@@ -38,6 +57,11 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       /* ignore */
     }
   }, []);
+
+  const handleUnauthorized = useCallback(() => {
+    logout();
+    setShowLoginModal(true);
+  }, [logout]);
 
   const toggleAdmin = useCallback(() => {
     if (token) {
@@ -92,6 +116,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         login,
         logout,
         toggleAdmin,
+        handleUnauthorized,
         showLoginModal,
         setShowLoginModal,
       }}

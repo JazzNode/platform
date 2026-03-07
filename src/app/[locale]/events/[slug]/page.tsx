@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, buildMap, type Event, type Venue, type Artist } from '@/lib/airtable';
 import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
-import EventNav from '@/components/EventNav';
+import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
@@ -215,7 +215,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       )}
 
       {/* ─── Prev / Next Navigation ─── */}
-      <EventNav
+      <RecordNav
         prevHref={prevEvent ? `/${locale}/events/${prevEvent.id}` : null}
         prevTitle={prevEvent ? (prevEvent.fields.title || prevEvent.fields.title_local || 'Event') : null}
         nextHref={nextEvent ? `/${locale}/events/${nextEvent.id}` : null}

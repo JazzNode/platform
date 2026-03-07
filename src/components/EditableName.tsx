@@ -23,7 +23,7 @@ export default function EditableName({
   className = '',
   tag: Tag = 'p',
 }: EditableNameProps) {
-  const { isAdmin, token } = useAdmin();
+  const { isAdmin, token, handleUnauthorized } = useAdmin();
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);
@@ -75,6 +75,10 @@ export default function EditableName({
         }),
       });
 
+      if (res.status === 401) {
+        handleUnauthorized();
+        throw new Error('Token 已過期，請重新登入');
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Update failed');
 

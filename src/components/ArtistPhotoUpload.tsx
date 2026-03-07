@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUrl, size }: Props) {
-  const { isAdmin, token } = useAdmin();
+  const { isAdmin, token, handleUnauthorized } = useAdmin();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +52,10 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
         });
 
         if (!res.ok) {
+          if (res.status === 401) {
+            handleUnauthorized();
+            throw new Error('Token 已過期，請重新登入');
+          }
           const data = await res.json();
           throw new Error(data.error || 'Upload failed');
         }

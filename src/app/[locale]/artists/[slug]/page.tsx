@@ -13,6 +13,7 @@ import FollowButton from '@/components/FollowButton';
 import BadgeDock from '@/components/BadgeDock';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
+import RecordNav from '@/components/RecordNav';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -40,6 +41,14 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       </div>
     );
   }
+
+  // Compute prev/next artist — alphabetical by displayName
+  const allSorted = [...artists].sort((a, b) =>
+    artistDisplayName(a.fields, locale).localeCompare(artistDisplayName(b.fields, locale))
+  );
+  const currentIdx = allSorted.findIndex((a) => a.id === artist.id);
+  const prevArtist = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
+  const nextArtist = currentIdx >= 0 && currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
 
   const f = artist.fields;
   const bioShort = localized(f as Record<string, unknown>, 'bio_short', locale);
@@ -621,6 +630,16 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </section>
         </FadeUp>
       )}
+
+      {/* ═══ Prev / Next Navigation ═══ */}
+      <RecordNav
+        prevHref={prevArtist ? `/${locale}/artists/${prevArtist.id}` : null}
+        prevTitle={prevArtist ? artistDisplayName(prevArtist.fields, locale) : null}
+        nextHref={nextArtist ? `/${locale}/artists/${nextArtist.id}` : null}
+        nextTitle={nextArtist ? artistDisplayName(nextArtist.fields, locale) : null}
+        prevLabel={t('prevArtist')}
+        nextLabel={t('nextArtist')}
+      />
     </div>
   );
 }

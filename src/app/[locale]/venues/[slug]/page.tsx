@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks } from '@/lib/airtable';
+import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
 import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
@@ -10,6 +10,7 @@ import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
+import RecordNav from '@/components/RecordNav';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -48,6 +49,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       </div>
     );
   }
+
+  // Compute prev/next venue — sorted by event count (descending), same as list page
+  const venueCountsFallback = buildVenueEventCounts(events);
+  const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
+  const allSorted = [...venuesWithEvents].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
+  const currentIdx = allSorted.findIndex((v) => v.id === venue.id);
+  const prevVenue = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
+  const nextVenue = currentIdx >= 0 && currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
 
   const f = venue.fields;
   const desc = localized(f as Record<string, unknown>, 'description', locale);
@@ -383,6 +392,16 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           </>
         );
       })()}
+
+      {/* ─── Prev / Next Navigation ─── */}
+      <RecordNav
+        prevHref={prevVenue ? `/${locale}/venues/${prevVenue.id}` : null}
+        prevTitle={prevVenue ? displayName(prevVenue.fields) : null}
+        nextHref={nextVenue ? `/${locale}/venues/${nextVenue.id}` : null}
+        nextTitle={nextVenue ? displayName(nextVenue.fields) : null}
+        prevLabel={t('prevVenue')}
+        nextLabel={t('nextVenue')}
+      />
       </FavoriteHighlight>
     </div>
   );

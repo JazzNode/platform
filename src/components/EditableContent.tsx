@@ -29,7 +29,7 @@ export default function EditableContent({
   shortContentClassName = '',
   wrapperClassName,
 }: EditableContentProps) {
-  const { isAdmin, token } = useAdmin();
+  const { isAdmin, token, handleUnauthorized } = useAdmin();
   const router = useRouter();
   const t = useTranslations('admin');
   const [editing, setEditing] = useState(false);
@@ -82,6 +82,11 @@ export default function EditableContent({
           content: draft.trim(),
         }),
       });
+
+      if (res.status === 401) {
+        handleUnauthorized();
+        throw new Error('Token 已過期，請重新登入');
+      }
 
       const data = await res.json();
 
