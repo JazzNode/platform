@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
+import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
@@ -12,6 +12,7 @@ import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import BadgeDock from '@/components/BadgeDock';
 import EditableContent from '@/components/EditableContent';
+import EditableName from '@/components/EditableName';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -210,11 +211,25 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
           <div className="flex-1 space-y-5">
             <div className="flex items-start justify-between gap-4">
-              <h1 className="font-serif text-4xl sm:text-5xl font-bold">{artistDisplayName(f, locale)}</h1>
+              <EditableName
+                entityType="artist"
+                entityId={artist.id}
+                field={artistDisplayNameField(f, locale)}
+                value={artistDisplayName(f, locale)}
+                className="font-serif text-4xl sm:text-5xl font-bold"
+                tag="h1"
+              />
               <FollowButton itemType="artist" itemId={artist.id} variant="full" />
             </div>
             {f.name_en && f.name_local && f.name_en !== f.name_local && (
-              <p className="text-xl text-[#8A8578]">{f.name_en}</p>
+              <EditableName
+                entityType="artist"
+                entityId={artist.id}
+                field="name_en"
+                value={f.name_en}
+                className="text-xl text-[#8A8578]"
+                tag="p"
+              />
             )}
 
             {/* Tags */}

@@ -64,6 +64,23 @@ export function artistDisplayName(
   return fields.name_en || fields.name_local || 'Unknown';
 }
 
+/** Return which field artistDisplayName() resolves to. */
+export function artistDisplayNameField(
+  fields: { display_name?: string; name_local?: string; name_en?: string },
+  locale: string,
+): 'display_name' | 'name_local' | 'name_en' {
+  if (fields.display_name) return 'display_name';
+  if (fields.name_local) {
+    const detectedLocale = detectTextLocale(fields.name_local);
+    const cjkLocales = ['zh', 'ja'];
+    const isCjkMatch = detectedLocale && cjkLocales.includes(detectedLocale) && cjkLocales.includes(locale);
+    if (detectedLocale === locale || isCjkMatch) return 'name_local';
+  }
+  if (fields.name_en) return 'name_en';
+  if (fields.name_local) return 'name_local';
+  return 'name_en';
+}
+
 /** Format a date string for display. */
 export function formatDate(iso: string | undefined, locale: string = 'en', timezone: string = 'Asia/Taipei'): string {
   if (!iso) return '';
