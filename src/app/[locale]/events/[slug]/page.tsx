@@ -157,10 +157,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           </div>
 
           {/* Description */}
-          {(descShort || desc) && (
+          {(desc || descShort) && (
             <div className="border-t border-[var(--border)] pt-6">
               <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">
-                {descShort || desc}
+                {desc || descShort}
               </p>
             </div>
           )}
