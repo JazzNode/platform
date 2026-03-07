@@ -59,12 +59,19 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const eventLineups = lineups
     .filter((l) => l.fields.event_id?.some((eid) => eid === event.id))
     .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
-  const lineupArtists = eventLineups
+  const lineupArtistsRaw = eventLineups
     .map((l) => {
       const artist = resolveLinks(l.fields.artist_id, artistMap)[0];
       return artist ? { artist, instruments: l.fields.instrument_list || [], role: l.fields.role } : null;
     })
     .filter(Boolean) as { artist: { id: string; fields: Artist }; instruments: string[]; role?: string }[];
+
+  // If the primary artist is a group/big band and has no ensemble lineup yet, inject it at the top
+  const hasEnsembleLineup = lineupArtistsRaw.some((l) => l.role === 'ensemble');
+  const isGroupPrimary = primaryArtist && (primaryArtist.fields.type === 'group' || primaryArtist.fields.type === 'big band');
+  const lineupArtists = (!hasEnsembleLineup && isGroupPrimary)
+    ? [{ artist: primaryArtist, instruments: [], role: 'ensemble' as string | undefined }, ...lineupArtistsRaw]
+    : lineupArtistsRaw;
 
   return (
     <div className="space-y-12">
@@ -185,7 +192,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                         {artistDisplayName(artist.fields, locale)}
                       </h3>
                       <p className="text-xs uppercase tracking-widest text-gold mt-1">
-                        {instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}
+                        {role === 'ensemble'
+                          ? (artist.fields.type === 'big band' ? 'BIG BAND' : 'GROUP')
+                          : instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}
                       </p>
                       {bioShort && (
                         <p className="text-xs text-[#8A8578] mt-3 leading-relaxed line-clamp-3">

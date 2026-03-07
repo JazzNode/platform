@@ -54,6 +54,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     const eventLineups = (lineupsByEvent.get(event.id) || [])
       .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
     const lineupArtists = eventLineups
+      .filter((l) => l.fields.role !== 'ensemble')
       .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
       .filter(Boolean)
       .filter((a) => a.id !== primaryArtist?.id);
