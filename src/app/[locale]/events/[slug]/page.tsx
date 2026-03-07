@@ -214,10 +214,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                       <img
                         src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!}
                         alt={artistDisplayName(artist.fields, locale)}
-                        className="w-14 h-14 rounded-full object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
+                        className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-full bg-[var(--bg)] flex items-center justify-center text-lg shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
+                      <div className="w-14 h-14 rounded-xl bg-[var(--bg)] flex items-center justify-center text-lg shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
                         ♪
                       </div>
                     )}

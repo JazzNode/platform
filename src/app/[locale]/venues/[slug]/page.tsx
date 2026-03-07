@@ -87,6 +87,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       </Link>
 
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
+      <div className="space-y-12">
       {/* Hero */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
@@ -402,6 +403,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         prevLabel={t('prevVenue')}
         nextLabel={t('nextVenue')}
       />
+      </div>
       </FavoriteHighlight>
     </div>
   );
