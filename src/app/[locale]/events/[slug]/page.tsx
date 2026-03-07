@@ -208,16 +208,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               const bioShort = localized(artist.fields as Record<string, unknown>, 'bio_short', locale);
               return (
                 <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-center gap-4">
                     {/* Artist avatar */}
                     {photoUrl(artist.fields.photo_url, artist.fields.photo_file) ? (
                       <img
                         src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!}
                         alt={artistDisplayName(artist.fields, locale)}
-                        className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
+                        className="w-18 h-18 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
                       />
                     ) : (
-                      <div className="w-14 h-14 rounded-xl bg-[var(--bg)] flex items-center justify-center text-lg shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
+                      <div className="w-18 h-18 rounded-xl bg-[var(--bg)] flex items-center justify-center text-xl shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
                         ♪
                       </div>
                     )}
