@@ -148,21 +148,19 @@ export default function Footer() {
             <ThemePicker />
           </div>
 
-          {/* Bottom row — sound wave instead of pulse dot */}
-          <div className="mt-10 flex items-center gap-8 text-xs text-[var(--muted-foreground,#8A8578)]">
-            <div className="flex items-center gap-2">
-              <SoundWave />
-              <span className="font-mono uppercase tracking-widest">Live Data</span>
-            </div>
-            <span className="opacity-30">·</span>
+          {/* Bottom row */}
+          <div className="mt-10 flex flex-col items-center gap-4 text-xs text-[var(--muted-foreground,#8A8578)]">
             <span>© {new Date().getFullYear()} JazzNode</span>
-            <span className="opacity-30">·</span>
-            <button
-              onClick={() => setLegalOpen(true)}
-              className="cursor-pointer hover:text-gold transition-colors duration-300"
-            >
-              {t('legal')}
-            </button>
+            <div className="flex items-center gap-6">
+              <span className="font-mono uppercase tracking-widest">Live Data</span>
+              <SoundWave />
+              <button
+                onClick={() => setLegalOpen(true)}
+                className="cursor-pointer hover:text-gold transition-colors duration-300"
+              >
+                {t('legal')}
+              </button>
+            </div>
           </div>
         </div>
       </div>
