@@ -135,6 +135,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {upcoming.map((event, i) => {
               const tz = event.fields.timezone || 'Asia/Taipei';
               const venue = resolveLinks(event.fields.venue_id, venues)[0];
+              const city = venue?.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
               const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
               const eventLineups = (lineupsByEvent.get(event.id) || [])
                 .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
@@ -152,7 +153,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <FadeUpItem key={event.id} delay={(i % 3) * 60} className={i >= 6 ? 'hidden sm:block' : undefined}>
                 <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
                   {venue && (
-                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{city ? `${cityName(city, locale)} · ` : ''}{displayName(venue.fields)}</p>
                   )}
                   <div className="text-xs uppercase tracking-widest text-gold mb-2">
                     {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
@@ -200,6 +201,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             {weeklyJams.map((event, i) => {
               const tz = event.fields.timezone || 'Asia/Taipei';
               const venue = resolveLinks(event.fields.venue_id, venues)[0];
+              const city = venue?.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
               const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
               const eventLineups = (lineupsByEvent.get(event.id) || [])
                 .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
@@ -217,7 +219,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                 <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
                   {venue && (
-                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{city ? `${cityName(city, locale)} · ` : ''}{displayName(venue.fields)}</p>
                   )}
                   <div className="text-xs uppercase tracking-widest text-gold mb-2">
                     {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
