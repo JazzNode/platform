@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react';
 
 const tabs = [
   { key: 'cities', path: '/cities' },
-  { key: 'events', path: '/events' },
   { key: 'venues', path: '/venues' },
+  { key: 'events', path: '/events' },
   { key: 'artists', path: '/artists' },
 ] as const;
 
