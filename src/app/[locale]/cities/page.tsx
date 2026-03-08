@@ -45,10 +45,10 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
       }));
 
     // Weekly jam sessions (next 7 days, tag = 'jam session')
-    const sevenDaysLater = new Date(new Date(now).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const thirtyDaysLater = new Date(new Date(now).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString();
     const weeklyJams = upcomingEvents
       .filter((e) => {
-        if (!e.fields.start_at || e.fields.start_at > sevenDaysLater) return false;
+        if (!e.fields.start_at || e.fields.start_at > thirtyDaysLater) return false;
         const eventTags = resolveLinks(e.fields.tag_list, tagMap).map((t) => t.fields.name?.toLowerCase());
         return eventTags.includes('jam session');
       })
