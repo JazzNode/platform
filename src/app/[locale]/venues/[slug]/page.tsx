@@ -60,6 +60,16 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
   const f = venue.fields;
   const desc = localized(f as Record<string, unknown>, 'description', locale);
+
+  // Lookup maps for localized labels
+  const jazzFreqLabel: Record<string, string> = {
+    nightly: t('jazzNightly'), weekends: t('jazzWeekends'), occasional: t('jazzOccasional'),
+  };
+  const paymentLabel: Record<string, string> = {
+    cash: t('payCash'), credit_card: t('payCreditCard'), bank_transfer: t('payBankTransfer'),
+    line_pay: 'Line Pay', apple_pay: 'Apple Pay', jkopay: 'JKOPay',
+  };
+
   const venueEvents = resolveLinks(f.event_list, events)
     .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''));
   const venueBadges = resolveLinks(f.badge_list, badges);
@@ -80,14 +90,55 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     .map(([id]) => artistMap.get(id))
     .filter(Boolean) as { id: string; fields: typeof artists[number]['fields'] }[];
 
+  // JSON-LD structured data for SEO
+  const city = f.city_id?.[0] ? cityMap.get(f.city_id[0]) : null;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MusicVenue',
+    name: displayName(f),
+    ...(desc && { description: desc }),
+    ...(photoUrl(f.photo_url) && { image: photoUrl(f.photo_url) }),
+    ...(f.website_url && { url: f.website_url }),
+    ...(f.phone && { telephone: f.phone }),
+    ...(f.contact_email && { email: f.contact_email }),
+    ...((f.address_local || f.address_en) && {
+      address: {
+        '@type': 'PostalAddress',
+        ...(f.address_en && { streetAddress: f.address_en }),
+        ...(city && { addressLocality: cityName(city, 'en') }),
+        ...(f.country_code && { addressCountry: f.country_code }),
+      },
+    }),
+    ...((f.lat && f.lng) && {
+      geo: { '@type': 'GeoCoordinates', latitude: f.lat, longitude: f.lng },
+    }),
+    ...(f.capacity && { maximumAttendeeCapacity: f.capacity }),
+  };
+
   return (
     <div className="space-y-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Link href={`/${locale}/venues`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
       <div className="space-y-12">
+
+      {/* Status Banner */}
+      {f.status === 'inactive' && (
+        <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-amber-900/20 border border-amber-700/30 text-amber-400">
+          <span className="text-lg">⚠️</span>
+          <span className="text-sm font-medium">{t('venueInactive')}</span>
+        </div>
+      )}
+      {f.status === 'closed' && (
+        <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-red-900/20 border border-red-700/30 text-red-400">
+          <span className="text-lg">🚫</span>
+          <span className="text-sm font-medium">{t('venueClosed')}</span>
+        </div>
+      )}
+
       {/* Hero */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
@@ -117,19 +168,29 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 📍 {cityName(cityMap.get(f.city_id[0])!, locale)}
               </span>
             )}
-            {f.jazz_frequency && (
+            {f.jazz_frequency && f.jazz_frequency !== 'none' && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                🎵 {f.jazz_frequency}
+                🎵 {jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency}
               </span>
             )}
             {f.capacity && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                👥 {f.capacity}
+                👥 {f.capacity} {t('capacitySeats')}
+              </span>
+            )}
+            {f.currency && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                💰 {f.currency}
+              </span>
+            )}
+            {f.is_gold_partner && (
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-[#0A0A0A] font-bold">
+                ★ {t('goldPartner')}
               </span>
             )}
             {f.verification_status === 'Verified' && (
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
-                ✓ Verified
+                ✓ {t('verified')}
               </span>
             )}
           </div>
@@ -137,7 +198,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           
           {/* Vibe Check / Practical Info */}
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
-            {f.payment_method && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💳 {f.payment_method}</span>}
+            {f.payment_method?.map((pm) => (
+              <span key={pm} className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💳 {paymentLabel[pm] || pm}</span>
+            ))}
             {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 中文友善</span>}
             {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 English Friendly</span>}
             {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 日本語OK</span>}
@@ -173,6 +236,22 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             facebookUrl={f.facebook_url}
           />
 
+          {/* Contact Info */}
+          {(f.phone || f.contact_email) && (
+            <div className="flex flex-wrap gap-4 text-sm text-[#C4BFB3]">
+              {f.phone && (
+                <a href={`tel:${f.phone}`} className="flex items-center gap-2 hover:text-gold transition-colors">
+                  <span>📞</span> {f.phone}
+                </a>
+              )}
+              {f.contact_email && (
+                <a href={`mailto:${f.contact_email}`} className="flex items-center gap-2 hover:text-gold transition-colors">
+                  <span>✉️</span> {f.contact_email}
+                </a>
+              )}
+            </div>
+          )}
+
         </div>
       </div>
 
@@ -183,32 +262,98 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       {((f.lat && f.lng) || f.address_local || f.address_en) && (
         <FadeUp stagger={0.1}>
           <section className="border-t border-[var(--border)] pt-12">
-            <h2 className="font-serif text-2xl font-bold mb-8">📍 Location & Map</h2>
+            <h2 className="font-serif text-2xl font-bold mb-8">📍 {t('locationMap')}</h2>
             {(f.address_local || f.address_en) && (
-              <p className="text-sm text-[#C4BFB3] mb-6">{f.address_local || f.address_en}</p>
-            )}
-            {f.lat && f.lng && (
-              <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] sm:h-[350px] relative bg-[#1A1A1A]">
-                <iframe
-                  width="100%"
-                  height="100%"
-                  style={{ border: 0, filter: "grayscale(100%) invert(92%) contrast(83%) opacity(80%)" }}
-                  loading="lazy"
-                  allowFullScreen
-                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
-                ></iframe>
-                {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
-                    <a href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`} target="_blank" rel="noreferrer" className="px-6 py-3 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors">
-                      Open in Apple Maps
-                    </a>
-                  </div>
+              <div className="mb-6 space-y-1">
+                {f.address_local && <p className="text-sm text-[#C4BFB3]">{f.address_local}</p>}
+                {f.address_en && f.address_en !== f.address_local && (
+                  <p className="text-xs text-[#8A8578]">{f.address_en}</p>
                 )}
               </div>
+            )}
+            {f.lat && f.lng && (
+              <>
+                <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] sm:h-[350px] relative bg-[#1A1A1A]">
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: "grayscale(100%) invert(92%) contrast(83%) opacity(80%)" }}
+                    loading="lazy"
+                    allowFullScreen
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ''}&q=${f.lat},${f.lng}`}
+                  ></iframe>
+                  {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#1A1A1A]">
+                      <a href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`} target="_blank" rel="noreferrer" className="px-6 py-3 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors">
+                        {t('openInAppleMaps')}
+                      </a>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <a
+                    href={f.place_id ? `https://www.google.com/maps/place/?q=place_id:${f.place_id}` : `https://www.google.com/maps/search/?api=1&query=${f.lat},${f.lng}`}
+                    target="_blank" rel="noreferrer"
+                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
+                  >
+                    🗺️ {t('openInGoogleMaps')}
+                  </a>
+                  <a
+                    href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`}
+                    target="_blank" rel="noreferrer"
+                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
+                  >
+                    🍎 {t('openInAppleMaps')}
+                  </a>
+                </div>
+              </>
             )}
           </section>
         </FadeUp>
       )}
+
+      {/* Venue Stats */}
+      {venueEvents.length > 0 && (() => {
+        const sortedByDate = [...venueEvents].filter(e => e.fields.start_at).sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+        const firstEvent = sortedByDate[0];
+        const firstYear = firstEvent?.fields.start_at ? new Date(firstEvent.fields.start_at).getFullYear() : null;
+        const currentYear = new Date().getFullYear();
+        const yearsActive = firstYear ? currentYear - firstYear + 1 : null;
+        const uniqueArtistCount = artistCounts.size;
+        return (
+          <FadeUp>
+            <section className="border-t border-[var(--border)] pt-12">
+              <h2 className="font-serif text-2xl font-bold mb-8">{t('venueStats')}</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
+                  <div className="text-3xl font-bold text-gold">{venueEvents.length}</div>
+                  <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('totalGigs')}</div>
+                </div>
+                {uniqueArtistCount > 0 && (
+                  <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
+                    <div className="text-3xl font-bold text-gold">{uniqueArtistCount}</div>
+                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('artists')}</div>
+                  </div>
+                )}
+                {yearsActive && yearsActive > 0 && (
+                  <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
+                    <div className="text-3xl font-bold text-gold">{yearsActive}</div>
+                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">
+                      {locale === 'zh' ? '年' : locale === 'ja' ? '年' : locale === 'ko' ? '년' : 'years'}
+                    </div>
+                  </div>
+                )}
+                {f.capacity && (
+                  <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
+                    <div className="text-3xl font-bold text-gold">{f.capacity}</div>
+                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('capacitySeats')}</div>
+                  </div>
+                )}
+              </div>
+            </section>
+          </FadeUp>
+        );
+      })()}
 
 {/* Most Frequent Performers */}
       {topPerformers.length > 0 && (

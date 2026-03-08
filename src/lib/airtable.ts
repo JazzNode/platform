@@ -114,6 +114,11 @@ export interface Venue {
   badge_list?: string[];
   verification_status?: string;
   currency?: string;
+  phone?: string;
+  contact_email?: string;
+  status?: string;              // active | inactive | closed
+  is_gold_partner?: boolean;
+  place_id?: string;            // Google Place ID
 }
 
 export interface Artist {
