@@ -95,11 +95,16 @@ export default function EditableContent({
       }
 
       if (data.translationFailed) {
-        setWarning(t('translationFailed'));
+        setWarning(data.translationError || t('translationFailed'));
       }
 
       setEditing(false);
       router.refresh();
+
+      // Clear warning after 8 seconds
+      if (data.translationFailed) {
+        setTimeout(() => setWarning(null), 8000);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : t('updateFailed'));
     } finally {
@@ -176,6 +181,12 @@ export default function EditableContent({
 
   return (
     <div className="relative group/edit">
+      {warning && (
+        <p className="text-xs text-amber-400 mb-2">{warning}</p>
+      )}
+      {error && (
+        <p className="text-xs text-red-400 mb-2">{error}</p>
+      )}
       {hasContent ? (
         <>
           {shortContent && <p className={shortContentClassName}>{shortContent}</p>}
