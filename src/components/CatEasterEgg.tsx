@@ -50,7 +50,6 @@ export default function CatEasterEgg() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setStretching(false);
 
     if (reduced) {

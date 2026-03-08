@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const cityLabel = city ? cityName(city.fields, locale) : '';
   const desc = localized(f as Record<string, unknown>, 'description', locale);
   const description = desc || (cityLabel ? `${name} — ${cityLabel}` : name);
-  const photo = photoUrl(f.photo_url, f.photo_file);
+  const photo = photoUrl(f.photo_url);
   return {
     title: name,
     description,
@@ -91,9 +91,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       {/* Hero */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
-        {photoUrl(f.photo_url, f.photo_file) ? (
+        {photoUrl(f.photo_url) ? (
           <div className="w-full lg:w-[400px] shrink-0 overflow-hidden rounded-2xl">
-            <Image src={photoUrl(f.photo_url, f.photo_file)!} alt={displayName(f)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
+            <Image src={photoUrl(f.photo_url)!} alt={displayName(f)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
           </div>
         ) : (
           <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl border border-[var(--border)]">
@@ -180,12 +180,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       
       {/* Location & Map */}
-      {((f.lat && f.lng) || f.address) && (
+      {((f.lat && f.lng) || f.address_local || f.address_en) && (
         <FadeUp stagger={0.1}>
           <section className="border-t border-[var(--border)] pt-12">
             <h2 className="font-serif text-2xl font-bold mb-8">📍 Location & Map</h2>
-            {f.address && (
-              <p className="text-sm text-[#C4BFB3] mb-6">{f.address}</p>
+            {(f.address_local || f.address_en) && (
+              <p className="text-sm text-[#C4BFB3] mb-6">{f.address_local || f.address_en}</p>
             )}
             {f.lat && f.lng && (
               <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[250px] sm:h-[350px] relative bg-[#1A1A1A]">
@@ -219,8 +219,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               {topPerformers.map((a) => (
                 <Link key={a.id} href={`/${locale}/artists/${a.id}`}
                   className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
-                  {photoUrl(a.fields.photo_url, a.fields.photo_file) && (
-                    <Image src={photoUrl(a.fields.photo_url, a.fields.photo_file)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                  {photoUrl(a.fields.photo_url) && (
+                    <Image src={photoUrl(a.fields.photo_url)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                   )}
                   <div>
                     <span className="text-sm font-medium group-hover:text-gold transition-colors">{artistDisplayName(a.fields, locale)}</span>

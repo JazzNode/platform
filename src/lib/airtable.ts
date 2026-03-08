@@ -81,6 +81,7 @@ async function fetchTable<T = Record<string, unknown>>(
 // ----- Typed fetchers -----
 
 export interface Venue {
+  venue_id?: string;          // immutable slug (e.g. tw-tpe-bluenote)
   name_local?: string;
   name_en?: string;
   display_name?: string;
@@ -99,7 +100,6 @@ export interface Venue {
   payment_method?: string[];
   city_id?: string[];       // linked Cities records
   country_code?: string;
-  address?: string;           // legacy
   address_local?: string;
   address_en?: string;
   lat?: number;
@@ -108,17 +108,16 @@ export interface Venue {
   instagram?: string;
   facebook_url?: string;
   photo_url?: string;
-  photo_file?: { url: string; filename: string }[];  // legacy, use photo_url
   jazz_frequency?: string;
   capacity?: number;
   event_list?: string[];
   badge_list?: string[];
   verification_status?: string;
   currency?: string;
-  slug?: string;
 }
 
 export interface Artist {
+  artist_id?: string;         // immutable slug (e.g. tw-lin-yu-ting)
   name_local?: string;
   name_en?: string;
   display_name?: string;
@@ -139,7 +138,6 @@ export interface Artist {
   instrument_list?: string[];
   genres?: string[];
   photo_url?: string;
-  photo_file?: { url: string; filename: string }[];  // legacy, use photo_url
   website_url?: string;
   instagram?: string;
   facebook_url?: string;
@@ -157,10 +155,10 @@ export interface Artist {
   is_master?: boolean;
   verification_status?: string;
   type?: string;
-  slug?: string;
 }
 
 export interface Event {
+  event_id?: string;        // immutable slug (e.g. 2026-02-15_tw-tpe-bluenote_tw-band_2000)
   title_local?: string;     // original-language title (CJK, Thai, Korean, etc.)
   title_en?: string;        // English title (from ingest or content_generator translation)
   description_en?: string;
@@ -184,12 +182,10 @@ export interface Event {
   tag_list?: string[];
   source_url?: string;
   price_info?: string;
-  poster_url?: string;  // Wix mainImage URL (high-res event poster)
-  photo_file?: { url: string; filename: string }[];  // legacy
-  source_list?: string[];
+  poster_url?: string;      // event poster URL (high-res)
+  source_id?: string[];     // linked Sources records
   subtype?: string;           // 'standard_show' | 'jam_session' | 'showcase' | 'workshop'
   lifecycle_status?: string;  // 'upcoming' | 'past' | 'cancelled' | 'unknown'
-  slug?: string;
 }
 
 export interface BadgeDef {
@@ -230,6 +226,7 @@ export interface Lineup {
   role?: string;
   order?: number;
   artist_name?: string[];   // lookup
+  event_title?: string[];   // lookup
 }
 
 export const getCities = cache(

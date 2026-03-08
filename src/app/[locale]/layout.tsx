@@ -1,5 +1,5 @@
-import type { Metadata, Viewport } from 'next';
-import { NextIntlClientProvider, useMessages } from 'next-intl';
+import type { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Inter } from 'next/font/google';
 import Header from '@/components/Header';

@@ -1,5 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
+import Image from 'next/image';
 import Link from 'next/link';
 import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
 import { artistDisplayName, photoUrl, formatDate, cityName, eventTitle } from '@/lib/helpers';
@@ -43,7 +44,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     // Venue photos (up to 3)
     const venuePhotos = cityVenues
       .map((v) => ({
-        url: photoUrl(v.fields.photo_url, v.fields.photo_file),
+        url: photoUrl(v.fields.photo_url),
         name: v.fields.display_name || v.fields.name_local || v.fields.name_en || '',
       }))
       .filter((p): p is { url: string; name: string } => p.url !== null)
@@ -104,13 +105,14 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                 {venuePhotos.length > 0 && (
                   <div className="flex items-center -space-x-3 mb-5">
                     {venuePhotos.map((photo, i) => (
-                      <img
+                      <Image
                         key={i}
                         src={photo.url}
                         alt={photo.name}
+                        width={40} height={40}
                         className="w-10 h-10 rounded-full object-cover border-2 border-[var(--card)]"
-                        loading="lazy"
                         style={{ zIndex: venuePhotos.length - i }}
+                        sizes="40px"
                       />
                     ))}
                     {cityVenues.length > venuePhotos.length && (

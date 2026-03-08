@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname, useRouter } from 'next/navigation';
@@ -138,7 +139,7 @@ export default function Header() {
           aria-label="User menu"
         >
           {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+            <Image src={profile.avatar_url} alt="" width={28} height={28} className="w-full h-full object-cover" sizes="28px" />
           ) : (
             userInitial
           )}

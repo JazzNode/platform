@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, formatPriceBadge, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
@@ -214,7 +214,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           <ArtistPhotoUpload
             artistId={artist.id}
             artistName={artistDisplayName(f, locale)}
-            currentPhotoUrl={photoUrl(f.photo_url, f.photo_file)}
+            currentPhotoUrl={photoUrl(f.photo_url)}
             size="md"
           />
 
@@ -307,11 +307,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   href={`/${locale}/artists/${member.id}`}
                   className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--card)] transition-colors group"
                 >
-                  {photoUrl(member.fields.photo_url, member.fields.photo_file) ? (
-                    <img
-                      src={photoUrl(member.fields.photo_url, member.fields.photo_file)!}
+                  {photoUrl(member.fields.photo_url) ? (
+                    <Image
+                      src={photoUrl(member.fields.photo_url)!}
                       alt={artistDisplayName(member.fields, locale)}
+                      width={36} height={36}
                       className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
+                      sizes="36px"
                     />
                   ) : (
                     <div className="w-9 h-9 rounded-full bg-[var(--card)] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">
@@ -538,11 +540,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                         className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--card)] transition-colors group"
                       >
                         {/* Avatar */}
-                        {photoUrl(collab.fields.photo_url, collab.fields.photo_file) ? (
-                          <img
-                            src={photoUrl(collab.fields.photo_url, collab.fields.photo_file)!}
+                        {photoUrl(collab.fields.photo_url) ? (
+                          <Image
+                            src={photoUrl(collab.fields.photo_url)!}
                             alt={artistDisplayName(collab.fields, locale)}
+                            width={36} height={36}
                             className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
+                            sizes="36px"
                           />
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-[var(--card)] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">

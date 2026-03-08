@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { useSearch } from './SearchProvider';
 import { search, type SearchResult, type SearchResultType, type SearchableEvent, type SearchableArtist, type SearchableVenue, type SearchableCity } from '@/lib/search';
 
@@ -176,7 +177,7 @@ export default function SearchOverlay() {
             }`}
           >
             {a.photoUrl ? (
-              <img src={a.photoUrl} alt="" className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" loading="lazy" />
+              <Image src={a.photoUrl} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">♪</div>
             )}

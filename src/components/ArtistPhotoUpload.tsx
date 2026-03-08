@@ -71,7 +71,7 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [artistId, token],
+    [artistId, token, handleUnauthorized],
   );
 
   return (

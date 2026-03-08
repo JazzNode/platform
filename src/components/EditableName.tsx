@@ -89,7 +89,7 @@ export default function EditableName({
     } finally {
       setSaving(false);
     }
-  }, [token, draft, value, entityType, entityId, field, router]);
+  }, [token, draft, value, entityType, entityId, field, router, handleUnauthorized]);
 
   if (!isAdmin) {
     return <Tag className={className}>{value}</Tag>;

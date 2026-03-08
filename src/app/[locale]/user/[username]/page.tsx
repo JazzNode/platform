@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getProfileByUsername, getPublicFavorites } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, photoUrl, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, photoUrl, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
 export default async function PublicProfilePage({ params }: { params: Promise<{ locale: string; username: string }> }) {
   const { locale, username } = await params;
   const t = await getTranslations('profile');
-  const tCommon = await getTranslations('common');
+  await getTranslations('common');
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
   const profile = await getProfileByUsername(username);
@@ -44,7 +44,6 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     getCities(),
   ]);
 
-  const artistMap = buildMap(artists);
   const venueMap = buildMap(venues);
   const cityMap = buildMap(cities);
 
@@ -157,9 +156,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                       href={`/${locale}/artists/${artist.id}`}
                       className="flex items-center gap-3 bg-[var(--card)] px-4 py-2.5 rounded-xl border border-[var(--border)] hover:border-gold/30 transition-colors group"
                     >
-                      {photoUrl(artist.fields.photo_url, artist.fields.photo_file) ? (
+                      {photoUrl(artist.fields.photo_url) ? (
                         <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-                          <Image src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
+                          <Image src={photoUrl(artist.fields.photo_url)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
                         </div>
                       ) : (
                         <div className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">♪</div>
@@ -186,9 +185,9 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
                         href={`/${locale}/venues/${venue.id}`}
                         className="flex items-center gap-3 bg-[var(--card)] px-4 py-2.5 rounded-xl border border-[var(--border)] hover:border-gold/30 transition-colors group"
                       >
-                        {photoUrl(venue.fields.photo_url, venue.fields.photo_file) ? (
+                        {photoUrl(venue.fields.photo_url) ? (
                           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-                            <Image src={photoUrl(venue.fields.photo_url, venue.fields.photo_file)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
+                            <Image src={photoUrl(venue.fields.photo_url)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
                           </div>
                         ) : (
                           <div className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">🎵</div>

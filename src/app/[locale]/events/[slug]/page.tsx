@@ -2,8 +2,8 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getEvents, getVenues, getArtists, getLineups, getBadges, resolveLinks, buildMap, type Event, type Venue, type Artist } from '@/lib/airtable';
-import { displayName, artistDisplayName, eventTitle, eventTitleField, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
+import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/airtable';
+import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
@@ -25,8 +25,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
 
-  const [events, venues, artists, lineups, badges] = await Promise.all([
-    getEvents(), getVenues(), getArtists(), getLineups(), getBadges(),
+  const [events, venues, artists, lineups] = await Promise.all([
+    getEvents(), getVenues(), getArtists(), getLineups(),
   ]);
   const event = events.find((e) => e.id === slug);
 
@@ -210,11 +210,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                   <div className="flex items-center gap-4">
                     {/* Artist avatar */}
-                    {photoUrl(artist.fields.photo_url, artist.fields.photo_file) ? (
-                      <img
-                        src={photoUrl(artist.fields.photo_url, artist.fields.photo_file)!}
+                    {photoUrl(artist.fields.photo_url) ? (
+                      <Image
+                        src={photoUrl(artist.fields.photo_url)!}
                         alt={artistDisplayName(artist.fields, locale)}
+                        width={72} height={72}
                         className="w-18 h-18 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
+                        sizes="72px"
                       />
                     ) : (
                       <div className="w-18 h-18 rounded-xl bg-[var(--bg)] flex items-center justify-center text-xl shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">

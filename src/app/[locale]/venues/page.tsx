@@ -45,7 +45,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
     return {
       id: venue.id,
       displayName: displayName(f),
-      photoUrl: photoUrl(f.photo_url, f.photo_file) || null,
+      photoUrl: photoUrl(f.photo_url) || null,
       cityRecordId: f.city_id?.[0] || null,
       cityLabel: cityFields ? cityName(cityFields, locale) : '',
       eventCount: venueEventCount(venue, venueCountsFallback),

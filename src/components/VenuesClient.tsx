@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -214,11 +215,12 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 </div>
                 {venue.photoUrl && (
                   <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl relative">
-                    <img
+                    <Image
                       src={venue.photoUrl}
                       alt={venue.displayName}
-                      className="w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
-                      loading="lazy"
+                      fill
+                      className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     />
                     {venue.hasUpcomingJam && (
                       <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">

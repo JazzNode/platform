@@ -110,7 +110,7 @@ export default function EditableContent({
     } finally {
       setSaving(false);
     }
-  }, [token, draft, entityType, entityId, fieldPrefix, locale, router]);
+  }, [token, draft, entityType, entityId, fieldPrefix, locale, router, handleUnauthorized, t]);
 
   // Non-admin: render content as-is
   if (!isAdmin) {

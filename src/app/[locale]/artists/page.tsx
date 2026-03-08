@@ -44,7 +44,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       countryCode: f.country_code || null,
       eventCount: f.event_list?.length || 0,
       bio: localized(f as Record<string, unknown>, 'bio_short', locale) || null,
-      photoUrl: photoUrl(f.photo_url, f.photo_file) || null,
+      photoUrl: photoUrl(f.photo_url) || null,
     };
   });
 
