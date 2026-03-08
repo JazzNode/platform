@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCities, getVenues, getEvents, getArtists } from '@/lib/airtable';
+import { getCities, getVenues, getEvents, getArtists, getTags, buildMap, resolveLinks } from '@/lib/airtable';
 import { artistDisplayName, photoUrl, formatDate, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
@@ -17,9 +17,11 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
   const { locale } = await params;
   const t = await getTranslations('common');
 
-  const [cities, venues, events, artists] = await Promise.all([
-    getCities(), getVenues(), getEvents(), getArtists(),
+  const [cities, venues, events, artists, tags] = await Promise.all([
+    getCities(), getVenues(), getEvents(), getArtists(), getTags(),
   ]);
+
+  const tagMap = buildMap(tags);
 
   const now = new Date().toISOString();
 
@@ -32,13 +34,30 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
 
-    // Upcoming event slides (up to 5, pre-serialized for client carousel)
+    // Upcoming event slides (up to 6, pre-serialized for client carousel)
     const upcomingSlides = [...upcomingEvents]
       .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-      .slice(0, 5)
+      .slice(0, 6)
       .map((e) => ({
         date: formatDate(e.fields.start_at, locale, e.fields.timezone || city.fields.timezone || 'Asia/Taipei'),
         title: eventTitle(e.fields, locale),
+        href: `/${locale}/events/${e.id}`,
+      }));
+
+    // Weekly jam sessions (next 7 days, tag = 'jam session')
+    const sevenDaysLater = new Date(new Date(now).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const weeklyJams = upcomingEvents
+      .filter((e) => {
+        if (!e.fields.start_at || e.fields.start_at > sevenDaysLater) return false;
+        const eventTags = resolveLinks(e.fields.tag_list, tagMap).map((t) => t.fields.name?.toLowerCase());
+        return eventTags.includes('jam session');
+      })
+      .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
+      .slice(0, 4)
+      .map((e) => ({
+        date: formatDate(e.fields.start_at, locale, e.fields.timezone || city.fields.timezone || 'Asia/Taipei'),
+        title: eventTitle(e.fields, locale),
+        href: `/${locale}/events/${e.id}`,
       }));
 
     // Venue photos (up to 3)
@@ -67,6 +86,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
       artistCount: cityArtists.length,
       venues: cityVenues,
       upcomingSlides,
+      weeklyJams,
       venuePhotos,
       topArtists,
     };
@@ -92,7 +112,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
       <FadeUp stagger={0.15}>
         <div className="grid gap-6 sm:grid-cols-2">
-          {activeCityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, upcomingSlides, venuePhotos, topArtists }) => {
+          {activeCityStats.map(({ city, venueCount, upcomingCount, artistCount, venues: cityVenues, upcomingSlides, weeklyJams, venuePhotos, topArtists }) => {
             const f = city.fields;
             const name = cityName(f, locale);
 
@@ -174,6 +194,11 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
                       ))}
                     </div>
                   </div>
+                )}
+
+                {/* Weekly Open Jam */}
+                {weeklyJams.length > 0 && (
+                  <EventCarousel events={weeklyJams} label={t('weeklyJam')} />
                 )}
 
                 {/* Upcoming events carousel */}
