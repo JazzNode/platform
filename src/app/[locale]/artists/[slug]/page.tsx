@@ -88,7 +88,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
   // ── Versatility: bandleader / sideman / featured_guest / band_member ──
   const leaderProjects = resolveLinks(f.as_bandleader_list, artists);
-  const sidemanProjects = resolveLinks(f.as_sideman_list, artists);
+  const sidemanProjects = resolveLinks(f.as_sideman_list, artists).filter(
+    (a) => a.fields.type === 'group' || a.fields.type === 'big band',
+  );
   const featuredGuestProjects = resolveLinks(f.as_featured_guest_list, artists);
   const bandMemberProjects = resolveLinks(f.as_band_member_list, artists);
   const hasVersatility = leaderProjects.length > 0 || sidemanProjects.length > 0 || featuredGuestProjects.length > 0 || bandMemberProjects.length > 0;
