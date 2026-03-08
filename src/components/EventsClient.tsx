@@ -37,6 +37,12 @@ interface VenueOption {
   cityRecordId: string | null;
 }
 
+interface InitialFilters {
+  venue?: string;     // venue record ID
+  category?: string;  // 'jam' | 'vocal' | 'matinee'
+  city?: string;      // city record ID
+}
+
 interface Props {
   events: SerializedEvent[];
   cities: CityOption[];
@@ -45,6 +51,7 @@ interface Props {
   showPast: boolean;
   regionLabels: Record<string, string>;  // e.g. { TW: '台灣', JP: '日本', HK: '香港' }
   worldMapLabel: string;                  // e.g. '世界版圖'
+  initialFilters?: InitialFilters;
   labels: {
     allCities: string;
     allVenues: string;
@@ -65,12 +72,40 @@ interface Props {
 // extends the touch target to 44px minimum (Apple/Google HIG recommendation).
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, labels }: Props) {
+export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFavorite } = useFavorites();
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
+
+  // Derive initial region/city from venue or city filter
+  const [activeRegion, setActiveRegion] = useState<string | null>(() => {
+    if (initialFilters?.venue) {
+      const v = venues.find((x) => x.recordId === initialFilters.venue);
+      if (v?.cityRecordId) {
+        const c = cities.find((x) => x.recordId === v.cityRecordId);
+        return c?.countryCode || null;
+      }
+    }
+    if (initialFilters?.city) {
+      const c = cities.find((x) => x.recordId === initialFilters.city);
+      return c?.countryCode || null;
+    }
+    return null;
+  });
+  const [selectedCity, setSelectedCity] = useState<string | null>(() => {
+    if (initialFilters?.venue) {
+      const v = venues.find((x) => x.recordId === initialFilters.venue);
+      return v?.cityRecordId || null;
+    }
+    if (initialFilters?.city) return initialFilters.city;
+    return null;
+  });
+  const [selectedCategory, setSelectedCategory] = useState<string>(
+    initialFilters?.category && ['jam', 'vocal', 'matinee'].includes(initialFilters.category)
+      ? initialFilters.category
+      : "all"
+  );
+  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(
+    initialFilters?.venue ? new Set([initialFilters.venue]) : new Set()
+  );
 
   // Group cities by country code
   const regionGroups = useMemo(() => {

@@ -183,7 +183,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
                 {/* Action link */}
                 <Link
-                  href={`/${locale}/events?city=${encodeURIComponent(name)}`}
+                  href={`/${locale}/events?city=${city.id}`}
                   className="text-xs uppercase tracking-widest text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
                 >
                   {t('exploreCityEvents')} →

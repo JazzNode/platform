@@ -292,7 +292,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     <span className="pulse-dot" />
                     {t('upcomingGigs')}
                   </h2>
-                  <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                  <Link href={`/${locale}/events?venue=${venue.id}`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
                     {t('viewAll')} →
                   </Link>
                 </div>
@@ -331,7 +331,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 <section className="border-t border-[var(--border)] pt-12">
                   <div className="flex items-end justify-between mb-8 border-b border-[var(--border)] pb-6">
                     <h2 className="font-serif text-2xl font-bold">{t('weeklyJam')}</h2>
-                    <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                    <Link href={`/${locale}/events?venue=${venue.id}&category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
                       {t('viewAll')} →
                     </Link>
                   </div>
