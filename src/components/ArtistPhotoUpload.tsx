@@ -60,8 +60,11 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
           throw new Error(data.error || 'Upload failed');
         }
 
-        // Success — reload to pick up revalidated data
-        window.location.reload();
+        // Use the server-returned URL directly instead of reloading,
+        // because ISR / edge cache invalidation is not instant.
+        const data = await res.json();
+        URL.revokeObjectURL(objectUrl);
+        setPreviewUrl(data.photoUrl);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Upload failed');
         setPreviewUrl(null);
