@@ -68,12 +68,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     })
     .filter(Boolean) as { artist: { id: string; fields: Artist }; instruments: string[]; role?: string }[];
 
+  // Deduplicate: if the same artist appears multiple times, keep the first (ensemble has order=-1 so it wins)
+  const seen = new Set<string>();
+  const lineupArtistsDeduped = lineupArtistsRaw.filter((l) => {
+    if (seen.has(l.artist.id)) return false;
+    seen.add(l.artist.id);
+    return true;
+  });
+
   // If the primary artist is a group/big band and has no ensemble lineup yet, inject it at the top
-  const hasEnsembleLineup = lineupArtistsRaw.some((l) => l.role === 'ensemble');
+  const hasEnsembleLineup = lineupArtistsDeduped.some((l) => l.role === 'ensemble');
   const isGroupPrimary = primaryArtist && (primaryArtist.fields.type === 'group' || primaryArtist.fields.type === 'big band');
   const lineupArtists = (!hasEnsembleLineup && isGroupPrimary)
-    ? [{ artist: primaryArtist, instruments: [], role: 'ensemble' as string | undefined }, ...lineupArtistsRaw]
-    : lineupArtistsRaw;
+    ? [{ artist: primaryArtist, instruments: [], role: 'ensemble' as string | undefined }, ...lineupArtistsDeduped]
+    : lineupArtistsDeduped;
 
   return (
     <div className="space-y-12">
