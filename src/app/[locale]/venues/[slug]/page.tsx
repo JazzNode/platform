@@ -106,7 +106,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         '@type': 'PostalAddress',
         ...(f.address_en && { streetAddress: f.address_en }),
         ...(city && { addressLocality: cityName(city, 'en') }),
-        ...(f.country_code && { addressCountry: f.country_code }),
+        ...(city?.country_code && { addressCountry: city.country_code }),
       },
     }),
     ...((f.lat && f.lng) && {

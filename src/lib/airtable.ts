@@ -99,7 +99,6 @@ export interface Venue {
   friendly_id?: boolean;
   payment_method?: string[];
   city_id?: string[];       // linked Cities records
-  country_code?: string;
   address_local?: string;
   address_en?: string;
   lat?: number;
