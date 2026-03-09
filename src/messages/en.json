@@ -196,7 +196,8 @@
     "marimba": "Marimba",
     "tabla": "Tabla",
     "shakuhachi": "Shakuhachi",
-    "kora": "Kora"
+    "kora": "Kora",
+    "shamisen": "Shamisen"
   },
   "admin": {
     "saveAndTranslate": "Save & Translate",

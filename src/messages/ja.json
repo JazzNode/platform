@@ -192,7 +192,8 @@
     "marimba": "マリンバ",
     "tabla": "タブラ",
     "shakuhachi": "尺八",
-    "kora": "コラ"
+    "kora": "コラ",
+    "shamisen": "三味線"
   },
   "admin": {
     "saveAndTranslate": "保存して翻訳",
