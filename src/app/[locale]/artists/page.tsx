@@ -101,6 +101,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
         noArtists: t('noArtists'),
         cityFootprint: t('cityFootprint'),
         venueFootprint: t('venueFootprint'),
+        artistFootprint: t('artistFootprint'),
         allCities: t('allCities'),
         allVenues: t('allVenues'),
       }}

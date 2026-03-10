@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -53,6 +53,7 @@ interface Props {
     noArtists: string;
     cityFootprint: string;
     venueFootprint: string;
+    artistFootprint: string;
     allCities: string;
     allVenues: string;
   };
@@ -64,7 +65,9 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
-  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
+  const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
+  const [venueDropdownOpen, setVenueDropdownOpen] = useState(false);
+  const venueDropdownRef = useRef<HTMLDivElement>(null);
 
   const toggleInstrument = useCallback((inst: string) => {
     setSelectedInstruments((prev) => {
@@ -84,16 +87,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     });
   }, []);
 
-  const toggleVenue = useCallback((id: string) => {
-    setSelectedVenues((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  // Filter venue chips based on selected cities (連動篩選)
+  // Filter venue options based on selected cities (連動篩選)
   const filteredVenueOptions = useMemo(() => {
     if (selectedCities.size === 0) return venueOptions;
     return venueOptions.filter((v) =>
@@ -101,15 +95,26 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     );
   }, [venueOptions, selectedCities]);
 
-  // Auto-clear venue selections that are no longer visible after city change
+  // Auto-clear venue selection if no longer visible after city change
   useEffect(() => {
-    const validIds = new Set(filteredVenueOptions.map((v) => v.recordId));
-    setSelectedVenues((prev) => {
-      const next = new Set([...prev].filter((id) => validIds.has(id)));
-      if (next.size !== prev.size) return next;
-      return prev;
-    });
-  }, [filteredVenueOptions]);
+    if (selectedVenue) {
+      const stillValid = filteredVenueOptions.some((v) => v.recordId === selectedVenue);
+      if (!stillValid) setSelectedVenue(null);
+    }
+  }, [filteredVenueOptions, selectedVenue]);
+
+  // Close venue dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (venueDropdownRef.current && !venueDropdownRef.current.contains(e.target as Node)) {
+        setVenueDropdownOpen(false);
+      }
+    }
+    if (venueDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [venueDropdownOpen]);
 
   const filteredArtists = useMemo(() => {
     return artists.filter((a) => {
@@ -126,23 +131,26 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         const hasMatch = a.instrumentList.some((i) => selectedInstruments.has(i));
         if (!hasMatch) return false;
       }
-      // City filter
+      // City filter — AND logic (intersection): artist must have ALL selected cities
       if (selectedCities.size > 0) {
-        const hasCity = a.cityList.some((c) => selectedCities.has(c));
-        if (!hasCity) return false;
+        const hasAll = [...selectedCities].every((c) => a.cityList.includes(c));
+        if (!hasAll) return false;
       }
-      // Venue filter
-      if (selectedVenues.size > 0) {
-        const hasVenue = a.venueList.some((v) => selectedVenues.has(v));
-        if (!hasVenue) return false;
+      // Venue filter — single select
+      if (selectedVenue) {
+        if (!a.venueList.includes(selectedVenue)) return false;
       }
       return true;
     });
-  }, [artists, selectedType, selectedInstruments, selectedCities, selectedVenues]);
+  }, [artists, selectedType, selectedInstruments, selectedCities, selectedVenue]);
 
   /* Shared pill style helpers */
   const pillActive = 'bg-gold/10 border-gold/60 text-gold';
   const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
+
+  const selectedVenueLabel = selectedVenue
+    ? filteredVenueOptions.find((v) => v.recordId === selectedVenue)?.label ?? labels.allVenues
+    : labels.allVenues;
 
   return (
     <div className="space-y-12">
@@ -215,10 +223,66 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         </FadeUpItem>
         </div>
 
-        {/* City Footprint pills — always visible */}
+        {/* ── Divider ── */}
         {cityOptions.length > 0 && (
         <FadeUpItem delay={340}>
-        <div className="flex flex-wrap gap-2">
+          <div className="border-t border-[var(--border)] my-1" />
+        </FadeUpItem>
+        )}
+
+        {/* ── Footprint row: label | venue dropdown | city chips ── */}
+        {cityOptions.length > 0 && (
+        <FadeUpItem delay={380}>
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Section label */}
+          <span className="text-[10px] uppercase tracking-[0.15em] text-[#8A8578] font-medium mr-1 shrink-0">
+            {labels.artistFootprint}
+          </span>
+
+          {/* Venue dropdown */}
+          <div className="relative shrink-0" ref={venueDropdownRef}>
+            <button
+              onClick={() => setVenueDropdownOpen((prev) => !prev)}
+              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border inline-flex items-center gap-1.5 ${
+                selectedVenue ? pillActive : pillInactive
+              }`}
+            >
+              {selectedVenueLabel}
+              <svg className="w-3 h-3 opacity-50 shrink-0" viewBox="0 0 12 12" fill="none">
+                <path d="M3 5L6 8L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+            {venueDropdownOpen && (
+              <div className="absolute top-full left-0 mt-1 z-50 w-64 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xl py-1">
+                {/* All venues option */}
+                <button
+                  onClick={() => { setSelectedVenue(null); setVenueDropdownOpen(false); }}
+                  className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
+                    !selectedVenue ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
+                  }`}
+                >
+                  {labels.allVenues}
+                </button>
+                {filteredVenueOptions.map((venue) => (
+                  <button
+                    key={venue.recordId}
+                    onClick={() => { setSelectedVenue(venue.recordId); setVenueDropdownOpen(false); }}
+                    className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
+                      selectedVenue === venue.recordId ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
+                    }`}
+                  >
+                    {venue.label}
+                    <span className="ml-1.5 opacity-40 text-[10px]">{venue.artistCount}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Divider dot */}
+          <span className="text-[#8A8578] opacity-30 mx-0.5">·</span>
+
+          {/* City chips: "所有城市" + individual city buttons */}
           <button
             onClick={() => setSelectedCities(new Set())}
             className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
@@ -237,34 +301,6 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             >
               {city.label}
               <span className="ml-1 opacity-50 text-[10px]">{city.artistCount}</span>
-            </button>
-          ))}
-        </div>
-        </FadeUpItem>
-        )}
-
-        {/* Venue Footprint pills — always visible, filtered by selected cities */}
-        {filteredVenueOptions.length > 0 && (
-        <FadeUpItem delay={460}>
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={() => setSelectedVenues(new Set())}
-            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-              selectedVenues.size === 0 ? pillActive : pillInactive
-            }`}
-          >
-            {labels.allVenues}
-          </button>
-          {filteredVenueOptions.map((venue) => (
-            <button
-              key={venue.recordId}
-              onClick={() => toggleVenue(venue.recordId)}
-              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
-                selectedVenues.has(venue.recordId) ? pillActive : pillInactive
-              }`}
-            >
-              {venue.label}
-              <span className="ml-1 opacity-50 text-[10px]">{venue.artistCount}</span>
             </button>
           ))}
         </div>
