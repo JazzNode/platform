@@ -118,6 +118,8 @@ export interface Venue {
   status?: string;              // active | inactive | closed
   is_gold_partner?: boolean;
   place_id?: string;            // Google Place ID
+  ticketing_mode_list?: string[];   // venue | external | jazznode
+  ticketing_mode_primary?: string;  // primary CTA: venue | external | jazznode
 }
 
 export interface Artist {
@@ -159,6 +161,8 @@ export interface Artist {
   is_master?: boolean;
   verification_status?: string;
   type?: string;
+  aka?: string;                 // aliases for search matching
+  tag_list?: string[];          // linked Tags records
 }
 
 export interface Event {
@@ -190,6 +194,9 @@ export interface Event {
   source_id?: string[];     // linked Sources records
   subtype?: string;           // 'standard_show' | 'jam_session' | 'showcase' | 'workshop'
   lifecycle_status?: string;  // 'upcoming' | 'past' | 'cancelled' | 'unknown'
+  payment_method?: string[];  // cash | credit_card | line_pay | apple_pay | jkopay | bank_transfer
+  popularity?: string;        // marketing copy (e.g. 🤯席位即將售罄🤯)
+  promoter_list?: string[];   // linked Promoters records
 }
 
 export interface BadgeDef {
@@ -220,6 +227,7 @@ export interface City {
   name_id?: string;
   country_code?: string;
   timezone?: string;
+  venue_list?: string[];      // linked Venues in this city
 }
 
 export interface Lineup {
@@ -249,7 +257,10 @@ export const getCities = cache(
 );
 
 export interface Tag {
+  tag_id?: string;
   name?: string;
+  category?: string;          // genre | vibe | special | instrument | venue | event | artist
+  description?: string;
 }
 
 export const getTags = cache(
