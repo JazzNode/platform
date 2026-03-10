@@ -116,9 +116,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   };
 
   return (
-    <div className="space-y-12">
+    <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Link href={`/${locale}/venues`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/venues`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 

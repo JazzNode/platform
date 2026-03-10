@@ -204,11 +204,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const hasHubs = artistVenues.length > 0 || artistCities.length > 0;
 
   return (
-    <div className="space-y-12">
-      <Link href={`/${locale}/artists`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+    <div>
+      <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
+      <div className="space-y-12">
       {/* ═══ Profile ═══ */}
       <FadeUp>
         <div className="flex flex-col md:flex-row gap-10 items-start">
@@ -648,6 +649,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         prevLabel={t('prevArtist')}
         nextLabel={t('nextArtist')}
       />
+      </div>
     </div>
   );
 }

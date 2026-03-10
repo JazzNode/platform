@@ -84,9 +84,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     : lineupArtistsDeduped;
 
   return (
-    <div className="space-y-12">
+    <div>
       {/* Back link */}
-      <Link href={`/${locale}/events`} className="text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
