@@ -233,7 +233,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         {/* ── Footprint row: label | venue dropdown | city chips ── */}
         {cityOptions.length > 0 && (
         <FadeUpItem delay={380}>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="relative z-20 flex flex-wrap items-center gap-2">
           {/* Section label */}
           <span className="text-[10px] uppercase tracking-[0.15em] text-[#8A8578] font-medium mr-1 shrink-0">
             {labels.artistFootprint}
@@ -300,7 +300,6 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               }`}
             >
               {city.label}
-              <span className="ml-1 opacity-50 text-[10px]">{city.artistCount}</span>
             </button>
           ))}
         </div>
