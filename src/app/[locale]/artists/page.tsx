@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getArtists, getCities, getVenues, buildMap } from '@/lib/airtable';
+import { getArtists, getCities, getVenues } from '@/lib/airtable';
 import { artistDisplayName, photoUrl, localized, normalizeInstrumentKey, cityName, displayName } from '@/lib/helpers';
 import ArtistsClient from '@/components/ArtistsClient';
 

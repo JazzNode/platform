@@ -96,11 +96,9 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   }, [venueOptions, selectedCities]);
 
   // Auto-clear venue selection if no longer visible after city change
-  useEffect(() => {
-    if (selectedVenue) {
-      const stillValid = filteredVenueOptions.some((v) => v.recordId === selectedVenue);
-      if (!stillValid) setSelectedVenue(null);
-    }
+  const activeVenue = useMemo(() => {
+    if (!selectedVenue) return null;
+    return filteredVenueOptions.some((v) => v.recordId === selectedVenue) ? selectedVenue : null;
   }, [filteredVenueOptions, selectedVenue]);
 
   // Close venue dropdown when clicking outside
@@ -137,19 +135,19 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         if (!hasAll) return false;
       }
       // Venue filter — single select
-      if (selectedVenue) {
-        if (!a.venueList.includes(selectedVenue)) return false;
+      if (activeVenue) {
+        if (!a.venueList.includes(activeVenue)) return false;
       }
       return true;
     });
-  }, [artists, selectedType, selectedInstruments, selectedCities, selectedVenue]);
+  }, [artists, selectedType, selectedInstruments, selectedCities, activeVenue]);
 
   /* Shared pill style helpers */
   const pillActive = 'bg-gold/10 border-gold/60 text-gold';
   const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
 
-  const selectedVenueLabel = selectedVenue
-    ? filteredVenueOptions.find((v) => v.recordId === selectedVenue)?.label ?? labels.allVenues
+  const selectedVenueLabel = activeVenue
+    ? filteredVenueOptions.find((v) => v.recordId === activeVenue)?.label ?? labels.allVenues
     : labels.allVenues;
 
   return (
@@ -244,7 +242,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <button
               onClick={() => setVenueDropdownOpen((prev) => !prev)}
               className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border inline-flex items-center gap-1.5 ${
-                selectedVenue ? pillActive : pillInactive
+                activeVenue ? pillActive : pillInactive
               }`}
             >
               {selectedVenueLabel}
@@ -258,7 +256,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 <button
                   onClick={() => { setSelectedVenue(null); setVenueDropdownOpen(false); }}
                   className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
-                    !selectedVenue ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
+                    !activeVenue ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
                   }`}
                 >
                   {labels.allVenues}
@@ -268,7 +266,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                     key={venue.recordId}
                     onClick={() => { setSelectedVenue(venue.recordId); setVenueDropdownOpen(false); }}
                     className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
-                      selectedVenue === venue.recordId ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
+                      activeVenue === venue.recordId ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
                     }`}
                   >
                     {venue.label}
