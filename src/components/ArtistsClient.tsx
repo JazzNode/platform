@@ -162,7 +162,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       </FadeUp>
 
       {/* Filter Bar */}
-      <div className="space-y-3">
+      <div className="relative z-30 space-y-3">
         {/* Type pills */}
         <FadeUpItem delay={100}>
         <div className="flex flex-wrap gap-2">
