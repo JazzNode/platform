@@ -59,6 +59,7 @@ interface Props {
     jamSession: string;
     withVocal: string;
     matinee: string;
+    tagVocals: string;
     events: string;
     pastEvents: string;
     upcomingCount: string;
@@ -419,14 +420,19 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     )}
                     {event.tags.length > 0 && (
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        {event.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                        {event.tags.map((tag) => {
+                          const tagLabel = tag === 'matinee' ? labels.matinee
+                            : tag === 'vocal' || tag === 'vocals' ? labels.tagVocals
+                            : tag;
+                          return (
+                            <span
+                              key={tag}
+                              className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                            >
+                              {tagLabel}
+                            </span>
+                          );
+                        })}
                       </div>
                     )}
                   </Link>
