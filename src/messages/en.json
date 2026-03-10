@@ -33,6 +33,8 @@
     "groups": "Groups",
     "bigBands": "Big Bands",
     "noArtists": "No artists found.",
+    "cityFootprint": "City Footprint",
+    "venueFootprint": "Venue Footprint",
     "language": "Language",
     "backToList": "← Back",
     "pastEvents": "Past Events",

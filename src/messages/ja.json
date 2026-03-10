@@ -33,6 +33,8 @@
     "groups": "グループ",
     "bigBands": "ビッグバンド",
     "noArtists": "該当するアーティストがいません。",
+    "cityFootprint": "都市フットプリント",
+    "venueFootprint": "会場フットプリント",
     "language": "言語",
     "backToList": "← 戻る",
     "pastEvents": "過去のイベント",
