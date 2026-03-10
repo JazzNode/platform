@@ -26,6 +26,9 @@ export default function IntroOverlay({ locale }: { locale: string }) {
     return { mainLine: main, subLines: subs };
   }, [locale]);
 
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const skippedRef = useRef(false);
+
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
@@ -53,7 +56,24 @@ export default function IntroOverlay({ locale }: { locale: string }) {
     const divider = el.querySelector<HTMLElement>('.intro-divider');
     if (!lines.length || !divider) return;
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
+    const timers = timersRef.current;
+
+    // Skip on click — immediately fade out the overlay
+    const handleSkip = () => {
+      if (skippedRef.current) return;
+      skippedRef.current = true;
+      timers.forEach(clearTimeout);
+      timers.length = 0;
+      el.style.transition = `opacity 0.5s ${EASE_IN_OUT}`;
+      el.style.opacity = '0';
+      const onEnd = () => {
+        document.body.style.overflow = '';
+        setRemoved(true);
+      };
+      el.addEventListener('transitionend', onEnd, { once: true });
+      timers.push(setTimeout(onEnd, 700));
+    };
+    el.addEventListener('click', handleSkip);
 
     // Phase 1: Main line fades in with blur removal (delay 0.2s, duration 0.8s)
     lines[0].style.transition = `opacity 0.8s ${EASE_OUT}, transform 0.8s ${EASE_OUT}, filter 0.8s ${EASE_OUT}`;
@@ -82,6 +102,7 @@ export default function IntroOverlay({ locale }: { locale: string }) {
 
     // Phase 5: Everything fades out (delay 2.8s, duration 1.0s)
     timers.push(setTimeout(() => {
+      if (skippedRef.current) return;
       el.style.transition = `opacity 1.0s ${EASE_IN_OUT}`;
       el.style.opacity = '0';
       const onEnd = () => {
@@ -95,6 +116,7 @@ export default function IntroOverlay({ locale }: { locale: string }) {
 
     return () => {
       document.body.style.overflow = '';
+      el.removeEventListener('click', handleSkip);
       timers.forEach(clearTimeout);
     };
   }, []);
