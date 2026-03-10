@@ -114,6 +114,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 entityId={event.id}
                 field={f.title_local ? 'title_local' : 'title_en'}
                 value={f.title_local || f.title_en || 'Untitled Event'}
+                fieldOptions={[
+                  { field: 'title_local', label: 'title_local', value: f.title_local || '' },
+                  { field: 'title_en', label: 'title_en', value: f.title_en || '' },
+                ]}
                 className="font-serif text-4xl sm:text-5xl font-bold leading-tight"
                 tag="h1"
               />
@@ -123,6 +127,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                   entityId={event.id}
                   field="title_en"
                   value={eventSubtitle(f)!}
+                  fieldOptions={[
+                    { field: 'title_local', label: 'title_local', value: f.title_local || '' },
+                    { field: 'title_en', label: 'title_en', value: f.title_en || '' },
+                  ]}
                   className="text-xl text-[#8A8578]"
                   tag="p"
                 />

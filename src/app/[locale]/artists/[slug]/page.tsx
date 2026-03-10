@@ -229,6 +229,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   entityId={artist.id}
                   field={artistDisplayNameField(f, locale)}
                   value={artistDisplayName(f, locale)}
+                  fieldOptions={[
+                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                  ]}
                   className="font-serif text-4xl sm:text-5xl font-bold"
                   tag="h1"
                 />
@@ -240,6 +245,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   entityId={artist.id}
                   field="name_en"
                   value={f.name_en}
+                  fieldOptions={[
+                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                  ]}
                   className="mt-1 text-xl text-[#8A8578]"
                   tag="p"
                 />
