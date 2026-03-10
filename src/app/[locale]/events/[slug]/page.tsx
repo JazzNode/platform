@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/airtable';
-import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge } from '@/lib/helpers';
+import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
@@ -23,7 +23,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const { locale, slug } = await params;
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
-  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
+  const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
 
   const [events, venues, artists, lineups] = await Promise.all([
     getEvents(), getVenues(), getArtists(), getLineups(),

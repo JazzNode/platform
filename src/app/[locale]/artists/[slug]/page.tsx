@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
@@ -26,7 +26,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const { locale, slug } = await params;
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
-  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
+  const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
 
   const [artists, events, venues, badges, lineups, cities, tags] = await Promise.all([
     getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(), getTags().catch(() => []),

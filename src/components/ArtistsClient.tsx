@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
 import { useFavorites } from '@/components/FavoritesProvider';
+import { normalizeInstrumentKey } from '@/lib/helpers';
 
 interface SerializedArtist {
   id: string;
@@ -18,12 +19,29 @@ interface SerializedArtist {
   eventCount: number;
   bio: string | null;
   photoUrl: string | null;
+  cityList: string[];          // Airtable record IDs
+  venueList: string[];         // Airtable record IDs
+}
+
+interface CityOption {
+  recordId: string;
+  label: string;
+  artistCount: number;
+}
+
+interface VenueOption {
+  recordId: string;
+  label: string;
+  artistCount: number;
+  cityRecordIds: string[];
 }
 
 interface Props {
   artists: SerializedArtist[];
   instruments: string[];       // sorted unique instrument list
   instrumentNames?: Record<string, string>; // i18n translated instrument names
+  cityOptions: CityOption[];
+  venueOptions: VenueOption[];
   locale: string;
   labels: {
     artists: string;
@@ -33,14 +51,20 @@ interface Props {
     groups: string;
     bigBands: string;
     noArtists: string;
+    cityFootprint: string;
+    venueFootprint: string;
+    allCities: string;
+    allVenues: string;
   };
 }
 
-export default function ArtistsClient({ artists, instruments, instrumentNames = {}, locale, labels }: Props) {
+export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, labels }: Props) {
   const { isFavorite } = useFavorites();
-  const instLabel = (key: string) => instrumentNames[key] || key;
+  const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); return instrumentNames[k] || k; };
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
+  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
 
   const toggleInstrument = useCallback((inst: string) => {
     setSelectedInstruments((prev) => {
@@ -50,6 +74,42 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       return next;
     });
   }, []);
+
+  const toggleCity = useCallback((id: string) => {
+    setSelectedCities((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const toggleVenue = useCallback((id: string) => {
+    setSelectedVenues((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  // Filter venue chips based on selected cities (連動篩選)
+  const filteredVenueOptions = useMemo(() => {
+    if (selectedCities.size === 0) return venueOptions;
+    return venueOptions.filter((v) =>
+      v.cityRecordIds.some((cid) => selectedCities.has(cid))
+    );
+  }, [venueOptions, selectedCities]);
+
+  // Auto-clear venue selections that are no longer visible after city change
+  useEffect(() => {
+    const validIds = new Set(filteredVenueOptions.map((v) => v.recordId));
+    setSelectedVenues((prev) => {
+      const next = new Set([...prev].filter((id) => validIds.has(id)));
+      if (next.size !== prev.size) return next;
+      return prev;
+    });
+  }, [filteredVenueOptions]);
 
   const filteredArtists = useMemo(() => {
     return artists.filter((a) => {
@@ -66,9 +126,23 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         const hasMatch = a.instrumentList.some((i) => selectedInstruments.has(i));
         if (!hasMatch) return false;
       }
+      // City filter
+      if (selectedCities.size > 0) {
+        const hasCity = a.cityList.some((c) => selectedCities.has(c));
+        if (!hasCity) return false;
+      }
+      // Venue filter
+      if (selectedVenues.size > 0) {
+        const hasVenue = a.venueList.some((v) => selectedVenues.has(v));
+        if (!hasVenue) return false;
+      }
       return true;
     });
-  }, [artists, selectedType, selectedInstruments]);
+  }, [artists, selectedType, selectedInstruments, selectedCities, selectedVenues]);
+
+  /* Shared pill style helpers */
+  const pillActive = 'bg-gold/10 border-gold/60 text-gold';
+  const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
 
   return (
     <div className="space-y-12">
@@ -121,9 +195,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
           <button
             onClick={() => setSelectedInstruments(new Set())}
             className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-              selectedInstruments.size === 0
-                ? 'bg-gold/10 border-gold/60 text-gold'
-                : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+              selectedInstruments.size === 0 ? pillActive : pillInactive
             }`}
           >
             {labels.allInstruments}
@@ -133,9 +205,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               key={inst}
               onClick={() => toggleInstrument(inst)}
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-                selectedInstruments.has(inst)
-                  ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                selectedInstruments.has(inst) ? pillActive : pillInactive
               }`}
             >
               {instLabel(inst)}
@@ -144,6 +214,62 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         </div>
         </FadeUpItem>
         </div>
+
+        {/* City Footprint pills — always visible */}
+        {cityOptions.length > 0 && (
+        <FadeUpItem delay={340}>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedCities(new Set())}
+            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              selectedCities.size === 0 ? pillActive : pillInactive
+            }`}
+          >
+            {labels.allCities}
+          </button>
+          {cityOptions.map((city) => (
+            <button
+              key={city.recordId}
+              onClick={() => toggleCity(city.recordId)}
+              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
+                selectedCities.has(city.recordId) ? pillActive : pillInactive
+              }`}
+            >
+              {city.label}
+              <span className="ml-1 opacity-50 text-[10px]">{city.artistCount}</span>
+            </button>
+          ))}
+        </div>
+        </FadeUpItem>
+        )}
+
+        {/* Venue Footprint pills — always visible, filtered by selected cities */}
+        {filteredVenueOptions.length > 0 && (
+        <FadeUpItem delay={460}>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => setSelectedVenues(new Set())}
+            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              selectedVenues.size === 0 ? pillActive : pillInactive
+            }`}
+          >
+            {labels.allVenues}
+          </button>
+          {filteredVenueOptions.map((venue) => (
+            <button
+              key={venue.recordId}
+              onClick={() => toggleVenue(venue.recordId)}
+              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
+                selectedVenues.has(venue.recordId) ? pillActive : pillInactive
+              }`}
+            >
+              {venue.label}
+              <span className="ml-1 opacity-50 text-[10px]">{venue.artistCount}</span>
+            </button>
+          ))}
+        </div>
+        </FadeUpItem>
+        )}
       </div>
 
       {filteredArtists.length === 0 && (

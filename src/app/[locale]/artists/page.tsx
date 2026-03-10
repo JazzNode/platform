@@ -1,7 +1,7 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getArtists } from '@/lib/airtable';
-import { artistDisplayName, photoUrl, localized } from '@/lib/helpers';
+import { getArtists, getCities, getVenues, buildMap } from '@/lib/airtable';
+import { artistDisplayName, photoUrl, localized, normalizeInstrumentKey, cityName, displayName } from '@/lib/helpers';
 import ArtistsClient from '@/components/ArtistsClient';
 
 export async function generateMetadata() {
@@ -14,7 +14,9 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
 
-  const artists = await getArtists();
+  const [artists, cities, venues] = await Promise.all([
+    getArtists(), getCities(), getVenues(),
+  ]);
 
   // Collect unique instruments (from primary_instrument, lowercased)
   const instrumentSet = new Set<string>();
@@ -31,6 +33,37 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     try { instrumentNames[inst] = tInst(inst as never); } catch { instrumentNames[inst] = inst; }
   }
 
+  // ── City & Venue footprint data ──
+  const cityArtistCount = new Map<string, number>();
+  const venueArtistCount = new Map<string, number>();
+  for (const a of artists) {
+    for (const cid of a.fields.city_list || []) {
+      cityArtistCount.set(cid, (cityArtistCount.get(cid) || 0) + 1);
+    }
+    for (const vid of a.fields.venue_list || []) {
+      venueArtistCount.set(vid, (venueArtistCount.get(vid) || 0) + 1);
+    }
+  }
+
+  const cityOptions = cities
+    .filter((c) => cityArtistCount.has(c.id))
+    .map((c) => ({
+      recordId: c.id,
+      label: cityName(c.fields, locale),
+      artistCount: cityArtistCount.get(c.id) || 0,
+    }))
+    .sort((a, b) => b.artistCount - a.artistCount);
+
+  const venueOptions = venues
+    .filter((v) => venueArtistCount.has(v.id))
+    .map((v) => ({
+      recordId: v.id,
+      label: displayName(v.fields),
+      artistCount: venueArtistCount.get(v.id) || 0,
+      cityRecordIds: v.fields.city_id || [],
+    }))
+    .sort((a, b) => b.artistCount - a.artistCount);
+
   // Serialize for client component
   const sorted = [...artists].sort((a, b) => artistDisplayName(a.fields, locale).localeCompare(artistDisplayName(b.fields, locale)));
   const serialized = sorted.map((a) => {
@@ -40,11 +73,13 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       displayName: artistDisplayName(f, locale),
       type: f.type || null,
       primaryInstrument: f.primary_instrument || null,
-      instrumentList: (f.instrument_list || []).map((i) => i.toLowerCase()),
+      instrumentList: (f.instrument_list || []).map((i) => normalizeInstrumentKey(i)),
       countryCode: f.country_code || null,
       eventCount: f.event_list?.length || 0,
       bio: localized(f as Record<string, unknown>, 'bio_short', locale) || null,
       photoUrl: photoUrl(f.photo_url) || null,
+      cityList: f.city_list || [],
+      venueList: f.venue_list || [],
     };
   });
 
@@ -54,6 +89,8 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       instruments={instruments}
       locale={locale}
       instrumentNames={instrumentNames}
+      cityOptions={cityOptions}
+      venueOptions={venueOptions}
       labels={{
         artists: t('artists'),
         allInstruments: t('allInstruments'),
@@ -62,6 +99,10 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
         groups: t('groups'),
         bigBands: t('bigBands'),
         noArtists: t('noArtists'),
+        cityFootprint: t('cityFootprint'),
+        venueFootprint: t('venueFootprint'),
+        allCities: t('allCities'),
+        allVenues: t('allVenues'),
       }}
     />
   );

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getProfileByUsername, getPublicFavorites } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/airtable';
-import { displayName, artistDisplayName, photoUrl, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
@@ -19,7 +19,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const t = await getTranslations('profile');
   await getTranslations('common');
   const tInst = await getTranslations('instruments');
-  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
+  const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
   const profile = await getProfileByUsername(username);
 
   if (!profile) {

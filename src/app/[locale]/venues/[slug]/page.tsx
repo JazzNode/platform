@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/airtable';
-import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
@@ -35,7 +35,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   const { locale, slug } = await params;
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
-  const instLabel = (key: string) => { try { return tInst(key as never); } catch { return key; } };
+  const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
 
   const [venues, events, artists, badges, cities, lineups] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities(), getLineups()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));

@@ -205,6 +205,22 @@ export function formatPriceBadge(currency?: string, priceInfo?: string): string 
   return priceInfo;
 }
 
+/**
+ * Normalize an instrument key so that legacy/malformed values
+ * (e.g. "INSTRUMENTS.DOUBLE BASS", "INSTRUMENTS.DRUMS")
+ * are converted to the canonical translation key (e.g. "double_bass", "drums").
+ */
+export function normalizeInstrumentKey(raw: string): string {
+  let k = raw;
+  // Strip "INSTRUMENTS." prefix (case-insensitive)
+  k = k.replace(/^INSTRUMENTS\./i, '');
+  // Lowercase + trim
+  k = k.toLowerCase().trim();
+  // Replace spaces / hyphens with underscores for lookup consistency
+  k = k.replace(/[\s-]+/g, '_');
+  return k;
+}
+
 /** Supported locales. */
 export const locales = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 export type Locale = (typeof locales)[number];
