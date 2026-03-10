@@ -34,8 +34,12 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
     const eventIds = new Set(cityEvents.map((e) => e.id));
     const cityArtists = artists.filter((a) => a.fields.event_list?.some((eid) => eventIds.has(eid)));
 
-    // Upcoming event slides (up to 6, pre-serialized for client carousel)
+    // Upcoming event slides (up to 6, exclude jam sessions, pre-serialized for client carousel)
     const upcomingSlides = [...upcomingEvents]
+      .filter((e) => {
+        const eventTags = resolveLinks(e.fields.tag_list, tagMap).map((t) => t.fields.name?.toLowerCase());
+        return !eventTags.includes('jam session');
+      })
       .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
       .slice(0, 6)
       .map((e) => ({
