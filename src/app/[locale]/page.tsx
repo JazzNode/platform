@@ -22,14 +22,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
 
   const now = new Date().toISOString();
   const sevenDaysLater = new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-  const upcoming = events
-    .filter((e) => e.fields.start_at && e.fields.start_at >= now)
-    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-    .slice(0, 9);
 
   // Pre-build lookup maps for upcoming event enrichment
   const artistMap = buildMap(artists);
   const tagMap = buildMap(tags);
+
+  const upcoming = events
+    .filter((e) => {
+      if (!e.fields.start_at || e.fields.start_at < now) return false;
+      const eventTags = resolveLinks(e.fields.tag_list, tagMap).map((t) => t.fields.name?.toLowerCase());
+      return !eventTags.includes('jam session');
+    })
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
+    .slice(0, 9);
 
   // Filter jam sessions within the next 7 days
   const weeklyJams = events
