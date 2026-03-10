@@ -35,6 +35,7 @@
     "noArtists": "해당하는 아티스트가 없습니다.",
     "cityFootprint": "도시 발자취",
     "venueFootprint": "공연장 발자취",
+    "artistFootprint": "연주자 발자취",
     "language": "언어",
     "backToList": "← 돌아가기",
     "pastEvents": "지난 공연",
@@ -106,7 +107,8 @@
     "jazzOccasional": "비정기",
     "payCash": "현금",
     "payCreditCard": "신용카드",
-    "payBankTransfer": "은행 이체"
+    "payBankTransfer": "은행 이체",
+    "businessHours": "영업시간"
   },
   "auth": {
     "signIn": "로그인",

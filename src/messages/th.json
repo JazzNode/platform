@@ -35,6 +35,7 @@
     "noArtists": "ไม่พบศิลปิน",
     "cityFootprint": "รอยเท้าเมือง",
     "venueFootprint": "รอยเท้าสถานที่",
+    "artistFootprint": "รอยเท้านักดนตรี",
     "language": "ภาษา",
     "backToList": "← กลับ",
     "pastEvents": "กิจกรรมที่ผ่านมา",
@@ -106,7 +107,8 @@
     "jazzOccasional": "ไม่ประจำ",
     "payCash": "เงินสด",
     "payCreditCard": "บัตรเครดิต",
-    "payBankTransfer": "โอนเงิน"
+    "payBankTransfer": "โอนเงิน",
+    "businessHours": "เวลาทำการ"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",

@@ -120,6 +120,7 @@ export interface Venue {
   place_id?: string;            // Google Place ID
   ticketing_mode_list?: string[];   // venue | external | jazznode
   ticketing_mode_primary?: string;  // primary CTA: venue | external | jazznode
+  business_hour?: string;           // manually entered opening hours for frontend display
 }
 
 export interface Artist {

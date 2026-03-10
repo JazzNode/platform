@@ -252,12 +252,22 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             </div>
           )}
 
+          {/* Business Hours */}
+          {f.business_hour && (
+            <div className="text-sm text-[#C4BFB3]">
+              <span className="flex items-center gap-2 text-[#8A8578] mb-1">
+                <span>🕐</span> {t('businessHours')}
+              </span>
+              <p className="whitespace-pre-line ml-6">{f.business_hour}</p>
+            </div>
+          )}
+
         </div>
       </div>
 
       </FadeUp>
 
-      
+
       {/* Location & Map */}
       {((f.lat && f.lng) || f.address_local || f.address_en) && (
         <FadeUp stagger={0.1}>

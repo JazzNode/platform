@@ -35,6 +35,7 @@
     "noArtists": "No artists found.",
     "cityFootprint": "City Footprint",
     "venueFootprint": "Venue Footprint",
+    "artistFootprint": "Footprint",
     "language": "Language",
     "backToList": "← Back",
     "pastEvents": "Past Events",
@@ -110,7 +111,8 @@
     "jazzOccasional": "Occasional",
     "payCash": "Cash",
     "payCreditCard": "Credit Card",
-    "payBankTransfer": "Bank Transfer"
+    "payBankTransfer": "Bank Transfer",
+    "businessHours": "Business Hours"
   },
   "auth": {
     "signIn": "Sign In",

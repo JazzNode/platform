@@ -35,6 +35,7 @@
     "noArtists": "Tidak ada artis ditemukan.",
     "cityFootprint": "Jejak Kota",
     "venueFootprint": "Jejak Tempat",
+    "artistFootprint": "Jejak Musisi",
     "language": "Bahasa",
     "backToList": "← Kembali",
     "pastEvents": "Acara Lalu",
@@ -106,7 +107,8 @@
     "jazzOccasional": "Tidak Tetap",
     "payCash": "Tunai",
     "payCreditCard": "Kartu Kredit",
-    "payBankTransfer": "Transfer Bank"
+    "payBankTransfer": "Transfer Bank",
+    "businessHours": "Jam Operasional"
   },
   "auth": {
     "signIn": "Masuk",

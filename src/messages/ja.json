@@ -35,6 +35,7 @@
     "noArtists": "該当するアーティストがいません。",
     "cityFootprint": "都市フットプリント",
     "venueFootprint": "会場フットプリント",
+    "artistFootprint": "演奏者の足跡",
     "language": "言語",
     "backToList": "← 戻る",
     "pastEvents": "過去のイベント",
@@ -106,7 +107,8 @@
     "jazzOccasional": "不定期",
     "payCash": "現金",
     "payCreditCard": "クレジットカード",
-    "payBankTransfer": "銀行振込"
+    "payBankTransfer": "銀行振込",
+    "businessHours": "営業時間"
   },
   "auth": {
     "signIn": "ログイン",
