@@ -221,27 +221,29 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           />
 
           <div className="flex-1 space-y-5">
-            <div className="flex items-start justify-between gap-4">
-              <EditableName
-                entityType="artist"
-                entityId={artist.id}
-                field={artistDisplayNameField(f, locale)}
-                value={artistDisplayName(f, locale)}
-                className="font-serif text-4xl sm:text-5xl font-bold"
-                tag="h1"
-              />
-              <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <EditableName
+                  entityType="artist"
+                  entityId={artist.id}
+                  field={artistDisplayNameField(f, locale)}
+                  value={artistDisplayName(f, locale)}
+                  className="font-serif text-4xl sm:text-5xl font-bold"
+                  tag="h1"
+                />
+                <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+              </div>
+              {f.name_en && f.name_local && f.name_en !== f.name_local && (
+                <EditableName
+                  entityType="artist"
+                  entityId={artist.id}
+                  field="name_en"
+                  value={f.name_en}
+                  className="mt-1 text-xl text-[#8A8578]"
+                  tag="p"
+                />
+              )}
             </div>
-            {f.name_en && f.name_local && f.name_en !== f.name_local && (
-              <EditableName
-                entityType="artist"
-                entityId={artist.id}
-                field="name_en"
-                value={f.name_en}
-                className="text-xl text-[#8A8578]"
-                tag="p"
-              />
-            )}
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
