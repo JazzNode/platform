@@ -15,7 +15,7 @@ interface FollowButtonProps {
 }
 
 export default function FollowButton({ itemType, itemId, variant = 'compact', glass = false }: FollowButtonProps) {
-  const { user, setShowAuthModal } = useAuth();
+  const { user, setShowComingSoon } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const t = useTranslations('common');
   const [animating, setAnimating] = useState<'pop' | 'unpop' | null>(null);
@@ -28,7 +28,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
     e.stopPropagation();
 
     if (!user) {
-      setShowAuthModal(true);
+      setShowComingSoon(true);
       return;
     }
 

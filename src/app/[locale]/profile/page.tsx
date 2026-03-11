@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const t = useTranslations('profile');
   const locale = useLocale();
   const router = useRouter();
-  const { user, profile, loading, refreshProfile, setShowAuthModal } = useAuth();
+  const { user, profile, loading, refreshProfile, setShowComingSoon } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
@@ -42,10 +42,10 @@ export default function ProfilePage() {
   // Redirect to home if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      setShowAuthModal(true);
+      setShowComingSoon(true);
       router.push('/');
     }
-  }, [loading, user, router, setShowAuthModal]);
+  }, [loading, user, router, setShowComingSoon]);
 
   const validateUsername = (value: string) => {
     if (!value) return true; // username is optional

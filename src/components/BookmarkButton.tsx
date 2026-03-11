@@ -12,7 +12,7 @@ interface BookmarkButtonProps {
 }
 
 export default function BookmarkButton({ itemId, variant = 'compact' }: BookmarkButtonProps) {
-  const { user, setShowAuthModal } = useAuth();
+  const { user, setShowComingSoon } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
   const t = useTranslations('common');
   const [animating, setAnimating] = useState<'pop' | 'unpop' | null>(null);
@@ -25,7 +25,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
     e.stopPropagation();
 
     if (!user) {
-      setShowAuthModal(true);
+      setShowComingSoon(true);
       return;
     }
 

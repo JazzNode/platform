@@ -26,6 +26,8 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
+  showComingSoon: boolean;
+  setShowComingSoon: (show: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -35,6 +37,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const supabase = createClient();
@@ -112,7 +115,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, showAuthModal, setShowAuthModal }}
+      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, showAuthModal, setShowAuthModal, showComingSoon, setShowComingSoon }}
     >
       {children}
     </AuthContext.Provider>
