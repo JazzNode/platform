@@ -54,22 +54,34 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     }))
     .sort((a, b) => b.artistCount - a.artistCount);
 
-  // Build city record-id → name lookup for venue labels
+  // Build city record-id → name/country lookup for venue labels & sorting
   const cityNameMap = new Map<string, string>();
+  const cityCountryMap = new Map<string, string>();
   for (const c of cities) {
     cityNameMap.set(c.id, cityName(c.fields, locale));
+    cityCountryMap.set(c.id, c.fields.country_code || 'ZZ');
   }
 
   const venueOptions = venues
     .filter((v) => venueArtistCount.has(v.id))
-    .map((v) => ({
-      recordId: v.id,
-      label: displayName(v.fields),
-      artistCount: venueArtistCount.get(v.id) || 0,
-      cityRecordIds: v.fields.city_id || [],
-      cityLabel: (v.fields.city_id || []).map((cid) => cityNameMap.get(cid)).filter(Boolean).join(', ') || '',
-    }))
-    .sort((a, b) => b.artistCount - a.artistCount);
+    .map((v) => {
+      const cids = v.fields.city_id || [];
+      return {
+        recordId: v.id,
+        label: displayName(v.fields),
+        artistCount: venueArtistCount.get(v.id) || 0,
+        cityRecordIds: cids,
+        cityLabel: cids.map((cid) => cityNameMap.get(cid)).filter(Boolean).join(', ') || '',
+        _country: cids[0] ? (cityCountryMap.get(cids[0]) || 'ZZ') : 'ZZ',
+        _city: cids[0] ? (cityNameMap.get(cids[0]) || '') : '',
+      };
+    })
+    // Group by country → city, then sort by artistCount within each group
+    .sort((a, b) =>
+      a._country.localeCompare(b._country)
+      || a._city.localeCompare(b._city)
+      || b.artistCount - a.artistCount
+    );
 
   // Serialize for client component
   const sorted = [...artists].sort((a, b) => artistDisplayName(a.fields, locale).localeCompare(artistDisplayName(b.fields, locale)));
