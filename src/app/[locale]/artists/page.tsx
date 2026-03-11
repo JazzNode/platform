@@ -54,6 +54,12 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     }))
     .sort((a, b) => b.artistCount - a.artistCount);
 
+  // Build city record-id → name lookup for venue labels
+  const cityNameMap = new Map<string, string>();
+  for (const c of cities) {
+    cityNameMap.set(c.id, cityName(c.fields, locale));
+  }
+
   const venueOptions = venues
     .filter((v) => venueArtistCount.has(v.id))
     .map((v) => ({
@@ -61,6 +67,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       label: displayName(v.fields),
       artistCount: venueArtistCount.get(v.id) || 0,
       cityRecordIds: v.fields.city_id || [],
+      cityLabel: (v.fields.city_id || []).map((cid) => cityNameMap.get(cid)).filter(Boolean).join(', ') || '',
     }))
     .sort((a, b) => b.artistCount - a.artistCount);
 

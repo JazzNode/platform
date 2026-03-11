@@ -34,6 +34,7 @@ interface VenueOption {
   label: string;
   artistCount: number;
   cityRecordIds: string[];
+  cityLabel: string;
 }
 
 interface Props {
@@ -85,21 +86,16 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       else next.add(id);
       return next;
     });
+    // Mutual exclusion: selecting a city clears venue
+    setSelectedVenue(null);
   }, []);
 
-  // Filter venue options based on selected cities (連動篩選)
-  const filteredVenueOptions = useMemo(() => {
-    if (selectedCities.size === 0) return venueOptions;
-    return venueOptions.filter((v) =>
-      v.cityRecordIds.some((cid) => selectedCities.has(cid))
-    );
-  }, [venueOptions, selectedCities]);
+  // Venue/City filters are independent — no linked filtering
+  const activeVenue = selectedVenue;
 
-  // Auto-clear venue selection if no longer visible after city change
-  const activeVenue = useMemo(() => {
-    if (!selectedVenue) return null;
-    return filteredVenueOptions.some((v) => v.recordId === selectedVenue) ? selectedVenue : null;
-  }, [filteredVenueOptions, selectedVenue]);
+  // Whether each filter group is "disabled" by the other being active
+  const venueDisabled = selectedCities.size > 0;
+  const cityDisabled = !!activeVenue;
 
   // Close venue dropdown when clicking outside
   useEffect(() => {
@@ -146,8 +142,9 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   const pillActive = 'bg-gold/10 border-gold/60 text-gold';
   const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
 
-  const selectedVenueLabel = activeVenue
-    ? filteredVenueOptions.find((v) => v.recordId === activeVenue)?.label ?? labels.allVenues
+  const selectedVenueObj = activeVenue ? venueOptions.find((v) => v.recordId === activeVenue) : null;
+  const selectedVenueLabel = selectedVenueObj
+    ? (selectedVenueObj.cityLabel ? `${selectedVenueObj.cityLabel} · ${selectedVenueObj.label}` : selectedVenueObj.label)
     : labels.allVenues;
 
   return (
@@ -237,8 +234,16 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             {labels.artistFootprint}
           </span>
 
-          {/* Venue dropdown */}
-          <div className="relative shrink-0" ref={venueDropdownRef}>
+          {/* Venue dropdown — fades out when city filter is active */}
+          <div
+            className="relative shrink-0"
+            ref={venueDropdownRef}
+            style={{
+              opacity: venueDisabled ? 0.25 : 1,
+              pointerEvents: venueDisabled ? 'none' : 'auto',
+              transition: 'opacity 0.3s ease',
+            }}
+          >
             <button
               onClick={() => setVenueDropdownOpen((prev) => !prev)}
               className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border inline-flex items-center gap-1.5 ${
@@ -251,7 +256,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               </svg>
             </button>
             {venueDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 z-50 w-64 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xl py-1">
+              <div className="absolute top-full left-0 mt-1 z-50 w-72 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xl py-1">
                 {/* All venues option */}
                 <button
                   onClick={() => { setSelectedVenue(null); setVenueDropdownOpen(false); }}
@@ -261,14 +266,17 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 >
                   {labels.allVenues}
                 </button>
-                {filteredVenueOptions.map((venue) => (
+                {venueOptions.map((venue) => (
                   <button
                     key={venue.recordId}
-                    onClick={() => { setSelectedVenue(venue.recordId); setVenueDropdownOpen(false); }}
+                    onClick={() => { setSelectedVenue(venue.recordId); setSelectedCities(new Set()); setVenueDropdownOpen(false); }}
                     className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
                       activeVenue === venue.recordId ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
                     }`}
                   >
+                    {venue.cityLabel && (
+                      <span className="opacity-40 mr-1">{venue.cityLabel}</span>
+                    )}
                     {venue.label}
                     <span className="ml-1.5 opacity-40 text-[10px]">{venue.artistCount}</span>
                   </button>
@@ -280,26 +288,27 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
           {/* Divider dot */}
           <span className="text-[#8A8578] opacity-30 mx-0.5">·</span>
 
-          {/* City chips: "所有城市" + individual city buttons */}
-          <button
-            onClick={() => setSelectedCities(new Set())}
-            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
-              selectedCities.size === 0 ? pillActive : pillInactive
-            }`}
+          {/* City chips — fade out when venue filter is active */}
+          <div
+            className="flex flex-wrap gap-2"
+            style={{
+              opacity: cityDisabled ? 0.25 : 1,
+              pointerEvents: cityDisabled ? 'none' : 'auto',
+              transition: 'opacity 0.3s ease',
+            }}
           >
-            {labels.allCities}
-          </button>
-          {cityOptions.map((city) => (
-            <button
-              key={city.recordId}
-              onClick={() => toggleCity(city.recordId)}
-              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
-                selectedCities.has(city.recordId) ? pillActive : pillInactive
-              }`}
-            >
-              {city.label}
-            </button>
-          ))}
+            {cityOptions.map((city) => (
+              <button
+                key={city.recordId}
+                onClick={() => toggleCity(city.recordId)}
+                className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
+                  selectedCities.has(city.recordId) ? pillActive : pillInactive
+                }`}
+              >
+                {city.label}
+              </button>
+            ))}
+          </div>
         </div>
         </FadeUpItem>
         )}
