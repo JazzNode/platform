@@ -26,8 +26,8 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
-  showComingSoon: boolean;
-  setShowComingSoon: (show: boolean) => void;
+  showComingSoon: { x: number; y: number } | null;
+  setShowComingSoon: (pos: { x: number; y: number } | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -37,7 +37,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showComingSoon, setShowComingSoon] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState<{ x: number; y: number } | null>(null);
 
   const fetchProfile = useCallback(async (userId: string) => {
     const supabase = createClient();

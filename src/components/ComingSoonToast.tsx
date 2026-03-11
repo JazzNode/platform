@@ -1,29 +1,49 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from './AuthProvider';
 
 export default function ComingSoonToast() {
   const { showComingSoon, setShowComingSoon } = useAuth();
+  const ref = useRef<HTMLDivElement>(null);
+  const [nudge, setNudge] = useState<'left' | 'right' | null>(null);
 
+  // Auto-dismiss
   useEffect(() => {
     if (!showComingSoon) return;
-    const timer = setTimeout(() => setShowComingSoon(false), 2500);
+    const timer = setTimeout(() => setShowComingSoon(null), 2500);
     return () => clearTimeout(timer);
   }, [showComingSoon, setShowComingSoon]);
 
+  // Clamp to viewport so it doesn't overflow off-screen
+  useEffect(() => {
+    if (!showComingSoon || !ref.current) { setNudge(null); return; }
+    const el = ref.current;
+    const rect = el.getBoundingClientRect();
+    if (rect.left < 8) setNudge('right');
+    else if (rect.right > window.innerWidth - 8) setNudge('left');
+    else setNudge(null);
+  }, [showComingSoon]);
+
+  const visible = !!showComingSoon;
+  const x = showComingSoon?.x ?? 0;
+  const y = showComingSoon?.y ?? 0;
+
   return (
     <div
-      className="fixed bottom-8 left-1/2 z-[80]"
+      ref={ref}
+      className="fixed z-[80]"
       style={{
-        transform: `translateX(-50%) translateY(${showComingSoon ? '0' : '8px'})`,
-        opacity: showComingSoon ? 1 : 0,
-        pointerEvents: showComingSoon ? 'auto' : 'none',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        left: x,
+        top: y,
+        transform: `translateX(${nudge === 'left' ? '-90%' : nudge === 'right' ? '-10%' : '-50%'}) translateY(calc(-100% - 10px)) translateY(${visible ? '0' : '6px'})`,
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? 'auto' : 'none',
+        transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
       <div
-        className="px-6 py-3 rounded-2xl border border-[var(--border)] shadow-2xl text-sm font-medium tracking-wide whitespace-nowrap"
+        className="px-4 py-2 rounded-xl border border-[var(--border)] shadow-2xl text-sm font-medium tracking-wide whitespace-nowrap"
         style={{
           background: 'color-mix(in srgb, var(--background) 92%, transparent)',
           backdropFilter: 'blur(20px)',

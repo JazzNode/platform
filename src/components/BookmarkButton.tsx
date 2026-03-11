@@ -25,7 +25,8 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
     e.stopPropagation();
 
     if (!user) {
-      setShowComingSoon(true);
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      setShowComingSoon({ x: rect.left + rect.width / 2, y: rect.top });
       return;
     }
 

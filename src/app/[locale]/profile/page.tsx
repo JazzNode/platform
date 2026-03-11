@@ -42,7 +42,7 @@ export default function ProfilePage() {
   // Redirect to home if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      setShowComingSoon(true);
+      setShowComingSoon({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
       router.push('/');
     }
   }, [loading, user, router, setShowComingSoon]);
