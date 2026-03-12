@@ -10,6 +10,7 @@ import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
 import SocialIcons from '@/components/SocialIcons';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
+import ClaimButton from '@/components/ClaimButton';
 import BadgeDock from '@/components/BadgeDock';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
@@ -237,7 +238,10 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   className="font-serif text-4xl sm:text-5xl font-bold"
                   tag="h1"
                 />
-                <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+                <div className="flex items-center gap-2 shrink-0">
+                  <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
+                  <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+                </div>
               </div>
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName

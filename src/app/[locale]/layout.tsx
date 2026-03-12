@@ -12,6 +12,7 @@ import AdminLoginModal from '@/components/AdminLoginModal';
 import AdminBadge from '@/components/AdminBadge';
 import AuthProvider from '@/components/AuthProvider';
 import FollowsProvider from '@/components/FollowsProvider';
+import ClaimsProvider from '@/components/ClaimsProvider';
 import AuthModal from '@/components/AuthModal';
 import ComingSoonToast from '@/components/ComingSoonToast';
 import CatEasterEgg from '@/components/CatEasterEgg';
@@ -135,6 +136,7 @@ export default async function LocaleLayout({
             <SearchProvider data={searchData}>
               <AuthProvider>
               <FollowsProvider>
+              <ClaimsProvider>
                 <AdminProvider>
                   <Header />
                   <main className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8 pb-24 md:pb-8">{children}</main>
@@ -148,6 +150,7 @@ export default async function LocaleLayout({
                   <ComingSoonToast />
                   <CatEasterEgg />
                 </AdminProvider>
+              </ClaimsProvider>
               </FollowsProvider>
               </AuthProvider>
             </SearchProvider>
