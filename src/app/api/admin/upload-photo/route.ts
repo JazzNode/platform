@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { updateTag } from 'next/cache';
+import { createClient } from '@supabase/supabase-js';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { uploadToR2 } from '@/lib/r2';
@@ -11,12 +12,14 @@ const SIZES = {
   lg: { width: 384, height: 384 },
 } as const;
 
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID!;
-const ARTIST_TABLE_ID = 'tblNEPMBzkcJhdf6l';
-const PHOTO_URL_FIELD_ID = 'fldHf2Dy9E27S5uox';
-
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+
+function getSupabaseAdmin() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+}
 
 export async function POST(req: NextRequest) {
   // 1. Auth check
@@ -68,24 +71,15 @@ export async function POST(req: NextRequest) {
     const results = await Promise.all(uploads);
     const mdUrl = results.find((r) => r.size === 'md')!.url;
 
-    // 5. Update Airtable — set photo_url to the md-size image URL
-    const airtableRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${ARTIST_TABLE_ID}/${artistId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fields: { [PHOTO_URL_FIELD_ID]: mdUrl },
-        }),
-      },
-    );
+    // 5. Update Supabase — set photo_url to the md-size image URL
+    const sb = getSupabaseAdmin();
+    const { error: updateErr } = await sb
+      .from('artists')
+      .update({ photo_url: mdUrl })
+      .eq('artist_id', artistId);
 
-    if (!airtableRes.ok) {
-      const errText = await airtableRes.text();
-      throw new Error(`Airtable update failed: ${errText}`);
+    if (updateErr) {
+      throw new Error(`Supabase update failed: ${updateErr.message}`);
     }
 
     // 6. Revalidate the artists cache
