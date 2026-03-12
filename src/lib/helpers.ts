@@ -221,6 +221,46 @@ export function normalizeInstrumentKey(raw: string): string {
   return k;
 }
 
+/** Convert a Spotify URL to its embed URL. Supports artist, album, track, playlist paths. */
+export function parseSpotifyEmbedUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    if (!u.hostname.endsWith('spotify.com')) return null;
+    // pathname like /artist/xxx, /album/xxx, /track/xxx, /playlist/xxx
+    const match = u.pathname.match(/^\/(artist|album|track|playlist|episode|show)\/([a-zA-Z0-9]+)/);
+    if (!match) return null;
+    return `https://open.spotify.com/embed/${match[1]}/${match[2]}?theme=0`;
+  } catch {
+    return null;
+  }
+}
+
+/** Extract a YouTube video ID from various URL formats. Returns null for channel/non-video URLs. */
+export function parseYouTubeVideoId(url: string): string | null {
+  try {
+    const u = new URL(url);
+    // youtu.be/VIDEO_ID
+    if (u.hostname === 'youtu.be') {
+      const id = u.pathname.slice(1).split('/')[0];
+      return id && id.length === 11 ? id : null;
+    }
+    // youtube.com/watch?v=VIDEO_ID
+    if (u.hostname.endsWith('youtube.com')) {
+      const v = u.searchParams.get('v');
+      if (v && v.length === 11) return v;
+      // youtube.com/embed/VIDEO_ID
+      const embedMatch = u.pathname.match(/^\/embed\/([a-zA-Z0-9_-]{11})/);
+      if (embedMatch) return embedMatch[1];
+      // youtube.com/shorts/VIDEO_ID
+      const shortsMatch = u.pathname.match(/^\/shorts\/([a-zA-Z0-9_-]{11})/);
+      if (shortsMatch) return shortsMatch[1];
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 /** Supported locales. */
 export const locales = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 export type Locale = (typeof locales)[number];
