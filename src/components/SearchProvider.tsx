@@ -1,13 +1,14 @@
 'use client';
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
-import type { SearchableEvent, SearchableArtist, SearchableVenue, SearchableCity } from '@/lib/search';
+import type { SearchableEvent, SearchableArtist, SearchableVenue, SearchableCity, SearchableMember } from '@/lib/search';
 
 interface SearchData {
   events: SearchableEvent[];
   artists: SearchableArtist[];
   venues: SearchableVenue[];
   cities: SearchableCity[];
+  members: SearchableMember[];
 }
 
 interface SearchContextValue {

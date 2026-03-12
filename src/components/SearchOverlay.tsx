@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { useSearch } from './SearchProvider';
-import { search, type SearchResult, type SearchResultType, type SearchableEvent, type SearchableArtist, type SearchableVenue, type SearchableCity } from '@/lib/search';
+import { search, type SearchResult, type SearchResultType, type SearchableEvent, type SearchableArtist, type SearchableVenue, type SearchableCity, type SearchableMember } from '@/lib/search';
 
 const CATEGORY_FILTERS: { key: SearchResultType | 'all'; icon: string }[] = [
   { key: 'all', icon: '✦' },
@@ -13,6 +13,7 @@ const CATEGORY_FILTERS: { key: SearchResultType | 'all'; icon: string }[] = [
   { key: 'artist', icon: '🎤' },
   { key: 'venue', icon: '📍' },
   { key: 'city', icon: '🏙' },
+  { key: 'member', icon: '👤' },
 ];
 
 const TYPE_LABELS: Record<string, Record<string, string>> = {
@@ -21,6 +22,7 @@ const TYPE_LABELS: Record<string, Record<string, string>> = {
   artist: { en: 'Artists', zh: '藝人', ja: 'アーティスト', ko: '아티스트' },
   venue:  { en: 'Venues', zh: '場地', ja: '会場', ko: '베뉴' },
   city:   { en: 'Cities', zh: '城市', ja: '都市', ko: '도시' },
+  member: { en: 'Members', zh: '會員', ja: 'メンバー', ko: '멤버' },
 };
 
 const SECTION_LABELS: Record<string, Record<string, string>> = {
@@ -28,6 +30,7 @@ const SECTION_LABELS: Record<string, Record<string, string>> = {
   artist: { en: 'ARTISTS', zh: '藝人', ja: 'アーティスト', ko: '아티스트' },
   venue:  { en: 'VENUES', zh: '場地', ja: '会場', ko: '베뉴' },
   city:   { en: 'CITIES', zh: '城市', ja: '都市', ko: '도시' },
+  member: { en: 'MEMBERS', zh: '會員', ja: 'メンバー', ko: '멤버' },
 };
 
 export default function SearchOverlay() {
@@ -93,7 +96,7 @@ export default function SearchOverlay() {
   const flatResults = useMemo(() => {
     if (grouped) {
       const flat: SearchResult[] = [];
-      for (const type of ['event', 'artist', 'venue', 'city'] as SearchResultType[]) {
+      for (const type of ['event', 'artist', 'venue', 'city', 'member'] as SearchResultType[]) {
         const items = grouped.get(type);
         if (items) flat.push(...items);
       }
@@ -117,6 +120,11 @@ export default function SearchOverlay() {
       case 'city':
         router.push(`${base}/cities`);
         break;
+      case 'member': {
+        const m = result.data as SearchableMember;
+        router.push(m.username ? `${base}/user/${m.username}` : `${base}/user/id/${result.id}`);
+        break;
+      }
     }
     close();
   }, [locale, router, close]);
@@ -234,6 +242,34 @@ export default function SearchOverlay() {
           </button>
         );
       }
+      case 'member': {
+        const m = result.data as SearchableMember;
+        const label = m.displayName || `@${m.username}`;
+        return (
+          <button
+            key={`m-${result.id}`}
+            onClick={() => navigateTo(result)}
+            onMouseEnter={() => setActiveIndex(index)}
+            className={`w-full text-left px-4 py-3 flex items-center gap-4 transition-colors duration-150 rounded-xl ${
+              isActive ? 'bg-[var(--color-gold)]/10' : 'hover:bg-[var(--color-gold)]/5'
+            }`}
+          >
+            {m.avatarUrl ? (
+              <Image src={m.avatarUrl} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm font-bold shrink-0 border border-[var(--border)] text-[var(--muted-foreground)]">
+                {label.charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="font-serif text-sm font-bold truncate text-[var(--foreground)]">{label}</p>
+              {m.displayName && m.username && (
+                <p className="text-xs text-[var(--muted-foreground)] truncate">@{m.username}</p>
+              )}
+            </div>
+          </button>
+        );
+      }
     }
   }
 
@@ -345,7 +381,7 @@ export default function SearchOverlay() {
             ) : grouped ? (
               /* Grouped results */
               <div className="py-2">
-                {(['event', 'artist', 'venue', 'city'] as SearchResultType[]).map((type) => {
+                {(['event', 'artist', 'venue', 'city', 'member'] as SearchResultType[]).map((type) => {
                   const items = grouped.get(type);
                   if (!items || items.length === 0) return null;
                   const sectionStart = flatIndex;

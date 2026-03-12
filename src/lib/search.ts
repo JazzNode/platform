@@ -40,13 +40,21 @@ export interface SearchableCity {
   venueCount: number;
 }
 
-export type SearchResultType = 'event' | 'artist' | 'venue' | 'city';
+export interface SearchableMember {
+  id: string;
+  username: string | null;
+  displayName: string | null;
+  avatarUrl: string | null;
+  bio: string | null;
+}
+
+export type SearchResultType = 'event' | 'artist' | 'venue' | 'city' | 'member';
 
 export interface SearchResult {
   type: SearchResultType;
   id: string;
   score: number;
-  data: SearchableEvent | SearchableArtist | SearchableVenue | SearchableCity;
+  data: SearchableEvent | SearchableArtist | SearchableVenue | SearchableCity | SearchableMember;
 }
 
 function normalize(s: string): string {
@@ -76,6 +84,7 @@ export function search(
     artists: SearchableArtist[];
     venues: SearchableVenue[];
     cities: SearchableCity[];
+    members: SearchableMember[];
   },
   filter: SearchResultType | 'all' = 'all',
 ): SearchResult[] {
@@ -126,6 +135,17 @@ export function search(
         matchScore(q, c.citySlug),
       );
       if (score > 0) results.push({ type: 'city', id: c.id, score, data: c });
+    }
+  }
+
+  if (filter === 'all' || filter === 'member') {
+    for (const m of data.members) {
+      const score = Math.max(
+        matchScore(q, m.displayName) * 1.5,
+        matchScore(q, m.username) * 1.2,
+        matchScore(q, m.bio) * 0.4,
+      );
+      if (score > 0) results.push({ type: 'member', id: m.id, score, data: m });
     }
   }
 

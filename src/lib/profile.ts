@@ -29,6 +29,35 @@ export async function getPublicFavorites(userId: string): Promise<{ item_type: s
   return follows.map((f) => ({ item_type: f.target_type, item_id: f.target_id }));
 }
 
+export interface SearchableProfile {
+  id: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  bio: string | null;
+}
+
+export async function getSearchableProfiles(): Promise<SearchableProfile[]> {
+  const supabase = await createClient();
+  // Fetch profiles that have display_name or username set
+  const { data } = await supabase
+    .from('profiles')
+    .select('id, username, display_name, avatar_url, bio')
+    .or('display_name.not.is.null,username.not.is.null');
+  return (data || []) as SearchableProfile[];
+}
+
+export async function getProfileById(id: string): Promise<Profile | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error || !data) return null;
+  return data as Profile;
+}
+
 export async function getProfileByUsername(username: string): Promise<Profile | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

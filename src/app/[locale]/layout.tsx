@@ -20,6 +20,7 @@ const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
 import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/airtable';
 import { displayName, artistDisplayName, localized, cityName, eventTitle, eventTitleField } from '@/lib/helpers';
+import { getSearchableProfiles } from '@/lib/profile';
 import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -56,8 +57,8 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   // Fetch all data for search (cached per request via React.cache)
-  const [events, artists, venues, cities] = await Promise.all([
-    getEvents(), getArtists(), getVenues(), getCities(),
+  const [events, artists, venues, cities, profiles] = await Promise.all([
+    getEvents(), getArtists(), getVenues(), getCities(), getSearchableProfiles(),
   ]);
 
   const now = new Date().toISOString();
@@ -117,6 +118,13 @@ export default async function LocaleLayout({
         name: cityName(c.fields, locale),
         venueCount: venues.filter((v) => v.fields.city_id?.includes(c.id) && v.fields.event_list && v.fields.event_list.length > 0).length,
       })),
+    members: profiles.map((p) => ({
+      id: p.id,
+      username: p.username,
+      displayName: p.display_name,
+      avatarUrl: p.avatar_url,
+      bio: p.bio,
+    })),
   };
 
   return (
