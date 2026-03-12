@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { getPublicFavorites } from '@/lib/profile';
 import type { Profile } from '@/lib/profile';
-import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/airtable';
+import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 

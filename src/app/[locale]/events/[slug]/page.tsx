@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/supabase';
 import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';

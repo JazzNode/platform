@@ -19,7 +19,7 @@ import CatEasterEgg from '@/components/CatEasterEgg';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
-import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/airtable';
+import { getEvents, getArtists, getVenues, getCities, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, localized, cityName, eventTitle, eventTitleField } from '@/lib/helpers';
 import { getSearchableProfiles } from '@/lib/profile';
 import '@/app/globals.css';

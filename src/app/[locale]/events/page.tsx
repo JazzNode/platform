@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
+import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName, eventTitle } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 

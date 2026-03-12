@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCities, getVenues, getEvents, getArtists, getTags, buildMap, resolveLinks } from '@/lib/airtable';
+import { getCities, getVenues, getEvents, getArtists, getTags, buildMap, resolveLinks } from '@/lib/supabase';
 import { artistDisplayName, photoUrl, formatDate, cityName, eventTitle } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';

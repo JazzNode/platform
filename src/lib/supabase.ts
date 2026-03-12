@@ -270,6 +270,8 @@ interface VenueRow {
   ticketing_mode_list: string[] | null;
   ticketing_mode_primary: string | null;
   business_hour: string | null;
+  country_code: string | null;
+  timezone: string | null;
 }
 
 interface ArtistRow {
@@ -334,6 +336,14 @@ interface EventRow {
   lifecycle_status: string | null;
   payment_method: string[] | null;
   popularity: string | null;
+  // Pipeline-owned fields (not exposed to frontend interfaces)
+  description_raw: string | null;
+  lineup_raw_text: string | null;
+  extraction_notes: string | null;
+  extraction_run_id: string | null;
+  fetched_at: string | null;
+  raw_payload_hash: string | null;
+  raw_payload_url: string | null;
 }
 
 interface LineupRow {
@@ -373,6 +383,7 @@ interface BadgeRow {
   description_th: string | null;
   description_id: string | null;
   icon_url: string | null;
+  criteria: string | null;
 }
 
 interface TagRow {
