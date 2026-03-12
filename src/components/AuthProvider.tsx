@@ -7,10 +7,13 @@ import type { User } from '@supabase/supabase-js';
 export interface UserProfile {
   id: string;
   username: string | null;
+  handle: string | null;
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
   website: string | null;
+  role: 'member' | 'artist' | 'venue_owner' | 'admin';
+  social_links: Record<string, string>;
   created_at: string;
   updated_at: string;
 }

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
-import { useFavorites } from '@/components/FavoritesProvider';
+import { useFavorites } from '@/components/FollowsProvider';
 
 
 interface SerializedEvent {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from './AuthProvider';
-import { useFavorites } from './FavoritesProvider';
+import { useFavorites } from './FollowsProvider';
 
 interface FavoriteHighlightProps {
   itemType: 'artist' | 'venue' | 'event';

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useAuth } from './AuthProvider';
-import { useFavorites } from './FavoritesProvider';
+import { useFollows } from './FollowsProvider';
 import { useTranslations } from 'next-intl';
 
 interface FollowButtonProps {
@@ -16,12 +16,12 @@ interface FollowButtonProps {
 
 export default function FollowButton({ itemType, itemId, variant = 'compact', glass = false }: FollowButtonProps) {
   const { user, setShowComingSoon } = useAuth();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFollowing, toggleFollow } = useFollows();
   const t = useTranslations('common');
   const [animating, setAnimating] = useState<'pop' | 'unpop' | null>(null);
   const ringRef = useRef<HTMLSpanElement>(null);
 
-  const active = user ? isFavorite(itemType, itemId) : false;
+  const active = user ? isFollowing(itemType, itemId) : false;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
     setAnimating(willActivate ? 'pop' : 'unpop');
     setTimeout(() => setAnimating(null), 500);
 
-    toggleFavorite(itemType, itemId);
+    toggleFollow(itemType, itemId);
   };
 
   if (variant === 'compact') {

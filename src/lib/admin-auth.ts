@@ -1,23 +1,38 @@
-import { jwtVerify } from 'jose';
+import { createAdminClient } from '@/utils/supabase/admin';
 
-const JWT_SECRET = new TextEncoder().encode(process.env.ADMIN_JWT_SECRET!);
+interface AdminVerifyResult {
+  isAdmin: boolean;
+  userId: string | null;
+}
 
 /**
  * Verify an admin Bearer token from request headers.
- * Returns true if valid admin, false otherwise.
- *
- * MIGRATION NOTE: When switching to Supabase, replace with:
- *   const { data: { user } } = await supabase.auth.getUser(token);
- *   return user?.app_metadata?.role === 'admin';
+ * Uses Supabase auth to identify the user, then checks profiles.role.
+ * Returns isAdmin flag and userId (for audit logging).
  */
-export async function verifyAdminToken(authHeader: string | null): Promise<boolean> {
-  if (!authHeader?.startsWith('Bearer ')) return false;
+export async function verifyAdminToken(authHeader: string | null): Promise<AdminVerifyResult> {
+  if (!authHeader?.startsWith('Bearer ')) return { isAdmin: false, userId: null };
   const token = authHeader.slice(7);
 
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload.role === 'admin';
+    const supabase = createAdminClient();
+
+    // Verify the Supabase access token and get user
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return { isAdmin: false, userId: null };
+
+    // Check profile role
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    return {
+      isAdmin: profile?.role === 'admin',
+      userId: user.id,
+    };
   } catch {
-    return false;
+    return { isAdmin: false, userId: null };
   }
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useFavorites } from './FavoritesProvider';
+import { useFavorites } from './FollowsProvider';
 
 const MOBILE_BREAKPOINT = 640;
 

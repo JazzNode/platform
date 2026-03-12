@@ -6,7 +6,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
-import { useFavorites } from '@/components/FavoritesProvider';
+import { useFavorites } from '@/components/FollowsProvider';
 import { normalizeInstrumentKey } from '@/lib/helpers';
 
 interface SerializedArtist {

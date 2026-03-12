@@ -4,28 +4,27 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from './AuthProvider';
 
-type ItemType = 'artist' | 'venue' | 'event';
+type TargetType = 'artist' | 'venue' | 'event' | 'user';
 
-interface FavoritesContextType {
-  isFavorite: (type: ItemType, id: string) => boolean;
-  toggleFavorite: (type: ItemType, id: string) => Promise<void>;
+interface FollowsContextType {
+  isFollowing: (type: TargetType, id: string) => boolean;
+  toggleFollow: (type: TargetType, id: string) => Promise<void>;
   loading: boolean;
-  /** Increments when the jazz cat easter egg should fire 🐱 */
+  /** Increments when the jazz cat easter egg should fire */
   catEggTrigger: number;
 }
 
-const FavoritesContext = createContext<FavoritesContextType | null>(null);
+const FollowsContext = createContext<FollowsContextType | null>(null);
 
-export default function FavoritesProvider({ children }: { children: React.ReactNode }) {
+export default function FollowsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [keys, setKeys] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
   const [catEggTrigger, setCatEggTrigger] = useState(0);
 
-  // Fetch all favorites on login
+  // Fetch all follows on login
   useEffect(() => {
     if (!user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setKeys(new Set());
       return;
     }
@@ -35,13 +34,13 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
 
     const supabase = createClient();
     supabase
-      .from('favorites')
-      .select('item_type, item_id')
+      .from('follows')
+      .select('target_type, target_id')
       .eq('user_id', user.id)
       .then(({ data }) => {
         if (cancelled) return;
         if (data) {
-          setKeys(new Set(data.map((r) => `${r.item_type}:${r.item_id}`)));
+          setKeys(new Set(data.map((r) => `${r.target_type}:${r.target_id}`)));
         }
         setLoading(false);
       });
@@ -49,13 +48,13 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
     return () => { cancelled = true; };
   }, [user]);
 
-  const isFavorite = useCallback(
-    (type: ItemType, id: string) => keys.has(`${type}:${id}`),
+  const isFollowing = useCallback(
+    (type: TargetType, id: string) => keys.has(`${type}:${id}`),
     [keys],
   );
 
-  const toggleFavorite = useCallback(
-    async (type: ItemType, id: string) => {
+  const toggleFollow = useCallback(
+    async (type: TargetType, id: string) => {
       if (!user) return;
 
       const key = `${type}:${id}`;
@@ -73,36 +72,34 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
 
       if (removing) {
         const { error } = await supabase
-          .from('favorites')
+          .from('follows')
           .delete()
           .eq('user_id', user.id)
-          .eq('item_id', id)
-          .eq('item_type', type);
+          .eq('target_id', id)
+          .eq('target_type', type);
 
         if (error) {
-          // Revert on failure
           setKeys((prev) => new Set(prev).add(key));
         }
       } else {
         const { error } = await supabase
-          .from('favorites')
-          .insert({ user_id: user.id, item_id: id, item_type: type });
+          .from('follows')
+          .insert({ user_id: user.id, target_id: id, target_type: type });
 
         if (error) {
-          // Revert on failure
           setKeys((prev) => {
             const next = new Set(prev);
             next.delete(key);
             return next;
           });
         } else if (type === 'artist') {
-          // 🐱 Jazz cat easter egg: count artist follows after successful add
+          // Jazz cat easter egg: count artist follows after successful add
           setKeys((current) => {
             const artistCount = Array.from(current).filter((k) => k.startsWith('artist:')).length;
             if (artistCount === 10) {
               setCatEggTrigger((n) => n + 1);
             }
-            return current; // no mutation, just reading
+            return current;
           });
         }
       }
@@ -111,14 +108,25 @@ export default function FavoritesProvider({ children }: { children: React.ReactN
   );
 
   return (
-    <FavoritesContext.Provider value={{ isFavorite, toggleFavorite, loading, catEggTrigger }}>
+    <FollowsContext.Provider value={{ isFollowing, toggleFollow, loading, catEggTrigger }}>
       {children}
-    </FavoritesContext.Provider>
+    </FollowsContext.Provider>
   );
 }
 
-export function useFavorites() {
-  const ctx = useContext(FavoritesContext);
-  if (!ctx) throw new Error('useFavorites must be used within FavoritesProvider');
+export function useFollows() {
+  const ctx = useContext(FollowsContext);
+  if (!ctx) throw new Error('useFollows must be used within FollowsProvider');
   return ctx;
+}
+
+/** @deprecated Use useFollows instead — backward compat alias */
+export function useFavorites() {
+  const { isFollowing, toggleFollow, loading, catEggTrigger } = useFollows();
+  return {
+    isFavorite: isFollowing,
+    toggleFavorite: toggleFollow,
+    loading,
+    catEggTrigger,
+  };
 }

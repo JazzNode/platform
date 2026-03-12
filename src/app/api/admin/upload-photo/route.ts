@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
+import { writeAuditLog } from '@/lib/audit-log';
 import { uploadToR2 } from '@/lib/r2';
 
 const SIZES = {
@@ -19,8 +20,8 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export async function POST(req: NextRequest) {
   // 1. Auth check
-  const isAdmin = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin) {
+  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
+  if (!isAdmin || !userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -88,7 +89,16 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Revalidate the artists cache
-    revalidateTag('artists');
+    updateTag('artists');
+
+    writeAuditLog({
+      adminUserId: userId,
+      action: 'upload_photo',
+      entityType: 'artist',
+      entityId: artistId,
+      details: { photoUrl: mdUrl },
+      ipAddress: req.headers.get('x-forwarded-for'),
+    });
 
     return NextResponse.json({
       success: true,

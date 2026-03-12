@@ -1,75 +1,64 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createClient } from '@/utils/supabase/client';
+import { useAuth } from './AuthProvider';
 
 interface AdminContextType {
   isAdmin: boolean;
+  /** Supabase access token — pass as Bearer token to admin API routes */
   token: string | null;
-  login: (password: string) => Promise<boolean>;
-  logout: () => void;
+  /** Whether admin mode UI is active (admin may toggle it off to see regular view) */
+  adminModeEnabled: boolean;
   toggleAdmin: () => void;
   showLoginModal: boolean;
   setShowLoginModal: (show: boolean) => void;
-  /** Call when an API returns 401 to clear token and prompt re-login */
+  /** Call when an API returns 401 to prompt re-login */
   handleUnauthorized: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
-const STORAGE_KEY = 'jazznode_admin_token';
-
-/** Decode JWT payload and check if it's expired */
-function isTokenExpired(token: string): boolean {
-  try {
-    const parts = token.split('.');
-    if (parts.length !== 3) return true;
-    const payload = JSON.parse(atob(parts[1]));
-    if (!payload.exp) return true;
-    // Add 60s buffer so we don't use a token that's about to expire
-    return Date.now() >= (payload.exp - 60) * 1000;
-  } catch {
-    return true;
-  }
-}
 
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
-  // Initialize state synchronously; discard expired tokens immediately
-  const [token, setToken] = useState<string | null>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored && !isTokenExpired(stored)) return stored;
-        // Clean up expired token
-        if (stored) localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        /* ignore */
-      }
-    }
-    return null;
-  });
-  
+  const { user, profile, setShowAuthModal } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+  const [adminModeEnabled, setAdminModeEnabled] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);
 
-  const logout = useCallback(() => {
-    setToken(null);
-    try {
-      localStorage.removeItem(STORAGE_KEY);
-    } catch {
-      /* ignore */
+  const isAdmin = !!(profile?.role === 'admin' && adminModeEnabled);
+
+  // Keep Supabase access token in sync for API calls
+  useEffect(() => {
+    if (!user) {
+      setToken(null);
+      return;
     }
-  }, []);
+
+    const supabase = createClient();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setToken(session?.access_token ?? null);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setToken(session?.access_token ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user]);
 
   const handleUnauthorized = useCallback(() => {
-    logout();
-    setShowLoginModal(true);
-  }, [logout]);
+    setToken(null);
+    setShowAuthModal(true);
+  }, [setShowAuthModal]);
 
   const toggleAdmin = useCallback(() => {
-    if (token) {
-      logout();
-    } else {
-      setShowLoginModal(true);
+    if (!user) {
+      setShowAuthModal(true);
+      return;
     }
-  }, [token, logout]);
+    if (profile?.role !== 'admin') return;
+    setAdminModeEnabled((prev) => !prev);
+  }, [user, profile, setShowAuthModal]);
 
   // Ctrl+Shift+A keyboard shortcut
   useEffect(() => {
@@ -83,38 +72,12 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     return () => window.removeEventListener('keydown', handler);
   }, [toggleAdmin]);
 
-  const login = useCallback(async (password: string): Promise<boolean> => {
-    try {
-      const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setToken(data.token);
-        try {
-          localStorage.setItem(STORAGE_KEY, data.token);
-        } catch {
-          /* ignore */
-        }
-        setShowLoginModal(false);
-        return true;
-      }
-    } catch (err) {
-      console.error('Login error', err);
-    }
-    return false;
-  }, []);
-
   return (
     <AdminContext.Provider
       value={{
-        isAdmin: !!token,
+        isAdmin,
         token,
-        login,
-        logout,
+        adminModeEnabled,
         toggleAdmin,
         handleUnauthorized,
         showLoginModal,

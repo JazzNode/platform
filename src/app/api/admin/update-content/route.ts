@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
+import { writeAuditLog } from '@/lib/audit-log';
 import { translateAndGenerate } from '@/lib/gemini';
 import { TABLE_IDS } from '@/lib/airtable';
 
@@ -22,8 +23,8 @@ const ENTITY_TAG: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const isAdmin = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin) {
+  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
+  if (!isAdmin || !userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -107,7 +108,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Revalidate cache
-    revalidateTag(ENTITY_TAG[entityType]);
+    updateTag(ENTITY_TAG[entityType]);
+
+    writeAuditLog({
+      adminUserId: userId,
+      action: 'update_content',
+      entityType,
+      entityId,
+      details: { fieldPrefix, sourceLocale, fieldsUpdated: Object.keys(fields), translationFailed },
+      ipAddress: req.headers.get('x-forwarded-for'),
+    });
 
     return NextResponse.json({
       success: true,

@@ -3,21 +3,30 @@ import { createClient } from '@/utils/supabase/server';
 export interface Profile {
   id: string;
   username: string | null;
+  handle: string | null;
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
   website: string | null;
+  role: 'member' | 'artist' | 'venue_owner' | 'admin';
+  social_links: Record<string, string>;
   created_at: string;
   updated_at: string;
 }
 
-export async function getPublicFavorites(userId: string): Promise<{ item_type: string; item_id: string }[]> {
+export async function getPublicFollows(userId: string): Promise<{ target_type: string; target_id: string }[]> {
   const supabase = await createClient();
   const { data } = await supabase
-    .from('favorites')
-    .select('item_type, item_id')
+    .from('follows')
+    .select('target_type, target_id')
     .eq('user_id', userId);
   return data || [];
+}
+
+/** @deprecated Use getPublicFollows */
+export async function getPublicFavorites(userId: string): Promise<{ item_type: string; item_id: string }[]> {
+  const follows = await getPublicFollows(userId);
+  return follows.map((f) => ({ item_type: f.target_type, item_id: f.target_id }));
 }
 
 export async function getProfileByUsername(username: string): Promise<Profile | null> {

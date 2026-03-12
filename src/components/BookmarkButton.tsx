@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useAuth } from './AuthProvider';
-import { useFavorites } from './FavoritesProvider';
+import { useFollows } from './FollowsProvider';
 import { useTranslations } from 'next-intl';
 
 interface BookmarkButtonProps {
@@ -13,12 +13,12 @@ interface BookmarkButtonProps {
 
 export default function BookmarkButton({ itemId, variant = 'compact' }: BookmarkButtonProps) {
   const { user, setShowComingSoon } = useAuth();
-  const { isFavorite, toggleFavorite } = useFavorites();
+  const { isFollowing, toggleFollow } = useFollows();
   const t = useTranslations('common');
   const [animating, setAnimating] = useState<'pop' | 'unpop' | null>(null);
   const ringRef = useRef<HTMLSpanElement>(null);
 
-  const active = user ? isFavorite('event', itemId) : false;
+  const active = user ? isFollowing('event', itemId) : false;
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -34,7 +34,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
     setAnimating(willActivate ? 'pop' : 'unpop');
     setTimeout(() => setAnimating(null), 500);
 
-    toggleFavorite('event', itemId);
+    toggleFollow('event', itemId);
   };
 
   if (variant === 'compact') {

@@ -83,7 +83,7 @@ export default function Footer() {
   const [legalOpen, setLegalOpen] = useState(false);
   const { toggleAdmin } = useAdmin();
   const tapCountRef = useRef(0);
-  const tapTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const tapTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     return () => { if (tapTimerRef.current) clearTimeout(tapTimerRef.current); };
