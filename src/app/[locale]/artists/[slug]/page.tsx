@@ -747,10 +747,10 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       )}
 
       {/* ═══ Badge Dock ═══ */}
-      {(badgeItems.length > 0 || (f.genres && f.genres.length > 0)) && (
+      {badgeItems.length > 0 && (
         <FadeUp>
           <section className="pt-4">
-            <BadgeDock badges={badgeItems} genres={f.genres} />
+            <BadgeDock badges={badgeItems} />
           </section>
         </FadeUp>
       )}

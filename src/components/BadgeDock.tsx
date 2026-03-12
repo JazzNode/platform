@@ -11,7 +11,6 @@ interface BadgeItem {
 
 interface BadgeDockProps {
   badges: BadgeItem[];
-  genres?: string[];
 }
 
 const BADGE_ICONS: Record<string, React.ReactNode> = {
@@ -47,10 +46,10 @@ function BadgeIcon({ badgeId }: { badgeId?: string }) {
   );
 }
 
-export default function BadgeDock({ badges, genres }: BadgeDockProps) {
+export default function BadgeDock({ badges }: BadgeDockProps) {
   const [hoveredBadge, setHoveredBadge] = useState<string | null>(null);
 
-  if (badges.length === 0 && (!genres || genres.length === 0)) return null;
+  if (badges.length === 0) return null;
 
   return (
     <div className="relative">
@@ -63,7 +62,6 @@ export default function BadgeDock({ badges, genres }: BadgeDockProps) {
 
       {/* Dock */}
       <div className="flex items-center gap-2 overflow-x-auto py-3 px-4 bg-[#0A0A0A]/80 backdrop-blur-xl border border-[var(--border)] rounded-2xl scrollbar-hide">
-        {/* Badges */}
         {badges.map((badge) => (
           <div
             key={badge.id}
@@ -74,21 +72,6 @@ export default function BadgeDock({ badges, genres }: BadgeDockProps) {
             <BadgeIcon badgeId={badge.badgeId} />
             {badge.name}
           </div>
-        ))}
-
-        {/* Separator */}
-        {badges.length > 0 && genres && genres.length > 0 && (
-          <div className="w-px h-5 bg-[var(--border)] shrink-0 mx-1" />
-        )}
-
-        {/* Genres as secondary items */}
-        {genres?.map((g) => (
-          <span
-            key={g}
-            className="text-xs px-2.5 py-1 rounded-lg border border-[var(--border)] text-[#8A8578] whitespace-nowrap shrink-0"
-          >
-            {g}
-          </span>
         ))}
       </div>
     </div>

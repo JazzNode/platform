@@ -123,7 +123,6 @@ export interface Artist {
   country_code?: string;
   primary_instrument?: string;
   instrument_list?: string[];
-  genres?: string[];
   photo_url?: string;
   website_url?: string;
   instagram?: string;
@@ -294,7 +293,6 @@ interface ArtistRow {
   country_code: string | null;
   primary_instrument: string | null;
   instrument_list: string[] | null;
-  genres: string[] | null;
   photo_url: string | null;
   website_url: string | null;
   instagram: string | null;

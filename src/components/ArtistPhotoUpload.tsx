@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { useAdmin } from './AdminProvider';
+import { useCanEdit } from '@/hooks/useCanEdit';
 
 interface Props {
   artistId: string;
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUrl, size }: Props) {
-  const { isAdmin, token, handleUnauthorized } = useAdmin();
+  const { canEdit, isAdmin, token, handleUnauthorized } = useCanEdit('artist', artistId);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,9 +25,9 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
   const displayUrl = previewUrl || currentPhotoUrl;
 
   const handleClick = useCallback(() => {
-    if (!isAdmin || uploading) return;
+    if (!canEdit || uploading) return;
     fileInputRef.current?.click();
-  }, [isAdmin, uploading]);
+  }, [canEdit, uploading]);
 
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +45,8 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
         formData.append('file', file);
         formData.append('artistId', artistId);
 
-        const res = await fetch('/api/admin/upload-photo', {
+        const endpoint = isAdmin ? '/api/admin/upload-photo' : '/api/artist/upload-photo';
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
@@ -81,7 +82,7 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
     <div className="relative">
       <div
         className={`${dimensions} ${rounded} overflow-hidden shrink-0 border border-[var(--border)] relative ${
-          isAdmin ? 'cursor-pointer group/upload' : ''
+          canEdit ? 'cursor-pointer group/upload' : ''
         }`}
         onClick={handleClick}
       >
@@ -93,8 +94,8 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
           </div>
         )}
 
-        {/* Admin overlay: camera icon on hover */}
-        {isAdmin && (
+        {/* Edit overlay: camera icon on hover */}
+        {canEdit && (
           <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/upload:opacity-100 transition-opacity flex items-center justify-center">
             {uploading ? (
               <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -117,7 +118,7 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
       </div>
 
       {/* Hidden file input */}
-      {isAdmin && (
+      {canEdit && (
         <input
           ref={fileInputRef}
           type="file"

@@ -203,6 +203,21 @@
     "kora": "コラ",
     "shamisen": "三味線"
   },
+  "artistDashboard": {
+    "title": "アーティストページ管理",
+    "socialLinks": "ソーシャルリンク",
+    "aka": "別名",
+    "akaPlaceholder": "例：芸名、ニックネーム...",
+    "save": "保存",
+    "saved": "保存しました！",
+    "saveFailed": "保存に失敗しました。もう一度お試しください。",
+    "viewPage": "アーティストページを見る",
+    "noClaimedArtists": "まだアーティストページを申請していません。",
+    "claimCta": "アーティストページを見つけて「申請」をクリックして始めましょう。",
+    "browseArtists": "アーティスト一覧",
+    "contactSupport": "お困りですか？",
+    "contactSupportDesc": "名前変更やその他のリクエスト"
+  },
   "admin": {
     "saveAndTranslate": "保存して翻訳",
     "saving": "保存中...",

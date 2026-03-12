@@ -203,6 +203,21 @@
     "kora": "코라",
     "shamisen": "샤미센"
   },
+  "artistDashboard": {
+    "title": "아티스트 페이지 관리",
+    "socialLinks": "소셜 링크",
+    "aka": "별명",
+    "akaPlaceholder": "예: 예명, 별명...",
+    "save": "저장",
+    "saved": "저장되었습니다!",
+    "saveFailed": "저장에 실패했습니다. 다시 시도해 주세요.",
+    "viewPage": "아티스트 페이지 보기",
+    "noClaimedArtists": "아직 아티스트 페이지를 신청하지 않았습니다.",
+    "claimCta": "아티스트 페이지를 찾아 \"신청\"을 클릭하여 시작하세요.",
+    "browseArtists": "아티스트 둘러보기",
+    "contactSupport": "도움이 필요하세요?",
+    "contactSupportDesc": "이름 변경이나 기타 요청"
+  },
   "admin": {
     "saveAndTranslate": "저장 및 번역",
     "saving": "저장 중...",

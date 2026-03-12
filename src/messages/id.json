@@ -203,6 +203,21 @@
     "kora": "Kora",
     "shamisen": "Shamisen"
   },
+  "artistDashboard": {
+    "title": "Kelola Halaman Artis",
+    "socialLinks": "Tautan Sosial",
+    "aka": "Nama Lain",
+    "akaPlaceholder": "Contoh: nama panggung, alias...",
+    "save": "Simpan",
+    "saved": "Tersimpan!",
+    "saveFailed": "Gagal menyimpan. Silakan coba lagi.",
+    "viewPage": "Lihat Halaman Artis",
+    "noClaimedArtists": "Anda belum mengklaim halaman artis apa pun.",
+    "claimCta": "Temukan halaman artis Anda dan klik \"Klaim\" untuk memulai.",
+    "browseArtists": "Jelajahi Artis",
+    "contactSupport": "Butuh Bantuan?",
+    "contactSupportDesc": "Perubahan nama atau permintaan lainnya"
+  },
   "admin": {
     "saveAndTranslate": "Simpan & Terjemahkan",
     "saving": "Menyimpan...",

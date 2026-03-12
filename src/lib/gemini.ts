@@ -37,6 +37,8 @@ export interface TranslateOptions {
   sourceLocale: Locale;
   fieldPrefix: 'bio' | 'description';
   entityType: 'artist' | 'event' | 'venue';
+  /** When true, auto-detect language and translate to ALL 6 locales (including source locale) */
+  autoDetectLanguage?: boolean;
 }
 
 /**
@@ -105,6 +107,46 @@ Rules:
 Output as a single JSON object with field names as keys.`;
 }
 
+function buildAutoDetectBioPrompt(content: string): string {
+  const allTargets = LOCALES
+    .map((l) => `- bio_${l}: ${LANG_LABELS[l]}. ${BIO_STYLE[l]}`)
+    .join('\n');
+
+  const shortTargets = LOCALES.map((l) => {
+    switch (l) {
+      case 'zh': return `- bio_short_zh: 繁體中文摘要，60-70 字元。專業但溫暖的爵士樂評風格。`;
+      case 'en': return `- bio_short_en: English summary, ~30-40 words. Professional tone.`;
+      case 'ja': return `- bio_short_ja: 日本語の要約、約80-100文字。敬意を込めた文体。`;
+      case 'ko': return `- bio_short_ko: 한국어 요약, ~70-90자. 정중하고 전문적인 재즈 문체.`;
+      case 'th': return `- bio_short_th: สรุปภาษาไทย ~80-110 ตัวอักษร สไตล์นักวิจารณ์แจ๊สมืออาชีพ`;
+      case 'id': return `- bio_short_id: Ringkasan Bahasa Indonesia, ~30-40 kata. Gaya editor jazz profesional.`;
+    }
+  }).join('\n');
+
+  return `You are a professional jazz music translator and editor.
+
+The following bio is written in an unknown language. First detect its language, then translate/adapt it to ALL 6 target languages.
+
+Source bio:
+${content}
+
+== Task 1: Translate/adapt to ALL 6 languages ==
+For the detected source language, keep the original content as-is. For others, translate.
+${allTargets}
+
+== Task 2: Generate short summaries for ALL 6 languages ==
+${shortTargets}
+
+Rules:
+- Do NOT fabricate facts (awards, albums, collaborations must come from the source)
+- Preserve artist/venue names in their original form
+- Music terminology: use natural expressions in each target language
+- Match the length and detail level of the source bio
+- Each short summary must stand alone — don't reference other languages
+
+Output as a single JSON object with field names as keys.`;
+}
+
 function buildDescriptionPrompt(content: string, sourceLocale: Locale, entityType: 'event' | 'venue'): string {
   const targetLocales = LOCALES.filter((l) => l !== sourceLocale);
   const style = entityType === 'event' ? DESC_STYLE : BIO_STYLE;
@@ -155,9 +197,14 @@ Output as a single JSON object with field names as keys.`;
 export async function translateAndGenerate(opts: TranslateOptions): Promise<Record<string, string>> {
   if (!GEMINI_API_KEY) throw new Error('GEMINI_API_KEY not configured');
 
-  const prompt = opts.fieldPrefix === 'bio'
-    ? buildBioPrompt(opts.content, opts.sourceLocale)
-    : buildDescriptionPrompt(opts.content, opts.sourceLocale, opts.entityType as 'event' | 'venue');
+  let prompt: string;
+  if (opts.autoDetectLanguage && opts.fieldPrefix === 'bio') {
+    prompt = buildAutoDetectBioPrompt(opts.content);
+  } else if (opts.fieldPrefix === 'bio') {
+    prompt = buildBioPrompt(opts.content, opts.sourceLocale);
+  } else {
+    prompt = buildDescriptionPrompt(opts.content, opts.sourceLocale, opts.entityType as 'event' | 'venue');
+  }
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],

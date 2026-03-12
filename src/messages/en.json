@@ -207,6 +207,21 @@
     "kora": "Kora",
     "shamisen": "Shamisen"
   },
+  "artistDashboard": {
+    "title": "Manage Artist Page",
+    "socialLinks": "Social Links",
+    "aka": "Also Known As",
+    "akaPlaceholder": "e.g. stage name, alias...",
+    "save": "Save",
+    "saved": "Saved!",
+    "saveFailed": "Save failed. Please try again.",
+    "viewPage": "View Artist Page",
+    "noClaimedArtists": "You haven't claimed any artist pages yet.",
+    "claimCta": "Find your artist page and click \"Claim\" to get started.",
+    "browseArtists": "Browse Artists",
+    "contactSupport": "Need Help?",
+    "contactSupportDesc": "For name changes or other requests"
+  },
   "admin": {
     "saveAndTranslate": "Save & Translate",
     "saving": "Saving...",

@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from './AuthProvider';
-import { useAdmin } from './AdminProvider';
 import { useClaims } from './ClaimsProvider';
-import { useTranslations } from 'next-intl';
 import ClaimModal from './ClaimModal';
 
 interface ClaimButtonProps {
@@ -14,24 +14,27 @@ interface ClaimButtonProps {
 }
 
 export default function ClaimButton({ targetType, targetId, targetName }: ClaimButtonProps) {
-  const { user, setShowComingSoon } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { user, setShowAuthModal } = useAuth();
   const { getMyClaimStatus, isClaimed } = useClaims();
   const t = useTranslations('claim');
+  const locale = useLocale();
   const [showModal, setShowModal] = useState(false);
 
   const myStatus = user ? getMyClaimStatus(targetType, targetId) : null;
   const claimedByOther = isClaimed(targetType, targetId) && myStatus !== 'approved';
 
-  // Already approved for this user — show "You manage this page"
+  // Already approved for this user — show "You manage this page" linking to dashboard
   if (myStatus === 'approved') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30">
+      <Link
+        href={`/${locale}/profile/artist/${targetId}`}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
+      >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 6L9 17l-5-5" />
         </svg>
         {t('managedByYou')}
-      </span>
+      </Link>
     );
   }
 
@@ -66,9 +69,9 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     e.preventDefault();
     e.stopPropagation();
 
-    if (!user || !isAdmin) {
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      setShowComingSoon({ x: rect.left + rect.width / 2, y: rect.top });
+    if (!user) {
+      // Not logged in — prompt login
+      setShowAuthModal(true);
       return;
     }
 

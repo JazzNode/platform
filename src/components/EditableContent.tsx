@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { useAdmin } from './AdminProvider';
+import { useCanEdit } from '@/hooks/useCanEdit';
 
 interface EditableContentProps {
   entityType: 'artist' | 'event' | 'venue';
@@ -29,7 +29,10 @@ export default function EditableContent({
   shortContentClassName = '',
   wrapperClassName,
 }: EditableContentProps) {
-  const { isAdmin, token, handleUnauthorized } = useAdmin();
+  const { canEdit, isAdmin, token, handleUnauthorized } = useCanEdit(
+    entityType as 'artist' | 'venue',
+    entityId,
+  );
   const router = useRouter();
   const t = useTranslations('admin');
   const [editing, setEditing] = useState(false);
@@ -68,7 +71,8 @@ export default function EditableContent({
     setWarning(null);
 
     try {
-      const res = await fetch('/api/admin/update-content', {
+      const endpoint = isAdmin ? '/api/admin/update-content' : '/api/artist/update-content';
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -112,8 +116,8 @@ export default function EditableContent({
     }
   }, [token, draft, entityType, entityId, fieldPrefix, locale, router, handleUnauthorized, t]);
 
-  // Non-admin: render content as-is
-  if (!isAdmin) {
+  // Cannot edit: render content as-is
+  if (!canEdit) {
     return (
       <>
         {shortContent && <p className={shortContentClassName}>{shortContent}</p>}

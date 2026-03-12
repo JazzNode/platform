@@ -207,6 +207,21 @@
     "kora": "科拉琴",
     "shamisen": "三味線"
   },
+  "artistDashboard": {
+    "title": "管理藝人頁面",
+    "socialLinks": "社群連結",
+    "aka": "別名",
+    "akaPlaceholder": "例：藝名、暱稱...",
+    "save": "儲存",
+    "saved": "已儲存！",
+    "saveFailed": "儲存失敗，請再試一次。",
+    "viewPage": "查看藝人頁面",
+    "noClaimedArtists": "你尚未認領任何藝人頁面。",
+    "claimCta": "找到你的藝人頁面，點擊「認領」即可開始。",
+    "browseArtists": "瀏覽藝人",
+    "contactSupport": "需要協助？",
+    "contactSupportDesc": "更改名稱或其他需求"
+  },
   "admin": {
     "saveAndTranslate": "儲存並翻譯",
     "saving": "儲存中...",
