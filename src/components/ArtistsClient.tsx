@@ -27,6 +27,7 @@ interface CityOption {
   recordId: string;
   label: string;
   artistCount: number;
+  countryCode: string;
 }
 
 interface VenueOption {

@@ -18,14 +18,18 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     getArtists(), getCities(), getVenues(),
   ]);
 
-  // Collect unique instruments (from primary_instrument, lowercased)
-  const instrumentSet = new Set<string>();
+  // Collect unique instruments with counts (from primary_instrument, lowercased)
+  const instrumentCount = new Map<string, number>();
   for (const a of artists) {
     if (a.fields.primary_instrument) {
-      instrumentSet.add(a.fields.primary_instrument.toLowerCase());
+      const inst = a.fields.primary_instrument.toLowerCase();
+      instrumentCount.set(inst, (instrumentCount.get(inst) || 0) + 1);
     }
   }
-  const instruments = [...instrumentSet].sort();
+  // Sort by count descending, then alphabetically for ties
+  const instruments = [...instrumentCount.keys()].sort((a, b) =>
+    (instrumentCount.get(b)! - instrumentCount.get(a)!) || a.localeCompare(b)
+  );
 
   // Build instrument translation map for client component
   const instrumentNames: Record<string, string> = {};
@@ -51,8 +55,13 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       recordId: c.id,
       label: cityName(c.fields, locale),
       artistCount: cityArtistCount.get(c.id) || 0,
+      countryCode: c.fields.country_code || 'ZZ',
     }))
-    .sort((a, b) => b.artistCount - a.artistCount);
+    // Group by country code alphabetically (matching events world map), then by artist count within country
+    .sort((a, b) =>
+      a.countryCode.localeCompare(b.countryCode)
+      || b.artistCount - a.artistCount
+    );
 
   // Build city record-id → name/country lookup for venue labels & sorting
   const cityNameMap = new Map<string, string>();
