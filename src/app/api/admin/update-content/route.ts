@@ -3,17 +3,20 @@ import { updateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { translateAndGenerate } from '@/lib/gemini';
-import { TABLE_IDS } from '@/lib/airtable';
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID!;
+import { createAdminClient } from '@/utils/supabase/admin';
 
 const LOCALES = ['en', 'zh', 'ja', 'ko', 'th', 'id'];
 
 const ENTITY_TABLE: Record<string, string> = {
-  artist: TABLE_IDS.Artists,
-  event: TABLE_IDS.Events,
-  venue: TABLE_IDS.Venues,
+  artist: 'artists',
+  event: 'events',
+  venue: 'venues',
+};
+
+const ENTITY_PK: Record<string, string> = {
+  artist: 'artist_id',
+  event: 'event_id',
+  venue: 'venue_id',
 };
 
 const ENTITY_TAG: Record<string, string> = {
@@ -31,7 +34,6 @@ export async function POST(req: NextRequest) {
   try {
     const { entityType, entityId, fieldPrefix, sourceLocale, content } = await req.json();
 
-    // Validate inputs
     if (!entityType || !entityId || !fieldPrefix || !sourceLocale || !content) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
@@ -45,10 +47,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid field prefix' }, { status: 400 });
     }
 
-    // Determine whether to generate short versions
     const needShort = !(entityType === 'venue' && fieldPrefix === 'description');
 
-    // Call Gemini for translation + short generation
     let translationFailed = false;
     let translationError: string | undefined;
     let geminiResult: Record<string, string> = {};
@@ -66,20 +66,16 @@ export async function POST(req: NextRequest) {
       translationError = err instanceof Error ? err.message : 'Translation failed';
     }
 
-    // Build Airtable update payload
+    // Build Supabase update payload
     const fields: Record<string, string> = {};
-
-    // Always write the source locale content
     fields[`${fieldPrefix}_${sourceLocale}`] = content;
 
     if (!translationFailed) {
-      // Write translated fields
       const targetLocales = LOCALES.filter((l) => l !== sourceLocale);
       for (const locale of targetLocales) {
         const key = `${fieldPrefix}_${locale}`;
         if (geminiResult[key]) fields[key] = geminiResult[key];
       }
-      // Write short fields
       if (needShort) {
         for (const locale of LOCALES) {
           const key = `${fieldPrefix}_short_${locale}`;
@@ -88,26 +84,20 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // PATCH Airtable
-    const tableId = ENTITY_TABLE[entityType];
-    const airtableRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${tableId}/${entityId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fields }),
-      },
-    );
+    // Update Supabase
+    const supabase = createAdminClient();
+    const table = ENTITY_TABLE[entityType];
+    const pk = ENTITY_PK[entityType];
 
-    if (!airtableRes.ok) {
-      const errText = await airtableRes.text();
-      throw new Error(`Airtable update failed: ${errText}`);
+    const { error: updateError } = await supabase
+      .from(table)
+      .update({ ...fields, updated_at: new Date().toISOString() })
+      .eq(pk, entityId);
+
+    if (updateError) {
+      throw new Error(`Supabase update failed: ${updateError.message}`);
     }
 
-    // Revalidate cache
     updateTag(ENTITY_TAG[entityType]);
 
     writeAuditLog({

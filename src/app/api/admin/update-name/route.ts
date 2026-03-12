@@ -2,17 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { updateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
-import { TABLE_IDS } from '@/lib/airtable';
-
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY!;
-const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID!;
+import { createAdminClient } from '@/utils/supabase/admin';
 
 const ALLOWED_FIELDS = ['name_local', 'name_en', 'display_name', 'title_local', 'title_en'] as const;
 
 const ENTITY_TABLE: Record<string, string> = {
-  artist: TABLE_IDS.Artists,
-  event: TABLE_IDS.Events,
-  venue: TABLE_IDS.Venues,
+  artist: 'artists',
+  event: 'events',
+  venue: 'venues',
+};
+
+const ENTITY_PK: Record<string, string> = {
+  artist: 'artist_id',
+  event: 'event_id',
+  venue: 'venue_id',
 };
 
 const ENTITY_TAG: Record<string, string> = {
@@ -40,22 +43,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid field' }, { status: 400 });
     }
 
-    const tableId = ENTITY_TABLE[entityType];
-    const airtableRes = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${tableId}/${entityId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ fields: { [field]: value } }),
-      },
-    );
+    const supabase = createAdminClient();
+    const table = ENTITY_TABLE[entityType];
+    const pk = ENTITY_PK[entityType];
 
-    if (!airtableRes.ok) {
-      const errText = await airtableRes.text();
-      throw new Error(`Airtable update failed: ${errText}`);
+    const { error: updateError } = await supabase
+      .from(table)
+      .update({ [field]: value, updated_at: new Date().toISOString() })
+      .eq(pk, entityId);
+
+    if (updateError) {
+      throw new Error(`Supabase update failed: ${updateError.message}`);
     }
 
     updateTag(ENTITY_TAG[entityType]);

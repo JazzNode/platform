@@ -2,6 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/airtable';
 import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey, parseSpotifyEmbedUrl, parseYouTubeVideoId } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
@@ -32,7 +33,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const [artists, events, venues, badges, lineups, cities, tags] = await Promise.all([
     getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(), getTags().catch(() => []),
   ]);
-  const artist = artists.find((a) => a.id === slug);
+  let artist = artists.find((a) => a.id === slug);
+
+  // Legacy URL redirect: old Airtable record IDs → semantic slugs
+  if (!artist && slug.startsWith('rec')) {
+    const legacy = artists.find((a) => (a.fields as Record<string, unknown>).airtable_record_id === slug);
+    if (legacy) redirect(`/${locale}/artists/${legacy.id}`);
+  }
 
   if (!artist) {
     return (
