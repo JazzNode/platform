@@ -30,7 +30,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   // Keep Supabase access token in sync for API calls
   useEffect(() => {
     if (!user) {
-      setToken(null);
+      setToken(null); // eslint-disable-line react-hooks/set-state-in-effect -- intentional reset on logout
       return;
     }
 

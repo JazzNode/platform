@@ -17,7 +17,10 @@ export default function ComingSoonToast() {
 
   // Clamp to viewport so it doesn't overflow off-screen
   useEffect(() => {
-    if (!showComingSoon || !ref.current) { setNudge(null); return; }
+    if (!showComingSoon || !ref.current) {
+      setNudge(null); // eslint-disable-line react-hooks/set-state-in-effect -- intentional reset when toast hidden
+      return;
+    }
     const el = ref.current;
     const rect = el.getBoundingClientRect();
     if (rect.left < 8) setNudge('right');

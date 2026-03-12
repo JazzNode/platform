@@ -25,7 +25,7 @@ export default function FollowsProvider({ children }: { children: React.ReactNod
   // Fetch all follows on login
   useEffect(() => {
     if (!user) {
-      setKeys(new Set());
+      setKeys(new Set()); // eslint-disable-line react-hooks/set-state-in-effect -- intentional reset on logout
       return;
     }
 
