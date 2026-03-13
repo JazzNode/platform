@@ -46,7 +46,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
   // Resolve params
   useEffect(() => {
-    params.then((p) => setSlug(p.slug));
+    params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
   // Auth + permission check
