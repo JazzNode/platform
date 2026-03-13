@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/components/AdminProvider';
+import { useAuth } from '@/components/AuthProvider';
 import { useTranslations } from 'next-intl';
 import Link from 'next/link';
 
@@ -32,6 +33,7 @@ type TabFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
 export default function AdminClaimsPage() {
   const { isAdmin, token } = useAdmin();
+  const { loading: authLoading } = useAuth();
   const router = useRouter();
   const t = useTranslations('claim');
   const [claims, setClaims] = useState<Claim[]>([]);
@@ -41,10 +43,10 @@ export default function AdminClaimsPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [tab, setTab] = useState<TabFilter>('pending');
 
-  // Redirect if not admin
+  // Redirect if not admin (wait for auth to finish loading first)
   useEffect(() => {
-    if (!isAdmin) router.push('/');
-  }, [isAdmin, router]);
+    if (!authLoading && !isAdmin) router.push('/');
+  }, [authLoading, isAdmin, router]);
 
   const fetchClaims = useCallback(async () => {
     if (!token) return;
@@ -98,7 +100,7 @@ export default function AdminClaimsPage() {
   const filtered = tab === 'all' ? claims : claims.filter((c) => c.status === tab);
   const pendingCount = claims.filter((c) => c.status === 'pending').length;
 
-  if (!isAdmin) return null;
+  if (authLoading || !isAdmin) return null;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8">
