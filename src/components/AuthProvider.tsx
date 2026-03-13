@@ -61,9 +61,9 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const supabase = createClient();
 
     // Get initial session
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       setUser(user);
-      if (user) fetchProfile(user.id);
+      if (user) await fetchProfile(user.id);
       setLoading(false);
     });
 
