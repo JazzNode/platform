@@ -55,7 +55,7 @@ export default function VenuePremiumPage({ params }: { params: Promise<{ slug: s
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('premiumLockedHint')}
             </p>
-            <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button onClick={() => alert(t('comingSoon'))} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('premiumCTA')}
             </button>
           </div>
