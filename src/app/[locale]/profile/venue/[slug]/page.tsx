@@ -1,133 +1,64 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/components/AuthProvider';
-import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
-interface VenueData {
-  venue_id: string;
-  display_name: string | null;
-  name_local: string | null;
-  name_en: string | null;
-  website_url: string | null;
-  instagram: string | null;
-  facebook_url: string | null;
-  phone: string | null;
-  contact_email: string | null;
-  business_hour: string | null;
-}
-
-export default function VenueEditPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function VenueOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const locale = useLocale();
-  const router = useRouter();
-  const { user, profile, loading } = useAuth();
-  const { token } = useAdmin();
 
-  const [slug, setSlug] = useState<string>('');
-  const [venue, setVenue] = useState<VenueData | null>(null);
-  const [fetching, setFetching] = useState(true);
+  const [slug, setSlug] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ pageViews: 0, followers: 0, eventsThisMonth: 0 });
 
-  // Form state
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [facebookUrl, setFacebookUrl] = useState('');
-  const [phone, setPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [businessHour, setBusinessHour] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Resolve params
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  // Auth + permission check
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-      return;
-    }
-    if (!loading && profile && slug) {
-      if (!profile.claimed_venue_ids?.includes(slug) && profile.role !== 'admin') {
-        router.push(`/${locale}/profile`);
-      }
-    }
-  }, [loading, user, profile, slug, locale, router]);
-
-  // Fetch venue data
   useEffect(() => {
     if (!slug) return;
     const supabase = createClient();
-    supabase
-      .from('venues')
-      .select('venue_id, display_name, name_local, name_en, website_url, instagram, facebook_url, phone, contact_email, business_hour')
-      .eq('venue_id', slug)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setVenue(data);
-          setWebsiteUrl(data.website_url || '');
-          setInstagram(data.instagram || '');
-          setFacebookUrl(data.facebook_url || '');
-          setPhone(data.phone || '');
-          setContactEmail(data.contact_email || '');
-          setBusinessHour(data.business_hour || '');
-        }
-        setFetching(false);
+
+    const fetchStats = async () => {
+      // Page views (total)
+      const { count: viewCount } = await supabase
+        .from('venue_page_views')
+        .select('id', { count: 'exact', head: true })
+        .eq('venue_id', slug);
+
+      // Followers
+      const { count: followerCount } = await supabase
+        .from('follows')
+        .select('id', { count: 'exact', head: true })
+        .eq('target_type', 'venue')
+        .eq('target_id', slug);
+
+      // Events this month
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+      const { count: eventCount } = await supabase
+        .from('events')
+        .select('event_id', { count: 'exact', head: true })
+        .eq('venue_id', slug)
+        .gte('start_at', startOfMonth)
+        .lte('start_at', endOfMonth);
+
+      setStats({
+        pageViews: viewCount || 0,
+        followers: followerCount || 0,
+        eventsThisMonth: eventCount || 0,
       });
+      setLoading(false);
+    };
+
+    fetchStats();
   }, [slug]);
 
-  const venueName = venue?.display_name || venue?.name_local || venue?.name_en || slug;
-
-  const handleSave = useCallback(async () => {
-    if (!token || !slug) return;
-    setSaving(true);
-    setError(null);
-    setSaved(false);
-
-    try {
-      const res = await fetch('/api/venue/update-profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          venueId: slug,
-          fields: {
-            website_url: websiteUrl,
-            instagram,
-            facebook_url: facebookUrl,
-            phone,
-            contact_email: contactEmail,
-            business_hour: businessHour,
-          },
-        }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Update failed');
-      }
-
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('saveFailed'));
-    } finally {
-      setSaving(false);
-    }
-  }, [token, slug, websiteUrl, instagram, facebookUrl, phone, contactEmail, businessHour, t]);
-
-  if (loading || fetching) {
+  if (loading) {
     return (
       <div className="py-24 text-center">
         <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
@@ -135,172 +66,73 @@ export default function VenueEditPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  if (!venue) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Venue not found.</p>
-      </div>
-    );
-  }
-
-  const inputClass = 'w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors';
+  const basePath = `/${locale}/profile/venue/${slug}`;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="space-y-6">
       <FadeUp>
-        <div className="flex items-center justify-between">
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('title')}</h1>
-          <Link
-            href={`/${locale}/venues/${encodeURIComponent(slug)}`}
-            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors link-lift"
-          >
-            {t('viewPage')} →
-          </Link>
-        </div>
-        <p className="text-[var(--muted-foreground)] mt-2">{venueName}</p>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('overviewTitle')}</h1>
       </FadeUp>
 
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <FadeUp>
+          <div className="bg-gradient-to-br from-[var(--color-gold)]/8 to-[var(--color-gold)]/3 border border-[var(--color-gold)]/20 rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('totalPageViews')}</p>
+            <p className="text-3xl font-bold text-[var(--color-gold)]">{stats.pageViews.toLocaleString()}</p>
+          </div>
+        </FadeUp>
+        <FadeUp>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('followerCount')}</p>
+            <p className="text-3xl font-bold">{stats.followers.toLocaleString()}</p>
+          </div>
+        </FadeUp>
+        <FadeUp>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('eventsThisMonth')}</p>
+            <p className="text-3xl font-bold">{stats.eventsThisMonth.toLocaleString()}</p>
+          </div>
+        </FadeUp>
+      </div>
+
+      {/* Quick Actions */}
       <FadeUp>
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 space-y-8">
-          {/* Social Links */}
-          <div className="space-y-5">
-            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
-              {t('socialLinks')}
-            </h2>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Instagram
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60">@</span>
-                <input
-                  type="text"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ''))}
-                  className={`${inputClass} pl-9`}
-                  placeholder="username"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Facebook
-              </label>
-              <input
-                type="url"
-                value={facebookUrl}
-                onChange={(e) => setFacebookUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://facebook.com/..."
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Website
-              </label>
-              <input
-                type="url"
-                value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://"
-              />
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-[var(--border)]" />
-
-          {/* Contact Info */}
-          <div className="space-y-5">
-            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
-              {t('contactInfo')}
-            </h2>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                {t('phone')}
-              </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className={inputClass}
-                placeholder="+886-2-xxxx-xxxx"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-                className={inputClass}
-                placeholder="hello@venue.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                {t('businessHours')}
-              </label>
-              <textarea
-                value={businessHour}
-                onChange={(e) => setBusinessHour(e.target.value)}
-                className={`${inputClass} resize-none`}
-                rows={3}
-                placeholder={t('businessHoursPlaceholder')}
-              />
-            </div>
-          </div>
-
-          {/* Save button */}
-          {error && <p className="text-xs text-red-400">{error}</p>}
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="btn-magnetic px-8 py-3 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-[#0A0A0A]/30 border-t-[#0A0A0A] rounded-full animate-spin" />
-              ) : saved ? (
-                t('saved')
-              ) : (
-                t('save')
-              )}
-            </button>
-          </div>
-
-          {/* View Public Page */}
-          <div className="border-t border-[var(--border)] pt-6 flex items-center justify-between">
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6">
+          <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">
+            {t('quickActions')}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link
-              href={`/${locale}/venues/${encodeURIComponent(slug)}`}
-              className="inline-flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
+              href={`${basePath}/edit`}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/5 transition-all"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-                <polyline points="15 3 21 3 21 9" />
-                <line x1="10" y1="14" x2="21" y2="3" />
+              <svg className="w-5 h-5 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
               </svg>
-              <span>{t('viewPage')}</span>
+              <span className="text-sm font-medium">{t('editProfile')}</span>
             </Link>
-            <a
-              href="mailto:hello@jazznode.com?subject=Venue%20Page%20Support"
-              className="inline-flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
+            <Link
+              href={`${basePath}/analytics`}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/5 transition-all"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <svg className="w-5 h-5 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
+                <path d="M7 14l4-4 4 4 6-6" />
               </svg>
-              <span>{t('contactSupport')}</span>
-            </a>
+              <span className="text-sm font-medium">{t('viewAnalytics')}</span>
+            </Link>
+            <Link
+              href={`${basePath}/premium`}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/5 transition-all"
+            >
+              <svg className="w-5 h-5 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span className="text-sm font-medium">{t('managePremium')}</span>
+            </Link>
           </div>
         </div>
       </FadeUp>
