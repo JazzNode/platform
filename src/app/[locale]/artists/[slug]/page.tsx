@@ -24,11 +24,14 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const artist = artists.find((a) => a.id === slug);
   const name = artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist';
   const bio = artist?.fields.bio_en || artist?.fields.bio_zh || '';
-  const photo = artist?.fields.photo_url || undefined;
+  const ogParams = new URLSearchParams({ name });
+  if (artist?.fields.primary_instrument) ogParams.set('instrument', artist.fields.primary_instrument);
+  if (artist?.fields.photo_url) ogParams.set('photo', artist.fields.photo_url);
+  const ogUrl = `/api/og/artist?${ogParams.toString()}`;
   return {
     title: name,
     ...(bio && { description: bio.slice(0, 160) }),
-    ...(photo && { openGraph: { images: [{ url: photo }] } }),
+    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
     alternates: {
       canonical: `/${locale}/artists/${slug}`,
       languages: {

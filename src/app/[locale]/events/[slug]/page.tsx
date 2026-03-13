@@ -18,10 +18,23 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const event = events.find((e) => e.id === slug);
   const title = event ? eventTitle(event.fields, 'en') : 'Event';
   const desc = event?.fields.description_en || event?.fields.description_zh || '';
+  // Build dynamic OG image
+  const ogParams = new URLSearchParams({ title });
+  if (event) {
+    const venues = await getVenues();
+    const v = venues.find((v) => v.id === event.fields.venue_id?.[0]);
+    if (v) ogParams.set('venue', v.fields.display_name || v.fields.name_en || v.fields.name_local || '');
+    if (event.fields.start_at) {
+      const d = new Date(event.fields.start_at);
+      ogParams.set('date', d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: event.fields.timezone || 'Asia/Taipei' }));
+    }
+    if (event.fields.poster_url) ogParams.set('poster', event.fields.poster_url);
+  }
+  const ogUrl = `/api/og/event?${ogParams.toString()}`;
   return {
     title,
     ...(desc && { description: desc.slice(0, 160) }),
-    ...(event?.fields.poster_url && { openGraph: { images: [{ url: event.fields.poster_url }] } }),
+    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
     alternates: {
       canonical: `/${locale}/events/${slug}`,
       languages: {
