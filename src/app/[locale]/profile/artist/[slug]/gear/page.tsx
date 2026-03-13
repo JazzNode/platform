@@ -222,7 +222,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
         <FadeUp>
           <div className="bg-gradient-to-br from-[var(--color-gold)]/5 to-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-2xl p-6 text-center">
             <p className="text-sm mb-3">{t('gearLimitReached')}</p>
-            <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button onClick={() => alert(t('comingSoon') || 'Coming Soon')} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

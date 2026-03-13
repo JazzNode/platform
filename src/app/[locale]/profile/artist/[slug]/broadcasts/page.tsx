@@ -178,7 +178,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('broadcastLockedHint')}
             </p>
-            <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button onClick={() => alert(t('comingSoon') || t('premiumCTA', { defaultValue: 'Coming Soon' }))} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>
