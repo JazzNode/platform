@@ -238,6 +238,7 @@
     "claimPage": "認領",
     "claimAgain": "重新認領",
     "claimPending": "審核中",
+    "cancelClaim": "取消認領",
     "claimDescription": "請說明你與 {name} 的關係。我們會審核你的申請並通知結果。",
     "claimEvidence": "你的關係",
     "claimEvidencePlaceholder": "例：我就是這位藝人 / 我是這位藝人的經紀人...",

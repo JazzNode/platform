@@ -234,6 +234,7 @@
     "claimPage": "ยืนยันตัวตน",
     "claimAgain": "ยื่นใหม่",
     "claimPending": "รอตรวจสอบ",
+    "cancelClaim": "ยกเลิกคำขอ",
     "claimDescription": "กรุณาอธิบายความสัมพันธ์ของคุณกับ {name} เราจะตรวจสอบคำขอและแจ้งผลให้ทราบ",
     "claimEvidence": "ความสัมพันธ์",
     "claimEvidencePlaceholder": "เช่น ฉันเป็นศิลปินท่านนี้ / ฉันเป็นผู้จัดการ...",

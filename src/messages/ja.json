@@ -234,6 +234,7 @@
     "claimPage": "認証申請",
     "claimAgain": "再申請",
     "claimPending": "審査中",
+    "cancelClaim": "申請を取消",
     "claimDescription": "{name}との関係を説明してください。申請を審査し、結果をお知らせします。",
     "claimEvidence": "関係",
     "claimEvidencePlaceholder": "例：私はこのアーティスト本人です / マネージャーです...",

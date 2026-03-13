@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from './AuthProvider';
@@ -15,10 +15,19 @@ interface ClaimButtonProps {
 
 export default function ClaimButton({ targetType, targetId, targetName }: ClaimButtonProps) {
   const { user, setShowAuthModal } = useAuth();
-  const { getMyClaimStatus, isClaimed } = useClaims();
+  const { getMyClaimStatus, isClaimed, cancelClaim } = useClaims();
   const t = useTranslations('claim');
   const locale = useLocale();
   const [showModal, setShowModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancel = useCallback(async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCancelling(true);
+    await cancelClaim(targetType, targetId);
+    setCancelling(false);
+  }, [cancelClaim, targetType, targetId]);
 
   const myStatus = user ? getMyClaimStatus(targetType, targetId) : null;
   const claimedByOther = isClaimed(targetType, targetId) && myStatus !== 'approved';
@@ -50,15 +59,34 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     );
   }
 
-  // Pending claim by current user
+  // Pending claim by current user — show status + cancel button
   if (myStatus === 'pending') {
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-amber-400/80 border border-amber-400/20 bg-amber-400/5">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <polyline points="12 6 12 12 16 14" />
-        </svg>
-        {t('claimPending')}
+      <span className="inline-flex items-center gap-1.5 rounded-xl text-xs font-medium tracking-wide text-amber-400/80 border border-amber-400/20 bg-amber-400/5">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          {t('claimPending')}
+        </span>
+        <button
+          onClick={handleCancel}
+          disabled={cancelling}
+          className="inline-flex items-center gap-1 px-2 py-1.5 border-l border-amber-400/20 text-amber-400/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl disabled:opacity-50"
+          title={t('cancelClaim')}
+        >
+          {cancelling ? (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="animate-spin">
+              <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="12" />
+            </svg>
+          ) : (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          )}
+        </button>
       </span>
     );
   }

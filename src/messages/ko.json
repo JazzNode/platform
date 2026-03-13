@@ -234,6 +234,7 @@
     "claimPage": "인증 신청",
     "claimAgain": "재신청",
     "claimPending": "심사 중",
+    "cancelClaim": "신청 취소",
     "claimDescription": "{name}과의 관계를 설명해 주세요. 신청을 검토한 후 결과를 알려드리겠습니다.",
     "claimEvidence": "관계",
     "claimEvidencePlaceholder": "예: 저는 이 아티스트 본인입니다 / 매니저입니다...",

@@ -234,6 +234,7 @@
     "claimPage": "Klaim",
     "claimAgain": "Klaim Lagi",
     "claimPending": "Menunggu",
+    "cancelClaim": "Batalkan Klaim",
     "claimDescription": "Jelaskan hubungan Anda dengan {name}. Kami akan meninjau permintaan Anda dan menghubungi Anda.",
     "claimEvidence": "Hubungan Anda",
     "claimEvidencePlaceholder": "Contoh: Saya adalah artis ini / Saya manajer artis ini...",

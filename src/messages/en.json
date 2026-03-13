@@ -238,6 +238,7 @@
     "claimPage": "Claim",
     "claimAgain": "Claim Again",
     "claimPending": "Pending",
+    "cancelClaim": "Cancel Claim",
     "claimDescription": "Please describe your relationship with {name}. We'll review your request and get back to you.",
     "claimEvidence": "Your relationship",
     "claimEvidencePlaceholder": "e.g. I am this artist / I manage this artist...",

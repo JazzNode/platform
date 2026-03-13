@@ -20,6 +20,8 @@ interface ClaimsContextType {
   isClaimed: (type: TargetType, id: string) => boolean;
   /** Submit a new claim */
   submitClaim: (type: TargetType, id: string, evidenceText: string) => Promise<{ error?: string }>;
+  /** Cancel a pending claim */
+  cancelClaim: (type: TargetType, id: string) => Promise<{ error?: string }>;
   loading: boolean;
 }
 
@@ -111,8 +113,34 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
     [user],
   );
 
+  const cancelClaim = useCallback(
+    async (type: TargetType, id: string): Promise<{ error?: string }> => {
+      if (!user) return { error: 'Not logged in' };
+
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('claims')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('target_type', type)
+        .eq('target_id', id)
+        .eq('status', 'pending');
+
+      if (error) {
+        console.error('Claim cancellation failed:', error);
+        return { error: error.message };
+      }
+
+      // Optimistic update — remove from local state
+      setMyClaims((prev) => prev.filter((c) => !(c.target_type === type && c.target_id === id && c.status === 'pending')));
+
+      return {};
+    },
+    [user],
+  );
+
   return (
-    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, submitClaim, loading }}>
+    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, submitClaim, cancelClaim, loading }}>
       {children}
     </ClaimsContext.Provider>
   );
