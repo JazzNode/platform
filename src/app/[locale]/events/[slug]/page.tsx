@@ -90,8 +90,64 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     ? [{ artist: primaryArtist, instruments: [], role: 'ensemble' as string | undefined }, ...lineupArtistsDeduped]
     : lineupArtistsDeduped;
 
+  // ─── JSON-LD structured data (schema.org/Event) ───
+  const localeToInLanguage: Record<string, string> = {
+    en: 'en', zh: 'zh-Hant', ja: 'ja', ko: 'ko', th: 'th', id: 'id',
+  };
+  const eventStatus = f.lifecycle_status === 'cancelled'
+    ? 'https://schema.org/EventCancelled'
+    : f.lifecycle_status === 'postponed'
+      ? 'https://schema.org/EventPostponed'
+      : 'https://schema.org/EventScheduled';
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'MusicEvent',
+    name: eventTitle(f, locale),
+    ...(f.start_at && { startDate: f.start_at }),
+    ...(f.end_at && { endDate: f.end_at }),
+    eventStatus,
+    eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+    ...(desc && { description: desc }),
+    ...(f.poster_url && { image: f.poster_url }),
+    ...(f.source_url && { url: f.source_url }),
+    ...(localeToInLanguage[locale] && { inLanguage: localeToInLanguage[locale] }),
+    ...(venue && {
+      location: {
+        '@type': 'MusicVenue',
+        name: displayName(venue.fields),
+        ...((venue.fields.address_local || venue.fields.address_en) && {
+          address: {
+            '@type': 'PostalAddress',
+            ...(venue.fields.address_en && { streetAddress: venue.fields.address_en }),
+          },
+        }),
+        ...((venue.fields.lat && venue.fields.lng) && {
+          geo: { '@type': 'GeoCoordinates', latitude: venue.fields.lat, longitude: venue.fields.lng },
+        }),
+      },
+    }),
+    ...(lineupArtists.length > 0 && {
+      performer: lineupArtists.map(({ artist }) => ({
+        '@type': artist.fields.type === 'group' || artist.fields.type === 'big band'
+          ? 'MusicGroup' : 'Person',
+        name: artistDisplayName(artist.fields, locale),
+      })),
+    }),
+    ...(f.price_info != null && {
+      offers: {
+        '@type': 'Offer',
+        ...(venue?.fields.currency && { priceCurrency: venue.fields.currency }),
+        price: f.price_info,
+        availability: 'https://schema.org/InStock',
+        ...(f.source_url && { url: f.source_url }),
+      },
+    }),
+  };
+
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       {/* Back link */}
       <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}

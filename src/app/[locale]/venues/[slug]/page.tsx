@@ -98,7 +98,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     .filter(Boolean) as { id: string; fields: typeof artists[number]['fields'] }[];
 
   // JSON-LD structured data for SEO
+  const localeToInLanguage: Record<string, string> = {
+    en: 'en', zh: 'zh-Hant', ja: 'ja', ko: 'ko', th: 'th', id: 'id',
+  };
   const city = f.city_id?.[0] ? cityMap.get(f.city_id[0]) : null;
+  const venueSameAs = [
+    f.website_url, f.facebook_url,
+    f.instagram ? `https://www.instagram.com/${f.instagram.replace(/^@/, '')}` : undefined,
+  ].filter(Boolean) as string[];
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'MusicVenue',
@@ -108,10 +115,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     ...(f.website_url && { url: f.website_url }),
     ...(f.phone && { telephone: f.phone }),
     ...(f.contact_email && { email: f.contact_email }),
+    ...(localeToInLanguage[locale] && { inLanguage: localeToInLanguage[locale] }),
+    ...(venueSameAs.length > 0 && { sameAs: venueSameAs }),
     ...((f.address_local || f.address_en) && {
       address: {
         '@type': 'PostalAddress',
         ...(f.address_en && { streetAddress: f.address_en }),
+        ...(f.address_local && { streetAddress: f.address_local }),
         ...(city && { addressLocality: cityName(city, 'en') }),
         ...(city?.country_code && { addressCountry: city.country_code }),
       },

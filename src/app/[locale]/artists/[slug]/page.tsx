@@ -213,8 +213,35 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const hasNetwork = hasVersatility || topCollaborators.length > 0;
   const hasHubs = artistVenues.length > 0 || artistCities.length > 0;
 
+  // ─── JSON-LD structured data (schema.org) ───
+  const localeToInLanguage: Record<string, string> = {
+    en: 'en', zh: 'zh-Hant', ja: 'ja', ko: 'ko', th: 'th', id: 'id',
+  };
+  const sameAs = [
+    f.website_url, f.spotify_url, f.youtube_url, f.facebook_url,
+    f.instagram ? `https://www.instagram.com/${f.instagram.replace(/^@/, '')}` : undefined,
+  ].filter(Boolean) as string[];
+  const artistBio = bioFull || bioShort || desc;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': f.type === 'group' || f.type === 'big band' ? 'MusicGroup' : 'Person',
+    name: artistDisplayName(f, locale),
+    ...(artistBio && { description: artistBio }),
+    ...(photoUrl(f.photo_url) && { image: photoUrl(f.photo_url) }),
+    ...(sameAs.length > 0 && { sameAs }),
+    ...(localeToInLanguage[locale] && { inLanguage: localeToInLanguage[locale] }),
+    ...(f.primary_instrument && { knowsAbout: f.primary_instrument }),
+    ...(isGroupType && groupMembers.length > 0 && {
+      member: groupMembers.map((m) => ({
+        '@type': 'Person',
+        name: artistDisplayName(m.fields, locale),
+      })),
+    }),
+  };
+
   return (
     <div>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
