@@ -218,6 +218,19 @@
     "contactSupport": "ต้องการความช่วยเหลือ?",
     "contactSupportDesc": "เปลี่ยนชื่อหรือคำขออื่น ๆ"
   },
+  "venueDashboard": {
+    "title": "จัดการหน้าสถานที่",
+    "socialLinks": "ลิงก์โซเชียล",
+    "contactInfo": "ข้อมูลติดต่อ",
+    "phone": "โทรศัพท์",
+    "businessHours": "เวลาเปิดทำการ",
+    "businessHoursPlaceholder": "เช่น อ.–ส. 19:00–01:00",
+    "save": "บันทึก",
+    "saved": "บันทึกแล้ว!",
+    "saveFailed": "บันทึกไม่สำเร็จ กรุณาลองอีกครั้ง",
+    "viewPage": "ดูหน้าสถานที่",
+    "contactSupport": "ต้องการความช่วยเหลือ?"
+  },
   "admin": {
     "saveAndTranslate": "บันทึกและแปล",
     "saving": "กำลังบันทึก...",

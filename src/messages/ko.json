@@ -218,6 +218,19 @@
     "contactSupport": "도움이 필요하세요?",
     "contactSupportDesc": "이름 변경이나 기타 요청"
   },
+  "venueDashboard": {
+    "title": "공연장 페이지 관리",
+    "socialLinks": "소셜 링크",
+    "contactInfo": "연락처",
+    "phone": "전화번호",
+    "businessHours": "영업시간",
+    "businessHoursPlaceholder": "예: 화~토 19:00–01:00",
+    "save": "저장",
+    "saved": "저장됨!",
+    "saveFailed": "저장 실패. 다시 시도해 주세요.",
+    "viewPage": "공연장 페이지 보기",
+    "contactSupport": "도움이 필요하세요?"
+  },
   "admin": {
     "saveAndTranslate": "저장 및 번역",
     "saving": "저장 중...",

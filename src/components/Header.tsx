@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearch } from './SearchProvider';
 import { useAuth } from './AuthProvider';
 import { useAdmin } from './AdminProvider';
+import { createClient } from '@/utils/supabase/client';
 
 const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
@@ -94,6 +95,112 @@ export default function Header() {
     router.push(segments.join('/'));
   }
 
+  // Fetch display names for claimed artists/venues
+  const [claimedArtists, setClaimedArtists] = useState<{ id: string; name: string }[]>([]);
+  const [claimedVenues, setClaimedVenues] = useState<{ id: string; name: string }[]>([]);
+
+  useEffect(() => {
+    if (!profile) { setClaimedArtists([]); setClaimedVenues([]); return; }
+    const supabase = createClient();
+
+    if (profile.claimed_artist_ids?.length) {
+      supabase
+        .from('artists')
+        .select('artist_id, display_name, name_local, name_en')
+        .in('artist_id', profile.claimed_artist_ids)
+        .then(({ data }) => {
+          if (data) setClaimedArtists(data.map((a) => ({
+            id: a.artist_id,
+            name: a.display_name || a.name_local || a.name_en || a.artist_id,
+          })));
+        });
+    } else {
+      setClaimedArtists([]);
+    }
+
+    if (profile.claimed_venue_ids?.length) {
+      supabase
+        .from('venues')
+        .select('venue_id, display_name, name_local, name_en')
+        .in('venue_id', profile.claimed_venue_ids)
+        .then(({ data }) => {
+          if (data) setClaimedVenues(data.map((v) => ({
+            id: v.venue_id,
+            name: v.display_name || v.name_local || v.name_en || v.venue_id,
+          })));
+        });
+    } else {
+      setClaimedVenues([]);
+    }
+  }, [profile]);
+
+  const hasClaimed = claimedArtists.length > 0 || claimedVenues.length > 0;
+
+  function renderUserMenuContent() {
+    if (!user) return null;
+    return (
+      <>
+        <div className="px-4 py-2 border-b border-[var(--border)]">
+          <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
+        </div>
+        <button
+          onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
+          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M20 21a8 8 0 0 0-16 0" />
+          </svg>
+          {tAuth('profile')}
+        </button>
+        {hasClaimed && (
+          <div className="border-t border-[var(--border)] py-1">
+            {claimedArtists.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => { router.push(`/${locale}/profile/artist/${encodeURIComponent(a.id)}`); setUserMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 18V5l12-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+                <span className="truncate">{a.name}</span>
+              </button>
+            ))}
+            {claimedVenues.map((v) => (
+              <button
+                key={v.id}
+                onClick={() => { router.push(`/${locale}/profile/venue/${encodeURIComponent(v.id)}`); setUserMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                  <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span className="truncate">{v.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <div className={hasClaimed ? 'border-t border-[var(--border)]' : ''}>
+          <button
+            onClick={() => { signOut(); setUserMenuOpen(false); }}
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+          >
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {tAuth('signOut')}
+          </button>
+        </div>
+      </>
+    );
+  }
+
   const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
 
   /* Shared user button render helper — called as function, NOT as <Component />,
@@ -146,30 +253,7 @@ export default function Header() {
         </button>
         {userMenuOpen && !mobile && (
           <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-            <div className="px-4 py-2 border-b border-[var(--border)]">
-              <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
-            </div>
-            <button
-              onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4" />
-                <path d="M20 21a8 8 0 0 0-16 0" />
-              </svg>
-              {tAuth('profile')}
-            </button>
-            <button
-              onClick={() => { signOut(); setUserMenuOpen(false); }}
-              className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
-            >
-              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              {tAuth('signOut')}
-            </button>
+            {renderUserMenuContent()}
           </div>
         )}
       </div>
@@ -281,30 +365,7 @@ export default function Header() {
               {/* Mobile user menu — rendered here so ref catches outside clicks */}
               {user && userMenuOpen && (
                 <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <div className="px-4 py-2 border-b border-[var(--border)]">
-                    <p className="text-xs text-[var(--muted-foreground)] truncate">{user.email}</p>
-                  </div>
-                  <button
-                    onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="8" r="4" />
-                      <path d="M20 21a8 8 0 0 0-16 0" />
-                    </svg>
-                    {tAuth('profile')}
-                  </button>
-                  <button
-                    onClick={() => { signOut(); setUserMenuOpen(false); }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" y1="12" x2="9" y2="12" />
-                    </svg>
-                    {tAuth('signOut')}
-                  </button>
+                  {renderUserMenuContent()}
                 </div>
               )}
             </div>

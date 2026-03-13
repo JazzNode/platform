@@ -12,8 +12,8 @@ export function useCanEdit(entityType: 'artist' | 'venue', entityId: string) {
   const isClaimed = !!(
     user &&
     profile &&
-    entityType === 'artist' &&
-    profile.claimed_artist_ids?.includes(entityId)
+    ((entityType === 'artist' && profile.claimed_artist_ids?.includes(entityId)) ||
+      (entityType === 'venue' && profile.claimed_venue_ids?.includes(entityId)))
   );
 
   return {

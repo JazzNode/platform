@@ -218,6 +218,19 @@
     "contactSupport": "お困りですか？",
     "contactSupportDesc": "名前変更やその他のリクエスト"
   },
+  "venueDashboard": {
+    "title": "会場ページ管理",
+    "socialLinks": "SNSリンク",
+    "contactInfo": "連絡先",
+    "phone": "電話番号",
+    "businessHours": "営業時間",
+    "businessHoursPlaceholder": "例：火〜土 19:00–01:00",
+    "save": "保存",
+    "saved": "保存しました！",
+    "saveFailed": "保存に失敗しました。もう一度お試しください。",
+    "viewPage": "会場ページを見る",
+    "contactSupport": "サポート"
+  },
   "admin": {
     "saveAndTranslate": "保存して翻訳",
     "saving": "保存中...",

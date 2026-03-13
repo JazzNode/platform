@@ -222,6 +222,19 @@
     "contactSupport": "Need Help?",
     "contactSupportDesc": "For name changes or other requests"
   },
+  "venueDashboard": {
+    "title": "Manage Venue Page",
+    "socialLinks": "Social Links",
+    "contactInfo": "Contact Info",
+    "phone": "Phone",
+    "businessHours": "Business Hours",
+    "businessHoursPlaceholder": "e.g. Tue–Sat 19:00–01:00",
+    "save": "Save",
+    "saved": "Saved!",
+    "saveFailed": "Save failed. Please try again.",
+    "viewPage": "View Venue Page",
+    "contactSupport": "Need Help?"
+  },
   "admin": {
     "saveAndTranslate": "Save & Translate",
     "saving": "Saving...",

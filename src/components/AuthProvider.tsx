@@ -15,6 +15,7 @@ export interface UserProfile {
   role: 'member' | 'artist' | 'venue_owner' | 'admin';
   social_links: Record<string, string>;
   claimed_artist_ids: string[];
+  claimed_venue_ids: string[];
   created_at: string;
   updated_at: string;
 }

@@ -222,6 +222,19 @@
     "contactSupport": "需要協助？",
     "contactSupportDesc": "更改名稱或其他需求"
   },
+  "venueDashboard": {
+    "title": "管理場地頁面",
+    "socialLinks": "社群連結",
+    "contactInfo": "聯絡資訊",
+    "phone": "電話",
+    "businessHours": "營業時間",
+    "businessHoursPlaceholder": "例：週二至週六 19:00–01:00",
+    "save": "儲存",
+    "saved": "已儲存！",
+    "saveFailed": "儲存失敗，請再試一次。",
+    "viewPage": "查看場地頁面",
+    "contactSupport": "需要協助？"
+  },
   "admin": {
     "saveAndTranslate": "儲存並翻譯",
     "saving": "儲存中...",

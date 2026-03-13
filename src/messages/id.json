@@ -218,6 +218,19 @@
     "contactSupport": "Butuh Bantuan?",
     "contactSupportDesc": "Perubahan nama atau permintaan lainnya"
   },
+  "venueDashboard": {
+    "title": "Kelola Halaman Venue",
+    "socialLinks": "Tautan Sosial",
+    "contactInfo": "Info Kontak",
+    "phone": "Telepon",
+    "businessHours": "Jam Operasional",
+    "businessHoursPlaceholder": "cth: Sel–Sab 19:00–01:00",
+    "save": "Simpan",
+    "saved": "Tersimpan!",
+    "saveFailed": "Gagal menyimpan. Silakan coba lagi.",
+    "viewPage": "Lihat Halaman Venue",
+    "contactSupport": "Butuh Bantuan?"
+  },
   "admin": {
     "saveAndTranslate": "Simpan & Terjemahkan",
     "saving": "Menyimpan...",
