@@ -73,8 +73,14 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
 
   const getMyClaimStatus = useCallback(
     (type: TargetType, id: string): ClaimStatus | null => {
-      const claim = myClaims.find((c) => c.target_type === type && c.target_id === id);
-      return claim?.status ?? null;
+      const matches = myClaims.filter((c) => c.target_type === type && c.target_id === id);
+      if (matches.length === 0) return null;
+      // Priority: approved > pending > rejected
+      const priority: ClaimStatus[] = ['approved', 'pending', 'rejected'];
+      for (const s of priority) {
+        if (matches.some((c) => c.status === s)) return s;
+      }
+      return matches[0].status;
     },
     [myClaims],
   );
