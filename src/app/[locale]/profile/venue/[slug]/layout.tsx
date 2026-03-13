@@ -215,6 +215,27 @@ export default function VenueDashboardLayout({
 
         {/* ─── Content Area ─── */}
         <main className="flex-1 min-w-0 pt-14 lg:pt-0">
+          {/* Mobile Identity */}
+          <div className="lg:hidden mb-6 flex items-center gap-3">
+            {venue?.photo_url ? (
+              <img
+                src={venue.photo_url}
+                alt=""
+                className="w-10 h-10 rounded-full object-cover border border-[var(--border)]"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center text-sm font-bold text-[var(--muted-foreground)]">
+                {venueName.charAt(0)}
+              </div>
+            )}
+            <div className="min-w-0">
+              <p className="text-sm font-bold truncate">{venueName}</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {venue?.tier === 2 ? 'Premium' : venue?.tier === 1 ? 'Claimed' : 'Free'}
+              </p>
+            </div>
+          </div>
+
           {children}
         </main>
       </div>
