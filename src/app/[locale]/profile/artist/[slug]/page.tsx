@@ -26,14 +26,14 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
   const [tier, setTier] = useState(0);
   const [fanStats, setFanStats] = useState<FanStats | null>(null);
   const [unread, setUnread] = useState<UnreadStats>({ unreadMessages: 0, unreadBroadcasts: 0 });
-  const [pageViews] = useState(0); // placeholder for analytics
+  const [pageViews, setPageViews] = useState(0);
   const [fetching, setFetching] = useState(true);
 
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  // Fetch artist tier
+  // Fetch artist tier + page views
   useEffect(() => {
     if (!slug) return;
     const supabase = createClient();
@@ -44,6 +44,13 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
       .single()
       .then(({ data }) => {
         if (data) setTier(data.tier);
+      });
+    supabase
+      .from('artist_page_views')
+      .select('id', { count: 'exact', head: true })
+      .eq('artist_id', slug)
+      .then(({ count }) => {
+        setPageViews(count || 0);
       });
   }, [slug]);
 
@@ -141,7 +148,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
 
       {/* ─── Stat Cards ─── */}
       <FadeUp>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard
             label={t('totalFans')}
             value={stats.totalFans}
@@ -158,6 +165,11 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
             label={t('unreadMessages')}
             value={unread.unreadMessages}
             icon="mail"
+          />
+          <StatCard
+            label={t('pageViews')}
+            value={pageViews}
+            icon="views"
           />
         </div>
       </FadeUp>
@@ -243,6 +255,26 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
           )}
+        </div>
+      </FadeUp>
+
+      {/* ─── Quick Actions ─── */}
+      <FadeUp>
+        <div className="flex flex-wrap gap-3">
+          <a
+            href={`/api/artist/epk?artistId=${slug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--card)] border border-[var(--border)] text-sm hover:border-[var(--color-gold)]/40 transition-colors"
+          >
+            <svg className="w-4 h-4 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+              <line x1="12" y1="18" x2="12" y2="12" />
+              <line x1="9" y1="15" x2="15" y2="15" />
+            </svg>
+            {t('downloadEpk')}
+          </a>
         </div>
       </FadeUp>
 

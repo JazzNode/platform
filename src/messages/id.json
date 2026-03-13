@@ -116,7 +116,10 @@
     "payCash": "Tunai",
     "payCreditCard": "Kartu Kredit",
     "payBankTransfer": "Transfer Bank",
-    "businessHours": "Jam Operasional"
+    "businessHours": "Jam Operasional",
+    "acceptingStudents": "Menerima Murid",
+    "lessonPriceRange": "Tarif Les",
+    "gear": "Peralatan"
   },
   "auth": {
     "signIn": "Masuk",
@@ -221,7 +224,18 @@
     "claimCta": "Temukan halaman artis Anda dan klik \"Klaim\" untuk memulai.",
     "browseArtists": "Jelajahi Artis",
     "contactSupport": "Butuh Bantuan?",
-    "contactSupportDesc": "Perubahan nama atau permintaan lainnya"
+    "contactSupportDesc": "Perubahan nama atau permintaan lainnya",
+    "teaching": "Mengajar",
+    "acceptingStudents": "Menerima Murid",
+    "teachingStyles": "Gaya Mengajar",
+    "teachingDescription": "Tentang Pengajaran",
+    "teachingDescriptionPlaceholder": "Jelaskan pendekatan mengajar, pengalaman, dan apa yang bisa diharapkan murid...",
+    "lessonPriceRange": "Kisaran Harga Les",
+    "hireMe": "Hire Me",
+    "availableForHire": "Tersedia untuk Disewa",
+    "hireCategories": "Kategori Layanan",
+    "hireDescription": "Tentang Layanan",
+    "hireDescriptionPlaceholder": "Jelaskan jenis acara yang Anda tampil, pengalaman, dan detail pemesanan..."
   },
   "venueDashboard": {
     "title": "Kelola Halaman Venue",
@@ -351,6 +365,49 @@
     "noFanMessagesHint": "Kirim pesan ke artis dari halaman mereka untuk memulai percakapan.",
     "noFanBroadcasts": "Belum ada siaran.",
     "noFanBroadcastsHint": "Ikuti artis untuk menerima siaran mereka.",
-    "fromArtist": "dari {name}"
+    "fromArtist": "dari {name}",
+
+    "gear": "Peralatan Saya",
+    "addGear": "Tambah Peralatan",
+    "gearName": "Nama",
+    "gearType": "Jenis",
+    "gearBrand": "Merek",
+    "gearModel": "Model",
+    "gearLimitReached": "Upgrade ke Premium untuk peralatan tak terbatas",
+    "gearUsed": "{count}/{max} item peralatan digunakan",
+    "noGear": "Belum ada peralatan. Tambahkan instrumen dan peralatan Anda.",
+
+    "bookings": "Pemesanan",
+    "noBookings": "Belum ada permintaan pemesanan.",
+    "enableHireFirst": "Aktifkan 'Tersedia untuk Disewa' di pengaturan profil untuk menerima permintaan pemesanan.",
+    "all": "Semua",
+    "pending": "Menunggu",
+    "accepted": "Diterima",
+    "declined": "Ditolak",
+    "archived": "Diarsipkan",
+
+    "analytics": "Analitik",
+    "pageViews": "Tampilan Halaman",
+    "viewsByDay": "Tampilan per Hari",
+    "referrerSources": "Sumber Rujukan",
+    "cityDistribution": "Distribusi Kota",
+    "noData": "Tidak ada data untuk periode ini.",
+
+    "downloadEpk": "Unduh EPK",
+    "customDomainTeaser": "Domain Kustom — Segera Hadir",
+
+    "submitInquiry": "Kirim Permintaan",
+    "inquiryName": "Nama Anda",
+    "inquiryEmail": "Email",
+    "inquiryPhone": "Telepon (opsional)",
+    "inquiryEventType": "Jenis Acara",
+    "inquiryEventDate": "Tanggal Acara",
+    "inquiryVenue": "Tempat",
+    "inquiryBudget": "Kisaran Anggaran",
+    "inquiryMessage": "Pesan",
+    "inquirySent": "Permintaan terkirim! Artis akan meninjau permintaan Anda.",
+    "hireMe": "Hire Me",
+    "acceptingStudents": "Menerima Murid",
+    "lessonPriceRange": "Tarif les"
   }
 }

@@ -116,7 +116,10 @@
     "payCash": "現金",
     "payCreditCard": "クレジットカード",
     "payBankTransfer": "銀行振込",
-    "businessHours": "営業時間"
+    "businessHours": "営業時間",
+    "acceptingStudents": "生徒募集中",
+    "lessonPriceRange": "レッスン料金",
+    "gear": "ギア"
   },
   "auth": {
     "signIn": "ログイン",
@@ -221,7 +224,18 @@
     "claimCta": "アーティストページを見つけて「申請」をクリックして始めましょう。",
     "browseArtists": "アーティスト一覧",
     "contactSupport": "お困りですか？",
-    "contactSupportDesc": "名前変更やその他のリクエスト"
+    "contactSupportDesc": "名前変更やその他のリクエスト",
+    "teaching": "レッスン",
+    "acceptingStudents": "生徒募集中",
+    "teachingStyles": "レッスン形式",
+    "teachingDescription": "レッスンについて",
+    "teachingDescriptionPlaceholder": "レッスンのアプローチ、経験、生徒が期待できることを記入してください...",
+    "lessonPriceRange": "レッスン料金の目安",
+    "hireMe": "出演依頼",
+    "availableForHire": "出演依頼を受付中",
+    "hireCategories": "サービスカテゴリ",
+    "hireDescription": "サービスについて",
+    "hireDescriptionPlaceholder": "出演するイベントの種類、経験、予約方法などを記入してください..."
   },
   "venueDashboard": {
     "title": "会場ページ管理",
@@ -351,6 +365,49 @@
     "noFanMessagesHint": "アーティストページからメッセージを送って会話を始めましょう。",
     "noFanBroadcasts": "まだブロードキャストはありません。",
     "noFanBroadcastsHint": "アーティストをフォローしてブロードキャストを受け取りましょう。",
-    "fromArtist": "{name}から"
+    "fromArtist": "{name}から",
+
+    "gear": "マイギア",
+    "addGear": "ギアを追加",
+    "gearName": "名前",
+    "gearType": "タイプ",
+    "gearBrand": "ブランド",
+    "gearModel": "モデル",
+    "gearLimitReached": "プレミアムにアップグレードで無制限のギア登録",
+    "gearUsed": "{count}/{max} アイテム使用中",
+    "noGear": "まだギアがありません。楽器や機材を追加しましょう。",
+
+    "bookings": "出演依頼",
+    "noBookings": "まだ出演依頼はありません。",
+    "enableHireFirst": "プロフィール設定で「出演依頼を受付中」を有効にして依頼を受け取りましょう。",
+    "all": "すべて",
+    "pending": "保留中",
+    "accepted": "承諾済み",
+    "declined": "辞退済み",
+    "archived": "アーカイブ",
+
+    "analytics": "アナリティクス",
+    "pageViews": "ページビュー",
+    "viewsByDay": "日別ビュー",
+    "referrerSources": "リファラー",
+    "cityDistribution": "都市分布",
+    "noData": "この期間のデータはありません。",
+
+    "downloadEpk": "EPKをダウンロード",
+    "customDomainTeaser": "カスタムドメイン — 近日公開",
+
+    "submitInquiry": "依頼を送信",
+    "inquiryName": "お名前",
+    "inquiryEmail": "メール",
+    "inquiryPhone": "電話番号（任意）",
+    "inquiryEventType": "イベントタイプ",
+    "inquiryEventDate": "イベント日",
+    "inquiryVenue": "会場",
+    "inquiryBudget": "予算目安",
+    "inquiryMessage": "メッセージ",
+    "inquirySent": "依頼が送信されました！アーティストが確認します。",
+    "hireMe": "出演依頼",
+    "acceptingStudents": "生徒募集中",
+    "lessonPriceRange": "レッスン料金"
   }
 }

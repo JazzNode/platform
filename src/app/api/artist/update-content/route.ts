@@ -14,7 +14,10 @@ const LOCALES = ['en', 'zh', 'ja', 'ko', 'th', 'id'];
  */
 export async function POST(req: NextRequest) {
   try {
-    const { entityId, content } = await req.json();
+    const { entityId, content, fieldPrefix: rawPrefix } = await req.json();
+
+    const ALLOWED_PREFIXES = ['bio', 'teaching_description', 'hire_description'];
+    const fieldPrefix = ALLOWED_PREFIXES.includes(rawPrefix) ? rawPrefix : 'bio';
 
     if (!entityId || !content) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -41,7 +44,7 @@ export async function POST(req: NextRequest) {
       geminiResult = await translateAndGenerate({
         content,
         sourceLocale: 'en', // Gemini will auto-detect and override
-        fieldPrefix: 'bio',
+        fieldPrefix,
         entityType: 'artist',
         autoDetectLanguage: true,
       });
@@ -57,14 +60,17 @@ export async function POST(req: NextRequest) {
     if (!translationFailed && Object.keys(geminiResult).length > 0) {
       // Use all translated fields from Gemini
       for (const locale of LOCALES) {
-        const bioKey = `bio_${locale}`;
-        const shortKey = `bio_short_${locale}`;
-        if (geminiResult[bioKey]) fields[bioKey] = geminiResult[bioKey];
-        if (geminiResult[shortKey]) fields[shortKey] = geminiResult[shortKey];
+        const mainKey = `${fieldPrefix}_${locale}`;
+        if (geminiResult[mainKey]) fields[mainKey] = geminiResult[mainKey];
+        // bio also has short variants
+        if (fieldPrefix === 'bio') {
+          const shortKey = `bio_short_${locale}`;
+          if (geminiResult[shortKey]) fields[shortKey] = geminiResult[shortKey];
+        }
       }
     } else {
-      // Fallback: save the raw content to bio_en (best guess)
-      fields.bio_en = content;
+      // Fallback: save the raw content to {prefix}_en (best guess)
+      fields[`${fieldPrefix}_en`] = content;
     }
 
     // Update Supabase using admin client (bypasses RLS for simplicity)

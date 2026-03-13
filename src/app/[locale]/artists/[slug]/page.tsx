@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
-import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/supabase';
+import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap, getArtistGear } from '@/lib/supabase';
 import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey, parseSpotifyEmbedUrl, parseYouTubeVideoId } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -17,6 +17,8 @@ import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
 import ContactArtistButton from '@/components/ContactArtistButton';
+import PageViewTracker from '@/components/PageViewTracker';
+import HireMeButton from '@/components/HireMeButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -36,6 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `/${locale}/artists/${slug}`,
       languages: {
+        'x-default': `/en/artists/${slug}`,
         en: `/en/artists/${slug}`,
         'zh-Hant': `/zh/artists/${slug}`,
         ja: `/ja/artists/${slug}`,
@@ -68,6 +71,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   if (!artist) {
     notFound();
   }
+
+  // Fetch gear for this artist
+  const artistGear = await getArtistGear(artist.id);
 
   // Compute prev/next artist — alphabetical by displayName
   const allSorted = [...artists].sort((a, b) =>
@@ -261,9 +267,20 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     }),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'JazzNode', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t('artists'), item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/artists` },
+      { '@type': 'ListItem', position: 3, name: artistDisplayName(f, locale) },
+    ],
+  };
+
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
@@ -297,6 +314,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   tag="h1"
                 />
                 <div className="flex items-center gap-2 shrink-0">
+                  {f.available_for_hire && (
+                    <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
+                  )}
                   <ContactArtistButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
                   <FollowButton itemType="artist" itemId={artist.id} variant="full" />
@@ -798,6 +818,64 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         </FadeUp>
       )}
 
+      {/* ═══ Teaching Section ═══ */}
+      {f.accepting_students && (
+        <FadeUp>
+          <section className="space-y-4">
+            <h2 className="font-serif text-2xl font-bold">{t('acceptingStudents')}</h2>
+            {f.teaching_styles && f.teaching_styles.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {f.teaching_styles.map((style: string) => (
+                  <span key={style} className="px-3 py-1.5 rounded-xl bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs border border-[var(--color-gold)]/20">
+                    {style}
+                  </span>
+                ))}
+              </div>
+            )}
+            {localized(f as Record<string, unknown>, 'teaching_description', locale) && (
+              <p className="text-sm text-[#C4BFB3] leading-relaxed">
+                {localized(f as Record<string, unknown>, 'teaching_description', locale)}
+              </p>
+            )}
+            {f.lesson_price_range && (
+              <p className="text-sm text-[var(--muted-foreground)]">
+                {t('lessonPriceRange')}: <span className="text-[var(--color-gold)]">{f.lesson_price_range}</span>
+              </p>
+            )}
+          </section>
+        </FadeUp>
+      )}
+
+      {/* ═══ Gear Section ═══ */}
+      {artistGear.length > 0 && (
+        <FadeUp>
+          <section className="space-y-4">
+            <h2 className="font-serif text-2xl font-bold">{t('gear')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {artistGear.map((g) => (
+                <div key={g.id} className="flex items-center gap-3 bg-[var(--card)] border border-[var(--border)] rounded-xl p-3">
+                  {g.photo_url ? (
+                    <img src={g.photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                  ) : (
+                    <div className="w-10 h-10 rounded-lg bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path d="M9 19V6l12-3v13M9 19c0 1.1-1.34 2-3 2s-3-.9-3-2 1.34-2 3-2 3 .9 3 2zm12-3c0 1.1-1.34 2-3 2s-3-.9-3-2 1.34-2 3-2 3 .9 3 2z" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm truncate">{g.gear_name}</p>
+                    <p className="text-xs text-[var(--muted-foreground)] truncate">
+                      {[g.brand, g.model].filter(Boolean).join(' · ') || g.gear_type}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        </FadeUp>
+      )}
+
       {/* ═══ Badge Dock ═══ */}
       {badgeItems.length > 0 && (
         <FadeUp>
@@ -806,6 +884,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </section>
         </FadeUp>
       )}
+
+      {/* ═══ Page View Tracker ═══ */}
+      <PageViewTracker artistId={artist.id} />
 
       {/* ═══ Prev / Next Navigation ═══ */}
       <RecordNav

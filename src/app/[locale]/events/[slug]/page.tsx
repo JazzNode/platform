@@ -38,6 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `/${locale}/events/${slug}`,
       languages: {
+        'x-default': `/en/events/${slug}`,
         en: `/en/events/${slug}`,
         'zh-Hant': `/zh/events/${slug}`,
         ja: `/ja/events/${slug}`,
@@ -170,9 +171,20 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     }),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'JazzNode', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t('events'), item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/events` },
+      { '@type': 'ListItem', position: 3, name: eventTitle(f, locale) },
+    ],
+  };
+
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Back link */}
       <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}

@@ -120,7 +120,10 @@
     "payCash": "Cash",
     "payCreditCard": "Credit Card",
     "payBankTransfer": "Bank Transfer",
-    "businessHours": "Business Hours"
+    "businessHours": "Business Hours",
+    "acceptingStudents": "Accepting Students",
+    "lessonPriceRange": "Lesson Price Range",
+    "gear": "Gear"
   },
   "auth": {
     "signIn": "Sign In",
@@ -225,7 +228,18 @@
     "claimCta": "Find your artist page and click \"Claim\" to get started.",
     "browseArtists": "Browse Artists",
     "contactSupport": "Need Help?",
-    "contactSupportDesc": "For name changes or other requests"
+    "contactSupportDesc": "For name changes or other requests",
+    "teaching": "Teaching",
+    "acceptingStudents": "Accepting Students",
+    "teachingStyles": "Teaching Styles",
+    "teachingDescription": "About Your Teaching",
+    "teachingDescriptionPlaceholder": "Describe your teaching approach, experience, and what students can expect...",
+    "lessonPriceRange": "Lesson Price Range",
+    "hireMe": "Hire Me",
+    "availableForHire": "Available for Hire",
+    "hireCategories": "Service Categories",
+    "hireDescription": "About Your Services",
+    "hireDescriptionPlaceholder": "Describe the types of events you perform at, your experience, and booking details..."
   },
   "venueDashboard": {
     "title": "Manage Venue Page",
@@ -355,6 +369,49 @@
     "noFanMessagesHint": "Send a message to an artist from their page to start a conversation.",
     "noFanBroadcasts": "No broadcasts yet.",
     "noFanBroadcastsHint": "Follow artists to receive their broadcasts.",
-    "fromArtist": "from {name}"
+    "fromArtist": "from {name}",
+
+    "gear": "My Gear",
+    "addGear": "Add Gear",
+    "gearName": "Name",
+    "gearType": "Type",
+    "gearBrand": "Brand",
+    "gearModel": "Model",
+    "gearLimitReached": "Upgrade to Premium for unlimited gear items",
+    "gearUsed": "{count}/{max} gear items used",
+    "noGear": "No gear items yet. Add your instruments and equipment.",
+
+    "bookings": "Bookings",
+    "noBookings": "No booking inquiries yet.",
+    "enableHireFirst": "Enable 'Available for Hire' in your profile settings to receive booking inquiries.",
+    "all": "All",
+    "pending": "Pending",
+    "accepted": "Accepted",
+    "declined": "Declined",
+    "archived": "Archived",
+
+    "analytics": "Analytics",
+    "pageViews": "Page Views",
+    "viewsByDay": "Views by Day",
+    "referrerSources": "Referrer Sources",
+    "cityDistribution": "City Distribution",
+    "noData": "No data for this period.",
+
+    "downloadEpk": "Download EPK",
+    "customDomainTeaser": "Custom Domain — Coming Soon",
+
+    "submitInquiry": "Submit Inquiry",
+    "inquiryName": "Your Name",
+    "inquiryEmail": "Email",
+    "inquiryPhone": "Phone (optional)",
+    "inquiryEventType": "Event Type",
+    "inquiryEventDate": "Event Date",
+    "inquiryVenue": "Venue",
+    "inquiryBudget": "Budget Range",
+    "inquiryMessage": "Message",
+    "inquirySent": "Inquiry sent! The artist will review your request.",
+    "hireMe": "Hire Me",
+    "acceptingStudents": "Accepting Students",
+    "lessonPriceRange": "Lesson rates"
   }
 }

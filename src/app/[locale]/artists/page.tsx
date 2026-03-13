@@ -13,6 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `/${locale}/artists`,
       languages: {
+        'x-default': '/en/artists',
         en: '/en/artists',
         'zh-Hant': '/zh/artists',
         ja: '/ja/artists',

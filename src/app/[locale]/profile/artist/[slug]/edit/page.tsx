@@ -18,6 +18,13 @@ interface ArtistData {
   instagram: string | null;
   facebook_url: string | null;
   aka: string | null;
+  accepting_students: boolean;
+  teaching_styles: string[] | null;
+  lesson_price_range: string | null;
+  teaching_description: string | null;
+  available_for_hire: boolean;
+  hire_categories: string[] | null;
+  hire_description: string | null;
 }
 
 export default function ArtistEditPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -35,6 +42,13 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   const [instagram, setInstagram] = useState('');
   const [facebookUrl, setFacebookUrl] = useState('');
   const [aka, setAka] = useState('');
+  const [acceptingStudents, setAcceptingStudents] = useState(false);
+  const [teachingStyles, setTeachingStyles] = useState<string[]>([]);
+  const [lessonPriceRange, setLessonPriceRange] = useState('');
+  const [teachingDescription, setTeachingDescription] = useState('');
+  const [availableForHire, setAvailableForHire] = useState(false);
+  const [hireCategories, setHireCategories] = useState<string[]>([]);
+  const [hireDescription, setHireDescription] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +62,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     const supabase = createClient();
     supabase
       .from('artists')
-      .select('artist_id, display_name, name_local, name_en, website_url, spotify_url, youtube_url, instagram, facebook_url, aka')
+      .select('artist_id, display_name, name_local, name_en, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
       .eq('artist_id', slug)
       .single()
       .then(({ data }) => {
@@ -60,6 +74,13 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
           setInstagram(data.instagram || '');
           setFacebookUrl(data.facebook_url || '');
           setAka(data.aka || '');
+          setAcceptingStudents(data.accepting_students || false);
+          setTeachingStyles(data.teaching_styles || []);
+          setLessonPriceRange(data.lesson_price_range || '');
+          setTeachingDescription(data.teaching_description || '');
+          setAvailableForHire(data.available_for_hire || false);
+          setHireCategories(data.hire_categories || []);
+          setHireDescription(data.hire_description || '');
         }
         setFetching(false);
       });
@@ -87,6 +108,11 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
             instagram,
             facebook_url: facebookUrl,
             aka,
+            accepting_students: acceptingStudents,
+            teaching_styles: teachingStyles,
+            lesson_price_range: lessonPriceRange,
+            available_for_hire: availableForHire,
+            hire_categories: hireCategories,
           },
         }),
       });
@@ -103,7 +129,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     } finally {
       setSaving(false);
     }
-  }, [token, slug, websiteUrl, spotifyUrl, youtubeUrl, instagram, facebookUrl, aka, t]);
+  }, [token, slug, websiteUrl, spotifyUrl, youtubeUrl, instagram, facebookUrl, aka, acceptingStudents, teachingStyles, lessonPriceRange, availableForHire, hireCategories, t]);
 
   if (loading || fetching) {
     return (
@@ -186,6 +212,137 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
               className={inputClass}
               placeholder={t('akaPlaceholder')}
             />
+          </div>
+
+          <div className="border-t border-[var(--border)]" />
+
+          {/* Teaching Section */}
+          <div className="space-y-5">
+            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
+              {t('teaching')}
+            </h2>
+
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div
+                onClick={() => setAcceptingStudents(!acceptingStudents)}
+                className={`w-10 h-6 rounded-full transition-colors relative ${acceptingStudents ? 'bg-[var(--color-gold)]' : 'bg-[var(--muted)]'}`}
+              >
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${acceptingStudents ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
+              </div>
+              <span className="text-sm">{t('acceptingStudents')}</span>
+            </label>
+
+            {acceptingStudents && (
+              <>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                    {t('teachingStyles')}
+                  </label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {['Private Lessons', 'Group Classes', 'Online', 'Workshops', 'Masterclass'].map((style) => (
+                      <button
+                        key={style}
+                        type="button"
+                        onClick={() => setTeachingStyles((prev) =>
+                          prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]
+                        )}
+                        className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                          teachingStyles.includes(style)
+                            ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border-[var(--color-gold)]/30'
+                            : 'border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/20'
+                        }`}
+                      >
+                        {style}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                    {t('lessonPriceRange')}
+                  </label>
+                  <input
+                    type="text"
+                    value={lessonPriceRange}
+                    onChange={(e) => setLessonPriceRange(e.target.value)}
+                    className={inputClass}
+                    placeholder="e.g. $50-100/hr"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                    {t('teachingDescription')}
+                  </label>
+                  <textarea
+                    value={teachingDescription}
+                    onChange={(e) => setTeachingDescription(e.target.value)}
+                    className={`${inputClass} min-h-[100px] resize-y`}
+                    placeholder={t('teachingDescriptionPlaceholder')}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="border-t border-[var(--border)]" />
+
+          {/* Hire Me Section */}
+          <div className="space-y-5">
+            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
+              {t('hireMe')}
+            </h2>
+
+            <label className="flex items-center gap-3 cursor-pointer">
+              <div
+                onClick={() => setAvailableForHire(!availableForHire)}
+                className={`w-10 h-6 rounded-full transition-colors relative ${availableForHire ? 'bg-[var(--color-gold)]' : 'bg-[var(--muted)]'}`}
+              >
+                <div className={`absolute top-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform ${availableForHire ? 'translate-x-[18px]' : 'translate-x-0.5'}`} />
+              </div>
+              <span className="text-sm">{t('availableForHire')}</span>
+            </label>
+
+            {availableForHire && (
+              <>
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                    {t('hireCategories')}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Wedding', 'Corporate', 'Session', 'Recording', 'Festival', 'Private Event'].map((cat) => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setHireCategories((prev) =>
+                          prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+                        )}
+                        className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                          hireCategories.includes(cat)
+                            ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border-[var(--color-gold)]/30'
+                            : 'border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/20'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                    {t('hireDescription')}
+                  </label>
+                  <textarea
+                    value={hireDescription}
+                    onChange={(e) => setHireDescription(e.target.value)}
+                    className={`${inputClass} min-h-[100px] resize-y`}
+                    placeholder={t('hireDescriptionPlaceholder')}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {error && <p className="text-xs text-red-400">{error}</p>}

@@ -143,6 +143,29 @@ export interface Artist {
   type?: string;
   aka?: string;
   tag_list?: string[];        // derived: from artist_tags junction
+  // Teaching fields
+  accepting_students?: boolean;
+  teaching_styles?: string[];
+  teaching_description?: string;
+  teaching_description_en?: string;
+  teaching_description_zh?: string;
+  teaching_description_ja?: string;
+  teaching_description_ko?: string;
+  teaching_description_th?: string;
+  teaching_description_id?: string;
+  lesson_price_range?: string;
+  // Hire fields
+  available_for_hire?: boolean;
+  hire_categories?: string[];
+  hire_description?: string;
+  hire_description_en?: string;
+  hire_description_zh?: string;
+  hire_description_ja?: string;
+  hire_description_ko?: string;
+  hire_description_th?: string;
+  hire_description_id?: string;
+  // Tier
+  tier?: number;
 }
 
 export interface Event {
@@ -307,6 +330,29 @@ interface ArtistRow {
   aka: string | null;
   data_source: string;
   updated_by: string | null;
+  // Teaching fields
+  accepting_students: boolean;
+  teaching_styles: string[] | null;
+  teaching_description: string | null;
+  teaching_description_en: string | null;
+  teaching_description_zh: string | null;
+  teaching_description_ja: string | null;
+  teaching_description_ko: string | null;
+  teaching_description_th: string | null;
+  teaching_description_id: string | null;
+  lesson_price_range: string | null;
+  // Hire fields
+  available_for_hire: boolean;
+  hire_categories: string[] | null;
+  hire_description: string | null;
+  hire_description_en: string | null;
+  hire_description_zh: string | null;
+  hire_description_ja: string | null;
+  hire_description_ko: string | null;
+  hire_description_th: string | null;
+  hire_description_id: string | null;
+  // Tier
+  tier: number;
 }
 
 interface EventRow {
@@ -754,6 +800,18 @@ export const getBadges = cache(
     { revalidate: REVALIDATE.badges, tags: ['badges'] },
   ),
 );
+
+// ----- Artist Gear fetcher -----
+
+export const getArtistGear = cache(async (artistId: string) => {
+  const sb = getSupabase();
+  const { data } = await sb
+    .from('artist_gear')
+    .select('*')
+    .eq('artist_id', artistId)
+    .order('display_order');
+  return (data || []) as { id: string; gear_name: string; gear_type: string; brand: string | null; model: string | null; photo_url: string | null; display_order: number }[];
+});
 
 // ----- Utility functions (unchanged) -----
 

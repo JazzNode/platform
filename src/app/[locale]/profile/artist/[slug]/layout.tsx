@@ -19,7 +19,10 @@ interface ArtistBasic {
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
+  { key: 'bookings', icon: 'calendar', path: '/bookings' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
+  { key: 'gear', icon: 'guitar', path: '/gear' },
+  { key: 'analytics', icon: 'analytics', path: '/analytics' },
   { key: 'edit', icon: 'edit', path: '/edit' },
 ] as const;
 
@@ -44,6 +47,29 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      );
+    case 'calendar':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+      );
+    case 'guitar':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20.8 3.2a2.4 2.4 0 0 0-3.4 0L14 6.6l-1.7-1.7a1 1 0 0 0-1.4 0L9.5 6.3a1 1 0 0 0 0 1.4l.3.3-4.5 4.5a5 5 0 0 0-1.1 5.3l-.7.7a1 1 0 0 0 0 1.4l.6.6a1 1 0 0 0 1.4 0l.7-.7a5 5 0 0 0 5.3-1.1l4.5-4.5.3.3a1 1 0 0 0 1.4 0l1.4-1.4a1 1 0 0 0 0-1.4L17.4 10l3.4-3.4a2.4 2.4 0 0 0 0-3.4z" />
+          <circle cx="9.5" cy="14.5" r="1.5" />
+        </svg>
+      );
+    case 'analytics':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
+          <path d="M7 14l4-4 4 4 6-6" />
         </svg>
       );
     case 'edit':

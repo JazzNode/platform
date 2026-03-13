@@ -116,7 +116,10 @@
     "payCash": "เงินสด",
     "payCreditCard": "บัตรเครดิต",
     "payBankTransfer": "โอนเงิน",
-    "businessHours": "เวลาทำการ"
+    "businessHours": "เวลาทำการ",
+    "acceptingStudents": "เปิดรับนักเรียน",
+    "lessonPriceRange": "ค่าเรียน",
+    "gear": "อุปกรณ์"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",
@@ -221,7 +224,18 @@
     "claimCta": "ค้นหาหน้าศิลปินของคุณแล้วคลิก \"ยืนยัน\" เพื่อเริ่มต้น",
     "browseArtists": "เรียกดูศิลปิน",
     "contactSupport": "ต้องการความช่วยเหลือ?",
-    "contactSupportDesc": "เปลี่ยนชื่อหรือคำขออื่น ๆ"
+    "contactSupportDesc": "เปลี่ยนชื่อหรือคำขออื่น ๆ",
+    "teaching": "การสอน",
+    "acceptingStudents": "เปิดรับนักเรียน",
+    "teachingStyles": "รูปแบบการสอน",
+    "teachingDescription": "เกี่ยวกับการสอน",
+    "teachingDescriptionPlaceholder": "อธิบายวิธีการสอน ประสบการณ์ และสิ่งที่นักเรียนจะได้รับ...",
+    "lessonPriceRange": "ช่วงราคาเรียน",
+    "hireMe": "จ้างงาน",
+    "availableForHire": "พร้อมรับงาน",
+    "hireCategories": "ประเภทบริการ",
+    "hireDescription": "เกี่ยวกับบริการ",
+    "hireDescriptionPlaceholder": "อธิบายประเภทงานที่คุณแสดง ประสบการณ์ และรายละเอียดการจอง..."
   },
   "venueDashboard": {
     "title": "จัดการหน้าสถานที่",
@@ -351,6 +365,49 @@
     "noFanMessagesHint": "ส่งข้อความถึงศิลปินจากหน้าของพวกเขาเพื่อเริ่มสนทนา",
     "noFanBroadcasts": "ยังไม่มีประกาศ",
     "noFanBroadcastsHint": "ติดตามศิลปินเพื่อรับประกาศ",
-    "fromArtist": "จาก {name}"
+    "fromArtist": "จาก {name}",
+
+    "gear": "อุปกรณ์ของฉัน",
+    "addGear": "เพิ่มอุปกรณ์",
+    "gearName": "ชื่อ",
+    "gearType": "ประเภท",
+    "gearBrand": "แบรนด์",
+    "gearModel": "รุ่น",
+    "gearLimitReached": "อัปเกรดเป็นพรีเมียมเพื่อเพิ่มอุปกรณ์ไม่จำกัด",
+    "gearUsed": "ใช้ {count}/{max} รายการ",
+    "noGear": "ยังไม่มีอุปกรณ์ เพิ่มเครื่องดนตรีและอุปกรณ์ของคุณ",
+
+    "bookings": "การจ้างงาน",
+    "noBookings": "ยังไม่มีคำขอจ้างงาน",
+    "enableHireFirst": "เปิด 'พร้อมรับงาน' ในการตั้งค่าโปรไฟล์เพื่อรับคำขอจ้างงาน",
+    "all": "ทั้งหมด",
+    "pending": "รอดำเนินการ",
+    "accepted": "ตอบรับแล้ว",
+    "declined": "ปฏิเสธแล้ว",
+    "archived": "เก็บถาวร",
+
+    "analytics": "การวิเคราะห์",
+    "pageViews": "การเข้าชมหน้า",
+    "viewsByDay": "การเข้าชมรายวัน",
+    "referrerSources": "แหล่งที่มา",
+    "cityDistribution": "การกระจายตามเมือง",
+    "noData": "ไม่มีข้อมูลในช่วงนี้",
+
+    "downloadEpk": "ดาวน์โหลด EPK",
+    "customDomainTeaser": "โดเมนส่วนตัว — เร็ว ๆ นี้",
+
+    "submitInquiry": "ส่งคำขอ",
+    "inquiryName": "ชื่อของคุณ",
+    "inquiryEmail": "อีเมล",
+    "inquiryPhone": "โทรศัพท์ (ไม่บังคับ)",
+    "inquiryEventType": "ประเภทงาน",
+    "inquiryEventDate": "วันที่จัดงาน",
+    "inquiryVenue": "สถานที่",
+    "inquiryBudget": "งบประมาณ",
+    "inquiryMessage": "ข้อความ",
+    "inquirySent": "ส่งคำขอแล้ว! ศิลปินจะตรวจสอบคำขอของคุณ",
+    "hireMe": "จ้างงาน",
+    "acceptingStudents": "เปิดรับนักเรียน",
+    "lessonPriceRange": "ค่าเรียน"
   }
 }

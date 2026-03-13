@@ -120,7 +120,10 @@
     "payCash": "現金",
     "payCreditCard": "信用卡",
     "payBankTransfer": "銀行轉帳",
-    "businessHours": "營業時間"
+    "businessHours": "營業時間",
+    "acceptingStudents": "招收學生中",
+    "lessonPriceRange": "課程費用",
+    "gear": "器材"
   },
   "auth": {
     "signIn": "登入",
@@ -225,7 +228,18 @@
     "claimCta": "找到你的藝人頁面，點擊「認領」即可開始。",
     "browseArtists": "瀏覽藝人",
     "contactSupport": "需要協助？",
-    "contactSupportDesc": "更改名稱或其他需求"
+    "contactSupportDesc": "更改名稱或其他需求",
+    "teaching": "教學",
+    "acceptingStudents": "招收學生中",
+    "teachingStyles": "教學方式",
+    "teachingDescription": "教學介紹",
+    "teachingDescriptionPlaceholder": "描述你的教學方式、經驗，以及學生可以期待什麼...",
+    "lessonPriceRange": "課程費用範圍",
+    "hireMe": "邀約演出",
+    "availableForHire": "開放邀約",
+    "hireCategories": "服務類別",
+    "hireDescription": "服務介紹",
+    "hireDescriptionPlaceholder": "描述你演出的活動類型、經驗及預約方式..."
   },
   "venueDashboard": {
     "title": "管理場地頁面",
@@ -355,6 +369,49 @@
     "noFanMessagesHint": "在藝人頁面傳訊息，開始你們的對話。",
     "noFanBroadcasts": "還沒有收到廣播。",
     "noFanBroadcastsHint": "追蹤藝人即可收到他們的廣播。",
-    "fromArtist": "來自 {name}"
+    "fromArtist": "來自 {name}",
+
+    "gear": "我的器材",
+    "addGear": "新增器材",
+    "gearName": "名稱",
+    "gearType": "類型",
+    "gearBrand": "品牌",
+    "gearModel": "型號",
+    "gearLimitReached": "升級 Premium 即可新增無限器材",
+    "gearUsed": "已使用 {count}/{max} 項器材",
+    "noGear": "還沒有器材。新增你的樂器與設備吧。",
+
+    "bookings": "邀約",
+    "noBookings": "還沒有邀約。",
+    "enableHireFirst": "請在個人設定中開啟「開放邀約」以接收邀約。",
+    "all": "全部",
+    "pending": "待處理",
+    "accepted": "已接受",
+    "declined": "已婉拒",
+    "archived": "已封存",
+
+    "analytics": "數據分析",
+    "pageViews": "頁面瀏覽",
+    "viewsByDay": "每日瀏覽量",
+    "referrerSources": "流量來源",
+    "cityDistribution": "城市分布",
+    "noData": "此期間無資料。",
+
+    "downloadEpk": "下載 EPK",
+    "customDomainTeaser": "自訂網域 — 即將推出",
+
+    "submitInquiry": "提交邀約",
+    "inquiryName": "你的名字",
+    "inquiryEmail": "Email",
+    "inquiryPhone": "電話（選填）",
+    "inquiryEventType": "活動類型",
+    "inquiryEventDate": "活動日期",
+    "inquiryVenue": "場地",
+    "inquiryBudget": "預算範圍",
+    "inquiryMessage": "訊息",
+    "inquirySent": "邀約已送出！藝人將審核你的邀約。",
+    "hireMe": "邀約演出",
+    "acceptingStudents": "招收學生中",
+    "lessonPriceRange": "課程費用"
   }
 }

@@ -4,6 +4,10 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from './AuthProvider';
 
+export type ViewMode = 'admin' | 'tier0' | 'tier1' | 'tier2' | 'tier3';
+
+const VIEW_MODE_CYCLE: ViewMode[] = ['admin', 'tier0', 'tier1', 'tier2', 'tier3'];
+
 interface AdminContextType {
   isAdmin: boolean;
   /** Supabase access token — pass as Bearer token to admin API routes */
@@ -15,6 +19,10 @@ interface AdminContextType {
   setShowLoginModal: (show: boolean) => void;
   /** Call when an API returns 401 to prompt re-login */
   handleUnauthorized: () => void;
+  /** Current view mode for tier preview */
+  viewMode: ViewMode;
+  /** The tier number being previewed (null when in admin mode) */
+  previewTier: number | null;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -22,10 +30,12 @@ const AdminContext = createContext<AdminContextType | null>(null);
 export default function AdminProvider({ children }: { children: React.ReactNode }) {
   const { user, profile, setShowAuthModal } = useAuth();
   const [token, setToken] = useState<string | null>(null);
-  const [adminModeEnabled, setAdminModeEnabled] = useState(true);
+  const [viewMode, setViewMode] = useState<ViewMode>('admin');
   const [showLoginModal, setShowLoginModal] = useState(false);
 
+  const adminModeEnabled = viewMode === 'admin';
   const isAdmin = !!(profile?.role === 'admin' && adminModeEnabled);
+  const previewTier = viewMode === 'admin' ? null : parseInt(viewMode.replace('tier', ''), 10);
 
   // Keep Supabase access token in sync for API calls
   useEffect(() => {
@@ -57,10 +67,14 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       return;
     }
     if (profile?.role !== 'admin') return;
-    setAdminModeEnabled((prev) => !prev);
+
+    setViewMode((prev) => {
+      const idx = VIEW_MODE_CYCLE.indexOf(prev);
+      return VIEW_MODE_CYCLE[(idx + 1) % VIEW_MODE_CYCLE.length];
+    });
   }, [user, profile, setShowAuthModal]);
 
-  // Ctrl+Shift+A keyboard shortcut
+  // Ctrl+Shift+A keyboard shortcut — cycle through view modes
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
@@ -82,6 +96,8 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         handleUnauthorized,
         showLoginModal,
         setShowLoginModal,
+        viewMode,
+        previewTier,
       }}
     >
       {children}

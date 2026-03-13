@@ -116,7 +116,10 @@
     "payCash": "현금",
     "payCreditCard": "신용카드",
     "payBankTransfer": "은행 이체",
-    "businessHours": "영업시간"
+    "businessHours": "영업시간",
+    "acceptingStudents": "학생 모집 중",
+    "lessonPriceRange": "레슨 요금",
+    "gear": "장비"
   },
   "auth": {
     "signIn": "로그인",
@@ -221,7 +224,18 @@
     "claimCta": "아티스트 페이지를 찾아 \"신청\"을 클릭하여 시작하세요.",
     "browseArtists": "아티스트 둘러보기",
     "contactSupport": "도움이 필요하세요?",
-    "contactSupportDesc": "이름 변경이나 기타 요청"
+    "contactSupportDesc": "이름 변경이나 기타 요청",
+    "teaching": "레슨",
+    "acceptingStudents": "학생 모집 중",
+    "teachingStyles": "레슨 형태",
+    "teachingDescription": "레슨 소개",
+    "teachingDescriptionPlaceholder": "레슨 방식, 경험, 학생이 기대할 수 있는 내용을 설명해 주세요...",
+    "lessonPriceRange": "레슨 요금 범위",
+    "hireMe": "섭외하기",
+    "availableForHire": "섭외 가능",
+    "hireCategories": "서비스 카테고리",
+    "hireDescription": "서비스 소개",
+    "hireDescriptionPlaceholder": "공연하는 행사 유형, 경험, 예약 방법 등을 설명해 주세요..."
   },
   "venueDashboard": {
     "title": "공연장 페이지 관리",
@@ -351,6 +365,49 @@
     "noFanMessagesHint": "아티스트 페이지에서 메시지를 보내 대화를 시작하세요.",
     "noFanBroadcasts": "아직 브로드캐스트가 없습니다.",
     "noFanBroadcastsHint": "아티스트를 팔로우하여 브로드캐스트를 받아보세요.",
-    "fromArtist": "{name}로부터"
+    "fromArtist": "{name}로부터",
+
+    "gear": "내 장비",
+    "addGear": "장비 추가",
+    "gearName": "이름",
+    "gearType": "유형",
+    "gearBrand": "브랜드",
+    "gearModel": "모델",
+    "gearLimitReached": "프리미엄으로 업그레이드하면 장비를 무제한 등록할 수 있습니다",
+    "gearUsed": "{count}/{max}개 장비 사용 중",
+    "noGear": "아직 장비가 없습니다. 악기와 장비를 추가해 보세요.",
+
+    "bookings": "섭외",
+    "noBookings": "아직 섭외 문의가 없습니다.",
+    "enableHireFirst": "프로필 설정에서 '섭외 가능'을 활성화하여 섭외 문의를 받아보세요.",
+    "all": "전체",
+    "pending": "대기 중",
+    "accepted": "수락됨",
+    "declined": "거절됨",
+    "archived": "보관됨",
+
+    "analytics": "분석",
+    "pageViews": "페이지 조회",
+    "viewsByDay": "일별 조회수",
+    "referrerSources": "유입 경로",
+    "cityDistribution": "도시 분포",
+    "noData": "이 기간의 데이터가 없습니다.",
+
+    "downloadEpk": "EPK 다운로드",
+    "customDomainTeaser": "커스텀 도메인 — 출시 예정",
+
+    "submitInquiry": "문의 제출",
+    "inquiryName": "이름",
+    "inquiryEmail": "이메일",
+    "inquiryPhone": "전화번호 (선택)",
+    "inquiryEventType": "이벤트 유형",
+    "inquiryEventDate": "이벤트 날짜",
+    "inquiryVenue": "장소",
+    "inquiryBudget": "예산 범위",
+    "inquiryMessage": "메시지",
+    "inquirySent": "문의가 전송되었습니다! 아티스트가 확인할 예정입니다.",
+    "hireMe": "섭외하기",
+    "acceptingStudents": "학생 모집 중",
+    "lessonPriceRange": "레슨 요금"
   }
 }

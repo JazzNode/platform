@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `/${locale}/venues/${slug}`,
       languages: {
+        'x-default': `/en/venues/${slug}`,
         en: `/en/venues/${slug}`,
         'zh-Hant': `/zh/venues/${slug}`,
         ja: `/ja/venues/${slug}`,
@@ -138,9 +139,20 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     ...(f.capacity && { maximumAttendeeCapacity: f.capacity }),
   };
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'JazzNode', item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: t('venues'), item: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/venues` },
+      { '@type': 'ListItem', position: 3, name: displayName(f) },
+    ],
+  };
+
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <Link href={`/${locale}/venues`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>

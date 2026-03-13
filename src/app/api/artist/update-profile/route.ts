@@ -12,6 +12,13 @@ const ALLOWED_FIELDS = new Set([
   'instagram',
   'facebook_url',
   'aka',
+  // Teaching
+  'accepting_students',
+  'teaching_styles',
+  'lesson_price_range',
+  // Hire
+  'available_for_hire',
+  'hire_categories',
 ]);
 
 export async function POST(req: NextRequest) {
@@ -32,10 +39,16 @@ export async function POST(req: NextRequest) {
     }
 
     // Filter to only allowed fields
-    const sanitized: Record<string, string | null> = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(fields)) {
       if (ALLOWED_FIELDS.has(key)) {
-        sanitized[key] = typeof value === 'string' && value.trim() ? value.trim() : null;
+        if (typeof value === 'boolean') {
+          sanitized[key] = value;
+        } else if (Array.isArray(value)) {
+          sanitized[key] = value.filter((v: unknown) => typeof v === 'string');
+        } else {
+          sanitized[key] = typeof value === 'string' && value.trim() ? value.trim() : null;
+        }
       }
     }
 
@@ -51,6 +64,19 @@ export async function POST(req: NextRequest) {
 
     if (updateError) {
       throw new Error(`Supabase update failed: ${updateError.message}`);
+    }
+
+    // Auto-manage accepting_students badge
+    if ('accepting_students' in sanitized) {
+      if (sanitized.accepting_students === true) {
+        await supabase.from('artist_badges')
+          .upsert({ artist_id: artistId, badge_id: 'art_accepting_students' }, { onConflict: 'artist_id,badge_id' });
+      } else {
+        await supabase.from('artist_badges')
+          .delete()
+          .eq('artist_id', artistId)
+          .eq('badge_id', 'art_accepting_students');
+      }
     }
 
     updateTag('artists');
