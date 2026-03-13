@@ -446,5 +446,84 @@
     "hireMe": "Hire Me",
     "acceptingStudents": "Accepting Students",
     "lessonPriceRange": "Lesson rates"
+  },
+  "tiers": {
+    "metaTitle": "Plans & Tiers",
+    "metaDescription": "Compare JazzNode tier plans for artists and venues. From free listings to premium tools — find the right fit for your jazz career.",
+    "heroTitle": "Your Stage, Your Level",
+    "heroSubtitle": "Whether you're an artist or a venue, JazzNode grows with you. Compare plans and find the right tier for your jazz journey.",
+    "free": "Free",
+    "claimed": "Claimed",
+    "premium": "Premium",
+    "elite": "Elite",
+
+    "artistSectionTitle": "Artist Tiers",
+    "artistSectionDesc": "From auto-generated profiles to full-featured artist studios — claim your page and unlock tools that help you connect with fans and venues.",
+    "artistTier0Desc": "Auto-generated profile from event data",
+    "artistTier1Desc": "Claim your page, edit your bio & links",
+    "artistTier2Desc": "Full analytics, EPK, gear showcase & inbox",
+    "artistTier3Desc": "Broadcasts, booking system & priority features",
+
+    "artistCatProfile": "Profile & Identity",
+    "artistPublicProfile": "Public artist profile",
+    "artistEditProfile": "Edit bio, photo & details",
+    "artistVerifiedBadge": "Verified badge",
+    "artistCustomBio": "Custom biography",
+    "artistSocialLinks": "Social media links",
+
+    "artistCatDiscovery": "Discovery & Visibility",
+    "artistSearchListing": "Listed in search & city pages",
+    "artistEventAssociation": "Linked to events & venues",
+    "artistPrioritySearch": "Priority in search results",
+
+    "artistCatTools": "Tools & Analytics",
+    "artistGearShowcase": "Gear & equipment showcase",
+    "artistGearLimit": "Up to 3",
+    "artistGearUnlimited": "Unlimited",
+    "artistEPK": "Electronic Press Kit (EPK)",
+    "artistEPKBasic": "Basic",
+    "artistEPKFull": "Full + gear & hire",
+    "artistAnalyticsBasic": "Page views & daily trends",
+    "artistAnalyticsAdvanced": "Referrer sources & city breakdown",
+    "artistBroadcasts": "Fan broadcasts (email & in-app)",
+    "artistInbox": "Fan messaging inbox",
+
+    "artistCatBusiness": "Business & Bookings",
+    "artistAvailableForHire": "Available for Hire listing",
+    "artistBookingRequests": "Booking inquiry system",
+
+    "venueSectionTitle": "Venue Tiers",
+    "venueSectionDesc": "Your venue is already on the map. Claim it to take control, or go Premium to unlock the full management suite.",
+    "venueTier0Desc": "Auto-generated listing from event data",
+    "venueTier1Desc": "Claim ownership, edit info & photos",
+    "venueTier2Desc": "Full analytics, bookings, broadcasts & backline",
+
+    "venueCatProfile": "Profile & Identity",
+    "venuePublicListing": "Public venue listing",
+    "venueEditProfile": "Edit description, photos & hours",
+    "venueVerifiedBadge": "Verified badge",
+    "venuePhotos": "Photo gallery",
+    "venueDescription": "Custom description",
+
+    "venueCatDiscovery": "Discovery & Visibility",
+    "venueSearchListing": "Listed in search & city pages",
+    "venueMapPin": "Map pin on city page",
+    "venuePrioritySearch": "Priority in search results",
+    "venueEventShowcase": "Event listings on venue page",
+
+    "venueCatTools": "Tools & Analytics",
+    "venueBackline": "Backline equipment management",
+    "venueAnalyticsBasic": "Page views & daily trends",
+    "venueAnalyticsAdvanced": "Referrer sources & city breakdown",
+    "venueBroadcasts": "Fan broadcasts",
+    "venueInbox": "Messaging inbox",
+
+    "venueCatBusiness": "Business & Operations",
+    "venueBookingManagement": "Booking management system",
+    "venueArtistDiscovery": "Artist discovery & outreach",
+
+    "ctaTitle": "Ready to Level Up?",
+    "ctaDesc": "Claim your artist or venue page for free, and upgrade anytime to unlock the full suite of tools.",
+    "ctaButton": "Explore Artists"
   }
 }
