@@ -1,131 +1,126 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
-import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
-interface ArtistData {
-  artist_id: string;
-  display_name: string | null;
-  name_local: string | null;
-  name_en: string | null;
-  website_url: string | null;
-  spotify_url: string | null;
-  youtube_url: string | null;
-  instagram: string | null;
-  facebook_url: string | null;
-  aka: string | null;
+interface FanStats {
+  totalFans: number;
+  newFansThisMonth: number;
+  cityBreakdown: { city: string; count: number; pct: number }[];
+  dailyTrend: { date: string; count: number }[];
 }
 
-export default function ArtistEditPage({ params }: { params: Promise<{ slug: string }> }) {
-  const t = useTranslations('artistDashboard');
-  const locale = useLocale();
-  const router = useRouter();
-  const { user, profile, loading } = useAuth();
-  const { token } = useAdmin();
+interface UnreadStats {
+  unreadMessages: number;
+  unreadBroadcasts: number;
+}
 
-  const [slug, setSlug] = useState<string>('');
-  const [artist, setArtist] = useState<ArtistData | null>(null);
+export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = useTranslations('artistStudio');
+  const { user, loading } = useAuth();
+
+  const [slug, setSlug] = useState('');
+  const [tier, setTier] = useState(0);
+  const [fanStats, setFanStats] = useState<FanStats | null>(null);
+  const [unread, setUnread] = useState<UnreadStats>({ unreadMessages: 0, unreadBroadcasts: 0 });
+  const [pageViews] = useState(0); // placeholder for analytics
   const [fetching, setFetching] = useState(true);
 
-  // Form state
-  const [websiteUrl, setWebsiteUrl] = useState('');
-  const [spotifyUrl, setSpotifyUrl] = useState('');
-  const [youtubeUrl, setYoutubeUrl] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [facebookUrl, setFacebookUrl] = useState('');
-  const [aka, setAka] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Resolve params
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  // Auth + permission check
-  useEffect(() => {
-    if (!loading && !user) {
-      router.push('/');
-      return;
-    }
-    if (!loading && profile && slug) {
-      if (!profile.claimed_artist_ids?.includes(slug) && profile.role !== 'admin') {
-        router.push(`/${locale}/profile`);
-      }
-    }
-  }, [loading, user, profile, slug, locale, router]);
-
-  // Fetch artist data
+  // Fetch artist tier
   useEffect(() => {
     if (!slug) return;
     const supabase = createClient();
     supabase
       .from('artists')
-      .select('artist_id, display_name, name_local, name_en, website_url, spotify_url, youtube_url, instagram, facebook_url, aka')
+      .select('tier')
       .eq('artist_id', slug)
       .single()
       .then(({ data }) => {
-        if (data) {
-          setArtist(data);
-          setWebsiteUrl(data.website_url || '');
-          setSpotifyUrl(data.spotify_url || '');
-          setYoutubeUrl(data.youtube_url || '');
-          setInstagram(data.instagram || '');
-          setFacebookUrl(data.facebook_url || '');
-          setAka(data.aka || '');
-        }
-        setFetching(false);
+        if (data) setTier(data.tier);
       });
   }, [slug]);
 
-  const artistName = artist?.display_name || artist?.name_local || artist?.name_en || slug;
+  // Fetch fan stats from follows
+  useEffect(() => {
+    if (!slug) return;
 
-  const handleSave = useCallback(async () => {
-    if (!token || !slug) return;
-    setSaving(true);
-    setError(null);
-    setSaved(false);
+    const supabase = createClient();
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    try {
-      const res = await fetch('/api/artist/update-profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          artistId: slug,
-          fields: {
-            website_url: websiteUrl,
-            spotify_url: spotifyUrl,
-            youtube_url: youtubeUrl,
-            instagram,
-            facebook_url: facebookUrl,
-            aka,
-          },
-        }),
+    // Get all followers of this artist
+    supabase
+      .from('follows')
+      .select('user_id, created_at')
+      .eq('target_type', 'artist')
+      .eq('target_id', slug)
+      .then(async ({ data: follows }) => {
+        if (!follows) {
+          setFanStats({ totalFans: 0, newFansThisMonth: 0, cityBreakdown: [], dailyTrend: [] });
+          setFetching(false);
+          return;
+        }
+
+        const totalFans = follows.length;
+        const newFansThisMonth = follows.filter(
+          (f) => new Date(f.created_at) >= thirtyDaysAgo
+        ).length;
+
+        // Daily trend (last 30 days)
+        const dailyMap = new Map<string, number>();
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          dailyMap.set(d.toISOString().slice(0, 10), 0);
+        }
+        follows.forEach((f) => {
+          const day = f.created_at.slice(0, 10);
+          if (dailyMap.has(day)) {
+            dailyMap.set(day, (dailyMap.get(day) || 0) + 1);
+          }
+        });
+        const dailyTrend = Array.from(dailyMap.entries()).map(([date, count]) => ({ date, count }));
+
+        // City breakdown from profiles (best-effort: use country or region if available)
+        // For now, just show total — city data requires user location tracking later
+        setFanStats({
+          totalFans,
+          newFansThisMonth,
+          cityBreakdown: [], // future: aggregate from user profile data
+          dailyTrend,
+        });
+        setFetching(false);
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Update failed');
-      }
-
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t('saveFailed'));
-    } finally {
-      setSaving(false);
+    // Fetch unread message count
+    if (user) {
+      supabase
+        .from('conversations')
+        .select('id')
+        .eq('artist_id', slug)
+        .then(async ({ data: convos }) => {
+          if (!convos || convos.length === 0) {
+            setUnread({ unreadMessages: 0, unreadBroadcasts: 0 });
+            return;
+          }
+          const convoIds = convos.map((c) => c.id);
+          const { count } = await supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .in('conversation_id', convoIds)
+            .neq('sender_id', user.id)
+            .is('read_at', null);
+          setUnread((prev) => ({ ...prev, unreadMessages: count || 0 }));
+        });
     }
-  }, [token, slug, websiteUrl, spotifyUrl, youtubeUrl, instagram, facebookUrl, aka, t]);
+  }, [slug, user]);
 
   if (loading || fetching) {
     return (
@@ -135,159 +130,221 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     );
   }
 
-  if (!artist) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Artist not found.</p>
-      </div>
-    );
-  }
-
-  const inputClass = 'w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors';
+  const stats = fanStats || { totalFans: 0, newFansThisMonth: 0, cityBreakdown: [], dailyTrend: [] };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="space-y-6">
+      {/* ─── Header ─── */}
       <FadeUp>
-        <div className="flex items-center justify-between">
-          <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('title')}</h1>
-          <Link
-            href={`/${locale}/artists/${slug}`}
-            className="text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors link-lift"
-          >
-            {t('viewPage')} →
-          </Link>
-        </div>
-        <p className="text-[var(--muted-foreground)] mt-2">{artistName}</p>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('overviewTitle')}</h1>
       </FadeUp>
 
+      {/* ─── Stat Cards ─── */}
       <FadeUp>
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 space-y-8">
-          {/* Social Links */}
-          <div className="space-y-5">
-            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
-              {t('socialLinks')}
-            </h2>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <StatCard
+            label={t('totalFans')}
+            value={stats.totalFans}
+            icon="fans"
+            highlight
+          />
+          <StatCard
+            label={t('newFansMonth')}
+            value={stats.newFansThisMonth}
+            icon="trending"
+            suffix={t('thisMonth')}
+          />
+          <StatCard
+            label={t('unreadMessages')}
+            value={unread.unreadMessages}
+            icon="mail"
+          />
+        </div>
+      </FadeUp>
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Spotify
-              </label>
-              <input
-                type="url"
-                value={spotifyUrl}
-                onChange={(e) => setSpotifyUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://open.spotify.com/artist/..."
-              />
-            </div>
+      {/* ─── Fan Growth Trend (Mini Chart) ─── */}
+      <FadeUp>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6">
+          <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">
+            {t('fanGrowth')}
+          </h2>
+          <MiniBarChart data={stats.dailyTrend} />
+          <p className="text-xs text-[var(--muted-foreground)] mt-3">
+            {t('last30Days')}
+          </p>
+        </div>
+      </FadeUp>
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                YouTube
-              </label>
-              <input
-                type="url"
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://youtube.com/@..."
-              />
-            </div>
+      {/* ─── Fan Insights (Tier-gated) ─── */}
+      <FadeUp>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
+          <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">
+            {t('fanInsights')}
+          </h2>
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Instagram
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60">@</span>
-                <input
-                  type="text"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ''))}
-                  className={`${inputClass} pl-9`}
-                  placeholder="username"
-                />
+          {stats.totalFans > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {/* City distribution placeholder */}
+              <div>
+                <p className="text-sm text-[var(--muted-foreground)] mb-3">{t('topCities')}</p>
+                <div className="space-y-2">
+                  {stats.cityBreakdown.length > 0 ? (
+                    stats.cityBreakdown.slice(0, 5).map((c) => (
+                      <CityBar key={c.city} city={c.city} pct={c.pct} count={c.count} />
+                    ))
+                  ) : (
+                    <div className="space-y-2">
+                      {/* Placeholder bars with blur for teasing */}
+                      {['Taipei', 'Hong Kong', 'Tokyo', 'Osaka', 'Bangkok'].map((city, i) => (
+                        <CityBar key={city} city={city} pct={[45, 22, 15, 10, 8][i]} count={0} blurred={tier < 2} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Fan activity summary */}
+              <div>
+                <p className="text-sm text-[var(--muted-foreground)] mb-3">{t('fanActivity')}</p>
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">{t('activeFans')}</span>
+                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {tier < 2 ? '128' : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">{t('avgEngagement')}</span>
+                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {tier < 2 ? '73%' : '—'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">{t('topFan')}</span>
+                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {tier < 2 ? 'jazz_lover_tw' : '—'}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
+          ) : (
+            <p className="text-sm text-[var(--muted-foreground)]">{t('noFansYet')}</p>
+          )}
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Facebook
-              </label>
-              <input
-                type="url"
-                value={facebookUrl}
-                onChange={(e) => setFacebookUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://facebook.com/..."
-              />
+          {/* Premium upgrade overlay for tier < 2 */}
+          {tier < 2 && stats.totalFans > 0 && (
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
+              <div className="text-center">
+                <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
+                <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                  {t('upgradePremium')}
+                </button>
+              </div>
             </div>
-
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Website
-              </label>
-              <input
-                type="url"
-                value={websiteUrl}
-                onChange={(e) => setWebsiteUrl(e.target.value)}
-                className={inputClass}
-                placeholder="https://"
-              />
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="border-t border-[var(--border)]" />
-
-          {/* AKA */}
-          <div>
-            <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-              {t('aka')}
-            </label>
-            <input
-              type="text"
-              value={aka}
-              onChange={(e) => setAka(e.target.value)}
-              className={inputClass}
-              placeholder={t('akaPlaceholder')}
-            />
-          </div>
-
-          {/* Save button */}
-          {error && <p className="text-xs text-red-400">{error}</p>}
-
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="btn-magnetic px-8 py-3 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-sm uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-50"
-            >
-              {saving ? (
-                <div className="w-4 h-4 border-2 border-[#0A0A0A]/30 border-t-[#0A0A0A] rounded-full animate-spin" />
-              ) : saved ? (
-                t('saved')
-              ) : (
-                t('save')
-              )}
-            </button>
-          </div>
-
-          {/* Contact Support */}
-          <div className="border-t border-[var(--border)] pt-6">
-            <a
-              href="mailto:hello@jazznode.com?subject=Artist%20Page%20Support"
-              className="inline-flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-              <span>{t('contactSupport')}</span>
-              <span className="text-xs text-[var(--muted-foreground)]/60">— {t('contactSupportDesc')}</span>
-            </a>
-          </div>
+          )}
         </div>
       </FadeUp>
+
+      {/* ─── Premium Features Teaser ─── */}
+      {tier < 2 && (
+        <FadeUp>
+          <div className="bg-gradient-to-br from-[var(--color-gold)]/5 to-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-2xl p-6">
+            <h2 className="text-sm font-bold text-[var(--color-gold)] mb-3">{t('premiumFeatures')}</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                { icon: 'broadcast', label: t('featureBroadcast') },
+                { icon: 'analytics', label: t('featureAnalytics') },
+                { icon: 'priority', label: t('featurePriority') },
+                { icon: 'badge', label: t('featureBadge') },
+              ].map((f) => (
+                <div key={f.icon} className="flex items-center gap-2 text-sm text-[var(--foreground)]/80">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]" />
+                  {f.label}
+                </div>
+              ))}
+            </div>
+            <button className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+              {t('upgradePremium')}
+            </button>
+          </div>
+        </FadeUp>
+      )}
+    </div>
+  );
+}
+
+/* ─── Sub-components ─── */
+
+function StatCard({
+  label,
+  value,
+  icon,
+  highlight,
+  suffix,
+}: {
+  label: string;
+  value: number;
+  icon: string;
+  highlight?: boolean;
+  suffix?: string;
+}) {
+  return (
+    <div
+      className={`rounded-2xl border p-4 sm:p-5 ${
+        highlight
+          ? 'bg-gradient-to-br from-[var(--color-gold)]/8 to-[var(--color-gold)]/3 border-[var(--color-gold)]/20'
+          : 'bg-[var(--card)] border-[var(--border)]'
+      }`}
+    >
+      <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">{label}</p>
+      <p className={`text-2xl sm:text-3xl font-bold ${highlight ? 'text-[var(--color-gold)]' : ''}`}>
+        {value.toLocaleString()}
+      </p>
+      {suffix && <p className="text-xs text-[var(--muted-foreground)] mt-1">{suffix}</p>}
+    </div>
+  );
+}
+
+function MiniBarChart({ data }: { data: { date: string; count: number }[] }) {
+  const max = Math.max(...data.map((d) => d.count), 1);
+  return (
+    <div className="flex items-end gap-px h-16">
+      {data.map((d) => (
+        <div
+          key={d.date}
+          className="flex-1 bg-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/60 rounded-t transition-colors"
+          style={{ height: `${Math.max((d.count / max) * 100, 4)}%` }}
+          title={`${d.date}: +${d.count}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+function CityBar({
+  city,
+  pct,
+  count,
+  blurred,
+}: {
+  city: string;
+  pct: number;
+  count: number;
+  blurred?: boolean;
+}) {
+  return (
+    <div className={blurred ? 'blur-[3px] select-none pointer-events-none' : ''}>
+      <div className="flex justify-between text-xs mb-0.5">
+        <span>{city}</span>
+        <span className="text-[var(--muted-foreground)]">{pct}%</span>
+      </div>
+      <div className="h-1.5 bg-[var(--muted)] rounded-full overflow-hidden">
+        <div
+          className="h-full bg-[var(--color-gold)]/60 rounded-full"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
     </div>
   );
 }

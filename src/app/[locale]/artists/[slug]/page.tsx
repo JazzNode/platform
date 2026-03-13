@@ -16,6 +16,7 @@ import BadgeDock from '@/components/BadgeDock';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
+import ContactArtistButton from '@/components/ContactArtistButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -296,6 +297,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   tag="h1"
                 />
                 <div className="flex items-center gap-2 shrink-0">
+                  <ContactArtistButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
                   <FollowButton itemType="artist" itemId={artist.id} variant="full" />
                 </div>
