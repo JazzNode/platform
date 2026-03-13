@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -21,6 +22,7 @@ interface UnreadStats {
 export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
   const { user, loading, setShowComingSoon } = useAuth();
+  const { previewArtistTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -137,6 +139,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
     );
   }
 
+  const effectiveTier = previewArtistTier ?? tier;
   const stats = fanStats || { totalFans: 0, newFansThisMonth: 0, cityBreakdown: [], dailyTrend: [] };
 
   return (
@@ -208,7 +211,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
                     <div className="space-y-2">
                       {/* Placeholder bars with blur for teasing */}
                       {['Taipei', 'Hong Kong', 'Tokyo', 'Osaka', 'Bangkok'].map((city, i) => (
-                        <CityBar key={city} city={city} pct={[45, 22, 15, 10, 8][i]} count={0} blurred={tier < 2} />
+                        <CityBar key={city} city={city} pct={[45, 22, 15, 10, 8][i]} count={0} blurred={effectiveTier < 2} />
                       ))}
                     </div>
                   )}
@@ -221,20 +224,20 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">{t('activeFans')}</span>
-                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
-                      {tier < 2 ? '128' : '—'}
+                    <span className={`text-sm font-bold ${effectiveTier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {effectiveTier < 2 ? '128' : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">{t('avgEngagement')}</span>
-                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
-                      {tier < 2 ? '73%' : '—'}
+                    <span className={`text-sm font-bold ${effectiveTier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {effectiveTier < 2 ? '73%' : '—'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">{t('topFan')}</span>
-                    <span className={`text-sm font-bold ${tier < 2 ? 'blur-sm select-none' : ''}`}>
-                      {tier < 2 ? 'jazz_lover_tw' : '—'}
+                    <span className={`text-sm font-bold ${effectiveTier < 2 ? 'blur-sm select-none' : ''}`}>
+                      {effectiveTier < 2 ? 'jazz_lover_tw' : '—'}
                     </span>
                   </div>
                 </div>
@@ -245,7 +248,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
           )}
 
           {/* Premium upgrade overlay for tier < 2 */}
-          {tier < 2 && stats.totalFans > 0 && (
+          {effectiveTier < 2 && stats.totalFans > 0 && (
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
               <div className="text-center">
                 <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
@@ -279,7 +282,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
       </FadeUp>
 
       {/* ─── Premium Features Teaser ─── */}
-      {tier < 2 && (
+      {effectiveTier < 2 && (
         <FadeUp>
           <div className="bg-gradient-to-br from-[var(--color-gold)]/5 to-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-2xl p-6">
             <h2 className="text-sm font-bold text-[var(--color-gold)] mb-3">{t('premiumFeatures')}</h2>

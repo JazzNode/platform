@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 
 interface ArtistBasic {
@@ -96,6 +97,7 @@ export default function ArtistDashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, profile, loading } = useAuth();
+  const { previewArtistTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [artist, setArtist] = useState<ArtistBasic | null>(null);
@@ -141,6 +143,7 @@ export default function ArtistDashboardLayout({
     );
   }
 
+  const effectiveTier = previewArtistTier ?? (artist?.tier ?? 0);
   const artistName = artist?.display_name || artist?.name_local || artist?.name_en || slug;
   const basePath = `/${locale}/profile/artist/${slug}`;
 
@@ -175,7 +178,7 @@ export default function ArtistDashboardLayout({
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{artistName}</p>
                 <p className="text-xs text-[var(--muted-foreground)]">
-                  {artist?.tier === 2 ? 'Premium' : artist?.tier === 1 ? 'Claimed' : 'Free'}
+                  {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
                 </p>
               </div>
             </div>
@@ -225,8 +228,8 @@ export default function ArtistDashboardLayout({
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--foreground)]">{artistName}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span className={artist?.tier === 2 ? 'text-[var(--color-gold)]' : ''}>
-                {artist?.tier === 2 ? 'Premium' : artist?.tier === 1 ? 'Claimed' : 'Free'}
+              <span className={effectiveTier === 2 ? 'text-[var(--color-gold)]' : ''}>
+                {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
               </span>
             </p>
           </div>

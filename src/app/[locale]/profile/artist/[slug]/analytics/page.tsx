@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -11,6 +12,7 @@ const COLORS = ['#C8A84E', '#8B7355', '#6B5B3E', '#4B3F2B', '#2B2519'];
 
 export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
+  const { previewArtistTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -50,6 +52,8 @@ export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug
     setData(json);
     setLoading(false);
   };
+
+  const effectiveTier = previewArtistTier ?? tier;
 
   if (loading) {
     return (
@@ -115,7 +119,7 @@ export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug
       </FadeUp>
 
       {/* Premium Analytics (Tier 2+) */}
-      {tier >= 2 ? (
+      {effectiveTier >= 2 ? (
         <>
           {/* Referrer Sources */}
           {data?.referrerBreakdown && data.referrerBreakdown.length > 0 && (

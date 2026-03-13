@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -20,6 +21,7 @@ interface Broadcast {
 export default function BroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
   const { user, loading, setShowComingSoon } = useAuth();
+  const { previewArtistTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -158,8 +160,10 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
     );
   }
 
+  const effectiveTier = previewArtistTier ?? tier;
+
   // Tier gate
-  if (tier < 2) {
+  if (effectiveTier < 2) {
     return (
       <div className="space-y-6">
         <FadeUp>

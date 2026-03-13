@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -10,6 +11,7 @@ const GOLD = '#C8A84E';
 
 export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
+  const { previewVenueTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -51,6 +53,8 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
     }
     setLoading(false);
   };
+
+  const effectiveTier = previewVenueTier ?? tier;
 
   if (loading) {
     return (
@@ -116,7 +120,7 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
       </FadeUp>
 
       {/* Premium Analytics Teaser (Tier < 2) */}
-      {tier < 2 && (
+      {effectiveTier < 2 && (
         <FadeUp>
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
             <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">

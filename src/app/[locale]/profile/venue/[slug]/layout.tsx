@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 
 interface VenueBasic {
@@ -95,6 +96,7 @@ export default function VenueDashboardLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, profile, loading } = useAuth();
+  const { previewVenueTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [venue, setVenue] = useState<VenueBasic | null>(null);
@@ -140,6 +142,7 @@ export default function VenueDashboardLayout({
   }
 
   const venueName = venue?.display_name || venue?.name_local || venue?.name_en || slug;
+  const effectiveTier = previewVenueTier ?? (venue?.tier ?? 0);
   const basePath = `/${locale}/profile/venue/${slug}`;
 
   const isActive = (navPath: string) => {
@@ -172,7 +175,7 @@ export default function VenueDashboardLayout({
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{venueName}</p>
                 <p className="text-xs text-[var(--muted-foreground)]">
-                  {venue?.tier === 2 ? 'Premium' : venue?.tier === 1 ? 'Claimed' : 'Free'}
+                  {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
                 </p>
               </div>
             </div>
@@ -222,8 +225,8 @@ export default function VenueDashboardLayout({
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--foreground)]">{venueName}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span className={venue?.tier === 2 ? 'text-[var(--color-gold)]' : ''}>
-                {venue?.tier === 2 ? 'Premium' : venue?.tier === 1 ? 'Claimed' : 'Free'}
+              <span className={effectiveTier === 2 ? 'text-[var(--color-gold)]' : ''}>
+                {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
               </span>
             </p>
           </div>

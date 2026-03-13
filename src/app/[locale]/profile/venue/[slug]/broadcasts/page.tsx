@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
+import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
 export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const { setShowComingSoon } = useAuth();
+  const { previewVenueTier } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -36,7 +38,9 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
     );
   }
 
-  if (tier < 2) {
+  const effectiveTier = previewVenueTier ?? tier;
+
+  if (effectiveTier < 2) {
     return (
       <div className="space-y-6">
         <FadeUp>

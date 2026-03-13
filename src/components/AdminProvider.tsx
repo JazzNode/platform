@@ -4,9 +4,13 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from './AuthProvider';
 
-export type ViewMode = 'admin' | 'tier0' | 'tier1' | 'tier2' | 'tier3';
+export type ViewMode =
+  | 'admin'
+  | 'artist-tier0' | 'artist-tier1' | 'artist-tier2' | 'artist-tier3'
+  | 'venue-tier0' | 'venue-tier1' | 'venue-tier2';
 
-const VIEW_MODE_CYCLE: ViewMode[] = ['admin', 'tier0', 'tier1', 'tier2', 'tier3'];
+const ARTIST_TIER_CYCLE: ViewMode[] = ['admin', 'artist-tier0', 'artist-tier1', 'artist-tier2', 'artist-tier3'];
+const VENUE_TIER_CYCLE: ViewMode[] = ['admin', 'venue-tier0', 'venue-tier1', 'venue-tier2'];
 
 interface AdminContextType {
   isAdmin: boolean;
@@ -14,6 +18,7 @@ interface AdminContextType {
   token: string | null;
   /** Whether admin mode UI is active (admin may toggle it off to see regular view) */
   adminModeEnabled: boolean;
+  /** @deprecated Use toggleArtistTier or toggleVenueTier instead */
   toggleAdmin: () => void;
   showLoginModal: boolean;
   setShowLoginModal: (show: boolean) => void;
@@ -21,8 +26,14 @@ interface AdminContextType {
   handleUnauthorized: () => void;
   /** Current view mode for tier preview */
   viewMode: ViewMode;
-  /** The tier number being previewed (null when in admin mode) */
-  previewTier: number | null;
+  /** Preview artist tier (null when not previewing artist tiers) */
+  previewArtistTier: number | null;
+  /** Preview venue tier (null when not previewing venue tiers) */
+  previewVenueTier: number | null;
+  /** Ctrl+Shift+A — cycle through artist tiers */
+  toggleArtistTier: () => void;
+  /** Ctrl+Shift+V — cycle through venue tiers */
+  toggleVenueTier: () => void;
 }
 
 const AdminContext = createContext<AdminContextType | null>(null);
@@ -35,7 +46,14 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
 
   const adminModeEnabled = viewMode === 'admin';
   const isAdmin = !!(profile?.role === 'admin' && adminModeEnabled);
-  const previewTier = viewMode === 'admin' ? null : parseInt(viewMode.replace('tier', ''), 10);
+
+  // Parse preview tiers from viewMode
+  const previewArtistTier = viewMode.startsWith('artist-tier')
+    ? parseInt(viewMode.replace('artist-tier', ''), 10)
+    : null;
+  const previewVenueTier = viewMode.startsWith('venue-tier')
+    ? parseInt(viewMode.replace('venue-tier', ''), 10)
+    : null;
 
   // Keep Supabase access token in sync for API calls
   useEffect(() => {
@@ -61,7 +79,8 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     setShowAuthModal(true);
   }, [setShowAuthModal]);
 
-  const toggleAdmin = useCallback(() => {
+  /** Cycle through a specific tier cycle based on current viewMode */
+  const cycleTier = useCallback((cycle: ViewMode[]) => {
     if (!user) {
       setShowAuthModal(true);
       return;
@@ -69,22 +88,38 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     if (profile?.role !== 'admin') return;
 
     setViewMode((prev) => {
-      const idx = VIEW_MODE_CYCLE.indexOf(prev);
-      return VIEW_MODE_CYCLE[(idx + 1) % VIEW_MODE_CYCLE.length];
+      const idx = cycle.indexOf(prev);
+      if (idx >= 0) {
+        // Already in this cycle — advance to next
+        return cycle[(idx + 1) % cycle.length];
+      }
+      // Currently in another cycle — jump to first non-admin entry
+      return cycle[1] ?? cycle[0];
     });
   }, [user, profile, setShowAuthModal]);
 
-  // Ctrl+Shift+A keyboard shortcut — cycle through view modes
+  const toggleArtistTier = useCallback(() => cycleTier(ARTIST_TIER_CYCLE), [cycleTier]);
+  const toggleVenueTier = useCallback(() => cycleTier(VENUE_TIER_CYCLE), [cycleTier]);
+
+  // Keep backward compat — toggleAdmin cycles artist tiers (same shortcut)
+  const toggleAdmin = toggleArtistTier;
+
+  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.ctrlKey && !e.metaKey && e.shiftKey && e.key === 'A') {
+      if (!e.ctrlKey || e.metaKey || !e.shiftKey) return;
+
+      if (e.key === 'A') {
         e.preventDefault();
-        toggleAdmin();
+        toggleArtistTier();
+      } else if (e.key === 'V') {
+        e.preventDefault();
+        toggleVenueTier();
       }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [toggleAdmin]);
+  }, [toggleArtistTier, toggleVenueTier]);
 
   return (
     <AdminContext.Provider
@@ -97,7 +132,10 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
         showLoginModal,
         setShowLoginModal,
         viewMode,
-        previewTier,
+        previewArtistTier,
+        previewVenueTier,
+        toggleArtistTier,
+        toggleVenueTier,
       }}
     >
       {children}
