@@ -10,8 +10,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const body = await req.json();
-    const tag = body?.tag;
+    let tag: string | undefined;
+    try {
+      const body = await req.json();
+      tag = body?.tag;
+    } catch {
+      // Empty body or invalid JSON → revalidate all
+    }
 
     if (tag && VALID_TAGS.includes(tag)) {
       updateTag(tag);
@@ -23,7 +28,7 @@ export async function POST(req: NextRequest) {
       updateTag(t);
     }
     return NextResponse.json({ revalidated: true, tags: VALID_TAGS });
-  } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  } catch (err) {
+    return NextResponse.json({ error: 'Revalidation failed', detail: String(err) }, { status: 500 });
   }
 }
