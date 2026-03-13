@@ -18,14 +18,16 @@ import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const artists = await getArtists();
   const artist = artists.find((a) => a.id === slug);
   return { title: artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist' };
 }
 
 export default async function ArtistDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
-  const { locale, slug } = await params;
+  const { locale, slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
