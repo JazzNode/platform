@@ -4,9 +4,24 @@ import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resol
 import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName, eventTitle } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('common');
-  return { title: t('events') };
+  return {
+    title: t('events'),
+    description: t('eventsPageDescription'),
+    alternates: {
+      canonical: `/${locale}/events`,
+      languages: {
+        en: '/en/events',
+        'zh-Hant': '/zh/events',
+        ja: '/ja/events',
+        ko: '/ko/events',
+        th: '/th/events',
+        id: '/id/events',
+      },
+    },
+  };
 }
 
 export default async function EventsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ view?: string; venue?: string; category?: string; city?: string }> }) {

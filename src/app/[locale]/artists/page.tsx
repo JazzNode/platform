@@ -4,9 +4,24 @@ import { getArtists, getCities, getVenues } from '@/lib/supabase';
 import { artistDisplayName, photoUrl, localized, normalizeInstrumentKey, cityName, displayName } from '@/lib/helpers';
 import ArtistsClient from '@/components/ArtistsClient';
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('common');
-  return { title: t('artists') };
+  return {
+    title: t('artists'),
+    description: t('artistsPageDescription'),
+    alternates: {
+      canonical: `/${locale}/artists`,
+      languages: {
+        en: '/en/artists',
+        'zh-Hant': '/zh/artists',
+        ja: '/ja/artists',
+        ko: '/ko/artists',
+        th: '/th/artists',
+        id: '/id/artists',
+      },
+    },
+  };
 }
 
 export default async function ArtistsPage({ params }: { params: Promise<{ locale: string }> }) {

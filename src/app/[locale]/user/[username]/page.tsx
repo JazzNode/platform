@@ -1,3 +1,4 @@
+import { notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { getProfileByUsername } from '@/lib/profile';
 import PublicProfileContent from '@/components/PublicProfileContent';
@@ -7,6 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ username:
   const profile = await getProfileByUsername(username);
   return {
     title: profile?.display_name || `@${username}`,
+    robots: { index: false, follow: false },
   };
 }
 
@@ -17,11 +19,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const profile = await getProfileByUsername(username);
 
   if (!profile) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">{t('notFound')}</p>
-      </div>
-    );
+    notFound();
   }
 
   return (

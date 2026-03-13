@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/supabase';
 import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale, slug } = await params;
   const events = await getEvents();
   const event = events.find((e) => e.id === slug);
-  const title = event ? eventTitle(event.fields, 'en') : 'Event';
-  const desc = event?.fields.description_en || event?.fields.description_zh || '';
+  const title = event ? eventTitle(event.fields, locale) : 'Event';
+  const desc = event ? (localized(event.fields as Record<string, unknown>, 'description', locale) || localized(event.fields as Record<string, unknown>, 'description_short', locale) || '') : '';
   // Build dynamic OG image
   const ogParams = new URLSearchParams({ title });
   if (event) {
@@ -67,12 +67,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   }
 
   if (!event) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Event not found.</p>
-        <Link href={`/${locale}/events`} className="text-gold mt-4 inline-block link-lift">← Back to events</Link>
-      </div>
-    );
+    notFound();
   }
 
   const f = event.fields;
@@ -139,7 +134,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
     ...(desc && { description: desc }),
     ...(f.poster_url && { image: f.poster_url }),
-    ...(f.source_url && { url: f.source_url }),
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/events/${slug}`,
+    ...(f.source_url && { sameAs: f.source_url }),
     ...(localeToInLanguage[locale] && { inLanguage: localeToInLanguage[locale] }),
     ...(venue && {
       location: {

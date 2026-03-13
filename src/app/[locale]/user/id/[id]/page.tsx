@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import { getProfileById } from '@/lib/profile';
 import PublicProfileContent from '@/components/PublicProfileContent';
@@ -8,6 +8,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const profile = await getProfileById(id);
   return {
     title: profile?.display_name || profile?.username || 'User',
+    robots: { index: false, follow: false },
   };
 }
 
@@ -18,11 +19,7 @@ export default async function PublicProfileByIdPage({ params }: { params: Promis
   const profile = await getProfileById(id);
 
   if (!profile) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">{t('notFound')}</p>
-      </div>
-    );
+    notFound();
   }
 
   // If user has a username, redirect to canonical URL

@@ -60,6 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     entry('/artists', 'daily', 0.9, now),
     entry('/events', 'daily', 0.9, now),
     entry('/venues', 'daily', 0.9, now),
+    entry('/cities', 'daily', 0.9, now),
   ];
 
   // Dynamic pages

@@ -135,7 +135,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                     >
                       {photoUrl(artist.fields.photo_url) ? (
                         <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-                          <Image src={photoUrl(artist.fields.photo_url)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
+                          <Image src={photoUrl(artist.fields.photo_url)!} alt={artistDisplayName(artist.fields, locale)} width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
                         </div>
                       ) : (
                         <div className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">♪</div>
@@ -163,7 +163,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                       >
                         {photoUrl(venue.fields.photo_url) ? (
                           <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0">
-                            <Image src={photoUrl(venue.fields.photo_url)!} alt="" width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
+                            <Image src={photoUrl(venue.fields.photo_url)!} alt={displayName(venue.fields)} width={32} height={32} className="object-cover w-full h-full" sizes="32px" />
                           </div>
                         ) : (
                           <div className="w-8 h-8 rounded-lg bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">🎵</div>

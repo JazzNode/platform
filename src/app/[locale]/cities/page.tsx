@@ -8,9 +8,24 @@ import FadeUp from '@/components/animations/FadeUp';
 import CountUp from '@/components/animations/CountUp';
 import EventCarousel from '@/components/EventCarousel';
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('common');
-  return { title: t('cities') };
+  return {
+    title: t('cities'),
+    description: t('citiesPageDescription'),
+    alternates: {
+      canonical: `/${locale}/cities`,
+      languages: {
+        en: '/en/cities',
+        'zh-Hant': '/zh/cities',
+        ja: '/ja/cities',
+        ko: '/ko/cities',
+        th: '/th/cities',
+        id: '/id/cities',
+      },
+    },
+  };
 }
 
 export default async function CitiesPage({ params }: { params: Promise<{ locale: string }> }) {

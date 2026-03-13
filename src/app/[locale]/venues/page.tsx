@@ -4,9 +4,24 @@ import { getVenues, getEvents, getCities, buildVenueEventCounts, venueEventCount
 import { displayName, photoUrl, localized, cityName } from '@/lib/helpers';
 import VenuesClient from '@/components/VenuesClient';
 
-export async function generateMetadata() {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('common');
-  return { title: t('venues') };
+  return {
+    title: t('venues'),
+    description: t('venuesPageDescription'),
+    alternates: {
+      canonical: `/${locale}/venues`,
+      languages: {
+        en: '/en/venues',
+        'zh-Hant': '/zh/venues',
+        ja: '/ja/venues',
+        ko: '/ko/venues',
+        th: '/th/venues',
+        id: '/id/venues',
+      },
+    },
+  };
 }
 
 export default async function VenuesPage({ params }: { params: Promise<{ locale: string }> }) {

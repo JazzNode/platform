@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
 import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
@@ -60,12 +60,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   }
 
   if (!venue) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Venue not found.</p>
-        <Link href={`/${locale}/venues`} className="text-gold mt-4 inline-block link-lift">← Back to venues</Link>
-      </div>
-    );
+    notFound();
   }
 
   // Compute prev/next venue — sorted by event count (descending), same as list page
@@ -123,7 +118,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     name: displayName(f),
     ...(desc && { description: desc }),
     ...(photoUrl(f.photo_url) && { image: photoUrl(f.photo_url) }),
-    ...(f.website_url && { url: f.website_url }),
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/venues/${slug}`,
     ...(f.phone && { telephone: f.phone }),
     ...(f.contact_email && { email: f.contact_email }),
     ...(localeToInLanguage[locale] && { inLanguage: localeToInLanguage[locale] }),
@@ -403,7 +398,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 <Link key={a.id} href={`/${locale}/artists/${a.id}`}
                   className="flex items-center gap-3 bg-[var(--card)] px-4 py-3 rounded-xl border border-[var(--border)] card-hover group">
                   {photoUrl(a.fields.photo_url) && (
-                    <Image src={photoUrl(a.fields.photo_url)!} alt="" width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
+                    <Image src={photoUrl(a.fields.photo_url)!} alt={artistDisplayName(a.fields, locale)} width={32} height={32} className="w-8 h-8 rounded-full object-cover" />
                   )}
                   <div>
                     <span className="text-sm font-medium group-hover:text-gold transition-colors">{artistDisplayName(a.fields, locale)}</span>
@@ -490,7 +485,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                         <Link key={event.id} href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
                           {event.fields.poster_url && (
                             <div className="h-36 overflow-hidden mb-4 -mx-5 -mt-5 rounded-t-2xl relative">
-                              <Image src={event.fields.poster_url} alt="" fill className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
+                              <Image src={event.fields.poster_url} alt={eventTitle(event.fields, locale)} fill className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500" sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw" />
                             </div>
                           )}
                           <div className="text-xs uppercase tracking-widest text-gold mb-2">

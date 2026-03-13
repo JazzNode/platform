@@ -185,7 +185,7 @@ export default function SearchOverlay() {
             }`}
           >
             {a.photoUrl ? (
-              <Image src={a.photoUrl} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
+              <Image src={a.photoUrl} alt={a.displayName} width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">♪</div>
             )}
@@ -255,7 +255,7 @@ export default function SearchOverlay() {
             }`}
           >
             {m.avatarUrl ? (
-              <Image src={m.avatarUrl} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
+              <Image src={m.avatarUrl} alt={m.displayName || m.username || ''} width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm font-bold shrink-0 border border-[var(--border)] text-[var(--muted-foreground)]">
                 {label.charAt(0).toUpperCase()}

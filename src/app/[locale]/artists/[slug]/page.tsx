@@ -2,7 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey, parseSpotifyEmbedUrl, parseYouTubeVideoId } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
@@ -23,8 +23,8 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const slug = decodeURIComponent(rawSlug);
   const artists = await getArtists();
   const artist = artists.find((a) => a.id === slug);
-  const name = artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist';
-  const bio = artist?.fields.bio_en || artist?.fields.bio_zh || '';
+  const name = artist ? artistDisplayName(artist.fields, locale) : 'Artist';
+  const bio = artist ? (localized(artist.fields as Record<string, unknown>, 'bio', locale) || localized(artist.fields as Record<string, unknown>, 'bio_short', locale) || '') : '';
   const ogParams = new URLSearchParams({ name });
   if (artist?.fields.primary_instrument) ogParams.set('instrument', artist.fields.primary_instrument);
   if (artist?.fields.photo_url) ogParams.set('photo', artist.fields.photo_url);
@@ -66,12 +66,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   }
 
   if (!artist) {
-    return (
-      <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Artist not found.</p>
-        <Link href={`/${locale}/artists`} className="text-gold mt-4 inline-block link-lift">{t('backToList')}</Link>
-      </div>
-    );
+    notFound();
   }
 
   // Compute prev/next artist — alphabetical by displayName
@@ -248,6 +243,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     '@context': 'https://schema.org',
     '@type': f.type === 'group' || f.type === 'big band' ? 'MusicGroup' : 'Person',
     name: artistDisplayName(f, locale),
+    url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/artists/${slug}`,
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com'}/${locale}/artists/${slug}`,
+    },
     ...(artistBio && { description: artistBio }),
     ...(photoUrl(f.photo_url) && { image: photoUrl(f.photo_url) }),
     ...(sameAs.length > 0 && { sameAs }),
