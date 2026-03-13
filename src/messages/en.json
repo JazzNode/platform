@@ -64,6 +64,7 @@
     "eventsPageDescription": "Discover upcoming jazz events, concerts, and jam sessions worldwide.",
     "venuesPageDescription": "Explore jazz venues and live music spots across the globe.",
     "citiesPageDescription": "Jazz scenes around the world — venues, artists, and events by city.",
+    "cityPageDescription": "Discover jazz venues, events, and artists in {city}.",
     "citiesCount": "cities",
     "venuesInCity": "venues",
     "eventsInCity": "events",

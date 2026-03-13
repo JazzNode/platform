@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     alternates: {
       canonical: `/${locale}/cities`,
       languages: {
+        'x-default': '/en/cities',
         en: '/en/cities',
         'zh-Hant': '/zh/cities',
         ja: '/ja/cities',
@@ -227,7 +228,7 @@ export default async function CitiesPage({ params }: { params: Promise<{ locale:
 
                 {/* Action link */}
                 <Link
-                  href={`/${locale}/events?city=${city.id}`}
+                  href={`/${locale}/cities/${city.id}`}
                   className="text-xs uppercase tracking-widest text-gold hover:text-[var(--color-gold-bright)] transition-colors duration-300"
                 >
                   {t('exploreCityEvents')} →

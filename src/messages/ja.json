@@ -60,6 +60,7 @@
     "eventsPageDescription": "世界中のジャズイベント、コンサート、ジャムセッションを発見。",
     "venuesPageDescription": "世界中のジャズ会場とライブミュージックスポットを探索。",
     "citiesPageDescription": "世界のジャズシーン — 都市別の会場、アーティスト、イベント。",
+    "cityPageDescription": "{city}のジャズ会場、イベント、アーティストを発見。",
     "citiesCount": "都市",
     "venuesInCity": "会場",
     "eventsInCity": "イベント",

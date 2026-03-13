@@ -60,6 +60,7 @@
     "eventsPageDescription": "ค้นพบกิจกรรมแจ๊ส คอนเสิร์ต และแจมเซสชันทั่วโลก",
     "venuesPageDescription": "สำรวจสถานที่แสดงแจ๊สและสถานที่เล่นดนตรีสดทั่วโลก",
     "citiesPageDescription": "วงการแจ๊สทั่วโลก — สถานที่ ศิลปิน และกิจกรรมตามเมือง",
+    "cityPageDescription": "ค้นพบสถานที่แจ๊ส อีเวนต์ และศิลปินใน{city}",
     "citiesCount": "เมือง",
     "venuesInCity": "สถานที่",
     "eventsInCity": "กิจกรรม",

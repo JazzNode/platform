@@ -34,7 +34,7 @@ const SECTION_LABELS: Record<string, Record<string, string>> = {
 };
 
 export default function SearchOverlay() {
-  const { isOpen, close, data } = useSearch();
+  const { isOpen, close, data, loading } = useSearch();
   const locale = useLocale();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -358,7 +358,14 @@ export default function SearchOverlay() {
 
           {/* Results */}
           <div className="overflow-y-auto" style={{ maxHeight: 'min(60vh, 440px)' }}>
-            {query.length === 0 ? (
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-foreground)]">
+                <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mb-3" />
+                <p className="text-sm">
+                  {locale === 'zh' ? '載入中…' : locale === 'ja' ? '読み込み中…' : locale === 'ko' ? '로딩 중…' : 'Loading…'}
+                </p>
+              </div>
+            ) : query.length === 0 ? (
               /* Empty state — keyboard hint */
               <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-foreground)]">
                 <p className="text-sm">
