@@ -12,18 +12,18 @@ export default function ComingSoonToast() {
 
   // Animate in, then auto-dismiss
   useEffect(() => {
-    if (!showComingSoon) {
-      setVisible(false);
-      return;
-    }
+    if (!showComingSoon) return;
     // Trigger enter animation on next frame
-    requestAnimationFrame(() => setVisible(true));
+    const raf = requestAnimationFrame(() => setVisible(true));
     const timer = setTimeout(() => {
       setVisible(false);
       setTimeout(() => setShowComingSoon(null), 300);
     }, 2500);
-    return () => clearTimeout(timer);
+    return () => { cancelAnimationFrame(raf); clearTimeout(timer); };
   }, [showComingSoon, setShowComingSoon]);
+
+  // Derive effective visibility — hidden when toast is dismissed
+  const effectiveVisible = showComingSoon ? visible : false;
 
   if (!showComingSoon) return null;
 
@@ -37,8 +37,8 @@ export default function ComingSoonToast() {
         style={{
           background: 'color-mix(in srgb, var(--background) 94%, var(--color-gold))',
           backdropFilter: 'blur(24px)',
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0)' : 'translateY(12px)',
+          opacity: effectiveVisible ? 1 : 0,
+          transform: effectiveVisible ? 'translateY(0)' : 'translateY(12px)',
           transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >

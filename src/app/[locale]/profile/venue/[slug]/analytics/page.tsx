@@ -33,11 +33,6 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
       .then(({ data: d }) => { if (d) setTier(d.tier); });
   }, [slug]);
 
-  useEffect(() => {
-    if (!slug) return;
-    fetchAnalytics();
-  }, [slug, range]);
-
   const fetchAnalytics = async () => {
     setLoading(true);
     const supabase = createClient();
@@ -53,6 +48,12 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (!slug) return;
+    fetchAnalytics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, range]);
 
   const effectiveTier = previewVenueTier ?? tier;
 
@@ -128,10 +129,10 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
             </h2>
             {/* Blurred placeholder */}
             <div className="blur-[6px] select-none pointer-events-none space-y-3">
-              {['Direct', 'Google', 'Instagram', 'Facebook'].map((s) => (
+              {['Direct', 'Google', 'Instagram', 'Facebook'].map((s, i) => (
                 <div key={s} className="flex justify-between text-sm">
                   <span>{s}</span>
-                  <span className="text-[var(--muted-foreground)]">{Math.floor(Math.random() * 100)}</span>
+                  <span className="text-[var(--muted-foreground)]">{[42, 28, 15, 9][i]}</span>
                 </div>
               ))}
             </div>

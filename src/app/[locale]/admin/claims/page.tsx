@@ -63,6 +63,7 @@ export default function AdminClaimsPage() {
     setLoading(false);
   }, [token]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchClaims(); }, [fetchClaims]);
 
   const handleAction = async (claimId: string, action: 'approve' | 'reject', rejectionReason?: string) => {

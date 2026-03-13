@@ -59,7 +59,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const [events, venues, artists, lineups] = await Promise.all([
     getEvents(), getVenues(), getArtists(), getLineups(),
   ]);
-  let event = events.find((e) => e.id === slug);
+  const event = events.find((e) => e.id === slug);
 
   // Legacy URL redirect: old Airtable record IDs → semantic slugs
   if (!event && slug.startsWith('rec')) {

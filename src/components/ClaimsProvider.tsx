@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import { useAuth } from './AuthProvider';
 
@@ -31,17 +31,13 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
   const { user } = useAuth();
   const [myClaims, setMyClaims] = useState<ClaimRecord[]>([]);
   const [approvedKeys, setApprovedKeys] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(false);
+  const [fetched, setFetched] = useState(false);
 
   // Fetch user's own claims + all approved claims
   useEffect(() => {
-    if (!user) {
-      setMyClaims([]);
-      return;
-    }
+    if (!user) return;
 
     let cancelled = false;
-    setLoading(true);
 
     const supabase = createClient();
 
@@ -65,15 +61,19 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
       if (approvedRes.data) {
         setApprovedKeys(new Set(approvedRes.data.map((r) => `${r.target_type}:${r.target_id}`)));
       }
-      setLoading(false);
+      setFetched(true);
     });
 
     return () => { cancelled = true; };
   }, [user]);
 
+  // Derive effective claims — empty when logged out
+  const effectiveMyClaims = useMemo(() => user ? myClaims : [], [user, myClaims]);
+  const loading = !!user && !fetched;
+
   const getMyClaimStatus = useCallback(
     (type: TargetType, id: string): ClaimStatus | null => {
-      const matches = myClaims.filter((c) => c.target_type === type && c.target_id === id);
+      const matches = effectiveMyClaims.filter((c) => c.target_type === type && c.target_id === id);
       if (matches.length === 0) return null;
       // Priority: approved > pending > rejected
       const priority: ClaimStatus[] = ['approved', 'pending', 'rejected'];
@@ -82,7 +82,7 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
       }
       return matches[0].status;
     },
-    [myClaims],
+    [effectiveMyClaims],
   );
 
   const isClaimed = useCallback(

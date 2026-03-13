@@ -53,7 +53,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
   const [venues, events, artists, badges, cities, lineups] = await Promise.all([getVenues(), getEvents(), getArtists(), getBadges(), getCities(), getLineups()]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
-  let venue = venues.find((v) => v.id === slug);
+  const venue = venues.find((v) => v.id === slug);
 
   // Legacy URL redirect: old Airtable record IDs → semantic slugs
   if (!venue && slug.startsWith('rec')) {

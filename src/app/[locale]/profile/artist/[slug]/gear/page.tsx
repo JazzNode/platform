@@ -36,15 +36,6 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  useEffect(() => {
-    if (!slug) return;
-    const supabase = createClient();
-    supabase.from('artists').select('tier').eq('artist_id', slug).single()
-      .then(({ data }) => { if (data) setTier(data.tier); });
-
-    fetchGear();
-  }, [slug]);
-
   const fetchGear = async () => {
     if (!slug) return;
     setLoading(true);
@@ -53,6 +44,16 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
     setGear(data.gear || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (!slug) return;
+    const supabase = createClient();
+    supabase.from('artists').select('tier').eq('artist_id', slug).single()
+      .then(({ data }) => { if (data) setTier(data.tier); });
+
+    fetchGear();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   const getToken = async () => {
     const supabase = createClient();

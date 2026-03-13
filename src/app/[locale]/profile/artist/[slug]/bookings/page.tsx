@@ -40,14 +40,6 @@ export default function ArtistBookingsPage({ params }: { params: Promise<{ slug:
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  useEffect(() => {
-    if (!slug) return;
-    const supabase = createClient();
-    supabase.from('artists').select('available_for_hire').eq('artist_id', slug).single()
-      .then(({ data }) => { if (data) setAvailable(data.available_for_hire || false); });
-    fetchInquiries();
-  }, [slug]);
-
   const getToken = async () => {
     const supabase = createClient();
     const { data: { session } } = await supabase.auth.getSession();
@@ -64,6 +56,15 @@ export default function ArtistBookingsPage({ params }: { params: Promise<{ slug:
     setInquiries(data.inquiries || []);
     setLoading(false);
   };
+
+  useEffect(() => {
+    if (!slug) return;
+    const supabase = createClient();
+    supabase.from('artists').select('available_for_hire').eq('artist_id', slug).single()
+      .then(({ data }) => { if (data) setAvailable(data.available_for_hire || false); });
+    fetchInquiries();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   const updateStatus = async (id: string, status: string) => {
     const token = await getToken();

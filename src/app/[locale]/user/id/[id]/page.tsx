@@ -31,7 +31,7 @@ export default async function PublicProfileByIdPage({ params }: { params: Promis
     <PublicProfileContent
       profile={profile}
       locale={locale}
-      t={(key, values) => values ? (t as Function)(key, values) : t(key as never)}
+      t={(key, values) => values ? (t as (...args: unknown[]) => string)(key, values) : t(key as never)}
       tInst={(key) => tInst(key as never)}
     />
   );

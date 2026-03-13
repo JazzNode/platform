@@ -100,7 +100,7 @@ export default function Header() {
   const [claimedVenues, setClaimedVenues] = useState<{ id: string; name: string }[]>([]);
 
   useEffect(() => {
-    if (!profile) { setClaimedArtists([]); setClaimedVenues([]); return; }
+    if (!profile) return;
     const supabase = createClient();
 
     if (profile.claimed_artist_ids?.length) {
@@ -114,8 +114,6 @@ export default function Header() {
             name: a.display_name || a.name_local || a.name_en || a.artist_id,
           })));
         });
-    } else {
-      setClaimedArtists([]);
     }
 
     if (profile.claimed_venue_ids?.length) {
@@ -129,12 +127,14 @@ export default function Header() {
             name: v.display_name || v.name_local || v.name_en || v.venue_id,
           })));
         });
-    } else {
-      setClaimedVenues([]);
     }
   }, [profile]);
 
-  const hasClaimed = claimedArtists.length > 0 || claimedVenues.length > 0;
+  // Derive effective claimed lists — empty when no profile
+  const effectiveClaimedArtists = profile ? claimedArtists : [];
+  const effectiveClaimedVenues = profile ? claimedVenues : [];
+
+  const hasClaimed = effectiveClaimedArtists.length > 0 || effectiveClaimedVenues.length > 0;
 
   function renderUserMenuContent() {
     if (!user) return null;
@@ -155,7 +155,7 @@ export default function Header() {
         </button>
         {hasClaimed && (
           <div className="border-t border-[var(--border)] py-1">
-            {claimedArtists.map((a) => (
+            {effectiveClaimedArtists.map((a) => (
               <button
                 key={a.id}
                 onClick={() => { router.push(`/${locale}/profile/artist/${encodeURIComponent(a.id)}`); setUserMenuOpen(false); }}
@@ -169,7 +169,7 @@ export default function Header() {
                 <span className="truncate">{a.name}</span>
               </button>
             ))}
-            {claimedVenues.map((v) => (
+            {effectiveClaimedVenues.map((v) => (
               <button
                 key={v.id}
                 onClick={() => { router.push(`/${locale}/profile/venue/${encodeURIComponent(v.id)}`); setUserMenuOpen(false); }}
