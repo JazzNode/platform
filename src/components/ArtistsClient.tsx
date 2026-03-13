@@ -173,7 +173,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <button
               key={key}
               onClick={() => { setSelectedType(key); if (key !== 'musicians' && key !== 'all') setSelectedInstruments(new Set()); }}
-              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
                   : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -198,7 +198,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setSelectedInstruments(new Set())}
-            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+            className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
               selectedInstruments.size === 0 ? pillActive : pillInactive
             }`}
           >
@@ -208,7 +208,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <button
               key={inst}
               onClick={() => toggleInstrument(inst)}
-              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedInstruments.has(inst) ? pillActive : pillInactive
               }`}
             >

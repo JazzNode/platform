@@ -119,7 +119,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
           {/* World Map pill */}
           <button
             onClick={handleWorldMapClick}
-            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
                 : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -150,7 +150,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 <button
                   onClick={() => handleRegionClick(code)}
                   style={{ animation: `geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${regionIdx * 0.04}s both` }}
-                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
                       : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -171,7 +171,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                         key={city.recordId}
                         onClick={() => handleCityClick(city.recordId)}
                         style={{ animation: `geo-pill-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${(i + 1) * 0.07}s both` }}
-                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
                             : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'

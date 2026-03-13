@@ -61,7 +61,7 @@ function TierTable({
               <tr>
                 <td
                   colSpan={columns.length + 1}
-                  className="pt-6 pb-2 px-4 text-xs uppercase tracking-widest text-[var(--muted)] font-semibold border-b border-[var(--border)]"
+                  className="pt-6 pb-2 px-4 text-xs uppercase tracking-widest text-zinc-400 font-semibold border-b border-[var(--border)]"
                 >
                   {group.category}
                 </td>
@@ -82,7 +82,7 @@ function TierTable({
                       {val === true ? (
                         <span className="text-emerald-400">&#10003;</span>
                       ) : val === false ? (
-                        <span className="text-[var(--muted)]/40">—</span>
+                        <span className="text-zinc-600">—</span>
                       ) : (
                         <span className="text-[var(--foreground)]">{val}</span>
                       )}
@@ -203,7 +203,7 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[var(--foreground)] leading-tight">
             {t('heroTitle')}
           </h1>
-          <p className="mt-4 text-lg text-[var(--muted)] max-w-xl mx-auto leading-relaxed">
+          <p className="mt-4 text-lg text-zinc-300 max-w-xl mx-auto leading-relaxed">
             {t('heroSubtitle')}
           </p>
         </section>
@@ -218,22 +218,22 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
               {t('artistSectionTitle')}
             </h2>
           </div>
-          <p className="text-[var(--muted)] mb-8 max-w-2xl">
+          <p className="text-zinc-400 mb-8 max-w-2xl">
             {t('artistSectionDesc')}
           </p>
 
           {/* Tier summary cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
             {[
-              { label: t('free'), sub: t('artistTier0Desc'), color: 'border-zinc-700 bg-zinc-900/30', tag: 'Tier 0' },
-              { label: t('claimed'), sub: t('artistTier1Desc'), color: 'border-blue-700 bg-blue-900/20', tag: 'Tier 1' },
-              { label: t('premium'), sub: t('artistTier2Desc'), color: 'border-amber-600 bg-amber-900/15 ring-1 ring-amber-500/20', tag: 'Tier 2' },
-              { label: t('elite'), sub: t('artistTier3Desc'), color: 'border-purple-700 bg-purple-900/15', tag: 'Tier 3' },
+              { label: t('free'), sub: t('artistTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
+              { label: t('claimed'), sub: t('artistTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
+              { label: t('premium'), sub: t('artistTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
+              { label: t('elite'), sub: t('artistTier3Desc'), color: 'border-purple-600 bg-purple-900/25', tagColor: 'text-purple-400', tag: 'Tier 3' },
             ].map((c) => (
               <div key={c.tag} className={`rounded-xl border p-4 ${c.color} transition-colors`}>
-                <div className="text-xs text-[var(--muted)] mb-1 tracking-wider uppercase">{c.tag}</div>
-                <div className="font-semibold text-[var(--foreground)] text-lg">{c.label}</div>
-                <div className="text-xs text-[var(--muted)] mt-1 leading-relaxed">{c.sub}</div>
+                <div className={`text-xs mb-1 tracking-wider uppercase ${c.tagColor}`}>{c.tag}</div>
+                <div className="font-semibold text-white text-lg">{c.label}</div>
+                <div className="text-sm text-zinc-300 mt-1 leading-relaxed">{c.sub}</div>
               </div>
             ))}
           </div>
@@ -256,21 +256,21 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
               {t('venueSectionTitle')}
             </h2>
           </div>
-          <p className="text-[var(--muted)] mb-8 max-w-2xl">
+          <p className="text-zinc-400 mb-8 max-w-2xl">
             {t('venueSectionDesc')}
           </p>
 
           {/* Tier summary cards */}
           <div className="grid grid-cols-3 gap-3 mb-10">
             {[
-              { label: t('free'), sub: t('venueTier0Desc'), color: 'border-zinc-700 bg-zinc-900/30', tag: 'Tier 0' },
-              { label: t('claimed'), sub: t('venueTier1Desc'), color: 'border-blue-700 bg-blue-900/20', tag: 'Tier 1' },
-              { label: t('premium'), sub: t('venueTier2Desc'), color: 'border-amber-600 bg-amber-900/15 ring-1 ring-amber-500/20', tag: 'Tier 2' },
+              { label: t('free'), sub: t('venueTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
+              { label: t('claimed'), sub: t('venueTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
+              { label: t('premium'), sub: t('venueTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
             ].map((c) => (
               <div key={c.tag} className={`rounded-xl border p-4 ${c.color} transition-colors`}>
-                <div className="text-xs text-[var(--muted)] mb-1 tracking-wider uppercase">{c.tag}</div>
-                <div className="font-semibold text-[var(--foreground)] text-lg">{c.label}</div>
-                <div className="text-xs text-[var(--muted)] mt-1 leading-relaxed">{c.sub}</div>
+                <div className={`text-xs mb-1 tracking-wider uppercase ${c.tagColor}`}>{c.tag}</div>
+                <div className="font-semibold text-white text-lg">{c.label}</div>
+                <div className="text-sm text-zinc-300 mt-1 leading-relaxed">{c.sub}</div>
               </div>
             ))}
           </div>
@@ -290,7 +290,7 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
           <h3 className="text-2xl font-bold text-[var(--foreground)] mb-3">
             {t('ctaTitle')}
           </h3>
-          <p className="text-[var(--muted)] mb-6 max-w-lg mx-auto">
+          <p className="text-zinc-400 mb-6 max-w-lg mx-auto">
             {t('ctaDesc')}
           </p>
           <a

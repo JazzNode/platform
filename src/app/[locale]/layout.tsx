@@ -21,7 +21,7 @@ const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
 import '@/app/globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com';
 
@@ -70,7 +70,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased noise-overlay`}>
+      <body className={`${inter.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased noise-overlay`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <SearchProvider locale={locale}>

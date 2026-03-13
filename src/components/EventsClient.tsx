@@ -250,7 +250,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
           {/* World Map pill */}
           <button
             onClick={handleWorldMapClick}
-            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
                 : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -281,7 +281,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 <button
                   onClick={() => handleRegionClick(code)}
                   style={{ animation: `geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${regionIdx * 0.04}s both` }}
-                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border ${
+                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
                       : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
@@ -302,7 +302,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                         key={city.recordId}
                         onClick={() => handleCityClick(city.recordId)}
                         style={{ animation: `geo-pill-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${(i + 1) * 0.07}s both` }}
-                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
                             : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
@@ -325,7 +325,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
           <div className="flex flex-wrap gap-x-2 gap-y-3">
             <button
               onClick={() => setSelectedVenues(new Set())}
-              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedVenues.size === 0
                   ? 'bg-gold/10 border-gold/60 text-gold'
                   : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
@@ -337,7 +337,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               <button
                 key={venue.recordId}
                 onClick={() => toggleVenue(venue.recordId)}
-                className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+                className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                   selectedVenues.has(venue.recordId)
                     ? 'bg-gold/10 border-gold/60 text-gold'
                     : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
@@ -362,7 +362,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             <button
               key={key}
               onClick={() => setSelectedCategory(key)}
-              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border ${
+              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedCategory === key
                   ? 'bg-gold/10 border-gold/60 text-gold'
                   : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
