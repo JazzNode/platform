@@ -119,7 +119,8 @@
     "businessHours": "Jam Operasional",
     "acceptingStudents": "Menerima Murid",
     "lessonPriceRange": "Tarif Les",
-    "gear": "Peralatan"
+    "gear": "Peralatan",
+    "premiumComingSoon": "Premium segera hadir — nantikan!"
   },
   "auth": {
     "signIn": "Masuk",

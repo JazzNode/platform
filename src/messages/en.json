@@ -123,7 +123,8 @@
     "businessHours": "Business Hours",
     "acceptingStudents": "Accepting Students",
     "lessonPriceRange": "Lesson Price Range",
-    "gear": "Gear"
+    "gear": "Gear",
+    "premiumComingSoon": "Premium is coming soon — stay tuned!"
   },
   "auth": {
     "signIn": "Sign In",

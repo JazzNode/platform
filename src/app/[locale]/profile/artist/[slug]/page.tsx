@@ -20,7 +20,7 @@ interface UnreadStats {
 
 export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
-  const { user, loading } = useAuth();
+  const { user, loading, setShowComingSoon } = useAuth();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -249,7 +249,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
               <div className="text-center">
                 <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
-                <button onClick={() => alert(t('comingSoon') || t('premiumCTA', { defaultValue: 'Coming Soon' }))} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                   {t('upgradePremium')}
                 </button>
               </div>
@@ -296,7 +296,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
                 </div>
               ))}
             </div>
-            <button onClick={() => alert(t('comingSoon') || 'Coming Soon')} className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

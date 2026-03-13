@@ -1,58 +1,63 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useAuth } from './AuthProvider';
 
 export default function ComingSoonToast() {
   const { showComingSoon, setShowComingSoon } = useAuth();
+  const t = useTranslations('common');
   const ref = useRef<HTMLDivElement>(null);
-  const [nudge, setNudge] = useState<'left' | 'right' | null>(null);
+  const [visible, setVisible] = useState(false);
 
-  // Auto-dismiss
+  // Animate in, then auto-dismiss
   useEffect(() => {
-    if (!showComingSoon) return;
-    const timer = setTimeout(() => setShowComingSoon(null), 2500);
+    if (!showComingSoon) {
+      setVisible(false);
+      return;
+    }
+    // Trigger enter animation on next frame
+    requestAnimationFrame(() => setVisible(true));
+    const timer = setTimeout(() => {
+      setVisible(false);
+      setTimeout(() => setShowComingSoon(null), 300);
+    }, 2500);
     return () => clearTimeout(timer);
   }, [showComingSoon, setShowComingSoon]);
 
-  // Clamp to viewport so it doesn't overflow off-screen
-  useEffect(() => {
-    if (!showComingSoon || !ref.current) {
-      setNudge(null); // eslint-disable-line react-hooks/set-state-in-effect -- intentional reset when toast hidden
-      return;
-    }
-    const el = ref.current;
-    const rect = el.getBoundingClientRect();
-    if (rect.left < 8) setNudge('right');
-    else if (rect.right > window.innerWidth - 8) setNudge('left');
-    else setNudge(null);
-  }, [showComingSoon]);
-
-  const visible = !!showComingSoon;
-  const x = showComingSoon?.x ?? 0;
-  const y = showComingSoon?.y ?? 0;
+  if (!showComingSoon) return null;
 
   return (
     <div
       ref={ref}
-      className="fixed z-[80]"
-      style={{
-        left: x,
-        top: y,
-        transform: `translateX(${nudge === 'left' ? '-90%' : nudge === 'right' ? '-10%' : '-50%'}) translateY(calc(-100% - 10px)) translateY(${visible ? '0' : '6px'})`,
-        opacity: visible ? 1 : 0,
-        pointerEvents: visible ? 'auto' : 'none',
-        transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-      }}
+      className="fixed inset-x-0 bottom-8 z-[80] flex justify-center pointer-events-none"
     >
       <div
-        className="px-4 py-2 rounded-xl border border-[var(--border)] shadow-2xl text-sm font-medium tracking-wide whitespace-nowrap"
+        className="pointer-events-auto px-5 py-3 rounded-2xl border border-[var(--color-gold)]/20 shadow-2xl flex items-center gap-2.5"
         style={{
-          background: 'color-mix(in srgb, var(--background) 92%, transparent)',
-          backdropFilter: 'blur(20px)',
+          background: 'color-mix(in srgb, var(--background) 94%, var(--color-gold))',
+          backdropFilter: 'blur(24px)',
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(12px)',
+          transition: 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         }}
       >
-        <span className="text-[var(--color-gold)]">Coming soon!</span>
+        <svg className="w-4 h-4 text-[var(--color-gold)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+        <span className="text-sm font-medium text-[var(--foreground)]">
+          {t('premiumComingSoon')}
+        </span>
+        <button
+          onClick={() => { setVisible(false); setTimeout(() => setShowComingSoon(null), 300); }}
+          className="ml-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+        >
+          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
     </div>
   );

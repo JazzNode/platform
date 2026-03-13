@@ -119,7 +119,8 @@
     "businessHours": "영업시간",
     "acceptingStudents": "학생 모집 중",
     "lessonPriceRange": "레슨 요금",
-    "gear": "장비"
+    "gear": "장비",
+    "premiumComingSoon": "Premium이 곧 출시됩니다. 기대해 주세요!"
   },
   "auth": {
     "signIn": "로그인",

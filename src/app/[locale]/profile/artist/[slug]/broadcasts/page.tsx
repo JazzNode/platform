@@ -19,7 +19,7 @@ interface Broadcast {
 
 export default function BroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
-  const { user, loading } = useAuth();
+  const { user, loading, setShowComingSoon } = useAuth();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -178,7 +178,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('broadcastLockedHint')}
             </p>
-            <button onClick={() => alert(t('comingSoon') || t('premiumCTA', { defaultValue: 'Coming Soon' }))} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

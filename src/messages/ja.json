@@ -119,7 +119,8 @@
     "businessHours": "営業時間",
     "acceptingStudents": "生徒募集中",
     "lessonPriceRange": "レッスン料金",
-    "gear": "ギア"
+    "gear": "ギア",
+    "premiumComingSoon": "Premiumは近日公開予定です。お楽しみに！"
   },
   "auth": {
     "signIn": "ログイン",

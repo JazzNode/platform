@@ -123,7 +123,8 @@
     "businessHours": "營業時間",
     "acceptingStudents": "招收學生中",
     "lessonPriceRange": "課程費用",
-    "gear": "器材"
+    "gear": "器材",
+    "premiumComingSoon": "Premium 即將推出，敬請期待！"
   },
   "auth": {
     "signIn": "登入",

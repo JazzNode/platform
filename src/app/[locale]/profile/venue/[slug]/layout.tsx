@@ -217,7 +217,18 @@ export default function VenueDashboardLayout({
 
         {/* ─── Mobile Top Bar ─── */}
         <div className="lg:hidden fixed top-[60px] left-0 right-0 z-30 bg-[var(--background)]/95 backdrop-blur-md border-b border-[var(--border)]">
-          <div className="flex items-center gap-2 px-4 py-2 overflow-x-auto no-scrollbar">
+          {/* Identity row — fixed, not scrollable */}
+          <div className="px-4 pt-2 pb-1">
+            <p className="text-xs text-[var(--muted-foreground)] truncate">
+              <span className="font-semibold text-[var(--foreground)]">{venueName}</span>
+              <span className="mx-1.5 opacity-40">·</span>
+              <span className={venue?.tier === 2 ? 'text-[var(--color-gold)]' : ''}>
+                {venue?.tier === 2 ? 'Premium' : venue?.tier === 1 ? 'Claimed' : 'Free'}
+              </span>
+            </p>
+          </div>
+          {/* Tab row — horizontally scrollable */}
+          <div className="flex items-center gap-2 px-4 py-1.5 overflow-x-auto no-scrollbar">
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.path);
               return (
@@ -239,28 +250,7 @@ export default function VenueDashboardLayout({
         </div>
 
         {/* ─── Content Area ─── */}
-        <main className="flex-1 min-w-0 pt-14 lg:pt-0">
-          {/* Mobile Identity */}
-          <div className="lg:hidden mb-6 flex items-center gap-3">
-            {venue?.photo_url ? (
-              <img
-                src={venue.photo_url}
-                alt=""
-                className="w-10 h-10 rounded-full object-cover border border-[var(--border)]"
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center text-sm font-bold text-[var(--muted-foreground)]">
-                {venueName.charAt(0)}
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="text-sm font-bold truncate">{venueName}</p>
-              <p className="text-xs text-[var(--muted-foreground)]">
-                {venue?.tier === 2 ? 'Premium' : venue?.tier === 1 ? 'Claimed' : 'Free'}
-              </p>
-            </div>
-          </div>
-
+        <main className="flex-1 min-w-0 pt-[5.5rem] lg:pt-0">
           {children}
         </main>
       </div>

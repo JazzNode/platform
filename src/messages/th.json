@@ -119,7 +119,8 @@
     "businessHours": "เวลาทำการ",
     "acceptingStudents": "เปิดรับนักเรียน",
     "lessonPriceRange": "ค่าเรียน",
-    "gear": "อุปกรณ์"
+    "gear": "อุปกรณ์",
+    "premiumComingSoon": "Premium กำลังจะมาเร็วๆ นี้ — โปรดติดตาม!"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",
