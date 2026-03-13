@@ -284,7 +284,19 @@
     "premiumCTA": "Upgrade to Premium Venue",
     "comingSoon": "Coming Soon",
     "schedulePlaceholder": "Your lineup schedule will appear here.",
-    "broadcastPlaceholder": "Your marketing broadcasts will appear here."
+    "broadcastPlaceholder": "Your marketing broadcasts will appear here.",
+    "inbox": "Inbox",
+    "bookings": "Bookings",
+    "broadcasts": "Broadcasts",
+    "backline": "Backline",
+    "broadcastsTitle": "Broadcasts",
+    "inboxPlaceholder": "Your inbox messages will appear here.",
+    "backlinePlaceholder": "Manage your venue's backline equipment here.",
+    "bookingsPlaceholder": "Your booking management will appear here.",
+    "bookingsLocked": "Booking Management",
+    "bookingsLockedDesc": "Upgrade to Premium Venue to unlock the booking management system.",
+    "broadcastsLocked": "Marketing Broadcasts",
+    "broadcastsLockedDesc": "Upgrade to Premium Venue to unlock marketing broadcast tools."
   },
   "admin": {
     "saveAndTranslate": "Save & Translate",
@@ -335,7 +347,6 @@
     "broadcasts": "Broadcasts",
     "edit": "Edit Profile",
     "viewArtistPage": "View Artist Page",
-
     "overviewTitle": "Dashboard",
     "totalFans": "Total Fans",
     "newFansMonth": "New Fans",
@@ -357,7 +368,6 @@
     "featureAnalytics": "Advanced fan analytics & engagement metrics",
     "featurePriority": "Priority listing in search results",
     "featureBadge": "Premium badge on your artist page",
-
     "conversations": "Conversations",
     "noConversations": "No messages yet.",
     "noConversationsHint": "Fans can message you from your artist page.",
@@ -365,7 +375,6 @@
     "anonymous": "Anonymous",
     "typeMessage": "Type a message...",
     "send": "Send",
-
     "broadcastsTitle": "Broadcasts",
     "newBroadcast": "New Broadcast",
     "broadcastTitlePlaceholder": "Subject line...",
@@ -384,16 +393,13 @@
     "broadcastLocked": "Broadcasts — Premium Feature",
     "broadcastLockedDesc": "Send messages to your {count} fans with one click.",
     "broadcastLockedHint": "Upgrade to Premium to unlock fan broadcasts, email campaigns, and more.",
-
     "settings": "Settings",
-
     "contactArtist": "Contact",
     "contactArtistTitle": "Message {name}",
     "contactArtistHint": "Your message will appear in their inbox. They'll reply when available.",
     "contactArtistPlaceholder": "Say hello, ask about upcoming shows, or just share your appreciation...",
     "messageSent": "Message Sent!",
     "messageSentDesc": "The artist will see your message in their inbox.",
-
     "fanInbox": "My Inbox",
     "fanInboxMessages": "Messages",
     "fanInboxBroadcasts": "From Artists",
@@ -402,7 +408,6 @@
     "noFanBroadcasts": "No broadcasts yet.",
     "noFanBroadcastsHint": "Follow artists to receive their broadcasts.",
     "fromArtist": "from {name}",
-
     "gear": "My Gear",
     "addGear": "Add Gear",
     "gearName": "Name",
@@ -412,7 +417,6 @@
     "gearLimitReached": "Upgrade to Premium for unlimited gear items",
     "gearUsed": "{count}/{max} gear items used",
     "noGear": "No gear items yet. Add your instruments and equipment.",
-
     "bookings": "Bookings",
     "noBookings": "No booking inquiries yet.",
     "enableHireFirst": "Enable 'Available for Hire' in your profile settings to receive booking inquiries.",
@@ -421,17 +425,14 @@
     "accepted": "Accepted",
     "declined": "Declined",
     "archived": "Archived",
-
     "analytics": "Analytics",
     "pageViews": "Page Views",
     "viewsByDay": "Views by Day",
     "referrerSources": "Referrer Sources",
     "cityDistribution": "City Distribution",
     "noData": "No data for this period.",
-
     "downloadEpk": "Download EPK",
     "customDomainTeaser": "Custom Domain — Coming Soon",
-
     "submitInquiry": "Submit Inquiry",
     "inquiryName": "Your Name",
     "inquiryEmail": "Email",

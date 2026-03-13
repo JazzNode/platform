@@ -280,7 +280,19 @@
     "premiumCTA": "プレミアム会場にアップグレード",
     "comingSoon": "近日公開",
     "schedulePlaceholder": "ラインナップスケジュールがここに表示されます。",
-    "broadcastPlaceholder": "マーケティング配信がここに表示されます。"
+    "broadcastPlaceholder": "マーケティング配信がここに表示されます。",
+    "inbox": "受信トレイ",
+    "bookings": "予約管理",
+    "broadcasts": "ブロードキャスト",
+    "backline": "バックライン",
+    "broadcastsTitle": "ブロードキャスト",
+    "inboxPlaceholder": "受信トレイのメッセージがここに表示されます。",
+    "backlinePlaceholder": "会場のバックライン機材をここで管理します。",
+    "bookingsPlaceholder": "予約管理がここに表示されます。",
+    "bookingsLocked": "予約管理",
+    "bookingsLockedDesc": "プレミアム会場にアップグレードして予約管理システムを解除しましょう。",
+    "broadcastsLocked": "マーケティングブロードキャスト",
+    "broadcastsLockedDesc": "プレミアム会場にアップグレードしてマーケティングブロードキャストツールを解除しましょう。"
   },
   "admin": {
     "saveAndTranslate": "保存して翻訳",
@@ -331,7 +343,6 @@
     "broadcasts": "ブロードキャスト",
     "edit": "プロフィール編集",
     "viewArtistPage": "アーティストページを見る",
-
     "overviewTitle": "ダッシュボード",
     "totalFans": "総ファン数",
     "newFansMonth": "新規ファン",
@@ -353,7 +364,6 @@
     "featureAnalytics": "高度なファン分析とエンゲージメント指標",
     "featurePriority": "検索結果での優先表示",
     "featureBadge": "アーティストページにプレミアムバッジ",
-
     "conversations": "会話",
     "noConversations": "まだメッセージはありません。",
     "noConversationsHint": "ファンがあなたのアーティストページからメッセージを送れます。",
@@ -361,7 +371,6 @@
     "anonymous": "匿名",
     "typeMessage": "メッセージを入力...",
     "send": "送信",
-
     "broadcastsTitle": "ブロードキャスト",
     "newBroadcast": "新規ブロードキャスト",
     "broadcastTitlePlaceholder": "件名...",
@@ -380,16 +389,13 @@
     "broadcastLocked": "ブロードキャスト — プレミアム機能",
     "broadcastLockedDesc": "ワンクリックで{count}人のファンにメッセージを送信。",
     "broadcastLockedHint": "プレミアムにアップグレードして、ブロードキャスト、メールキャンペーンなどを解放しましょう。",
-
     "settings": "設定",
-
     "contactArtist": "連絡する",
     "contactArtistTitle": "{name}にメッセージ",
     "contactArtistHint": "メッセージは受信箱に届きます。都合の良い時に返信されます。",
     "contactArtistPlaceholder": "挨拶、ライブの質問、感謝の気持ちなどを伝えましょう...",
     "messageSent": "メッセージ送信完了！",
     "messageSentDesc": "アーティストの受信箱にメッセージが届きます。",
-
     "fanInbox": "マイ受信箱",
     "fanInboxMessages": "メッセージ",
     "fanInboxBroadcasts": "アーティストから",
@@ -398,7 +404,6 @@
     "noFanBroadcasts": "まだブロードキャストはありません。",
     "noFanBroadcastsHint": "アーティストをフォローしてブロードキャストを受け取りましょう。",
     "fromArtist": "{name}から",
-
     "gear": "マイギア",
     "addGear": "ギアを追加",
     "gearName": "名前",
@@ -408,7 +413,6 @@
     "gearLimitReached": "プレミアムにアップグレードで無制限のギア登録",
     "gearUsed": "{count}/{max} アイテム使用中",
     "noGear": "まだギアがありません。楽器や機材を追加しましょう。",
-
     "bookings": "出演依頼",
     "noBookings": "まだ出演依頼はありません。",
     "enableHireFirst": "プロフィール設定で「出演依頼を受付中」を有効にして依頼を受け取りましょう。",
@@ -417,17 +421,14 @@
     "accepted": "承諾済み",
     "declined": "辞退済み",
     "archived": "アーカイブ",
-
     "analytics": "アナリティクス",
     "pageViews": "ページビュー",
     "viewsByDay": "日別ビュー",
     "referrerSources": "リファラー",
     "cityDistribution": "都市分布",
     "noData": "この期間のデータはありません。",
-
     "downloadEpk": "EPKをダウンロード",
     "customDomainTeaser": "カスタムドメイン — 近日公開",
-
     "submitInquiry": "依頼を送信",
     "inquiryName": "お名前",
     "inquiryEmail": "メール",

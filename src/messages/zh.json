@@ -284,7 +284,19 @@
     "premiumCTA": "升級為 Premium 場館",
     "comingSoon": "即將推出",
     "schedulePlaceholder": "您的演出排班將顯示在這裡。",
-    "broadcastPlaceholder": "您的行銷廣播將顯示在這裡。"
+    "broadcastPlaceholder": "您的行銷廣播將顯示在這裡。",
+    "inbox": "收件匣",
+    "bookings": "預訂管理",
+    "broadcasts": "廣播",
+    "backline": "場地設備",
+    "broadcastsTitle": "廣播",
+    "inboxPlaceholder": "您的收件匣訊息將顯示在這裡。",
+    "backlinePlaceholder": "在這裡管理您的場地設備。",
+    "bookingsPlaceholder": "您的預訂管理將顯示在這裡。",
+    "bookingsLocked": "預訂管理",
+    "bookingsLockedDesc": "升級至 Premium 場地以解鎖預訂管理系統。",
+    "broadcastsLocked": "行銷廣播",
+    "broadcastsLockedDesc": "升級至 Premium 場地以解鎖行銷廣播工具。"
   },
   "admin": {
     "saveAndTranslate": "儲存並翻譯",
@@ -335,7 +347,6 @@
     "broadcasts": "廣播",
     "edit": "編輯檔案",
     "viewArtistPage": "查看藝人頁面",
-
     "overviewTitle": "儀表板",
     "totalFans": "樂迷總數",
     "newFansMonth": "新增樂迷",
@@ -357,7 +368,6 @@
     "featureAnalytics": "進階樂迷分析與互動指標",
     "featurePriority": "搜尋結果優先曝光",
     "featureBadge": "藝人頁面 Premium 徽章",
-
     "conversations": "對話",
     "noConversations": "還沒有訊息。",
     "noConversationsHint": "樂迷可以從你的藝人頁面傳訊息給你。",
@@ -365,7 +375,6 @@
     "anonymous": "匿名用戶",
     "typeMessage": "輸入訊息...",
     "send": "傳送",
-
     "broadcastsTitle": "廣播",
     "newBroadcast": "新增廣播",
     "broadcastTitlePlaceholder": "標題...",
@@ -384,16 +393,13 @@
     "broadcastLocked": "廣播 — Premium 專屬功能",
     "broadcastLockedDesc": "一鍵發送訊息給你的 {count} 位樂迷。",
     "broadcastLockedHint": "升級 Premium 即可解鎖群發廣播、Email 行銷等功能。",
-
     "settings": "設定",
-
     "contactArtist": "聯絡",
     "contactArtistTitle": "傳訊息給 {name}",
     "contactArtistHint": "你的訊息會出現在對方的收件匣，他們會在方便時回覆。",
     "contactArtistPlaceholder": "打個招呼、詢問演出資訊，或表達你的欣賞...",
     "messageSent": "訊息已送出！",
     "messageSentDesc": "藝人會在收件匣看到你的訊息。",
-
     "fanInbox": "我的收件匣",
     "fanInboxMessages": "訊息",
     "fanInboxBroadcasts": "藝人廣播",
@@ -402,7 +408,6 @@
     "noFanBroadcasts": "還沒有收到廣播。",
     "noFanBroadcastsHint": "追蹤藝人即可收到他們的廣播。",
     "fromArtist": "來自 {name}",
-
     "gear": "我的器材",
     "addGear": "新增器材",
     "gearName": "名稱",
@@ -412,7 +417,6 @@
     "gearLimitReached": "升級 Premium 即可新增無限器材",
     "gearUsed": "已使用 {count}/{max} 項器材",
     "noGear": "還沒有器材。新增你的樂器與設備吧。",
-
     "bookings": "邀約",
     "noBookings": "還沒有邀約。",
     "enableHireFirst": "請在個人設定中開啟「開放邀約」以接收邀約。",
@@ -421,17 +425,14 @@
     "accepted": "已接受",
     "declined": "已婉拒",
     "archived": "已封存",
-
     "analytics": "數據分析",
     "pageViews": "頁面瀏覽",
     "viewsByDay": "每日瀏覽量",
     "referrerSources": "流量來源",
     "cityDistribution": "城市分布",
     "noData": "此期間無資料。",
-
     "downloadEpk": "下載 EPK",
     "customDomainTeaser": "自訂網域 — 即將推出",
-
     "submitInquiry": "提交邀約",
     "inquiryName": "你的名字",
     "inquiryEmail": "Email",

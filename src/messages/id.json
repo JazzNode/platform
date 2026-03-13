@@ -280,7 +280,19 @@
     "premiumCTA": "Upgrade ke Venue Premium",
     "comingSoon": "Segera Hadir",
     "schedulePlaceholder": "Jadwal lineup Anda akan muncul di sini.",
-    "broadcastPlaceholder": "Siaran pemasaran Anda akan muncul di sini."
+    "broadcastPlaceholder": "Siaran pemasaran Anda akan muncul di sini.",
+    "inbox": "Kotak Masuk",
+    "bookings": "Pemesanan",
+    "broadcasts": "Siaran",
+    "backline": "Backline",
+    "broadcastsTitle": "Siaran",
+    "inboxPlaceholder": "Pesan kotak masuk Anda akan muncul di sini.",
+    "backlinePlaceholder": "Kelola peralatan backline venue Anda di sini.",
+    "bookingsPlaceholder": "Manajemen pemesanan Anda akan muncul di sini.",
+    "bookingsLocked": "Manajemen Pemesanan",
+    "bookingsLockedDesc": "Upgrade ke Premium Venue untuk membuka sistem manajemen pemesanan.",
+    "broadcastsLocked": "Siaran Pemasaran",
+    "broadcastsLockedDesc": "Upgrade ke Premium Venue untuk membuka alat siaran pemasaran."
   },
   "admin": {
     "saveAndTranslate": "Simpan & Terjemahkan",
@@ -331,7 +343,6 @@
     "broadcasts": "Siaran",
     "edit": "Edit Profil",
     "viewArtistPage": "Lihat Halaman Artis",
-
     "overviewTitle": "Dasbor",
     "totalFans": "Total Penggemar",
     "newFansMonth": "Penggemar Baru",
@@ -353,7 +364,6 @@
     "featureAnalytics": "Analitik penggemar lanjutan & metrik keterlibatan",
     "featurePriority": "Prioritas tampil di hasil pencarian",
     "featureBadge": "Lencana premium di halaman artis",
-
     "conversations": "Percakapan",
     "noConversations": "Belum ada pesan.",
     "noConversationsHint": "Penggemar bisa mengirim pesan dari halaman artis Anda.",
@@ -361,7 +371,6 @@
     "anonymous": "Anonim",
     "typeMessage": "Ketik pesan...",
     "send": "Kirim",
-
     "broadcastsTitle": "Siaran",
     "newBroadcast": "Siaran Baru",
     "broadcastTitlePlaceholder": "Judul...",
@@ -380,16 +389,13 @@
     "broadcastLocked": "Siaran — Fitur Premium",
     "broadcastLockedDesc": "Kirim pesan ke {count} penggemar dengan satu klik.",
     "broadcastLockedHint": "Upgrade ke Premium untuk membuka siaran penggemar, kampanye email, dan lainnya.",
-
     "settings": "Pengaturan",
-
     "contactArtist": "Hubungi",
     "contactArtistTitle": "Pesan untuk {name}",
     "contactArtistHint": "Pesan Anda akan muncul di kotak masuk mereka. Mereka akan membalas saat tersedia.",
     "contactArtistPlaceholder": "Sapa, tanyakan tentang pertunjukan, atau sampaikan apresiasi Anda...",
     "messageSent": "Pesan Terkirim!",
     "messageSentDesc": "Artis akan melihat pesan Anda di kotak masuk mereka.",
-
     "fanInbox": "Kotak Masuk Saya",
     "fanInboxMessages": "Pesan",
     "fanInboxBroadcasts": "Dari Artis",
@@ -398,7 +404,6 @@
     "noFanBroadcasts": "Belum ada siaran.",
     "noFanBroadcastsHint": "Ikuti artis untuk menerima siaran mereka.",
     "fromArtist": "dari {name}",
-
     "gear": "Peralatan Saya",
     "addGear": "Tambah Peralatan",
     "gearName": "Nama",
@@ -408,7 +413,6 @@
     "gearLimitReached": "Upgrade ke Premium untuk peralatan tak terbatas",
     "gearUsed": "{count}/{max} item peralatan digunakan",
     "noGear": "Belum ada peralatan. Tambahkan instrumen dan peralatan Anda.",
-
     "bookings": "Pemesanan",
     "noBookings": "Belum ada permintaan pemesanan.",
     "enableHireFirst": "Aktifkan 'Tersedia untuk Disewa' di pengaturan profil untuk menerima permintaan pemesanan.",
@@ -417,17 +421,14 @@
     "accepted": "Diterima",
     "declined": "Ditolak",
     "archived": "Diarsipkan",
-
     "analytics": "Analitik",
     "pageViews": "Tampilan Halaman",
     "viewsByDay": "Tampilan per Hari",
     "referrerSources": "Sumber Rujukan",
     "cityDistribution": "Distribusi Kota",
     "noData": "Tidak ada data untuk periode ini.",
-
     "downloadEpk": "Unduh EPK",
     "customDomainTeaser": "Domain Kustom — Segera Hadir",
-
     "submitInquiry": "Kirim Permintaan",
     "inquiryName": "Nama Anda",
     "inquiryEmail": "Email",

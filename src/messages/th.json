@@ -280,7 +280,19 @@
     "premiumCTA": "อัปเกรดเป็นสถานที่พรีเมียม",
     "comingSoon": "เร็วๆ นี้",
     "schedulePlaceholder": "ตารางไลน์อัพของคุณจะแสดงที่นี่",
-    "broadcastPlaceholder": "การประกาศทางการตลาดของคุณจะแสดงที่นี่"
+    "broadcastPlaceholder": "การประกาศทางการตลาดของคุณจะแสดงที่นี่",
+    "inbox": "กล่องข้อความ",
+    "bookings": "การจอง",
+    "broadcasts": "ประกาศ",
+    "backline": "แบ็คไลน์",
+    "broadcastsTitle": "ประกาศ",
+    "inboxPlaceholder": "ข้อความในกล่องข้อความของคุณจะแสดงที่นี่",
+    "backlinePlaceholder": "จัดการอุปกรณ์แบ็คไลน์ของสถานที่ที่นี่",
+    "bookingsPlaceholder": "การจัดการการจองของคุณจะแสดงที่นี่",
+    "bookingsLocked": "การจัดการการจอง",
+    "bookingsLockedDesc": "อัปเกรดเป็นสถานที่พรีเมียมเพื่อปลดล็อกระบบจัดการการจอง",
+    "broadcastsLocked": "ประกาศการตลาด",
+    "broadcastsLockedDesc": "อัปเกรดเป็นสถานที่พรีเมียมเพื่อปลดล็อกเครื่องมือประกาศการตลาด"
   },
   "admin": {
     "saveAndTranslate": "บันทึกและแปล",
@@ -331,7 +343,6 @@
     "broadcasts": "ประกาศ",
     "edit": "แก้ไขโปรไฟล์",
     "viewArtistPage": "ดูหน้าศิลปิน",
-
     "overviewTitle": "แดชบอร์ด",
     "totalFans": "แฟนทั้งหมด",
     "newFansMonth": "แฟนใหม่",
@@ -353,7 +364,6 @@
     "featureAnalytics": "การวิเคราะห์แฟนขั้นสูงและตัวชี้วัดการมีส่วนร่วม",
     "featurePriority": "แสดงผลลำดับต้นในผลการค้นหา",
     "featureBadge": "ตราพรีเมียมบนหน้าศิลปิน",
-
     "conversations": "การสนทนา",
     "noConversations": "ยังไม่มีข้อความ",
     "noConversationsHint": "แฟนสามารถส่งข้อความถึงคุณจากหน้าศิลปิน",
@@ -361,7 +371,6 @@
     "anonymous": "ไม่ระบุชื่อ",
     "typeMessage": "พิมพ์ข้อความ...",
     "send": "ส่ง",
-
     "broadcastsTitle": "ประกาศ",
     "newBroadcast": "ประกาศใหม่",
     "broadcastTitlePlaceholder": "หัวข้อ...",
@@ -380,16 +389,13 @@
     "broadcastLocked": "ประกาศ — ฟีเจอร์พรีเมียม",
     "broadcastLockedDesc": "ส่งข้อความถึงแฟน {count} คนด้วยคลิกเดียว",
     "broadcastLockedHint": "อัปเกรดเป็นพรีเมียมเพื่อปลดล็อกประกาศ แคมเปญอีเมล และอื่นๆ",
-
     "settings": "ตั้งค่า",
-
     "contactArtist": "ติดต่อ",
     "contactArtistTitle": "ส่งข้อความถึง {name}",
     "contactArtistHint": "ข้อความจะปรากฏในกล่องข้อความของศิลปิน จะตอบกลับเมื่อพร้อม",
     "contactArtistPlaceholder": "ทักทาย สอบถามเรื่องการแสดง หรือแสดงความชื่นชม...",
     "messageSent": "ส่งข้อความแล้ว!",
     "messageSentDesc": "ศิลปินจะเห็นข้อความในกล่องข้อความ",
-
     "fanInbox": "กล่องข้อความของฉัน",
     "fanInboxMessages": "ข้อความ",
     "fanInboxBroadcasts": "จากศิลปิน",
@@ -398,7 +404,6 @@
     "noFanBroadcasts": "ยังไม่มีประกาศ",
     "noFanBroadcastsHint": "ติดตามศิลปินเพื่อรับประกาศ",
     "fromArtist": "จาก {name}",
-
     "gear": "อุปกรณ์ของฉัน",
     "addGear": "เพิ่มอุปกรณ์",
     "gearName": "ชื่อ",
@@ -408,7 +413,6 @@
     "gearLimitReached": "อัปเกรดเป็นพรีเมียมเพื่อเพิ่มอุปกรณ์ไม่จำกัด",
     "gearUsed": "ใช้ {count}/{max} รายการ",
     "noGear": "ยังไม่มีอุปกรณ์ เพิ่มเครื่องดนตรีและอุปกรณ์ของคุณ",
-
     "bookings": "การจ้างงาน",
     "noBookings": "ยังไม่มีคำขอจ้างงาน",
     "enableHireFirst": "เปิด 'พร้อมรับงาน' ในการตั้งค่าโปรไฟล์เพื่อรับคำขอจ้างงาน",
@@ -417,17 +421,14 @@
     "accepted": "ตอบรับแล้ว",
     "declined": "ปฏิเสธแล้ว",
     "archived": "เก็บถาวร",
-
     "analytics": "การวิเคราะห์",
     "pageViews": "การเข้าชมหน้า",
     "viewsByDay": "การเข้าชมรายวัน",
     "referrerSources": "แหล่งที่มา",
     "cityDistribution": "การกระจายตามเมือง",
     "noData": "ไม่มีข้อมูลในช่วงนี้",
-
     "downloadEpk": "ดาวน์โหลด EPK",
     "customDomainTeaser": "โดเมนส่วนตัว — เร็ว ๆ นี้",
-
     "submitInquiry": "ส่งคำขอ",
     "inquiryName": "ชื่อของคุณ",
     "inquiryEmail": "อีเมล",
