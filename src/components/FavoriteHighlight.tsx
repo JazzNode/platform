@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth } from './AuthProvider';
-import { useFavorites } from './FollowsProvider';
+import { useFollows } from './FollowsProvider';
 
 interface FavoriteHighlightProps {
   itemType: 'artist' | 'venue' | 'event';
@@ -15,8 +15,8 @@ interface FavoriteHighlightProps {
  */
 export default function FavoriteHighlight({ itemType, itemId, children }: FavoriteHighlightProps) {
   const { user } = useAuth();
-  const { isFavorite } = useFavorites();
-  const active = user ? isFavorite(itemType, itemId) : false;
+  const { isFollowing } = useFollows();
+  const active = user ? isFollowing(itemType, itemId) : false;
 
   return (
     <div

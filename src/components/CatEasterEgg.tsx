@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useFavorites } from './FollowsProvider';
+import { useFollows } from './FollowsProvider';
 
 const MOBILE_BREAKPOINT = 640;
 
@@ -31,7 +31,7 @@ function useIsMobile() {
  * Because jazz musicians = cats. And this is OpenClaw. 🐾
  */
 export default function CatEasterEgg() {
-  const { catEggTrigger: trigger } = useFavorites();
+  const { catEggTrigger: trigger } = useFollows();
   const [visible, setVisible] = useState(false);
   const [stretching, setStretching] = useState(false);
   const isMobile = useIsMobile();

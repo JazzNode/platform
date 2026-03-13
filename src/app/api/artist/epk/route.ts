@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
     const buffer = await renderToBuffer(doc);
 
     const filename = `${artist.name_en || artist.artist_id}-EPK.pdf`;
-    return new NextResponse(buffer, {
+    return new NextResponse(new Uint8Array(buffer), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="${filename}"`,

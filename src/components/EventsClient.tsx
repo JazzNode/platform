@@ -5,7 +5,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
-import { useFavorites } from '@/components/FollowsProvider';
+import { useFollows } from '@/components/FollowsProvider';
 
 
 interface SerializedEvent {
@@ -74,7 +74,7 @@ interface Props {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
-  const { isFavorite } = useFavorites();
+  const { isFollowing } = useFollows();
 
   // Derive initial region/city from venue or city filter
   const [activeRegion, setActiveRegion] = useState<string | null>(() => {
@@ -389,7 +389,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             </FadeUp>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {monthEvents.map((event, i) => {
-                  const bookmarked = isFavorite('event', event.id);
+                  const bookmarked = isFollowing('event', event.id);
                   return (
                   <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link

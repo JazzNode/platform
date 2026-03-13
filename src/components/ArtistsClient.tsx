@@ -6,7 +6,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
-import { useFavorites } from '@/components/FollowsProvider';
+import { useFollows } from '@/components/FollowsProvider';
 import { normalizeInstrumentKey } from '@/lib/helpers';
 
 interface SerializedArtist {
@@ -62,7 +62,7 @@ interface Props {
 }
 
 export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, labels }: Props) {
-  const { isFavorite } = useFavorites();
+  const { isFollowing } = useFollows();
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); return instrumentNames[k] || k; };
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -321,7 +321,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredArtists.map((artist, i) => {
-            const followed = isFavorite('artist', artist.id);
+            const followed = isFollowing('artist', artist.id);
             return (
             <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
             <Link

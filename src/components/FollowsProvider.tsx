@@ -119,14 +119,3 @@ export function useFollows() {
   if (!ctx) throw new Error('useFollows must be used within FollowsProvider');
   return ctx;
 }
-
-/** @deprecated Use useFollows instead — backward compat alias */
-export function useFavorites() {
-  const { isFollowing, toggleFollow, loading, catEggTrigger } = useFollows();
-  return {
-    isFavorite: isFollowing,
-    toggleFavorite: toggleFollow,
-    loading,
-    catEggTrigger,
-  };
-}

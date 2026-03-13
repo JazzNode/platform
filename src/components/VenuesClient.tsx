@@ -6,7 +6,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
-import { useFavorites } from '@/components/FollowsProvider';
+import { useFollows } from '@/components/FollowsProvider';
 
 interface SerializedVenue {
   id: string;
@@ -45,7 +45,7 @@ interface Props {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
-  const { isFavorite } = useFavorites();
+  const { isFollowing } = useFollows();
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
@@ -198,7 +198,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredVenues.map((venue, i) => {
-              const followed = isFavorite('venue', venue.id);
+              const followed = isFollowing('venue', venue.id);
               return (
               <FadeUpItem key={venue.id} delay={(i % 3) * 60}>
               <Link

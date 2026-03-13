@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPublicFavorites } from '@/lib/profile';
+import { getPublicFollows } from '@/lib/profile';
 import type { Profile } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
@@ -22,8 +22,8 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
     { year: 'numeric', month: 'long' },
   );
 
-  const [favorites, artists, venues, events, cities] = await Promise.all([
-    getPublicFavorites(profile.id),
+  const [follows, artists, venues, events, cities] = await Promise.all([
+    getPublicFollows(profile.id),
     getArtists(),
     getVenues(),
     getEvents(),
@@ -33,13 +33,13 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
   const venueMap = buildMap(venues);
   const cityMap = buildMap(cities);
 
-  const followedArtistIds = new Set(favorites.filter((f) => f.item_type === 'artist').map((f) => f.item_id));
+  const followedArtistIds = new Set(follows.filter((f) => f.target_type === 'artist').map((f) => f.target_id));
   const followedArtists = artists.filter((a) => followedArtistIds.has(a.id));
 
-  const followedVenueIds = new Set(favorites.filter((f) => f.item_type === 'venue').map((f) => f.item_id));
+  const followedVenueIds = new Set(follows.filter((f) => f.target_type === 'venue').map((f) => f.target_id));
   const followedVenues = venues.filter((v) => followedVenueIds.has(v.id));
 
-  const bookmarkedEventIds = new Set(favorites.filter((f) => f.item_type === 'event').map((f) => f.item_id));
+  const bookmarkedEventIds = new Set(follows.filter((f) => f.target_type === 'event').map((f) => f.target_id));
   const bookmarkedEvents = events
     .filter((e) => bookmarkedEventIds.has(e.id))
     .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));

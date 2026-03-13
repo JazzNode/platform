@@ -23,11 +23,6 @@ export async function getPublicFollows(userId: string): Promise<{ target_type: s
   return data || [];
 }
 
-/** @deprecated Use getPublicFollows */
-export async function getPublicFavorites(userId: string): Promise<{ item_type: string; item_id: string }[]> {
-  const follows = await getPublicFollows(userId);
-  return follows.map((f) => ({ item_type: f.target_type, item_id: f.target_id }));
-}
 
 export interface SearchableProfile {
   id: string;

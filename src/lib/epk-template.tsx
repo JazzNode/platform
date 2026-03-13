@@ -1,5 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Link } from '@react-pdf/renderer';
+import { Document, Page as PdfPage, Text, View as PdfView, StyleSheet, Link } from '@react-pdf/renderer';
+
+// @react-pdf/renderer's types reject conditional JSX children (false | Element).
+// Thin wrappers widen the children prop to accept standard React patterns.
+const Page = PdfPage as React.ComponentType<any>;
+const View = PdfView as React.ComponentType<any>;
 
 const gold = '#C8A84E';
 const dark = '#0A0A0A';

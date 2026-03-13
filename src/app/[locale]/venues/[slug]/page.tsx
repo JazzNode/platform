@@ -192,7 +192,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
             <div className="flex items-center gap-2 shrink-0">
-              <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f, locale)} />
+              <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" />
             </div>
           </div>

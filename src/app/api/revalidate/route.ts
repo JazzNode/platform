@@ -19,13 +19,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (tag && VALID_TAGS.includes(tag)) {
-      revalidateTag(tag);
+      revalidateTag(tag, { expire: 0 });
       return NextResponse.json({ revalidated: true, tag });
     }
 
     // No tag or invalid tag → revalidate all
     for (const t of VALID_TAGS) {
-      revalidateTag(t);
+      revalidateTag(t, { expire: 0 });
     }
     return NextResponse.json({ revalidated: true, tags: VALID_TAGS });
   } catch (err) {
