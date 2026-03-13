@@ -84,7 +84,10 @@ export async function PATCH(request: NextRequest) {
       })
       .eq('claim_id', claimId);
 
-    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+    if (updateError) {
+      console.log(JSON.stringify({ action: 'approve_claim', actor: adminUserId, target: claim.target_id, claimId, status: 'fail', error: updateError.message }));
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
 
     // Upgrade user role to 'artist' if currently 'member'
     if (claim.user_id && claim.target_type === 'artist') {
@@ -112,6 +115,7 @@ export async function PATCH(request: NextRequest) {
       ipAddress: request.headers.get('x-forwarded-for'),
     });
 
+    console.log(JSON.stringify({ action: 'approve_claim', actor: adminUserId, target: claim.target_id, claimId, userId: claim.user_id, status: 'success' }));
     return NextResponse.json({ status: 'approved' });
   }
 
@@ -126,7 +130,10 @@ export async function PATCH(request: NextRequest) {
       })
       .eq('claim_id', claimId);
 
-    if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
+    if (updateError) {
+      console.log(JSON.stringify({ action: 'reject_claim', actor: adminUserId, target: claim.target_id, claimId, status: 'fail', error: updateError.message }));
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
 
     writeAuditLog({
       adminUserId,
@@ -137,6 +144,7 @@ export async function PATCH(request: NextRequest) {
       ipAddress: request.headers.get('x-forwarded-for'),
     });
 
+    console.log(JSON.stringify({ action: 'reject_claim', actor: adminUserId, target: claim.target_id, claimId, userId: claim.user_id, status: 'success' }));
     return NextResponse.json({ status: 'rejected' });
   }
 

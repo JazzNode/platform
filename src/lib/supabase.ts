@@ -271,6 +271,8 @@ interface VenueRow {
   business_hour: string | null;
   country_code: string | null;
   timezone: string | null;
+  data_source: string;
+  updated_by: string | null;
 }
 
 interface ArtistRow {
@@ -303,6 +305,8 @@ interface ArtistRow {
   verification_status: string | null;
   type: string | null;
   aka: string | null;
+  data_source: string;
+  updated_by: string | null;
 }
 
 interface EventRow {

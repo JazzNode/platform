@@ -17,12 +17,30 @@ import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug: rawSlug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
   const artists = await getArtists();
   const artist = artists.find((a) => a.id === slug);
-  return { title: artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist' };
+  const name = artist ? (artist.fields.name_en || artist.fields.name_local || 'Artist') : 'Artist';
+  const bio = artist?.fields.bio_en || artist?.fields.bio_zh || '';
+  const photo = artist?.fields.photo_url || undefined;
+  return {
+    title: name,
+    ...(bio && { description: bio.slice(0, 160) }),
+    ...(photo && { openGraph: { images: [{ url: photo }] } }),
+    alternates: {
+      canonical: `/${locale}/artists/${slug}`,
+      languages: {
+        en: `/en/artists/${slug}`,
+        'zh-Hant': `/zh/artists/${slug}`,
+        ja: `/ja/artists/${slug}`,
+        ko: `/ko/artists/${slug}`,
+        th: `/th/artists/${slug}`,
+        id: `/id/artists/${slug}`,
+      },
+    },
+  };
 }
 
 export default async function ArtistDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {

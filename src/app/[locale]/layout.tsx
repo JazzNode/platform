@@ -26,12 +26,25 @@ import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com';
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     template: '%s | JazzNode',
     default: 'JazzNode — The Jazz Scene, Connected.',
   },
   description: 'Discover jazz venues, artists, and events worldwide.',
+  alternates: {
+    languages: {
+      en: '/en',
+      'zh-Hant': '/zh',
+      ja: '/ja',
+      ko: '/ko',
+      th: '/th',
+      id: '/id',
+    },
+  },
   other: {
     'mobile-web-app-capable': 'yes',
     'apple-mobile-web-app-capable': 'yes',

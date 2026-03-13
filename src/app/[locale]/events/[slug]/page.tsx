@@ -12,12 +12,28 @@ import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
+  const { locale, slug } = await params;
   const events = await getEvents();
   const event = events.find((e) => e.id === slug);
   const title = event ? eventTitle(event.fields, 'en') : 'Event';
-  return { title };
+  const desc = event?.fields.description_en || event?.fields.description_zh || '';
+  return {
+    title,
+    ...(desc && { description: desc.slice(0, 160) }),
+    ...(event?.fields.poster_url && { openGraph: { images: [{ url: event.fields.poster_url }] } }),
+    alternates: {
+      canonical: `/${locale}/events/${slug}`,
+      languages: {
+        en: `/en/events/${slug}`,
+        'zh-Hant': `/zh/events/${slug}`,
+        ja: `/ja/events/${slug}`,
+        ko: `/ko/events/${slug}`,
+        th: `/th/events/${slug}`,
+        id: `/id/events/${slug}`,
+      },
+    },
+  };
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {

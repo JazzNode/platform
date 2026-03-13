@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     const sb = getSupabaseAdmin();
     const { error: updateErr } = await sb
       .from('artists')
-      .update({ photo_url: mdUrl })
+      .update({ photo_url: mdUrl, data_source: 'admin', updated_by: userId })
       .eq('artist_id', artistId);
 
     if (updateErr) {
@@ -94,13 +94,14 @@ export async function POST(req: NextRequest) {
       ipAddress: req.headers.get('x-forwarded-for'),
     });
 
+    console.log(JSON.stringify({ action: 'admin_upload_photo', actor: userId, target: artistId, status: 'success', photoUrl: mdUrl }));
     return NextResponse.json({
       success: true,
       urls: Object.fromEntries(results.map((r) => [r.size, r.url])),
       photoUrl: mdUrl,
     });
   } catch (err) {
-    console.error('Photo upload error:', err);
+    console.log(JSON.stringify({ action: 'admin_upload_photo', actor: userId, status: 'fail', error: err instanceof Error ? err.message : 'Upload failed' }));
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Upload failed' },
       { status: 500 },

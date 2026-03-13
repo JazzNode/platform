@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const { error: updateErr } = await supabase
       .from('artists')
-      .update({ photo_url: mdUrl })
+      .update({ photo_url: mdUrl, data_source: 'user', updated_by: userId })
       .eq('artist_id', artistId);
 
     if (updateErr) {
@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
       ipAddress: req.headers.get('x-forwarded-for'),
     });
 
+    console.log(JSON.stringify({ action: 'artist_upload_photo', actor: userId, target: artistId, status: 'success', photoUrl: mdUrl }));
     return NextResponse.json({
       success: true,
       urls: Object.fromEntries(results.map((r) => [r.size, r.url])),
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     console.error('Artist photo upload error:', err);
+    console.log(JSON.stringify({ action: 'artist_upload_photo', status: 'fail', error: err instanceof Error ? err.message : 'Upload failed' }));
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Upload failed' },
       { status: 500 },

@@ -91,7 +91,11 @@ export async function POST(req: NextRequest) {
 
     const { error: updateError } = await supabase
       .from(table)
-      .update({ ...fields, updated_at: new Date().toISOString() })
+      .update({
+        ...fields,
+        updated_at: new Date().toISOString(),
+        ...(table !== 'events' && { data_source: 'admin', updated_by: userId }),
+      })
       .eq(pk, entityId);
 
     if (updateError) {

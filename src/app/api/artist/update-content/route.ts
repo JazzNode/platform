@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const { error: updateError } = await supabase
       .from('artists')
-      .update({ ...fields, updated_at: new Date().toISOString() })
+      .update({ ...fields, updated_at: new Date().toISOString(), data_source: 'user', updated_by: userId })
       .eq('artist_id', entityId);
 
     if (updateError) {

@@ -29,6 +29,17 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: name,
     description,
     ...(photo && { openGraph: { images: [{ url: photo }] } }),
+    alternates: {
+      canonical: `/${locale}/venues/${slug}`,
+      languages: {
+        en: `/en/venues/${slug}`,
+        'zh-Hant': `/zh/venues/${slug}`,
+        ja: `/ja/venues/${slug}`,
+        ko: `/ko/venues/${slug}`,
+        th: `/th/venues/${slug}`,
+        id: `/id/venues/${slug}`,
+      },
+    },
   };
 }
 
