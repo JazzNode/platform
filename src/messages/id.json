@@ -323,7 +323,22 @@
     "recentClaims": "Klaim Terbaru",
     "recentActivity": "Aktivitas Terbaru",
     "viewAll": "Lihat Semua",
-    "noClaims": "Tidak ada klaim terbaru."
+    "noClaims": "Tidak ada klaim terbaru.",
+    "artistTiers": "Tingkat Artis",
+    "venueTiers": "Tingkat Tempat",
+    "artistTiersTitle": "Pengaturan Tingkat Artis",
+    "artistTiersDesc": "Atur fitur yang tersedia di setiap tingkat artis.",
+    "venueTiersTitle": "Pengaturan Tingkat Tempat",
+    "venueTiersDesc": "Atur fitur yang tersedia di setiap tingkat tempat.",
+    "tierConfigHint": "Klik sel tingkat untuk mengatur tingkat minimum yang diperlukan. Hijau = terbuka, X = terkunci. Perubahan berlaku setelah disimpan.",
+    "feature": "Fitur",
+    "save": "Simpan",
+    "saved": "Tersimpan!",
+    "lockBehaviorPreview": "Pratinjau Perilaku Kunci",
+    "lockBehaviorDesc": "Saat fitur terkunci, pengguna tingkat rendah akan melihat pesan upgrade yang sesuai.",
+    "lockMsgClaim": "Tampil: \"Klaim halaman untuk membuka\"",
+    "lockMsgPremium": "Tampil: \"Upgrade ke Premium\"",
+    "lockMsgElite": "Tampil: \"Upgrade ke Elite\""
   },
   "claim": {
     "claimPage": "Klaim",

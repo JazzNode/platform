@@ -323,7 +323,22 @@
     "recentClaims": "최근 소유권 요청",
     "recentActivity": "최근 활동",
     "viewAll": "전체 보기",
-    "noClaims": "최근 소유권 요청이 없습니다."
+    "noClaims": "최근 소유권 요청이 없습니다.",
+    "artistTiers": "아티스트 등급",
+    "venueTiers": "공연장 등급",
+    "artistTiersTitle": "아티스트 등급 설정",
+    "artistTiersDesc": "각 아티스트 등급에서 사용할 수 있는 기능을 설정합니다.",
+    "venueTiersTitle": "공연장 등급 설정",
+    "venueTiersDesc": "각 공연장 등급에서 사용할 수 있는 기능을 설정합니다.",
+    "tierConfigHint": "등급 셀을 클릭하여 해당 기능의 최소 등급을 설정하세요. 초록 = 잠금 해제, X = 잠금. 변경사항은 저장 후 적용됩니다.",
+    "feature": "기능",
+    "save": "저장",
+    "saved": "저장됨!",
+    "lockBehaviorPreview": "잠금 동작 미리보기",
+    "lockBehaviorDesc": "기능이 잠기면 낮은 등급 사용자에게 해당 업그레이드 안내가 표시됩니다.",
+    "lockMsgClaim": "표시: \"페이지를 인증하여 잠금 해제\"",
+    "lockMsgPremium": "표시: \"프리미엄으로 업그레이드\"",
+    "lockMsgElite": "표시: \"엘리트로 업그레이드\""
   },
   "claim": {
     "claimPage": "인증 신청",

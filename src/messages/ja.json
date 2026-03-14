@@ -323,7 +323,22 @@
     "recentClaims": "最近の申請",
     "recentActivity": "最近の操作",
     "viewAll": "すべて表示",
-    "noClaims": "最近の申請はありません。"
+    "noClaims": "最近の申請はありません。",
+    "artistTiers": "アーティスト階層",
+    "venueTiers": "会場階層",
+    "artistTiersTitle": "アーティスト階層設定",
+    "artistTiersDesc": "各アーティスト階層で利用可能な機能を設定します。",
+    "venueTiersTitle": "会場階層設定",
+    "venueTiersDesc": "各会場階層で利用可能な機能を設定します。",
+    "tierConfigHint": "階層セルをクリックして、その機能を解除するために必要な最低階層を設定します。緑 = 解除済み、X = ロック中。変更は保存後に反映されます。",
+    "feature": "機能",
+    "save": "保存",
+    "saved": "保存しました！",
+    "lockBehaviorPreview": "ロック動作プレビュー",
+    "lockBehaviorDesc": "機能がロックされている場合、低階層ユーザーには対応するアップグレードプロンプトが表示されます。",
+    "lockMsgClaim": "表示：「ページを申請して解除」",
+    "lockMsgPremium": "表示：「プレミアムにアップグレード」",
+    "lockMsgElite": "表示：「エリートにアップグレード」"
   },
   "claim": {
     "claimPage": "認証申請",

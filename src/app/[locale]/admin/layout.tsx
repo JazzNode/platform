@@ -10,6 +10,8 @@ import { useAdmin } from '@/components/AdminProvider';
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
   { key: 'claims', icon: 'shield', path: '/claims' },
+  { key: 'artistTiers', icon: 'music', path: '/artist-tiers' },
+  { key: 'venueTiers', icon: 'house', path: '/venue-tiers' },
 ] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -26,6 +28,21 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="M9 12l2 2 4-4" />
+        </svg>
+      );
+    case 'music':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 18V5l12-2v13" />
+          <circle cx="6" cy="18" r="3" />
+          <circle cx="18" cy="16" r="3" />
+        </svg>
+      );
+    case 'house':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
       );
     default:

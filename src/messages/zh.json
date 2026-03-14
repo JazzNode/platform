@@ -327,7 +327,22 @@
     "recentClaims": "近期認領",
     "recentActivity": "近期操作",
     "viewAll": "查看全部",
-    "noClaims": "目前沒有近期認領。"
+    "noClaims": "目前沒有近期認領。",
+    "artistTiers": "藝人等級",
+    "venueTiers": "場地等級",
+    "artistTiersTitle": "藝人等級設定",
+    "artistTiersDesc": "設定每個藝人等級可使用的功能。",
+    "venueTiersTitle": "場地等級設定",
+    "venueTiersDesc": "設定每個場地等級可使用的功能。",
+    "tierConfigHint": "點擊等級格子以設定解鎖該功能所需的最低等級。綠色 = 已解鎖，X = 已鎖定。變更儲存後生效。",
+    "feature": "功能",
+    "save": "儲存",
+    "saved": "已儲存！",
+    "lockBehaviorPreview": "鎖定行為預覽",
+    "lockBehaviorDesc": "當功能被鎖定時，低等級用戶會看到相對應的升級提示。",
+    "lockMsgClaim": "顯示：「認領你的頁面來解鎖」",
+    "lockMsgPremium": "顯示：「升級 Premium」",
+    "lockMsgElite": "顯示：「升級 Elite」"
   },
   "claim": {
     "claimPage": "認領",

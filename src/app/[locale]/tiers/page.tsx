@@ -1,8 +1,13 @@
 import { Fragment } from 'react';
 import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
+import { createClient } from '@/utils/supabase/server';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import type { TierFeatures } from '@/components/TierConfigProvider';
+
+// Re-fetch tier config every 60s so admin changes propagate quickly
+export const revalidate = 60;
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -98,11 +103,46 @@ function TierTable({
   );
 }
 
+/* ─── Helper: convert minTier → display array ─── */
+function tierRow(cfg: TierFeatures, key: string, numTiers: number): (boolean | string)[] {
+  const min = cfg[key] ?? 0;
+  return Array.from({ length: numTiers }, (_, i) => i >= min);
+}
+
+async function fetchTierConfig(): Promise<{ artist: TierFeatures; venue: TierFeatures }> {
+  // Fallback defaults matching seed data
+  const DEFAULT_ARTIST: TierFeatures = {
+    public_profile: 0, edit_profile: 1, verified_badge: 1, custom_bio: 1, social_links: 1,
+    search_listing: 0, event_association: 0, priority_search: 2,
+    gear_showcase: 2, gear_unlimited: 3, epk_basic: 1, epk_full: 2,
+    analytics_basic: 2, analytics_advanced: 2, broadcasts: 3, inbox: 2,
+    available_for_hire: 2, booking_requests: 3,
+  };
+  const DEFAULT_VENUE: TierFeatures = {
+    public_listing: 0, edit_profile: 1, verified_badge: 1, photos: 1, description: 1,
+    search_listing: 0, map_pin: 0, priority_search: 2, event_showcase: 0,
+    backline: 2, analytics_basic: 2, analytics_advanced: 2,
+    broadcasts: 2, inbox: 2, booking_management: 2, artist_discovery: 2,
+  };
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.from('tier_config').select('entity_type, features');
+    if (!data) return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE };
+    const artist = data.find((r) => r.entity_type === 'artist')?.features ?? DEFAULT_ARTIST;
+    const venue = data.find((r) => r.entity_type === 'venue')?.features ?? DEFAULT_VENUE;
+    return { artist, venue };
+  } catch {
+    return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE };
+  }
+}
+
 export default async function TiersPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'tiers' });
+  const cfg = await fetchTierConfig();
 
-  /* ─── Artist tiers data ─── */
+  /* ─── Artist tiers data (dynamic from tier_config) ─── */
   const artistColumns = [t('free'), t('claimed'), t('premium'), t('elite')];
   const artistColors = [
     'bg-zinc-500/20 text-zinc-400',
@@ -110,46 +150,61 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
     'bg-amber-500/20 text-amber-400',
     'bg-purple-500/20 text-purple-400',
   ];
+
+  // Gear row: show text labels for tiers that unlock gear_showcase / gear_unlimited
+  const gearRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+    if (i >= (cfg.artist.gear_unlimited ?? 3)) return t('artistGearUnlimited');
+    if (i >= (cfg.artist.gear_showcase ?? 2)) return t('artistGearLimit');
+    return false;
+  });
+
+  // EPK row: show text labels for tiers that unlock epk_basic / epk_full
+  const epkRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+    if (i >= (cfg.artist.epk_full ?? 2)) return t('artistEPKFull');
+    if (i >= (cfg.artist.epk_basic ?? 1)) return t('artistEPKBasic');
+    return false;
+  });
+
   const artistFeatures = [
     {
       category: t('artistCatProfile'),
       items: [
-        { name: t('artistPublicProfile'), tiers: [true, true, true, true] },
-        { name: t('artistEditProfile'), tiers: [false, true, true, true] },
-        { name: t('artistVerifiedBadge'), tiers: [false, true, true, true] },
-        { name: t('artistCustomBio'), tiers: [false, true, true, true] },
-        { name: t('artistSocialLinks'), tiers: [false, true, true, true] },
+        { name: t('artistPublicProfile'), tiers: tierRow(cfg.artist, 'public_profile', 4) },
+        { name: t('artistEditProfile'), tiers: tierRow(cfg.artist, 'edit_profile', 4) },
+        { name: t('artistVerifiedBadge'), tiers: tierRow(cfg.artist, 'verified_badge', 4) },
+        { name: t('artistCustomBio'), tiers: tierRow(cfg.artist, 'custom_bio', 4) },
+        { name: t('artistSocialLinks'), tiers: tierRow(cfg.artist, 'social_links', 4) },
       ],
     },
     {
       category: t('artistCatDiscovery'),
       items: [
-        { name: t('artistSearchListing'), tiers: [true, true, true, true] },
-        { name: t('artistEventAssociation'), tiers: [true, true, true, true] },
-        { name: t('artistPrioritySearch'), tiers: [false, false, true, true] },
+        { name: t('artistSearchListing'), tiers: tierRow(cfg.artist, 'search_listing', 4) },
+        { name: t('artistEventAssociation'), tiers: tierRow(cfg.artist, 'event_association', 4) },
+        { name: t('artistPrioritySearch'), tiers: tierRow(cfg.artist, 'priority_search', 4) },
       ],
     },
     {
       category: t('artistCatTools'),
       items: [
-        { name: t('artistGearShowcase'), tiers: [false, false, t('artistGearLimit'), t('artistGearUnlimited')] },
-        { name: t('artistEPK'), tiers: [false, t('artistEPKBasic'), t('artistEPKFull'), t('artistEPKFull')] },
-        { name: t('artistAnalyticsBasic'), tiers: [false, false, true, true] },
-        { name: t('artistAnalyticsAdvanced'), tiers: [false, false, true, true] },
-        { name: t('artistBroadcasts'), tiers: [false, false, false, true] },
-        { name: t('artistInbox'), tiers: [false, false, true, true] },
+        { name: t('artistGearShowcase'), tiers: gearRow },
+        { name: t('artistEPK'), tiers: epkRow },
+        { name: t('artistAnalyticsBasic'), tiers: tierRow(cfg.artist, 'analytics_basic', 4) },
+        { name: t('artistAnalyticsAdvanced'), tiers: tierRow(cfg.artist, 'analytics_advanced', 4) },
+        { name: t('artistBroadcasts'), tiers: tierRow(cfg.artist, 'broadcasts', 4) },
+        { name: t('artistInbox'), tiers: tierRow(cfg.artist, 'inbox', 4) },
       ],
     },
     {
       category: t('artistCatBusiness'),
       items: [
-        { name: t('artistAvailableForHire'), tiers: [false, false, true, true] },
-        { name: t('artistBookingRequests'), tiers: [false, false, false, true] },
+        { name: t('artistAvailableForHire'), tiers: tierRow(cfg.artist, 'available_for_hire', 4) },
+        { name: t('artistBookingRequests'), tiers: tierRow(cfg.artist, 'booking_requests', 4) },
       ],
     },
   ];
 
-  /* ─── Venue tiers data ─── */
+  /* ─── Venue tiers data (dynamic from tier_config) ─── */
   const venueColumns = [t('free'), t('claimed'), t('premium')];
   const venueColors = [
     'bg-zinc-500/20 text-zinc-400',
@@ -160,37 +215,37 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
     {
       category: t('venueCatProfile'),
       items: [
-        { name: t('venuePublicListing'), tiers: [true, true, true] },
-        { name: t('venueEditProfile'), tiers: [false, true, true] },
-        { name: t('venueVerifiedBadge'), tiers: [false, true, true] },
-        { name: t('venuePhotos'), tiers: [false, true, true] },
-        { name: t('venueDescription'), tiers: [false, true, true] },
+        { name: t('venuePublicListing'), tiers: tierRow(cfg.venue, 'public_listing', 3) },
+        { name: t('venueEditProfile'), tiers: tierRow(cfg.venue, 'edit_profile', 3) },
+        { name: t('venueVerifiedBadge'), tiers: tierRow(cfg.venue, 'verified_badge', 3) },
+        { name: t('venuePhotos'), tiers: tierRow(cfg.venue, 'photos', 3) },
+        { name: t('venueDescription'), tiers: tierRow(cfg.venue, 'description', 3) },
       ],
     },
     {
       category: t('venueCatDiscovery'),
       items: [
-        { name: t('venueSearchListing'), tiers: [true, true, true] },
-        { name: t('venueMapPin'), tiers: [true, true, true] },
-        { name: t('venuePrioritySearch'), tiers: [false, false, true] },
-        { name: t('venueEventShowcase'), tiers: [true, true, true] },
+        { name: t('venueSearchListing'), tiers: tierRow(cfg.venue, 'search_listing', 3) },
+        { name: t('venueMapPin'), tiers: tierRow(cfg.venue, 'map_pin', 3) },
+        { name: t('venuePrioritySearch'), tiers: tierRow(cfg.venue, 'priority_search', 3) },
+        { name: t('venueEventShowcase'), tiers: tierRow(cfg.venue, 'event_showcase', 3) },
       ],
     },
     {
       category: t('venueCatTools'),
       items: [
-        { name: t('venueBackline'), tiers: [false, false, true] },
-        { name: t('venueAnalyticsBasic'), tiers: [false, false, true] },
-        { name: t('venueAnalyticsAdvanced'), tiers: [false, false, true] },
-        { name: t('venueBroadcasts'), tiers: [false, false, true] },
-        { name: t('venueInbox'), tiers: [false, false, true] },
+        { name: t('venueBackline'), tiers: tierRow(cfg.venue, 'backline', 3) },
+        { name: t('venueAnalyticsBasic'), tiers: tierRow(cfg.venue, 'analytics_basic', 3) },
+        { name: t('venueAnalyticsAdvanced'), tiers: tierRow(cfg.venue, 'analytics_advanced', 3) },
+        { name: t('venueBroadcasts'), tiers: tierRow(cfg.venue, 'broadcasts', 3) },
+        { name: t('venueInbox'), tiers: tierRow(cfg.venue, 'inbox', 3) },
       ],
     },
     {
       category: t('venueCatBusiness'),
       items: [
-        { name: t('venueBookingManagement'), tiers: [false, false, true] },
-        { name: t('venueArtistDiscovery'), tiers: [false, false, true] },
+        { name: t('venueBookingManagement'), tiers: tierRow(cfg.venue, 'booking_management', 3) },
+        { name: t('venueArtistDiscovery'), tiers: tierRow(cfg.venue, 'artist_discovery', 3) },
       ],
     },
   ];

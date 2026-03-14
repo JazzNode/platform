@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
+import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -22,6 +23,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
   const t = useTranslations('artistStudio');
   const { user, loading, setShowComingSoon } = useAuth();
   const { previewArtistTier } = useAdmin();
+  const { isUnlocked, minTier } = useTierConfig();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -161,9 +163,10 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
   }
 
   const effectiveTier = previewArtistTier ?? tier;
+  const broadcastMinTier = minTier('artist', 'broadcasts');
 
-  // Tier gate
-  if (effectiveTier < 2) {
+  // Tier gate — uses dynamic config
+  if (!isUnlocked('artist', 'broadcasts', effectiveTier)) {
     return (
       <div className="space-y-6">
         <FadeUp>
@@ -183,7 +186,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
               {t('broadcastLockedHint')}
             </p>
             <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
-              {t('upgradePremium')}
+              {broadcastMinTier <= 1 ? t('upgradePremium') : t('upgradePremium')}
             </button>
           </div>
         </FadeUp>

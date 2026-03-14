@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
+import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -23,6 +24,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
   const t = useTranslations('artistStudio');
   const { user, setShowComingSoon } = useAuth();
   const { previewArtistTier } = useAdmin();
+  const { isUnlocked } = useTierConfig();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -91,7 +93,8 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
   };
 
   const effectiveTier = previewArtistTier ?? tier;
-  const maxItems = effectiveTier < 2 ? 3 : Infinity;
+  const hasUnlimitedGear = isUnlocked('artist', 'gear_unlimited', effectiveTier);
+  const maxItems = hasUnlimitedGear ? Infinity : 3;
 
   if (loading) {
     return (
@@ -115,7 +118,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
             </button>
           )}
         </div>
-        {effectiveTier < 2 && (
+        {!hasUnlimitedGear && (
           <p className="text-xs text-[var(--muted-foreground)] mt-1">
             {t('gearUsed', { count: gear.length, max: 3 })}
           </p>
@@ -222,7 +225,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
       )}
 
       {/* Tier upgrade nudge */}
-      {effectiveTier < 2 && gear.length >= 3 && (
+      {!hasUnlimitedGear && gear.length >= 3 && (
         <FadeUp>
           <div className="bg-gradient-to-br from-[var(--color-gold)]/5 to-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-2xl p-6 text-center">
             <p className="text-sm mb-3">{t('gearLimitReached')}</p>
