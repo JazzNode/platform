@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import { TIER_DISABLED, type TierFeatures } from '@/components/TierConfigProvider';
@@ -72,21 +72,23 @@ export default function ArtistTiersPage() {
   const [saved, setSaved] = useState(false);
   const [dirty, setDirty] = useState(false);
 
-  const fetchConfig = useCallback(async () => {
-    try {
-      const res = await fetch('/api/admin/tier-config');
-      const data = await res.json();
-      if (data.artist?.features) {
-        setFeatures(data.artist.features);
-        setOriginalFeatures(data.artist.features);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/tier-config');
+        const data = await res.json();
+        if (!cancelled && data.artist?.features) {
+          setFeatures(data.artist.features);
+          setOriginalFeatures(data.artist.features);
+        }
+      } catch (err) {
+        console.error('Failed to fetch tier config:', err);
       }
-    } catch (err) {
-      console.error('Failed to fetch tier config:', err);
-    }
-    setLoading(false);
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => { fetchConfig(); }, [fetchConfig]);
 
   const handleTierClick = (featureKey: string, tierIndex: number) => {
     setFeatures((prev) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useAdmin } from '@/components/AdminProvider';
@@ -74,22 +74,23 @@ export default function AdminDashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchStats = useCallback(async () => {
+  useEffect(() => {
     if (!token) return;
-    setLoading(true);
-    try {
-      const res = await fetch('/api/admin/stats', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setStats(data);
-    } catch (err) {
-      console.error('Failed to fetch stats:', err);
-    }
-    setLoading(false);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/stats', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!cancelled) setStats(data);
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, [token]);
-
-  useEffect(() => { fetchStats(); }, [fetchStats]);
 
   if (loading || !stats) {
     return (
