@@ -135,7 +135,7 @@ export default function ArtistDashboardLayout({
       });
   }, [slug]);
 
-  if (loading || !slug) {
+  if (loading || !slug || !artist) {
     return (
       <div className="py-24 text-center">
         <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
