@@ -150,7 +150,16 @@ export default function Footer() {
 
           {/* Bottom row */}
           <div className="mt-10 flex flex-col items-center gap-4 text-xs text-[var(--muted-foreground,#8A8578)]">
-            <span>© {new Date().getFullYear()} JazzNode</span>
+            <span className="flex items-center gap-3">
+              <span>© {new Date().getFullYear()} JazzNode</span>
+              <span className="text-[var(--muted-foreground)] opacity-30">·</span>
+              <Link
+                href={`/${locale}/releases`}
+                className="hover:text-gold transition-colors duration-300"
+              >
+                Releases
+              </Link>
+            </span>
             <div className="flex items-center gap-6">
               <span className="font-mono uppercase tracking-widest">Live Data</span>
               <SoundWave />
