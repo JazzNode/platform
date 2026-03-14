@@ -17,39 +17,40 @@ const TIER_BG = [
   'bg-amber-500/10',
 ];
 
-interface FeatureDef {
+interface FeatureKey {
   key: string;
-  label: string;
-  category: string;
+  labelKey: string;
+  categoryKey: string;
 }
 
-const VENUE_FEATURES: FeatureDef[] = [
+const VENUE_FEATURES: FeatureKey[] = [
   // Profile & Identity
-  { key: 'public_listing', label: 'Public venue listing', category: 'Profile & Identity' },
-  { key: 'edit_profile', label: 'Edit description, photos & hours', category: 'Profile & Identity' },
-  { key: 'verified_badge', label: 'Verified badge', category: 'Profile & Identity' },
-  { key: 'photos', label: 'Photo gallery', category: 'Profile & Identity' },
-  { key: 'description', label: 'Custom description', category: 'Profile & Identity' },
+  { key: 'public_listing', labelKey: 'vf_publicListing', categoryKey: 'vc_profile' },
+  { key: 'edit_profile', labelKey: 'vf_editProfile', categoryKey: 'vc_profile' },
+  { key: 'verified_badge', labelKey: 'vf_verifiedBadge', categoryKey: 'vc_profile' },
+  { key: 'photos', labelKey: 'vf_photos', categoryKey: 'vc_profile' },
+  { key: 'description', labelKey: 'vf_description', categoryKey: 'vc_profile' },
   // Discovery & Visibility
-  { key: 'search_listing', label: 'Listed in search & city pages', category: 'Discovery & Visibility' },
-  { key: 'map_pin', label: 'Map pin on city page', category: 'Discovery & Visibility' },
-  { key: 'priority_search', label: 'Priority in search results', category: 'Discovery & Visibility' },
-  { key: 'event_showcase', label: 'Event listings on venue page', category: 'Discovery & Visibility' },
+  { key: 'search_listing', labelKey: 'vf_searchListing', categoryKey: 'vc_discovery' },
+  { key: 'map_pin', labelKey: 'vf_mapPin', categoryKey: 'vc_discovery' },
+  { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_discovery' },
+  { key: 'event_showcase', labelKey: 'vf_eventShowcase', categoryKey: 'vc_discovery' },
   // Tools & Analytics
-  { key: 'backline', label: 'Backline equipment management', category: 'Tools & Analytics' },
-  { key: 'analytics_basic', label: 'Page views & daily trends', category: 'Tools & Analytics' },
-  { key: 'analytics_advanced', label: 'Referrer sources & city breakdown', category: 'Tools & Analytics' },
-  { key: 'broadcasts', label: 'Fan broadcasts', category: 'Tools & Analytics' },
-  { key: 'inbox', label: 'Messaging inbox', category: 'Tools & Analytics' },
+  { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_tools' },
+  { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_tools' },
+  { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_tools' },
+  { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_tools' },
+  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_tools' },
   // Business & Operations
-  { key: 'booking_management', label: 'Booking management system', category: 'Business & Operations' },
-  { key: 'artist_discovery', label: 'Artist discovery & outreach', category: 'Business & Operations' },
+  { key: 'booking_management', labelKey: 'vf_bookingManagement', categoryKey: 'vc_business' },
+  { key: 'artist_discovery', labelKey: 'vf_artistDiscovery', categoryKey: 'vc_business' },
 ];
 
 export default function VenueTiersPage() {
   const { token } = useAdmin();
   const t = useTranslations('adminHQ');
   const [features, setFeatures] = useState<TierFeatures>({});
+  const [originalFeatures, setOriginalFeatures] = useState<TierFeatures>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -59,7 +60,10 @@ export default function VenueTiersPage() {
     try {
       const res = await fetch('/api/admin/tier-config');
       const data = await res.json();
-      if (data.venue?.features) setFeatures(data.venue.features);
+      if (data.venue?.features) {
+        setFeatures(data.venue.features);
+        setOriginalFeatures(data.venue.features);
+      }
     } catch (err) {
       console.error('Failed to fetch tier config:', err);
     }
@@ -91,6 +95,7 @@ export default function VenueTiersPage() {
         body: JSON.stringify({ entityType: 'venue', features }),
       });
       if (res.ok) {
+        setOriginalFeatures(features);
         setSaved(true);
         setDirty(false);
       }
@@ -98,6 +103,12 @@ export default function VenueTiersPage() {
       console.error('Failed to save:', err);
     }
     setSaving(false);
+  };
+
+  const handleCancel = () => {
+    setFeatures(originalFeatures);
+    setDirty(false);
+    setSaved(false);
   };
 
   if (loading) {
@@ -108,7 +119,7 @@ export default function VenueTiersPage() {
     );
   }
 
-  const categories = [...new Set(VENUE_FEATURES.map((f) => f.category))];
+  const categories = [...new Set(VENUE_FEATURES.map((f) => f.categoryKey))];
 
   return (
     <div className="space-y-8 pb-16">
@@ -118,19 +129,29 @@ export default function VenueTiersPage() {
           <h1 className="font-serif text-3xl font-bold">{t('venueTiersTitle')}</h1>
           <p className="text-sm text-[var(--muted-foreground)] mt-1">{t('venueTiersDesc')}</p>
         </div>
-        <button
-          onClick={handleSave}
-          disabled={!dirty || saving}
-          className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
-            dirty
-              ? 'bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90'
-              : saved
-                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                : 'bg-[var(--muted)] text-[var(--muted-foreground)] cursor-not-allowed'
-          }`}
-        >
-          {saving ? '...' : saved ? t('saved') : t('save')}
-        </button>
+        <div className="flex items-center gap-2">
+          {dirty && (
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]/30 transition-all"
+            >
+              {t('cancel')}
+            </button>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={!dirty || saving}
+            className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+              dirty
+                ? 'bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90'
+                : saved
+                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                  : 'bg-[var(--muted)] text-[var(--muted-foreground)] cursor-not-allowed'
+            }`}
+          >
+            {saving ? '...' : saved ? t('saved') : t('save')}
+          </button>
+        </div>
       </div>
 
       {/* Hint */}
@@ -163,17 +184,17 @@ export default function VenueTiersPage() {
                     colSpan={4}
                     className="pt-6 pb-2 px-4 text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-semibold border-b border-[var(--border)]"
                   >
-                    {cat}
+                    {t(cat)}
                   </td>
                 </tr>
-                {VENUE_FEATURES.filter((f) => f.category === cat).map((feat, fi) => {
+                {VENUE_FEATURES.filter((f) => f.categoryKey === cat).map((feat, fi) => {
                   const minTier = features[feat.key] ?? 0;
                   return (
                     <tr
                       key={feat.key}
                       className={`${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
                     >
-                      <td className="py-3 px-4 text-sm text-[var(--foreground)]">{feat.label}</td>
+                      <td className="py-3 px-4 text-sm text-[var(--foreground)]">{t(feat.labelKey)}</td>
                       {TIER_NAMES.map((_, tierIdx) => {
                         const unlocked = tierIdx >= minTier;
                         return (
@@ -222,7 +243,7 @@ export default function VenueTiersPage() {
                 <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${TIER_BG[min]} ${TIER_COLORS[min]}`}>
                   {TIER_NAMES[min]}+
                 </span>
-                <span className="text-[var(--foreground)]">{feat.label}</span>
+                <span className="text-[var(--foreground)]">{t(feat.labelKey)}</span>
                 <span className="text-[var(--muted-foreground)] text-xs ml-auto">
                   {min === 1 ? t('lockMsgClaim') : t('lockMsgPremium')}
                 </span>
