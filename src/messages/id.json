@@ -345,6 +345,8 @@
     "hiddenFeatures": "Fitur Tersembunyi",
     "hiddenMsg": "Tidak ditampilkan di frontend",
     "featureDisabledHint": "Fitur disembunyikan — klik tier mana saja untuk mengaktifkan kembali",
+    "tierHideHint": "Klik untuk menyembunyikan tier ini dari halaman publik",
+    "tierShowHint": "Klik untuk menampilkan tier ini di halaman publik",
     "cancel": "Batal",
     "ac_fanFacing": "Untuk Penggemar (Selalu Terlihat)",
     "ac_claimed": "Diklaim (Hak Edit)",

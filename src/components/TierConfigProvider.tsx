@@ -7,17 +7,26 @@ export type TierFeatures = Record<string, number>;
 /** Sentinel value: feature is disabled / hidden from all tiers */
 export const TIER_DISABLED = -1;
 
+/** Default: all 4 tiers visible */
+export const ALL_TIERS = [0, 1, 2, 3];
+
 interface TierConfigContextType {
   /** Artist feature config: feature_key → min tier required (-1 = disabled) */
   artistFeatures: TierFeatures;
   /** Venue feature config: feature_key → min tier required (-1 = disabled) */
   venueFeatures: TierFeatures;
+  /** Which tiers are publicly visible for artists */
+  artistVisibleTiers: number[];
+  /** Which tiers are publicly visible for venues */
+  venueVisibleTiers: number[];
   /** Check if a feature is unlocked for a given entity tier. Pass adminBypass=true to bypass disabled state. */
   isUnlocked: (entityType: 'artist' | 'venue', featureKey: string, currentTier: number, adminBypass?: boolean) => boolean;
   /** Get the min tier required for a feature (-1 = disabled) */
   minTier: (entityType: 'artist' | 'venue', featureKey: string) => number;
   /** Check if a feature is enabled (not disabled via dashboard) */
   isFeatureEnabled: (entityType: 'artist' | 'venue', featureKey: string) => boolean;
+  /** Check if a specific tier is publicly visible */
+  isTierVisible: (entityType: 'artist' | 'venue', tier: number) => boolean;
   /** Whether config has loaded */
   loaded: boolean;
 }
@@ -57,6 +66,8 @@ const DEFAULT_VENUE: TierFeatures = {
 export default function TierConfigProvider({ children }: { children: React.ReactNode }) {
   const [artistFeatures, setArtistFeatures] = useState<TierFeatures>(DEFAULT_ARTIST);
   const [venueFeatures, setVenueFeatures] = useState<TierFeatures>(DEFAULT_VENUE);
+  const [artistVisibleTiers, setArtistVisibleTiers] = useState<number[]>(ALL_TIERS);
+  const [venueVisibleTiers, setVenueVisibleTiers] = useState<number[]>(ALL_TIERS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -65,6 +76,8 @@ export default function TierConfigProvider({ children }: { children: React.React
       .then((data) => {
         if (data.artist?.features) setArtistFeatures(data.artist.features);
         if (data.venue?.features) setVenueFeatures(data.venue.features);
+        if (data.artist?.visible_tiers) setArtistVisibleTiers(data.artist.visible_tiers);
+        if (data.venue?.visible_tiers) setVenueVisibleTiers(data.venue.visible_tiers);
         setLoaded(true);
       })
       .catch(() => {
@@ -101,8 +114,21 @@ export default function TierConfigProvider({ children }: { children: React.React
     [artistFeatures, venueFeatures],
   );
 
+  const isTierVisible = useCallback(
+    (entityType: 'artist' | 'venue', tier: number) => {
+      const visible = entityType === 'artist' ? artistVisibleTiers : venueVisibleTiers;
+      return visible.includes(tier);
+    },
+    [artistVisibleTiers, venueVisibleTiers],
+  );
+
   return (
-    <TierConfigContext.Provider value={{ artistFeatures, venueFeatures, isUnlocked, minTier, isFeatureEnabled, loaded }}>
+    <TierConfigContext.Provider value={{
+      artistFeatures, venueFeatures,
+      artistVisibleTiers, venueVisibleTiers,
+      isUnlocked, minTier, isFeatureEnabled, isTierVisible,
+      loaded,
+    }}>
       {children}
     </TierConfigContext.Provider>
   );

@@ -349,6 +349,8 @@
     "hiddenFeatures": "已隱藏功能",
     "hiddenMsg": "前台不顯示",
     "featureDisabledHint": "功能已隱藏 — 點擊任意等級重新啟用",
+    "tierHideHint": "點擊以從公開頁面隱藏此等級",
+    "tierShowHint": "點擊以在公開頁面顯示此等級",
     "cancel": "取消",
     "ac_fanFacing": "粉絲端（永遠可見）",
     "ac_claimed": "已認領（編輯權限）",

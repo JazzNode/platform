@@ -345,6 +345,8 @@
     "hiddenFeatures": "숨겨진 기능",
     "hiddenMsg": "프론트엔드에 표시되지 않음",
     "featureDisabledHint": "기능이 숨겨져 있습니다 — 아무 티어를 클릭하여 다시 활성화",
+    "tierHideHint": "클릭하여 공개 페이지에서 이 티어를 숨기기",
+    "tierShowHint": "클릭하여 공개 페이지에 이 티어를 표시하기",
     "cancel": "취소",
     "ac_fanFacing": "팬 대상 (항상 표시)",
     "ac_claimed": "인증 완료 (편집 권한)",

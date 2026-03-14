@@ -10,7 +10,7 @@ export async function GET() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('tier_config')
-    .select('entity_type, features, updated_at');
+    .select('entity_type, features, visible_tiers, updated_at');
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -19,6 +19,7 @@ export async function GET() {
   for (const row of data || []) {
     config[row.entity_type] = {
       features: row.features,
+      visible_tiers: row.visible_tiers ?? [0, 1, 2, 3],
       updated_at: row.updated_at,
     };
   }
@@ -35,21 +36,25 @@ export async function PUT(request: NextRequest) {
   if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
-  const { entityType, features } = body;
+  const { entityType, features, visibleTiers } = body;
 
-  if (!entityType || !features || !['artist', 'venue'].includes(entityType)) {
+  if (!entityType || !['artist', 'venue'].includes(entityType)) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
   const supabase = createAdminClient();
 
+  // Build update payload — only include fields that were sent
+  const updatePayload: Record<string, unknown> = {
+    updated_at: new Date().toISOString(),
+    updated_by: userId,
+  };
+  if (features) updatePayload.features = features;
+  if (visibleTiers !== undefined) updatePayload.visible_tiers = visibleTiers;
+
   const { error } = await supabase
     .from('tier_config')
-    .update({
-      features,
-      updated_at: new Date().toISOString(),
-      updated_by: userId,
-    })
+    .update(updatePayload)
     .eq('entity_type', entityType);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -61,7 +66,7 @@ export async function PUT(request: NextRequest) {
       action: 'update_tier_config',
       entityType,
       entityId: entityType,
-      details: { features },
+      details: { features, visibleTiers },
     });
   }
 

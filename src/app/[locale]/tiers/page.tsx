@@ -103,13 +103,19 @@ function TierTable({
   );
 }
 
-/* ─── Helper: convert minTier → display array ─── */
-function tierRow(cfg: TierFeatures, key: string, numTiers: number): (boolean | string)[] {
+/* ─── Helper: convert minTier → display array, filtered by visible tiers ─── */
+function tierRow(cfg: TierFeatures, key: string, visible: number[]): (boolean | string)[] {
   const min = cfg[key] ?? 0;
-  return Array.from({ length: numTiers }, (_, i) => i >= min);
+  if (min < 0) return []; // disabled feature — empty row signals "skip"
+  return visible.map((tier) => tier >= min);
 }
 
-async function fetchTierConfig(): Promise<{ artist: TierFeatures; venue: TierFeatures }> {
+/** Check if a feature row should be shown (not disabled) */
+function isFeatureVisible(cfg: TierFeatures, key: string): boolean {
+  return (cfg[key] ?? 0) >= 0;
+}
+
+async function fetchTierConfig(): Promise<{ artist: TierFeatures; venue: TierFeatures; artistVisibleTiers: number[]; venueVisibleTiers: number[] }> {
   // Fallback defaults matching seed data
   // Philosophy: fan-facing (Tier 0) is always complete; tiers only gate creator backend tools
   const DEFAULT_ARTIST: TierFeatures = {
@@ -131,15 +137,21 @@ async function fetchTierConfig(): Promise<{ artist: TierFeatures; venue: TierFea
     booking_management: 3, revenue_analytics: 3, multi_location: 3, ical_api: 3,
   };
 
+  const ALL_TIERS = [0, 1, 2, 3];
   try {
     const supabase = await createClient();
-    const { data } = await supabase.from('tier_config').select('entity_type, features');
-    if (!data) return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE };
-    const artist = data.find((r) => r.entity_type === 'artist')?.features ?? DEFAULT_ARTIST;
-    const venue = data.find((r) => r.entity_type === 'venue')?.features ?? DEFAULT_VENUE;
-    return { artist, venue };
+    const { data } = await supabase.from('tier_config').select('entity_type, features, visible_tiers');
+    if (!data) return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE, artistVisibleTiers: ALL_TIERS, venueVisibleTiers: ALL_TIERS };
+    const artistRow = data.find((r) => r.entity_type === 'artist');
+    const venueRow = data.find((r) => r.entity_type === 'venue');
+    return {
+      artist: artistRow?.features ?? DEFAULT_ARTIST,
+      venue: venueRow?.features ?? DEFAULT_VENUE,
+      artistVisibleTiers: (artistRow?.visible_tiers as number[]) ?? ALL_TIERS,
+      venueVisibleTiers: (venueRow?.visible_tiers as number[]) ?? ALL_TIERS,
+    };
   } catch {
-    return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE };
+    return { artist: DEFAULT_ARTIST, venue: DEFAULT_VENUE, artistVisibleTiers: ALL_TIERS, venueVisibleTiers: ALL_TIERS };
   }
 }
 
@@ -149,23 +161,26 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
   const cfg = await fetchTierConfig();
 
   /* ─── Artist tiers data (dynamic from tier_config) ─── */
-  const artistColumns = [t('free'), t('claimed'), t('premium'), t('elite')];
-  const artistColors = [
+  const av = cfg.artistVisibleTiers; // visible artist tiers
+  const allArtistColumns = [t('free'), t('claimed'), t('premium'), t('elite')];
+  const allArtistColors = [
     'bg-zinc-500/20 text-zinc-400',
     'bg-blue-500/20 text-blue-400',
     'bg-amber-500/20 text-amber-400',
     'bg-purple-500/20 text-purple-400',
   ];
+  const artistColumns = av.map((i) => allArtistColumns[i]);
+  const artistColors = av.map((i) => allArtistColors[i]);
 
   // Gear row: show text labels for tiers that unlock gear_showcase / gear_unlimited
-  const gearRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+  const gearRow: (boolean | string)[] = av.map((i) => {
     if (i >= (cfg.artist.gear_unlimited ?? 2)) return t('artistGearUnlimited');
     if (i >= (cfg.artist.gear_showcase ?? 1)) return t('artistGearLimit');
     return false;
   });
 
   // EPK row: show text labels for tiers that unlock epk_basic / epk_full / epk_branded_pdf
-  const epkRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+  const epkRow: (boolean | string)[] = av.map((i) => {
     if (i >= (cfg.artist.epk_branded_pdf ?? 3)) return t('artistEPKBranded');
     if (i >= (cfg.artist.epk_full ?? 2)) return t('artistEPKFull');
     if (i >= (cfg.artist.epk_basic ?? 1)) return t('artistEPKBasic');
@@ -173,7 +188,7 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
   });
 
   // Broadcasts row: show text labels for limited / unlimited
-  const broadcastRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+  const broadcastRow: (boolean | string)[] = av.map((i) => {
     if (i >= (cfg.artist.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
     if (i >= (cfg.artist.broadcasts ?? 2)) return t('broadcastsLimited');
     return false;
@@ -183,62 +198,65 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
     {
       category: t('artistCatFanFacing'),
       items: [
-        { name: t('artistPublicProfile'), tiers: tierRow(cfg.artist, 'public_profile', 4) },
-        { name: t('artistSearchListing'), tiers: tierRow(cfg.artist, 'search_listing', 4) },
-        { name: t('artistEventAssociation'), tiers: tierRow(cfg.artist, 'event_association', 4) },
-        { name: t('artistCollaborationGraph'), tiers: tierRow(cfg.artist, 'collaboration_graph', 4) },
-        { name: t('artistFollowerCount'), tiers: tierRow(cfg.artist, 'follower_count_display', 4) },
-        { name: t('artistTagsBadges'), tiers: tierRow(cfg.artist, 'tags_badges', 4) },
-        { name: t('artistPerformanceHistory'), tiers: tierRow(cfg.artist, 'performance_history', 4) },
+        { name: t('artistPublicProfile'), tiers: tierRow(cfg.artist, 'public_profile', av) },
+        { name: t('artistSearchListing'), tiers: tierRow(cfg.artist, 'search_listing', av) },
+        { name: t('artistEventAssociation'), tiers: tierRow(cfg.artist, 'event_association', av) },
+        { name: t('artistCollaborationGraph'), tiers: tierRow(cfg.artist, 'collaboration_graph', av) },
+        { name: t('artistFollowerCount'), tiers: tierRow(cfg.artist, 'follower_count_display', av) },
+        { name: t('artistTagsBadges'), tiers: tierRow(cfg.artist, 'tags_badges', av) },
+        { name: t('artistPerformanceHistory'), tiers: tierRow(cfg.artist, 'performance_history', av) },
       ],
     },
     {
       category: t('artistCatClaimed'),
       items: [
-        { name: t('artistEditProfile'), tiers: tierRow(cfg.artist, 'edit_profile', 4) },
-        { name: t('artistVerifiedBadge'), tiers: tierRow(cfg.artist, 'verified_badge', 4) },
-        { name: t('artistCustomBio'), tiers: tierRow(cfg.artist, 'custom_bio', 4) },
-        { name: t('artistSocialLinks'), tiers: tierRow(cfg.artist, 'social_links', 4) },
-        { name: t('artistTeachingSection'), tiers: tierRow(cfg.artist, 'teaching_section', 4) },
+        { name: t('artistEditProfile'), tiers: tierRow(cfg.artist, 'edit_profile', av) },
+        { name: t('artistVerifiedBadge'), tiers: tierRow(cfg.artist, 'verified_badge', av) },
+        { name: t('artistCustomBio'), tiers: tierRow(cfg.artist, 'custom_bio', av) },
+        { name: t('artistSocialLinks'), tiers: tierRow(cfg.artist, 'social_links', av) },
+        { name: t('artistTeachingSection'), tiers: tierRow(cfg.artist, 'teaching_section', av) },
         { name: t('artistGearShowcase'), tiers: gearRow },
         { name: t('artistEPK'), tiers: epkRow },
-        { name: t('artistAnalyticsBasic'), tiers: tierRow(cfg.artist, 'analytics_basic', 4) },
+        { name: t('artistAnalyticsBasic'), tiers: tierRow(cfg.artist, 'analytics_basic', av) },
       ],
     },
     {
       category: t('artistCatPremium'),
       items: [
         { name: t('artistBroadcasts'), tiers: broadcastRow },
-        { name: t('artistFeaturedWall'), tiers: tierRow(cfg.artist, 'featured_wall', 4) },
-        { name: t('artistInbox'), tiers: tierRow(cfg.artist, 'inbox', 4) },
-        { name: t('artistAvailableForHire'), tiers: tierRow(cfg.artist, 'available_for_hire', 4) },
-        { name: t('artistAnalyticsAdvanced'), tiers: tierRow(cfg.artist, 'analytics_advanced', 4) },
-        { name: t('artistPrioritySearch'), tiers: tierRow(cfg.artist, 'priority_search', 4) },
+        { name: t('artistFeaturedWall'), tiers: tierRow(cfg.artist, 'featured_wall', av) },
+        { name: t('artistInbox'), tiers: tierRow(cfg.artist, 'inbox', av) },
+        { name: t('artistAvailableForHire'), tiers: tierRow(cfg.artist, 'available_for_hire', av) },
+        { name: t('artistAnalyticsAdvanced'), tiers: tierRow(cfg.artist, 'analytics_advanced', av) },
+        { name: t('artistPrioritySearch'), tiers: tierRow(cfg.artist, 'priority_search', av) },
       ],
     },
     {
       category: t('artistCatElite'),
       items: [
-        { name: t('artistCustomDomain'), tiers: tierRow(cfg.artist, 'custom_domain', 4) },
-        { name: t('artistCustomTheme'), tiers: tierRow(cfg.artist, 'custom_theme', 4) },
-        { name: t('artistBookingRequests'), tiers: tierRow(cfg.artist, 'booking_requests', 4) },
-        { name: t('artistSpotlight'), tiers: tierRow(cfg.artist, 'spotlight', 4) },
-        { name: t('artistDataExport'), tiers: tierRow(cfg.artist, 'data_export', 4) },
+        { name: t('artistCustomDomain'), tiers: tierRow(cfg.artist, 'custom_domain', av) },
+        { name: t('artistCustomTheme'), tiers: tierRow(cfg.artist, 'custom_theme', av) },
+        { name: t('artistBookingRequests'), tiers: tierRow(cfg.artist, 'booking_requests', av) },
+        { name: t('artistSpotlight'), tiers: tierRow(cfg.artist, 'spotlight', av) },
+        { name: t('artistDataExport'), tiers: tierRow(cfg.artist, 'data_export', av) },
       ],
     },
   ];
 
   /* ─── Venue tiers data (dynamic from tier_config) ─── */
-  const venueColumns = [t('free'), t('claimed'), t('premium'), t('elite')];
-  const venueColors = [
+  const vv = cfg.venueVisibleTiers; // visible venue tiers
+  const allVenueColumns = [t('free'), t('claimed'), t('premium'), t('elite')];
+  const allVenueColors = [
     'bg-zinc-500/20 text-zinc-400',
     'bg-blue-500/20 text-blue-400',
     'bg-amber-500/20 text-amber-400',
     'bg-purple-500/20 text-purple-400',
   ];
+  const venueColumns = vv.map((i) => allVenueColumns[i]);
+  const venueColors = vv.map((i) => allVenueColors[i]);
 
   // Venue broadcasts row: limited / unlimited
-  const venueBroadcastRow: (boolean | string)[] = Array.from({ length: 4 }, (_, i) => {
+  const venueBroadcastRow: (boolean | string)[] = vv.map((i) => {
     if (i >= (cfg.venue.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
     if (i >= (cfg.venue.broadcasts ?? 2)) return t('broadcastsLimited');
     return false;
@@ -248,45 +266,45 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
     {
       category: t('venueCatFanFacing'),
       items: [
-        { name: t('venuePublicListing'), tiers: tierRow(cfg.venue, 'public_listing', 4) },
-        { name: t('venueSearchListing'), tiers: tierRow(cfg.venue, 'search_listing', 4) },
-        { name: t('venueMapPin'), tiers: tierRow(cfg.venue, 'map_pin', 4) },
-        { name: t('venueEventShowcase'), tiers: tierRow(cfg.venue, 'event_showcase', 4) },
-        { name: t('venueVenueTags'), tiers: tierRow(cfg.venue, 'venue_tags', 4) },
+        { name: t('venuePublicListing'), tiers: tierRow(cfg.venue, 'public_listing', vv) },
+        { name: t('venueSearchListing'), tiers: tierRow(cfg.venue, 'search_listing', vv) },
+        { name: t('venueMapPin'), tiers: tierRow(cfg.venue, 'map_pin', vv) },
+        { name: t('venueEventShowcase'), tiers: tierRow(cfg.venue, 'event_showcase', vv) },
+        { name: t('venueVenueTags'), tiers: tierRow(cfg.venue, 'venue_tags', vv) },
       ],
     },
     {
       category: t('venueCatClaimed'),
       items: [
-        { name: t('venueEditProfile'), tiers: tierRow(cfg.venue, 'edit_profile', 4) },
-        { name: t('venueVerifiedBadge'), tiers: tierRow(cfg.venue, 'verified_badge', 4) },
-        { name: t('venuePhotos'), tiers: tierRow(cfg.venue, 'photos', 4) },
-        { name: t('venueDescription'), tiers: tierRow(cfg.venue, 'description', 4) },
+        { name: t('venueEditProfile'), tiers: tierRow(cfg.venue, 'edit_profile', vv) },
+        { name: t('venueVerifiedBadge'), tiers: tierRow(cfg.venue, 'verified_badge', vv) },
+        { name: t('venuePhotos'), tiers: tierRow(cfg.venue, 'photos', vv) },
+        { name: t('venueDescription'), tiers: tierRow(cfg.venue, 'description', vv) },
       ],
     },
     {
       category: t('venueCatPremium'),
       items: [
-        { name: t('venueScheduleManager'), tiers: tierRow(cfg.venue, 'schedule_manager', 4) },
-        { name: t('venueBackline'), tiers: tierRow(cfg.venue, 'backline', 4) },
-        { name: t('venueAnalyticsBasic'), tiers: tierRow(cfg.venue, 'analytics_basic', 4) },
-        { name: t('venueAnalyticsAdvanced'), tiers: tierRow(cfg.venue, 'analytics_advanced', 4) },
-        { name: t('venueInbox'), tiers: tierRow(cfg.venue, 'inbox', 4) },
-        { name: t('venueArtistDiscovery'), tiers: tierRow(cfg.venue, 'artist_discovery', 4) },
+        { name: t('venueScheduleManager'), tiers: tierRow(cfg.venue, 'schedule_manager', vv) },
+        { name: t('venueBackline'), tiers: tierRow(cfg.venue, 'backline', vv) },
+        { name: t('venueAnalyticsBasic'), tiers: tierRow(cfg.venue, 'analytics_basic', vv) },
+        { name: t('venueAnalyticsAdvanced'), tiers: tierRow(cfg.venue, 'analytics_advanced', vv) },
+        { name: t('venueInbox'), tiers: tierRow(cfg.venue, 'inbox', vv) },
+        { name: t('venueArtistDiscovery'), tiers: tierRow(cfg.venue, 'artist_discovery', vv) },
         { name: t('venueBroadcasts'), tiers: venueBroadcastRow },
-        { name: t('venuePrioritySearch'), tiers: tierRow(cfg.venue, 'priority_search', 4) },
+        { name: t('venuePrioritySearch'), tiers: tierRow(cfg.venue, 'priority_search', vv) },
       ],
     },
     {
       category: t('venueCatElite'),
       items: [
-        { name: t('venueCustomDomain'), tiers: tierRow(cfg.venue, 'custom_domain', 4) },
-        { name: t('venueCustomTheme'), tiers: tierRow(cfg.venue, 'custom_theme', 4) },
-        { name: t('venueTicketing'), tiers: tierRow(cfg.venue, 'ticketing', 4) },
-        { name: t('venueBookingManagement'), tiers: tierRow(cfg.venue, 'booking_management', 4) },
-        { name: t('venueRevenueAnalytics'), tiers: tierRow(cfg.venue, 'revenue_analytics', 4) },
-        { name: t('venueMultiLocation'), tiers: tierRow(cfg.venue, 'multi_location', 4) },
-        { name: t('venueIcalApi'), tiers: tierRow(cfg.venue, 'ical_api', 4) },
+        { name: t('venueCustomDomain'), tiers: tierRow(cfg.venue, 'custom_domain', vv) },
+        { name: t('venueCustomTheme'), tiers: tierRow(cfg.venue, 'custom_theme', vv) },
+        { name: t('venueTicketing'), tiers: tierRow(cfg.venue, 'ticketing', vv) },
+        { name: t('venueBookingManagement'), tiers: tierRow(cfg.venue, 'booking_management', vv) },
+        { name: t('venueRevenueAnalytics'), tiers: tierRow(cfg.venue, 'revenue_analytics', vv) },
+        { name: t('venueMultiLocation'), tiers: tierRow(cfg.venue, 'multi_location', vv) },
+        { name: t('venueIcalApi'), tiers: tierRow(cfg.venue, 'ical_api', vv) },
       ],
     },
   ];
@@ -318,14 +336,14 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
             {t('artistSectionDesc')}
           </p>
 
-          {/* Tier summary cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+          {/* Tier summary cards — only visible tiers */}
+          <div className={`grid grid-cols-2 sm:grid-cols-${Math.min(av.length, 4)} gap-3 mb-10`}>
             {[
-              { label: t('free'), sub: t('artistTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
-              { label: t('claimed'), sub: t('artistTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
-              { label: t('premium'), sub: t('artistTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
-              { label: t('elite'), sub: t('artistTier3Desc'), color: 'border-purple-600 bg-purple-900/25', tagColor: 'text-purple-400', tag: 'Tier 3' },
-            ].map((c) => (
+              { tier: 0, label: t('free'), sub: t('artistTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
+              { tier: 1, label: t('claimed'), sub: t('artistTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
+              { tier: 2, label: t('premium'), sub: t('artistTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
+              { tier: 3, label: t('elite'), sub: t('artistTier3Desc'), color: 'border-purple-600 bg-purple-900/25', tagColor: 'text-purple-400', tag: 'Tier 3' },
+            ].filter((c) => av.includes(c.tier)).map((c) => (
               <div key={c.tag} className={`rounded-xl border p-4 ${c.color} transition-colors`}>
                 <div className={`text-xs mb-1 tracking-wider uppercase ${c.tagColor}`}>{c.tag}</div>
                 <div className="font-semibold text-white text-lg">{c.label}</div>
@@ -337,8 +355,8 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
           <TierTable
             columns={artistColumns}
             columnColors={artistColors}
-            features={artistFeatures}
-            highlight={2}
+            features={artistFeatures.map((g) => ({ ...g, items: g.items.filter((f) => f.tiers.length > 0) })).filter((g) => g.items.length > 0)}
+            highlight={av.indexOf(2)}
           />
         </section>
       </FadeUpItem>
@@ -356,14 +374,14 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
             {t('venueSectionDesc')}
           </p>
 
-          {/* Tier summary cards */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+          {/* Tier summary cards — only visible tiers */}
+          <div className={`grid grid-cols-2 sm:grid-cols-${Math.min(vv.length, 4)} gap-3 mb-10`}>
             {[
-              { label: t('free'), sub: t('venueTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
-              { label: t('claimed'), sub: t('venueTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
-              { label: t('premium'), sub: t('venueTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
-              { label: t('elite'), sub: t('venueTier3Desc'), color: 'border-purple-600 bg-purple-900/25', tagColor: 'text-purple-400', tag: 'Tier 3' },
-            ].map((c) => (
+              { tier: 0, label: t('free'), sub: t('venueTier0Desc'), color: 'border-zinc-600 bg-zinc-800/50', tagColor: 'text-zinc-400', tag: 'Tier 0' },
+              { tier: 1, label: t('claimed'), sub: t('venueTier1Desc'), color: 'border-blue-600 bg-blue-900/30', tagColor: 'text-blue-400', tag: 'Tier 1' },
+              { tier: 2, label: t('premium'), sub: t('venueTier2Desc'), color: 'border-amber-500 bg-amber-900/25 ring-1 ring-amber-500/30', tagColor: 'text-amber-400', tag: 'Tier 2' },
+              { tier: 3, label: t('elite'), sub: t('venueTier3Desc'), color: 'border-purple-600 bg-purple-900/25', tagColor: 'text-purple-400', tag: 'Tier 3' },
+            ].filter((c) => vv.includes(c.tier)).map((c) => (
               <div key={c.tag} className={`rounded-xl border p-4 ${c.color} transition-colors`}>
                 <div className={`text-xs mb-1 tracking-wider uppercase ${c.tagColor}`}>{c.tag}</div>
                 <div className="font-semibold text-white text-lg">{c.label}</div>
@@ -375,8 +393,8 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
           <TierTable
             columns={venueColumns}
             columnColors={venueColors}
-            features={venueFeatures}
-            highlight={2}
+            features={venueFeatures.map((g) => ({ ...g, items: g.items.filter((f) => f.tiers.length > 0) })).filter((g) => g.items.length > 0)}
+            highlight={vv.indexOf(2)}
           />
         </section>
       </FadeUpItem>

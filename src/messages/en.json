@@ -349,6 +349,8 @@
     "hiddenFeatures": "Hidden Features",
     "hiddenMsg": "Not shown on frontend",
     "featureDisabledHint": "Feature is hidden — click any tier to re-enable",
+    "tierHideHint": "Click to hide this tier from the public page",
+    "tierShowHint": "Click to show this tier on the public page",
     "cancel": "Cancel",
     "ac_fanFacing": "Fan-Facing (Always Visible)",
     "ac_claimed": "Claimed (Edit Rights)",
