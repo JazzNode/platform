@@ -307,6 +307,24 @@
     "translationFailed": "내용이 저장되었지만 번역에 실패했습니다. 다른 언어는 업데이트되지 않았습니다.",
     "updateFailed": "업데이트 실패"
   },
+  "adminHQ": {
+    "overview": "개요",
+    "claims": "소유권 심사",
+    "dashboardTitle": "JazzNode HQ",
+    "dashboardDescription": "플랫폼 개요 및 관리 도구.",
+    "statArtists": "아티스트",
+    "statVenues": "공연장",
+    "statEvents": "이벤트",
+    "statCities": "도시",
+    "statUsers": "사용자",
+    "statPendingClaims": "대기 중",
+    "statApprovedClaims": "승인됨",
+    "statFollows": "팔로우",
+    "recentClaims": "최근 소유권 요청",
+    "recentActivity": "최근 활동",
+    "viewAll": "전체 보기",
+    "noClaims": "최근 소유권 요청이 없습니다."
+  },
   "claim": {
     "claimPage": "인증 신청",
     "claimAgain": "재신청",

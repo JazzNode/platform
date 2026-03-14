@@ -307,6 +307,24 @@
     "translationFailed": "Konten tersimpan. Terjemahan gagal — bahasa lain belum diperbarui.",
     "updateFailed": "Pembaruan gagal"
   },
+  "adminHQ": {
+    "overview": "Ringkasan",
+    "claims": "Klaim",
+    "dashboardTitle": "JazzNode HQ",
+    "dashboardDescription": "Ringkasan platform dan alat admin.",
+    "statArtists": "Artis",
+    "statVenues": "Tempat",
+    "statEvents": "Acara",
+    "statCities": "Kota",
+    "statUsers": "Pengguna",
+    "statPendingClaims": "Menunggu",
+    "statApprovedClaims": "Disetujui",
+    "statFollows": "Pengikut",
+    "recentClaims": "Klaim Terbaru",
+    "recentActivity": "Aktivitas Terbaru",
+    "viewAll": "Lihat Semua",
+    "noClaims": "Tidak ada klaim terbaru."
+  },
   "claim": {
     "claimPage": "Klaim",
     "claimAgain": "Klaim Lagi",

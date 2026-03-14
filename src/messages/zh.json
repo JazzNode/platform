@@ -311,6 +311,24 @@
     "translationFailed": "內容已儲存，但翻譯失敗 — 其他語言未更新。",
     "updateFailed": "更新失敗"
   },
+  "adminHQ": {
+    "overview": "總覽",
+    "claims": "認領審核",
+    "dashboardTitle": "JazzNode HQ",
+    "dashboardDescription": "平台總覽與管理工具。",
+    "statArtists": "藝人",
+    "statVenues": "場地",
+    "statEvents": "活動",
+    "statCities": "城市",
+    "statUsers": "用戶",
+    "statPendingClaims": "待審認領",
+    "statApprovedClaims": "已通過認領",
+    "statFollows": "追蹤數",
+    "recentClaims": "近期認領",
+    "recentActivity": "近期操作",
+    "viewAll": "查看全部",
+    "noClaims": "目前沒有近期認領。"
+  },
   "claim": {
     "claimPage": "認領",
     "claimAgain": "重新認領",

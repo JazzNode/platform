@@ -48,11 +48,12 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   const isAdmin = !!(profile?.role === 'admin' && adminModeEnabled);
 
   // Parse preview tiers from viewMode
-  const previewArtistTier = viewMode.startsWith('artist-tier')
-    ? parseInt(viewMode.replace('artist-tier', ''), 10)
+  // Admin mode → max tier (all features unlocked)
+  const previewArtistTier = viewMode === 'admin' ? 3
+    : viewMode.startsWith('artist-tier') ? parseInt(viewMode.replace('artist-tier', ''), 10)
     : null;
-  const previewVenueTier = viewMode.startsWith('venue-tier')
-    ? parseInt(viewMode.replace('venue-tier', ''), 10)
+  const previewVenueTier = viewMode === 'admin' ? 2
+    : viewMode.startsWith('venue-tier') ? parseInt(viewMode.replace('venue-tier', ''), 10)
     : null;
 
   // Keep Supabase access token in sync for API calls

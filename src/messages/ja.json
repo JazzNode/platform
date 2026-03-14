@@ -307,6 +307,24 @@
     "translationFailed": "内容は保存されましたが、翻訳に失敗しました。他の言語は更新されていません。",
     "updateFailed": "更新に失敗しました"
   },
+  "adminHQ": {
+    "overview": "概要",
+    "claims": "申請審査",
+    "dashboardTitle": "JazzNode HQ",
+    "dashboardDescription": "プラットフォーム概要と管理ツール。",
+    "statArtists": "アーティスト",
+    "statVenues": "会場",
+    "statEvents": "イベント",
+    "statCities": "都市",
+    "statUsers": "ユーザー",
+    "statPendingClaims": "審査中",
+    "statApprovedClaims": "承認済み",
+    "statFollows": "フォロー",
+    "recentClaims": "最近の申請",
+    "recentActivity": "最近の操作",
+    "viewAll": "すべて表示",
+    "noClaims": "最近の申請はありません。"
+  },
   "claim": {
     "claimPage": "認証申請",
     "claimAgain": "再申請",

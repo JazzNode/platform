@@ -184,6 +184,21 @@ export default function Header() {
             ))}
           </div>
         )}
+        {profile?.role === 'admin' && (
+          <div className="border-t border-[var(--border)] py-1">
+            <button
+              onClick={() => { router.push(`/${locale}/admin`); setUserMenuOpen(false); }}
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+            >
+              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+              <span>JazzNode HQ</span>
+            </button>
+          </div>
+        )}
         <div className={hasClaimed ? 'border-t border-[var(--border)]' : ''}>
           <button
             onClick={() => { signOut(); setUserMenuOpen(false); }}

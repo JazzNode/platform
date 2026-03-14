@@ -311,6 +311,24 @@
     "translationFailed": "Content saved. Translation failed — other languages were not updated.",
     "updateFailed": "Update failed"
   },
+  "adminHQ": {
+    "overview": "Overview",
+    "claims": "Claims",
+    "dashboardTitle": "JazzNode HQ",
+    "dashboardDescription": "Platform overview and admin tools.",
+    "statArtists": "Artists",
+    "statVenues": "Venues",
+    "statEvents": "Events",
+    "statCities": "Cities",
+    "statUsers": "Users",
+    "statPendingClaims": "Pending Claims",
+    "statApprovedClaims": "Approved Claims",
+    "statFollows": "Follows",
+    "recentClaims": "Recent Claims",
+    "recentActivity": "Recent Activity",
+    "viewAll": "View All",
+    "noClaims": "No recent claims."
+  },
   "claim": {
     "claimPage": "Claim",
     "claimAgain": "Claim Again",
