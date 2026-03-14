@@ -89,6 +89,22 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    // Upgrade entity tier to 1 (Claimed) if currently 0
+    const targetTable = claim.target_type === 'artist' ? 'artists' : 'venues';
+    const targetPK = claim.target_type === 'artist' ? 'artist_id' : 'venue_id';
+    const { data: entity } = await supabase
+      .from(targetTable)
+      .select('tier')
+      .eq(targetPK, claim.target_id)
+      .single();
+
+    if (entity && (!entity.tier || entity.tier === 0)) {
+      await supabase
+        .from(targetTable)
+        .update({ tier: 1 })
+        .eq(targetPK, claim.target_id);
+    }
+
     // Upgrade user role to 'artist' if currently 'member'
     if (claim.user_id && claim.target_type === 'artist') {
       const { data: profile } = await supabase
