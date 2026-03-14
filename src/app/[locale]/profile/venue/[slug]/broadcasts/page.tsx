@@ -11,7 +11,7 @@ import FadeUp from '@/components/animations/FadeUp';
 export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const { setShowComingSoon } = useAuth();
-  const { previewVenueTier } = useAdmin();
+  const { previewVenueTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
   const [slug, setSlug] = useState('');
@@ -42,7 +42,7 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
 
   const effectiveTier = previewVenueTier ?? tier;
 
-  if (!isUnlocked('venue', 'broadcasts', effectiveTier)) {
+  if (!isUnlocked('venue', 'broadcasts', effectiveTier, adminModeEnabled)) {
     return (
       <div className="space-y-6">
         <FadeUp>

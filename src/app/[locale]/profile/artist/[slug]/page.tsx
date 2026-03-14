@@ -23,7 +23,7 @@ interface UnreadStats {
 export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
   const { user, loading, setShowComingSoon } = useAuth();
-  const { previewArtistTier } = useAdmin();
+  const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
   const [slug, setSlug] = useState('');
@@ -142,7 +142,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
   }
 
   const effectiveTier = previewArtistTier ?? tier;
-  const analyticsLocked = !isUnlocked('artist', 'analytics_basic', effectiveTier);
+  const analyticsLocked = !isUnlocked('artist', 'analytics_basic', effectiveTier, adminModeEnabled);
   const stats = fanStats || { totalFans: 0, newFansThisMonth: 0, cityBreakdown: [], dailyTrend: [] };
 
   return (

@@ -23,7 +23,7 @@ const GEAR_TYPES = ['instrument', 'amp', 'effect', 'accessory', 'other'] as cons
 export default function ArtistGearPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
   const { user, setShowComingSoon } = useAuth();
-  const { previewArtistTier } = useAdmin();
+  const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
   const [slug, setSlug] = useState('');
@@ -93,7 +93,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
   };
 
   const effectiveTier = previewArtistTier ?? tier;
-  const hasUnlimitedGear = isUnlocked('artist', 'gear_unlimited', effectiveTier);
+  const hasUnlimitedGear = isUnlocked('artist', 'gear_unlimited', effectiveTier, adminModeEnabled);
   const maxItems = hasUnlimitedGear ? Infinity : 5;
 
   if (loading) {

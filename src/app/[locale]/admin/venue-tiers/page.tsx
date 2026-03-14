@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
-import type { TierFeatures } from '@/components/TierConfigProvider';
+import { TIER_DISABLED, type TierFeatures } from '@/components/TierConfigProvider';
 
 const TIER_NAMES = ['Free', 'Claimed', 'Premium', 'Elite'];
 const TIER_COLORS = [
@@ -86,8 +86,12 @@ export default function VenueTiersPage() {
   const handleTierClick = (featureKey: string, tierIndex: number) => {
     setFeatures((prev) => {
       const current = prev[featureKey] ?? 0;
-      const newVal = current === tierIndex ? tierIndex + 1 : tierIndex;
-      return { ...prev, [featureKey]: Math.min(newVal, 3) }; // max tier 3 for venues
+      if (current < 0) return { ...prev, [featureKey]: tierIndex };
+      if (current === tierIndex) {
+        if (tierIndex === 3) return { ...prev, [featureKey]: TIER_DISABLED };
+        return { ...prev, [featureKey]: tierIndex + 1 };
+      }
+      return { ...prev, [featureKey]: tierIndex };
     });
     setDirty(true);
     setSaved(false);
@@ -200,14 +204,22 @@ export default function VenueTiersPage() {
                 </tr>
                 {VENUE_FEATURES.filter((f) => f.categoryKey === cat).map((feat, fi) => {
                   const minTier = features[feat.key] ?? 0;
+                  const disabled = minTier < 0;
                   return (
                     <tr
                       key={feat.key}
-                      className={`${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
+                      className={`${disabled ? 'opacity-40' : ''} ${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
                     >
-                      <td className="py-3 px-4 text-sm text-[var(--foreground)]">{t(feat.labelKey)}</td>
+                      <td className="py-3 px-4 text-sm text-[var(--foreground)]">
+                        <span className={disabled ? 'line-through' : ''}>{t(feat.labelKey)}</span>
+                        {disabled && (
+                          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-red-500/15 text-red-400 border border-red-500/20">
+                            {t('hidden')}
+                          </span>
+                        )}
+                      </td>
                       {TIER_NAMES.map((_, tierIdx) => {
-                        const unlocked = tierIdx >= minTier;
+                        const unlocked = !disabled && tierIdx >= minTier;
                         return (
                           <td key={tierIdx} className="py-3 px-2 text-center">
                             <button
@@ -215,9 +227,11 @@ export default function VenueTiersPage() {
                               className={`w-8 h-8 rounded-lg transition-all inline-flex items-center justify-center ${
                                 unlocked
                                   ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
-                                  : 'bg-zinc-800/50 text-zinc-600 hover:bg-zinc-700/50 border border-zinc-700/30'
+                                  : disabled
+                                    ? 'bg-red-500/10 text-red-400/50 hover:bg-red-500/20 border border-red-500/20'
+                                    : 'bg-zinc-800/50 text-zinc-600 hover:bg-zinc-700/50 border border-zinc-700/30'
                               }`}
-                              title={unlocked ? `Unlocked at Tier ${minTier}` : `Locked (requires Tier ${minTier})`}
+                              title={disabled ? t('featureDisabledHint') : unlocked ? `Unlocked at Tier ${minTier}` : `Locked (requires Tier ${minTier})`}
                             >
                               {unlocked ? (
                                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -246,6 +260,24 @@ export default function VenueTiersPage() {
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 space-y-4">
         <h2 className="font-serif text-xl font-bold">{t('lockBehaviorPreview')}</h2>
         <p className="text-sm text-[var(--muted-foreground)]">{t('lockBehaviorDesc')}</p>
+
+        {/* Hidden / disabled features */}
+        {VENUE_FEATURES.filter((f) => (features[f.key] ?? 0) < 0).length > 0 && (
+          <div className="space-y-3 pb-3 border-b border-[var(--border)]">
+            <p className="text-xs uppercase tracking-widest text-red-400 font-semibold">{t('hiddenFeatures')}</p>
+            {VENUE_FEATURES.filter((f) => (features[f.key] ?? 0) < 0).map((feat) => (
+              <div key={feat.key} className="flex items-center gap-3 text-sm">
+                <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-red-500/15 text-red-400 border border-red-500/20">
+                  {t('hidden')}
+                </span>
+                <span className="text-[var(--muted-foreground)] line-through">{t(feat.labelKey)}</span>
+                <span className="text-[var(--muted-foreground)] text-xs ml-auto">{t('hiddenMsg')}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Tier-locked features */}
         <div className="space-y-3">
           {VENUE_FEATURES.filter((f) => (features[f.key] ?? 0) > 0).map((feat) => {
             const min = features[feat.key] ?? 0;

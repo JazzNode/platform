@@ -4,15 +4,20 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 export type TierFeatures = Record<string, number>;
 
+/** Sentinel value: feature is disabled / hidden from all tiers */
+export const TIER_DISABLED = -1;
+
 interface TierConfigContextType {
-  /** Artist feature config: feature_key → min tier required */
+  /** Artist feature config: feature_key → min tier required (-1 = disabled) */
   artistFeatures: TierFeatures;
-  /** Venue feature config: feature_key → min tier required */
+  /** Venue feature config: feature_key → min tier required (-1 = disabled) */
   venueFeatures: TierFeatures;
-  /** Check if a feature is unlocked for a given entity tier */
-  isUnlocked: (entityType: 'artist' | 'venue', featureKey: string, currentTier: number) => boolean;
-  /** Get the min tier required for a feature */
+  /** Check if a feature is unlocked for a given entity tier. Pass adminBypass=true to bypass disabled state. */
+  isUnlocked: (entityType: 'artist' | 'venue', featureKey: string, currentTier: number, adminBypass?: boolean) => boolean;
+  /** Get the min tier required for a feature (-1 = disabled) */
   minTier: (entityType: 'artist' | 'venue', featureKey: string) => number;
+  /** Check if a feature is enabled (not disabled via dashboard) */
+  isFeatureEnabled: (entityType: 'artist' | 'venue', featureKey: string) => boolean;
   /** Whether config has loaded */
   loaded: boolean;
 }
@@ -69,10 +74,11 @@ export default function TierConfigProvider({ children }: { children: React.React
   }, []);
 
   const isUnlocked = useCallback(
-    (entityType: 'artist' | 'venue', featureKey: string, currentTier: number) => {
+    (entityType: 'artist' | 'venue', featureKey: string, currentTier: number, adminBypass = false) => {
       const features = entityType === 'artist' ? artistFeatures : venueFeatures;
       const required = features[featureKey];
       if (required === undefined) return true; // unknown feature → allow
+      if (required < 0) return adminBypass; // disabled feature — only admin can see
       return currentTier >= required;
     },
     [artistFeatures, venueFeatures],
@@ -86,8 +92,17 @@ export default function TierConfigProvider({ children }: { children: React.React
     [artistFeatures, venueFeatures],
   );
 
+  const isFeatureEnabled = useCallback(
+    (entityType: 'artist' | 'venue', featureKey: string) => {
+      const features = entityType === 'artist' ? artistFeatures : venueFeatures;
+      const required = features[featureKey];
+      return required === undefined || required >= 0;
+    },
+    [artistFeatures, venueFeatures],
+  );
+
   return (
-    <TierConfigContext.Provider value={{ artistFeatures, venueFeatures, isUnlocked, minTier, loaded }}>
+    <TierConfigContext.Provider value={{ artistFeatures, venueFeatures, isUnlocked, minTier, isFeatureEnabled, loaded }}>
       {children}
     </TierConfigContext.Provider>
   );

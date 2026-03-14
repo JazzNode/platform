@@ -22,7 +22,7 @@ interface Broadcast {
 export default function BroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
   const { user, loading, setShowComingSoon } = useAuth();
-  const { previewArtistTier } = useAdmin();
+  const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked, minTier } = useTierConfig();
 
   const [slug, setSlug] = useState('');
@@ -166,7 +166,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
   const broadcastMinTier = minTier('artist', 'broadcasts');
 
   // Tier gate — uses dynamic config
-  if (!isUnlocked('artist', 'broadcasts', effectiveTier)) {
+  if (!isUnlocked('artist', 'broadcasts', effectiveTier, adminModeEnabled)) {
     return (
       <div className="space-y-6">
         <FadeUp>
