@@ -101,6 +101,8 @@ export interface Venue {
   ticketing_mode_list?: string[];
   ticketing_mode_primary?: string;
   business_hour?: string;
+  // Tier
+  tier?: number;
 }
 
 export interface Artist {
@@ -296,6 +298,7 @@ interface VenueRow {
   timezone: string | null;
   data_source: string;
   updated_by: string | null;
+  tier: number;
 }
 
 interface ArtistRow {

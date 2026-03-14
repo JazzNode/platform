@@ -5,16 +5,18 @@ import { useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import type { TierFeatures } from '@/components/TierConfigProvider';
 
-const TIER_NAMES = ['Free', 'Claimed', 'Premium'];
+const TIER_NAMES = ['Free', 'Claimed', 'Premium', 'Elite'];
 const TIER_COLORS = [
   'text-zinc-400',
   'text-blue-400',
   'text-amber-400',
+  'text-purple-400',
 ];
 const TIER_BG = [
   'bg-zinc-500/10',
   'bg-blue-500/10',
   'bg-amber-500/10',
+  'bg-purple-500/10',
 ];
 
 interface FeatureKey {
@@ -24,26 +26,35 @@ interface FeatureKey {
 }
 
 const VENUE_FEATURES: FeatureKey[] = [
-  // Profile & Identity
-  { key: 'public_listing', labelKey: 'vf_publicListing', categoryKey: 'vc_profile' },
-  { key: 'edit_profile', labelKey: 'vf_editProfile', categoryKey: 'vc_profile' },
-  { key: 'verified_badge', labelKey: 'vf_verifiedBadge', categoryKey: 'vc_profile' },
-  { key: 'photos', labelKey: 'vf_photos', categoryKey: 'vc_profile' },
-  { key: 'description', labelKey: 'vf_description', categoryKey: 'vc_profile' },
-  // Discovery & Visibility
-  { key: 'search_listing', labelKey: 'vf_searchListing', categoryKey: 'vc_discovery' },
-  { key: 'map_pin', labelKey: 'vf_mapPin', categoryKey: 'vc_discovery' },
-  { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_discovery' },
-  { key: 'event_showcase', labelKey: 'vf_eventShowcase', categoryKey: 'vc_discovery' },
-  // Tools & Analytics
-  { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_tools' },
-  { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_tools' },
-  { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_tools' },
-  { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_tools' },
-  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_tools' },
-  // Business & Operations
-  { key: 'booking_management', labelKey: 'vf_bookingManagement', categoryKey: 'vc_business' },
-  { key: 'artist_discovery', labelKey: 'vf_artistDiscovery', categoryKey: 'vc_business' },
+  // Tier 0 — Fan-facing (always visible)
+  { key: 'public_listing', labelKey: 'vf_publicListing', categoryKey: 'vc_fanFacing' },
+  { key: 'search_listing', labelKey: 'vf_searchListing', categoryKey: 'vc_fanFacing' },
+  { key: 'map_pin', labelKey: 'vf_mapPin', categoryKey: 'vc_fanFacing' },
+  { key: 'event_showcase', labelKey: 'vf_eventShowcase', categoryKey: 'vc_fanFacing' },
+  { key: 'venue_tags', labelKey: 'vf_venueTags', categoryKey: 'vc_fanFacing' },
+  // Tier 1 — Claimed (edit rights + identity)
+  { key: 'edit_profile', labelKey: 'vf_editProfile', categoryKey: 'vc_claimed' },
+  { key: 'verified_badge', labelKey: 'vf_verifiedBadge', categoryKey: 'vc_claimed' },
+  { key: 'photos', labelKey: 'vf_photos', categoryKey: 'vc_claimed' },
+  { key: 'description', labelKey: 'vf_description', categoryKey: 'vc_claimed' },
+  // Tier 2 — Premium (operational tools)
+  { key: 'schedule_manager', labelKey: 'vf_scheduleManager', categoryKey: 'vc_premium' },
+  { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_premium' },
+  { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_premium' },
+  { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_premium' },
+  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_premium' },
+  { key: 'artist_discovery', labelKey: 'vf_artistDiscovery', categoryKey: 'vc_premium' },
+  { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_premium' },
+  { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_premium' },
+  // Tier 3 — Elite (business engine)
+  { key: 'custom_domain', labelKey: 'vf_customDomain', categoryKey: 'vc_elite' },
+  { key: 'custom_theme', labelKey: 'vf_customTheme', categoryKey: 'vc_elite' },
+  { key: 'ticketing', labelKey: 'vf_ticketing', categoryKey: 'vc_elite' },
+  { key: 'broadcasts_unlimited', labelKey: 'vf_broadcastsUnlimited', categoryKey: 'vc_elite' },
+  { key: 'booking_management', labelKey: 'vf_bookingManagement', categoryKey: 'vc_elite' },
+  { key: 'revenue_analytics', labelKey: 'vf_revenueAnalytics', categoryKey: 'vc_elite' },
+  { key: 'multi_location', labelKey: 'vf_multiLocation', categoryKey: 'vc_elite' },
+  { key: 'ical_api', labelKey: 'vf_icalApi', categoryKey: 'vc_elite' },
 ];
 
 export default function VenueTiersPage() {
@@ -76,7 +87,7 @@ export default function VenueTiersPage() {
     setFeatures((prev) => {
       const current = prev[featureKey] ?? 0;
       const newVal = current === tierIndex ? tierIndex + 1 : tierIndex;
-      return { ...prev, [featureKey]: Math.min(newVal, 2) }; // max tier 2 for venues
+      return { ...prev, [featureKey]: Math.min(newVal, 3) }; // max tier 3 for venues
     });
     setDirty(true);
     setSaved(false);
@@ -161,10 +172,10 @@ export default function VenueTiersPage() {
 
       {/* Interactive Table */}
       <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <table className="w-full min-w-[540px] border-collapse">
+        <table className="w-full min-w-[640px] border-collapse">
           <thead>
             <tr>
-              <th className="text-left py-4 px-4 text-sm text-[var(--muted-foreground)] font-normal w-[45%]">
+              <th className="text-left py-4 px-4 text-sm text-[var(--muted-foreground)] font-normal w-[40%]">
                 {t('feature')}
               </th>
               {TIER_NAMES.map((name, i) => (
@@ -181,7 +192,7 @@ export default function VenueTiersPage() {
               <>
                 <tr key={`cat-${cat}`}>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="pt-6 pb-2 px-4 text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-semibold border-b border-[var(--border)]"
                   >
                     {t(cat)}
@@ -245,7 +256,7 @@ export default function VenueTiersPage() {
                 </span>
                 <span className="text-[var(--foreground)]">{t(feat.labelKey)}</span>
                 <span className="text-[var(--muted-foreground)] text-xs ml-auto">
-                  {min === 1 ? t('lockMsgClaim') : t('lockMsgPremium')}
+                  {min === 1 ? t('lockMsgClaim') : min === 2 ? t('lockMsgPremium') : t('lockMsgElite')}
                 </span>
               </div>
             );

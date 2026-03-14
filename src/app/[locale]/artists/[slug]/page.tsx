@@ -361,7 +361,19 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   Master
                 </span>
               )}
+              {f.verification_status === 'Verified' && (
+                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
+                  &#10003; {t('verified')}
+                </span>
+              )}
             </div>
+
+            {/* Unclaimed notice */}
+            {(!f.tier || f.tier === 0) && f.verification_status !== 'Verified' && (
+              <p className="text-xs text-[#8A8578] italic">
+                {t('unclaimedArtistNotice')}
+              </p>
+            )}
 
             {/* Bio */}
             <EditableContent

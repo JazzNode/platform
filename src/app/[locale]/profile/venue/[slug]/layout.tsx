@@ -175,7 +175,7 @@ export default function VenueDashboardLayout({
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{venueName}</p>
                 <p className="text-xs text-[var(--muted-foreground)]">
-                  {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+                  {effectiveTier === 3 ? 'Elite' : effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
                 </p>
               </div>
             </div>
@@ -225,8 +225,8 @@ export default function VenueDashboardLayout({
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--foreground)]">{venueName}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span className={effectiveTier === 2 ? 'text-[var(--color-gold)]' : ''}>
-                {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+              <span className={effectiveTier >= 2 ? 'text-[var(--color-gold)]' : ''}>
+                {effectiveTier === 3 ? 'Elite' : effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
               </span>
             </p>
           </div>

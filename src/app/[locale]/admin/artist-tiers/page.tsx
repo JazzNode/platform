@@ -26,28 +26,40 @@ interface FeatureKey {
 }
 
 const ARTIST_FEATURES: FeatureKey[] = [
-  // Profile & Identity
-  { key: 'public_profile', labelKey: 'af_publicProfile', categoryKey: 'ac_profile' },
-  { key: 'edit_profile', labelKey: 'af_editProfile', categoryKey: 'ac_profile' },
-  { key: 'verified_badge', labelKey: 'af_verifiedBadge', categoryKey: 'ac_profile' },
-  { key: 'custom_bio', labelKey: 'af_customBio', categoryKey: 'ac_profile' },
-  { key: 'social_links', labelKey: 'af_socialLinks', categoryKey: 'ac_profile' },
-  // Discovery & Visibility
-  { key: 'search_listing', labelKey: 'af_searchListing', categoryKey: 'ac_discovery' },
-  { key: 'event_association', labelKey: 'af_eventAssociation', categoryKey: 'ac_discovery' },
-  { key: 'priority_search', labelKey: 'af_prioritySearch', categoryKey: 'ac_discovery' },
-  // Tools & Analytics
-  { key: 'gear_showcase', labelKey: 'af_gearLimited', categoryKey: 'ac_tools' },
-  { key: 'gear_unlimited', labelKey: 'af_gearUnlimited', categoryKey: 'ac_tools' },
-  { key: 'epk_basic', labelKey: 'af_epkBasic', categoryKey: 'ac_tools' },
-  { key: 'epk_full', labelKey: 'af_epkFull', categoryKey: 'ac_tools' },
-  { key: 'analytics_basic', labelKey: 'af_analyticsBasic', categoryKey: 'ac_tools' },
-  { key: 'analytics_advanced', labelKey: 'af_analyticsAdvanced', categoryKey: 'ac_tools' },
-  { key: 'broadcasts', labelKey: 'af_broadcasts', categoryKey: 'ac_tools' },
-  { key: 'inbox', labelKey: 'af_inbox', categoryKey: 'ac_tools' },
-  // Business & Bookings
-  { key: 'available_for_hire', labelKey: 'af_availableForHire', categoryKey: 'ac_business' },
-  { key: 'booking_requests', labelKey: 'af_bookingRequests', categoryKey: 'ac_business' },
+  // Tier 0 — Fan-facing (always visible)
+  { key: 'public_profile', labelKey: 'af_publicProfile', categoryKey: 'ac_fanFacing' },
+  { key: 'search_listing', labelKey: 'af_searchListing', categoryKey: 'ac_fanFacing' },
+  { key: 'event_association', labelKey: 'af_eventAssociation', categoryKey: 'ac_fanFacing' },
+  { key: 'collaboration_graph', labelKey: 'af_collaborationGraph', categoryKey: 'ac_fanFacing' },
+  { key: 'follower_count_display', labelKey: 'af_followerCountDisplay', categoryKey: 'ac_fanFacing' },
+  { key: 'tags_badges', labelKey: 'af_tagsBadges', categoryKey: 'ac_fanFacing' },
+  { key: 'performance_history', labelKey: 'af_performanceHistory', categoryKey: 'ac_fanFacing' },
+  // Tier 1 — Claimed (edit rights + identity)
+  { key: 'edit_profile', labelKey: 'af_editProfile', categoryKey: 'ac_claimed' },
+  { key: 'verified_badge', labelKey: 'af_verifiedBadge', categoryKey: 'ac_claimed' },
+  { key: 'custom_bio', labelKey: 'af_customBio', categoryKey: 'ac_claimed' },
+  { key: 'social_links', labelKey: 'af_socialLinks', categoryKey: 'ac_claimed' },
+  { key: 'teaching_section', labelKey: 'af_teachingSection', categoryKey: 'ac_claimed' },
+  { key: 'gear_showcase', labelKey: 'af_gearLimited', categoryKey: 'ac_claimed' },
+  { key: 'epk_basic', labelKey: 'af_epkBasic', categoryKey: 'ac_claimed' },
+  { key: 'analytics_basic', labelKey: 'af_analyticsBasic', categoryKey: 'ac_claimed' },
+  // Tier 2 — Premium (proactive reach)
+  { key: 'broadcasts', labelKey: 'af_broadcasts', categoryKey: 'ac_premium' },
+  { key: 'featured_wall', labelKey: 'af_featuredWall', categoryKey: 'ac_premium' },
+  { key: 'inbox', labelKey: 'af_inbox', categoryKey: 'ac_premium' },
+  { key: 'available_for_hire', labelKey: 'af_availableForHire', categoryKey: 'ac_premium' },
+  { key: 'analytics_advanced', labelKey: 'af_analyticsAdvanced', categoryKey: 'ac_premium' },
+  { key: 'epk_full', labelKey: 'af_epkFull', categoryKey: 'ac_premium' },
+  { key: 'gear_unlimited', labelKey: 'af_gearUnlimited', categoryKey: 'ac_premium' },
+  { key: 'priority_search', labelKey: 'af_prioritySearch', categoryKey: 'ac_premium' },
+  // Tier 3 — Elite (brand independence)
+  { key: 'custom_domain', labelKey: 'af_customDomain', categoryKey: 'ac_elite' },
+  { key: 'custom_theme', labelKey: 'af_customTheme', categoryKey: 'ac_elite' },
+  { key: 'broadcasts_unlimited', labelKey: 'af_broadcastsUnlimited', categoryKey: 'ac_elite' },
+  { key: 'booking_requests', labelKey: 'af_bookingRequests', categoryKey: 'ac_elite' },
+  { key: 'epk_branded_pdf', labelKey: 'af_epkBrandedPdf', categoryKey: 'ac_elite' },
+  { key: 'spotlight', labelKey: 'af_spotlight', categoryKey: 'ac_elite' },
+  { key: 'data_export', labelKey: 'af_dataExport', categoryKey: 'ac_elite' },
 ];
 
 export default function ArtistTiersPage() {

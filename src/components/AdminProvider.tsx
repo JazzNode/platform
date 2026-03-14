@@ -7,10 +7,10 @@ import { useAuth } from './AuthProvider';
 export type ViewMode =
   | 'admin'
   | 'artist-tier0' | 'artist-tier1' | 'artist-tier2' | 'artist-tier3'
-  | 'venue-tier0' | 'venue-tier1' | 'venue-tier2';
+  | 'venue-tier0' | 'venue-tier1' | 'venue-tier2' | 'venue-tier3';
 
 const ARTIST_TIER_CYCLE: ViewMode[] = ['admin', 'artist-tier0', 'artist-tier1', 'artist-tier2', 'artist-tier3'];
-const VENUE_TIER_CYCLE: ViewMode[] = ['admin', 'venue-tier0', 'venue-tier1', 'venue-tier2'];
+const VENUE_TIER_CYCLE: ViewMode[] = ['admin', 'venue-tier0', 'venue-tier1', 'venue-tier2', 'venue-tier3'];
 
 interface AdminContextType {
   isAdmin: boolean;
@@ -52,7 +52,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   const previewArtistTier = viewMode === 'admin' ? 3
     : viewMode.startsWith('artist-tier') ? parseInt(viewMode.replace('artist-tier', ''), 10)
     : null;
-  const previewVenueTier = viewMode === 'admin' ? 2
+  const previewVenueTier = viewMode === 'admin' ? 3
     : viewMode.startsWith('venue-tier') ? parseInt(viewMode.replace('venue-tier', ''), 10)
     : null;
 

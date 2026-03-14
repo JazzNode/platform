@@ -12,6 +12,7 @@ const MODE_LABELS: Record<ViewMode, string> = {
   'venue-tier0': 'Venue T0',
   'venue-tier1': 'Venue T1',
   'venue-tier2': 'Venue T2',
+  'venue-tier3': 'Venue T3',
 };
 
 const MODE_COLORS: Record<ViewMode, string> = {
@@ -23,6 +24,7 @@ const MODE_COLORS: Record<ViewMode, string> = {
   'venue-tier0': 'bg-zinc-500/20 text-zinc-400 border-zinc-500/30 hover:bg-zinc-500/30',
   'venue-tier1': 'bg-blue-500/20 text-blue-400 border-blue-500/30 hover:bg-blue-500/30',
   'venue-tier2': 'bg-amber-500/20 text-amber-400 border-amber-500/30 hover:bg-amber-500/30',
+  'venue-tier3': 'bg-purple-500/20 text-purple-400 border-purple-500/30 hover:bg-purple-500/30',
 };
 
 export default function AdminBadge() {

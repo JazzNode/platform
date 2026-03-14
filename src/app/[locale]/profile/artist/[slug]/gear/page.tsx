@@ -94,7 +94,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
 
   const effectiveTier = previewArtistTier ?? tier;
   const hasUnlimitedGear = isUnlocked('artist', 'gear_unlimited', effectiveTier);
-  const maxItems = hasUnlimitedGear ? Infinity : 3;
+  const maxItems = hasUnlimitedGear ? Infinity : 5;
 
   if (loading) {
     return (

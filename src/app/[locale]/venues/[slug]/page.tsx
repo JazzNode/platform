@@ -234,7 +234,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             )}
           </div>
 
-          
+          {/* Unclaimed notice */}
+          {(!f.tier || f.tier === 0) && f.verification_status !== 'Verified' && (
+            <p className="text-xs text-[#8A8578] italic">
+              {t('unclaimedVenueNotice')}
+            </p>
+          )}
+
           {/* Vibe Check / Practical Info */}
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
             {f.payment_method?.map((pm) => (
