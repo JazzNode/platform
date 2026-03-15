@@ -101,7 +101,12 @@ export async function PATCH(request: NextRequest) {
     if (entity && (!entity.tier || entity.tier === 0)) {
       await supabase
         .from(targetTable)
-        .update({ tier: 1 })
+        .update({ tier: 1, verification_status: 'Claimed' })
+        .eq(targetPK, claim.target_id);
+    } else {
+      await supabase
+        .from(targetTable)
+        .update({ verification_status: 'Claimed' })
         .eq(targetPK, claim.target_id);
     }
 
