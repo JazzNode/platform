@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
         throw new Error(`Supabase update failed: ${updateError.message}`);
       }
 
-      revalidateTag(ENTITY_TAG[entityType]);
+      revalidateTag(ENTITY_TAG[entityType], { expire: 0 });
 
       writeAuditLog({
         adminUserId: userId,
@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
       throw new Error(`Supabase update failed: ${updateError.message}`);
     }
 
-    revalidateTag(ENTITY_TAG[entityType]);
+    revalidateTag(ENTITY_TAG[entityType], { expire: 0 });
 
     writeAuditLog({
       adminUserId: userId,
