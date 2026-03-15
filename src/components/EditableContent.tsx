@@ -65,7 +65,9 @@ export default function EditableContent({
   }, [editing, saving, content]);
 
   const handleSave = useCallback(async () => {
-    if (!token || !draft.trim()) return;
+    const trimmed = draft.trim();
+    // Admin can save empty (to clear fields); non-admin requires content
+    if (!token || (!trimmed && !isAdmin)) return;
     setSaving(true);
     setError(null);
     setWarning(null);
@@ -83,7 +85,7 @@ export default function EditableContent({
           entityId,
           fieldPrefix,
           sourceLocale: locale,
-          content: draft.trim(),
+          content: trimmed,
         }),
       });
 
@@ -158,7 +160,7 @@ export default function EditableContent({
         <div className="flex gap-2">
           <button
             onClick={handleSave}
-            disabled={saving || !draft.trim()}
+            disabled={saving || (!draft.trim() && !isAdmin)}
             className="px-4 py-2 rounded-lg bg-[var(--color-gold)] text-[#0A0A0A] text-sm font-bold disabled:opacity-50 hover:brightness-110 transition-all"
           >
             {saving ? t('saving') : t('saveAndTranslate')}

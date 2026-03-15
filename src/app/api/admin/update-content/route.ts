@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
   try {
     const { entityType, entityId, fieldPrefix, sourceLocale, content } = await req.json();
 
-    if (!entityType || !entityId || !fieldPrefix || !sourceLocale || !content) {
+    if (!entityType || !entityId || !fieldPrefix || !sourceLocale) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
     if (!ENTITY_TABLE[entityType]) {
@@ -48,6 +48,50 @@ export async function POST(req: NextRequest) {
     }
 
     const needShort = !(entityType === 'venue' && fieldPrefix === 'description');
+
+    // Empty content = clear all related fields (admin god-mode)
+    if (!content) {
+      const fields: Record<string, null> = {};
+      for (const locale of LOCALES) {
+        fields[`${fieldPrefix}_${locale}`] = null;
+        if (needShort) {
+          fields[`${fieldPrefix}_short_${locale}`] = null;
+        }
+      }
+
+      const supabase = createAdminClient();
+      const table = ENTITY_TABLE[entityType];
+      const pk = ENTITY_PK[entityType];
+
+      const { error: updateError } = await supabase
+        .from(table)
+        .update({
+          ...fields,
+          updated_at: new Date().toISOString(),
+          ...(table !== 'events' && { data_source: 'admin', updated_by: userId }),
+        })
+        .eq(pk, entityId);
+
+      if (updateError) {
+        throw new Error(`Supabase update failed: ${updateError.message}`);
+      }
+
+      updateTag(ENTITY_TAG[entityType]);
+
+      writeAuditLog({
+        adminUserId: userId,
+        action: 'clear_content',
+        entityType,
+        entityId,
+        details: { fieldPrefix, fieldsCleared: Object.keys(fields) },
+        ipAddress: req.headers.get('x-forwarded-for'),
+      });
+
+      return NextResponse.json({
+        success: true,
+        fieldsCleared: Object.keys(fields),
+      });
+    }
 
     let translationFailed = false;
     let translationError: string | undefined;
