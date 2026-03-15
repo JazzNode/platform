@@ -107,7 +107,10 @@ function TierTable({
 function tierRow(cfg: TierFeatures, key: string, visible: number[]): (boolean | string)[] {
   const min = cfg[key] ?? 0;
   if (min < 0) return []; // disabled feature — empty row signals "skip"
-  return visible.map((tier) => tier >= min);
+  const row = visible.map((tier) => tier >= min);
+  // Hide feature if no visible tier unlocks it (avoids leaking hidden-tier features)
+  if (!row.some(Boolean)) return [];
+  return row;
 }
 
 /** Check if a feature row should be shown (not disabled) */
@@ -173,26 +176,35 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
   const artistColors = av.map((i) => allArtistColors[i]);
 
   // Gear row: show text labels for tiers that unlock gear_showcase / gear_unlimited
-  const gearRow: (boolean | string)[] = av.map((i) => {
-    if (i >= (cfg.artist.gear_unlimited ?? 2)) return t('artistGearUnlimited');
-    if (i >= (cfg.artist.gear_showcase ?? 1)) return t('artistGearLimit');
-    return false;
-  });
+  const gearRow: (boolean | string)[] = (() => {
+    const row = av.map((i) => {
+      if (i >= (cfg.artist.gear_unlimited ?? 2)) return t('artistGearUnlimited');
+      if (i >= (cfg.artist.gear_showcase ?? 1)) return t('artistGearLimit');
+      return false;
+    });
+    return row.every((v) => v === false) ? [] : row;
+  })();
 
   // EPK row: show text labels for tiers that unlock epk_basic / epk_full / epk_branded_pdf
-  const epkRow: (boolean | string)[] = av.map((i) => {
-    if (i >= (cfg.artist.epk_branded_pdf ?? 3)) return t('artistEPKBranded');
-    if (i >= (cfg.artist.epk_full ?? 2)) return t('artistEPKFull');
-    if (i >= (cfg.artist.epk_basic ?? 1)) return t('artistEPKBasic');
-    return false;
-  });
+  const epkRow: (boolean | string)[] = (() => {
+    const row = av.map((i) => {
+      if (i >= (cfg.artist.epk_branded_pdf ?? 3)) return t('artistEPKBranded');
+      if (i >= (cfg.artist.epk_full ?? 2)) return t('artistEPKFull');
+      if (i >= (cfg.artist.epk_basic ?? 1)) return t('artistEPKBasic');
+      return false;
+    });
+    return row.every((v) => v === false) ? [] : row;
+  })();
 
   // Broadcasts row: show text labels for limited / unlimited
-  const broadcastRow: (boolean | string)[] = av.map((i) => {
-    if (i >= (cfg.artist.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
-    if (i >= (cfg.artist.broadcasts ?? 2)) return t('broadcastsLimited');
-    return false;
-  });
+  const broadcastRow: (boolean | string)[] = (() => {
+    const row = av.map((i) => {
+      if (i >= (cfg.artist.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
+      if (i >= (cfg.artist.broadcasts ?? 2)) return t('broadcastsLimited');
+      return false;
+    });
+    return row.every((v) => v === false) ? [] : row;
+  })();
 
   const artistFeatures = [
     {
@@ -256,11 +268,14 @@ export default async function TiersPage({ params }: { params: Promise<{ locale: 
   const venueColors = vv.map((i) => allVenueColors[i]);
 
   // Venue broadcasts row: limited / unlimited
-  const venueBroadcastRow: (boolean | string)[] = vv.map((i) => {
-    if (i >= (cfg.venue.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
-    if (i >= (cfg.venue.broadcasts ?? 2)) return t('broadcastsLimited');
-    return false;
-  });
+  const venueBroadcastRow: (boolean | string)[] = (() => {
+    const row = vv.map((i) => {
+      if (i >= (cfg.venue.broadcasts_unlimited ?? 3)) return t('broadcastsUnlimited');
+      if (i >= (cfg.venue.broadcasts ?? 2)) return t('broadcastsLimited');
+      return false;
+    });
+    return row.every((v) => v === false) ? [] : row;
+  })();
 
   const venueFeatures = [
     {
