@@ -9,6 +9,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
 import SocialIcons from '@/components/SocialIcons';
+import SocialIconsPlaceholder from '@/components/SocialIconsPlaceholder';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
@@ -368,12 +369,17 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               )}
             </div>
 
-            {/* Unclaimed notice */}
-            {(!f.tier || f.tier === 0) && f.verification_status !== 'Verified' && (
+            {/* Data source notice */}
+            {f.data_source === 'user' || f.data_source === 'admin' ? (
+              <p className="text-xs text-gold/70 flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                {t('dataSourceArtistManaged')}
+              </p>
+            ) : (!f.tier || f.tier === 0) && f.verification_status !== 'Verified' ? (
               <p className="text-xs text-[#8A8578] italic">
                 {t('unclaimedArtistNotice')}
               </p>
-            )}
+            ) : null}
 
             {/* Bio */}
             <EditableContent
@@ -393,14 +399,18 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               </div>
             )}
 
-            {/* Social Icons */}
-            <SocialIcons
-              websiteUrl={f.website_url}
-              spotifyUrl={f.spotify_url}
-              youtubeUrl={f.youtube_url}
-              instagram={f.instagram}
-              facebookUrl={f.facebook_url}
-            />
+            {/* Social Icons — show real links if available, otherwise placeholder for unclaimed */}
+            {(f.website_url || f.spotify_url || f.youtube_url || f.instagram || f.facebook_url) ? (
+              <SocialIcons
+                websiteUrl={f.website_url}
+                spotifyUrl={f.spotify_url}
+                youtubeUrl={f.youtube_url}
+                instagram={f.instagram}
+                facebookUrl={f.facebook_url}
+              />
+            ) : (
+              <SocialIconsPlaceholder artistName={artistDisplayName(f, locale)} />
+            )}
           </div>
         </div>
       </FadeUp>

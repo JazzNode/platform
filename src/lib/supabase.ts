@@ -103,6 +103,8 @@ export interface Venue {
   business_hour?: string;
   // Tier
   tier?: number;
+  // Data lineage
+  data_source?: string;
 }
 
 export interface Artist {
@@ -168,6 +170,8 @@ export interface Artist {
   hire_description_id?: string;
   // Tier
   tier?: number;
+  // Data lineage
+  data_source?: string;
 }
 
 export interface Event {
