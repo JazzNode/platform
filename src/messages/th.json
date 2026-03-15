@@ -22,7 +22,7 @@
     "weeklyJam": "Open Jam ที่กำลังจะมาถึง",
     "topPerformers": "นักแสดงประจำ",
     "verified": "ยืนยันแล้ว",
-    "unclaimedArtistNotice": "หน้านี้ยังไม่ได้ถูกเคลมโดยศิลปิน ข้อมูลสร้างขึ้นอัตโนมัติและอาจมีข้อผิดพลาด",
+    "unclaimedArtistNotice": "หน้านี้สร้างจากข้อมูลการแสดงสาธารณะ ยินดีต้อนรับศิลปินเจ้าของผลงาน<claimLink>เคลมและแก้ไข</claimLink>",
     "socialPlaceholderHint": "นักดนตรีคนนี้ยังไม่ได้เคลมหน้าเพจ รู้จักพวกเขาไหม? บอกพวกเขาว่าสามารถตั้งค่าโปรไฟล์บน JazzNode ได้!",
     "unclaimedVenueNotice": "หน้านี้ดูแลโดย JazzNode และยังไม่ได้ถูกเคลมโดยสถานที่",
     "dataSourceArtistManaged": "โปรไฟล์จัดการโดยศิลปิน",

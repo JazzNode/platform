@@ -22,7 +22,7 @@
     "weeklyJam": "Upcoming Open Jam",
     "topPerformers": "Frequent Performers",
     "verified": "Verified",
-    "unclaimedArtistNotice": "This page has not been claimed by the artist. Information is auto-generated and may contain inaccuracies.",
+    "unclaimedArtistNotice": "This page is based on public performance records. Artists are welcome to <claimLink>claim and edit</claimLink>.",
     "socialPlaceholderHint": "This musician hasn't claimed their page yet. Know them? Let them know they can set up their profile on JazzNode!",
     "unclaimedVenueNotice": "This page is maintained by JazzNode and has not been claimed by the venue.",
     "dataSourceArtistManaged": "Profile managed by artist",

@@ -13,6 +13,7 @@ import SocialIconsPlaceholder from '@/components/SocialIconsPlaceholder';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
+import UnclaimedNotice from '@/components/UnclaimedNotice';
 import BadgeDock from '@/components/BadgeDock';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
@@ -376,9 +377,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 {t('dataSourceArtistManaged')}
               </p>
             ) : (!f.tier || f.tier === 0) && f.verification_status !== 'Verified' ? (
-              <p className="text-xs text-[#8A8578] italic">
-                {t('unclaimedArtistNotice')}
-              </p>
+              <UnclaimedNotice targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
             ) : null}
 
             {/* Bio */}

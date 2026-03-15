@@ -22,7 +22,7 @@
     "weeklyJam": "近日のオープンジャム",
     "topPerformers": "レギュラーミュージシャン",
     "verified": "認証済み",
-    "unclaimedArtistNotice": "このページはアーティストによって申請されていません。情報は自動生成されており、不正確な場合があります。",
+    "unclaimedArtistNotice": "このページは公開の演奏記録をもとに作成されています。アーティストご本人の<claimLink>申請と編集</claimLink>をお待ちしています。",
     "socialPlaceholderHint": "このミュージシャンはまだページを申請していません。知り合いですか？JazzNodeでプロフィールを設定できることを教えてあげましょう！",
     "unclaimedVenueNotice": "このページはJazzNodeが管理しており、会場によって申請されていません。",
     "dataSourceArtistManaged": "アーティスト本人が管理",
