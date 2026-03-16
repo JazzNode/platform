@@ -72,8 +72,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     const lineupArtists = eventLineups
       .filter((l) => l.fields.role !== 'ensemble')
       .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
-      .filter(Boolean)
-      .filter((a) => a.id !== primaryArtist?.id);
+      .filter(Boolean);
 
     const eventTags = resolveLinks(event.fields.tag_list, tagMap)
       .map((tag) => tag.fields.name)
