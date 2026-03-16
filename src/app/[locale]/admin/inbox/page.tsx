@@ -27,6 +27,15 @@ interface HQConversation {
   last_message_at: string;
 }
 
+interface GuestContact {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  read_at: string | null;
+  created_at: string;
+}
+
 interface Message {
   id: string;
   conversation_id: string;
@@ -118,6 +127,8 @@ export default function AdminInboxPage() {
   const [sending, setSending] = useState(false);
   const [loadingNotifs, setLoadingNotifs] = useState(true);
   const [loadingConvos, setLoadingConvos] = useState(true);
+  const [guestContacts, setGuestContacts] = useState<GuestContact[]>([]);
+  const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch notifications
@@ -155,6 +166,33 @@ export default function AdminInboxPage() {
       if (!cancelled) setLoadingConvos(false);
     })();
     return () => { cancelled = true; };
+  }, [token]);
+
+  // Fetch guest contacts
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/guest-contacts', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!cancelled) setGuestContacts(data.contacts || []);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [token]);
+
+  // Mark guest contact as read
+  const markGuestRead = useCallback(async (id: string) => {
+    if (!token) return;
+    await fetch('/api/admin/guest-contacts', {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: [id] }),
+    });
+    setGuestContacts((prev) => prev.map((g) => g.id === id ? { ...g, read_at: new Date().toISOString() } : g));
   }, [token]);
 
   // Fetch messages for selected conversation
@@ -256,7 +294,9 @@ export default function AdminInboxPage() {
   }, [newMessage, selectedConvo, token, sending]);
 
   const selectedConversation = conversations.find((c) => c.id === selectedConvo);
+  const selectedGuestContact = guestContacts.find((g) => g.id === selectedGuest);
   const totalMsgUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
+  const guestUnread = guestContacts.filter((g) => !g.read_at).length;
 
   return (
     <div className="space-y-6 pb-16">
@@ -292,9 +332,9 @@ export default function AdminInboxPage() {
           }`}
         >
           {t('inboxMessages')}
-          {totalMsgUnread > 0 && (
+          {(totalMsgUnread + guestUnread) > 0 && (
             <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {totalMsgUnread}
+              {totalMsgUnread + guestUnread}
             </span>
           )}
         </button>
@@ -361,7 +401,7 @@ export default function AdminInboxPage() {
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
           <div className="flex h-full">
             {/* Conversation List */}
-            <div className={`${selectedConvo ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-72 border-r border-[var(--border)] shrink-0`}>
+            <div className={`${(selectedConvo || selectedGuest) ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-72 border-r border-[var(--border)] shrink-0`}>
               <div className="px-4 py-3 border-b border-[var(--border)]">
                 <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">
                   {t('memberMessages')}
@@ -372,48 +412,124 @@ export default function AdminInboxPage() {
                   <div className="p-6 text-center">
                     <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
                   </div>
-                ) : conversations.length === 0 ? (
+                ) : conversations.length === 0 && guestContacts.length === 0 ? (
                   <div className="p-6 text-center">
                     <p className="text-sm text-[var(--muted-foreground)]">{t('noMessages')}</p>
                   </div>
                 ) : (
-                  conversations.map((convo) => (
-                    <button
-                      key={convo.id}
-                      onClick={() => setSelectedConvo(convo.id)}
-                      className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${
-                        selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        {convo.user_avatar ? (
-                          <img src={convo.user_avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
-                            {(convo.user_display || '?').charAt(0)}
+                  <>
+                    {/* Guest contacts */}
+                    {guestContacts.map((guest) => (
+                      <button
+                        key={`guest-${guest.id}`}
+                        onClick={() => { setSelectedGuest(guest.id); setSelectedConvo(null); if (!guest.read_at) markGuestRead(guest.id); }}
+                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${
+                          selectedGuest === guest.id ? 'bg-[var(--muted)]' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-orange-400/10 border border-orange-400/20 flex items-center justify-center text-xs text-orange-400 shrink-0 font-bold">
+                            G
                           </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm font-semibold truncate">{convo.user_display || 'Unknown'}</p>
-                            {convo.unread_count > 0 && (
-                              <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
-                                {convo.unread_count}
-                              </span>
-                            )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <p className="text-sm font-semibold truncate">Guest · {guest.name}</p>
+                              </div>
+                              {!guest.read_at && (
+                                <span className="w-2.5 h-2.5 rounded-full bg-orange-400 shrink-0" />
+                              )}
+                            </div>
+                            <p className="text-xs text-[var(--muted-foreground)] truncate">{guest.message}</p>
                           </div>
-                          <p className="text-xs text-[var(--muted-foreground)] truncate">{convo.last_message || '...'}</p>
                         </div>
-                      </div>
-                    </button>
-                  ))
+                      </button>
+                    ))}
+                    {/* Member HQ conversations */}
+                    {conversations.map((convo) => (
+                      <button
+                        key={convo.id}
+                        onClick={() => { setSelectedConvo(convo.id); setSelectedGuest(null); }}
+                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${
+                          selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          {convo.user_avatar ? (
+                            <img src={convo.user_avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                          ) : (
+                            <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
+                              {(convo.user_display || '?').charAt(0)}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-semibold truncate">{convo.user_display || 'Unknown'}</p>
+                              {convo.unread_count > 0 && (
+                                <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
+                                  {convo.unread_count}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-[var(--muted-foreground)] truncate">{convo.last_message || '...'}</p>
+                          </div>
+                        </div>
+                      </button>
+                    ))}
+                  </>
                 )}
               </div>
             </div>
 
             {/* Message Area */}
-            <div className={`${selectedConvo ? 'flex' : 'hidden sm:flex'} flex-col flex-1 min-w-0`}>
-              {selectedConvo && selectedConversation ? (
+            <div className={`${(selectedConvo || selectedGuest) ? 'flex' : 'hidden sm:flex'} flex-col flex-1 min-w-0`}>
+              {/* Guest contact detail */}
+              {selectedGuest && selectedGuestContact ? (
+                <>
+                  <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)]">
+                    <button
+                      onClick={() => setSelectedGuest(null)}
+                      className="sm:hidden text-[var(--muted-foreground)]"
+                    >
+                      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="15 18 9 12 15 6" />
+                      </svg>
+                    </button>
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-full bg-orange-400/10 border border-orange-400/20 flex items-center justify-center text-xs text-orange-400 font-bold">G</div>
+                      <span className="text-sm font-semibold">Guest · {selectedGuestContact.name}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                    <div className="flex justify-start">
+                      <div className="max-w-[85%] rounded-2xl px-4 py-3 bg-[var(--muted)] text-[var(--foreground)]">
+                        <div className="flex items-start gap-2">
+                          <p className="text-sm whitespace-pre-wrap break-words flex-1">{selectedGuestContact.message}</p>
+                          <TranslateButton text={selectedGuestContact.message} locale={locale} />
+                        </div>
+                        <p className="text-[10px] text-[var(--muted-foreground)]/50 mt-1.5">
+                          {new Date(selectedGuestContact.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="border border-[var(--border)] rounded-xl p-4 space-y-2 bg-[var(--background)]/50">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)]">Guest Info</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <svg className="w-4 h-4 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                          <polyline points="22,6 12,13 2,6" />
+                        </svg>
+                        <a href={`mailto:${selectedGuestContact.email}`} className="text-gold hover:text-[var(--color-gold-bright)] underline underline-offset-2 transition-colors">
+                          {selectedGuestContact.email}
+                        </a>
+                      </div>
+                      <p className="text-xs text-[var(--muted-foreground)]">Reply to this guest via email.</p>
+                    </div>
+                  </div>
+                </>
+              ) : selectedConvo && selectedConversation ? (
                 <>
                   <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)]">
                     <button
