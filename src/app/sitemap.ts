@@ -50,6 +50,8 @@ function entry(
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [artistRows, eventRows, venueRows, cityRows] = await Promise.all([
     fetchForSitemap('artists', 'artist_id'),
