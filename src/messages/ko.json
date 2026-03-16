@@ -171,7 +171,13 @@
     "noBookmarks": "저장한 이벤트가 없습니다.",
     "sendDM": "메시지",
     "nav_settings": "설정",
-    "nav_inbox": "수신함"
+    "nav_inbox": "수신함",
+    "nav_members": "회원",
+    "ownerMembersTitle": "회원 관리",
+    "ownerMembersDescription": "{count}명의 등록 회원",
+    "ownerSearchPlaceholder": "이름, 사용자명 또는 이메일로 검색...",
+    "ownerNoMembers": "회원을 찾을 수 없습니다.",
+    "ownerRoleUpdated": "역할이 업데이트되었습니다!"
   },
   "regions": {
     "worldMap": "세계 지도",
@@ -438,6 +444,7 @@
     "role_artist": "아티스트",
     "role_venue_owner": "공연장 소유자",
     "role_admin": "관리자",
+    "role_owner": "소유자",
     "noMembers": "회원을 찾을 수 없습니다.",
     "memberBio": "소개",
     "memberWebsite": "웹사이트",

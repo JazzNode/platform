@@ -8,9 +8,13 @@ import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 
-const NAV_ITEMS = [
+const BASE_navItems = [
   { key: 'settings', icon: 'settings', path: '' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
+] as const;
+
+const OWNER_navItems = [
+  { key: 'members', icon: 'members', path: '/members' },
 ] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -28,6 +32,15 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
           <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
+        </svg>
+      );
+    case 'members':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       );
     default:
@@ -91,6 +104,13 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   const basePath = `/${locale}/profile`;
   const displayName = profile?.display_name || user.email?.split('@')[0] || '';
   const avatarUrl = profile?.avatar_url;
+  const isProfileOwner = profile?.role === 'owner';
+
+  // Build nav items — owner gets extra "members" tab
+  const navItems = [
+    ...BASE_navItems,
+    ...(isProfileOwner ? OWNER_navItems : []),
+  ];
 
   const isActive = (navPath: string) => {
     const fullPath = basePath + navPath;
@@ -135,7 +155,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
 
           {/* Navigation */}
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <Link
@@ -187,7 +207,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
             </p>
           </div>
           <div className="flex items-center gap-2 px-4 py-1.5 overflow-x-auto no-scrollbar">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <Link

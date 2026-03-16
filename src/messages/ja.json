@@ -171,7 +171,13 @@
     "noBookmarks": "保存したイベントはまだありません。",
     "sendDM": "メッセージ",
     "nav_settings": "設定",
-    "nav_inbox": "受信トレイ"
+    "nav_inbox": "受信トレイ",
+    "nav_members": "メンバー",
+    "ownerMembersTitle": "メンバー管理",
+    "ownerMembersDescription": "{count} 人の登録メンバー",
+    "ownerSearchPlaceholder": "名前、ユーザー名、メールで検索...",
+    "ownerNoMembers": "メンバーが見つかりません。",
+    "ownerRoleUpdated": "ロールを更新しました！"
   },
   "regions": {
     "worldMap": "世界地図",
@@ -438,6 +444,7 @@
     "role_artist": "アーティスト",
     "role_venue_owner": "会場オーナー",
     "role_admin": "管理者",
+    "role_owner": "オーナー",
     "noMembers": "メンバーが見つかりません。",
     "memberBio": "自己紹介",
     "memberWebsite": "ウェブサイト",

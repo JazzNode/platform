@@ -171,7 +171,13 @@
     "noBookmarks": "ยังไม่มีกิจกรรมที่บันทึกไว้",
     "sendDM": "ส่งข้อความ",
     "nav_settings": "ตั้งค่า",
-    "nav_inbox": "กล่องข้อความ"
+    "nav_inbox": "กล่องข้อความ",
+    "nav_members": "สมาชิก",
+    "ownerMembersTitle": "จัดการสมาชิก",
+    "ownerMembersDescription": "สมาชิกที่ลงทะเบียน {count} คน",
+    "ownerSearchPlaceholder": "ค้นหาด้วยชื่อ ชื่อผู้ใช้ หรืออีเมล...",
+    "ownerNoMembers": "ไม่พบสมาชิก",
+    "ownerRoleUpdated": "อัปเดตบทบาทแล้ว!"
   },
   "regions": {
     "worldMap": "แผนที่โลก",
@@ -438,6 +444,7 @@
     "role_artist": "ศิลปิน",
     "role_venue_owner": "เจ้าของสถานที่",
     "role_admin": "ผู้ดูแล",
+    "role_owner": "เจ้าของ",
     "noMembers": "ไม่พบสมาชิก",
     "memberBio": "ประวัติ",
     "memberWebsite": "เว็บไซต์",

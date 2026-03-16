@@ -115,7 +115,7 @@ export default function ArtistDashboardLayout({
       return;
     }
     if (!loading && profile && slug) {
-      if (!profile.claimed_artist_ids?.includes(slug) && profile.role !== 'admin') {
+      if (!profile.claimed_artist_ids?.includes(slug) && profile.role !== 'admin' && profile.role !== 'owner') {
         router.push(`/${locale}/profile`);
       }
     }

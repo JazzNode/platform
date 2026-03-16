@@ -31,7 +31,7 @@ export default function AdminBadge() {
   const { viewMode, toggleArtistTier, toggleVenueTier } = useAdmin();
   const { profile } = useAuth();
 
-  if (profile?.role !== 'admin') return null;
+  if (profile?.role !== 'admin' && profile?.role !== 'owner') return null;
 
   // Click continues cycling within the same group
   const handleClick = () => {

@@ -113,7 +113,7 @@ export default function VenueDashboardLayout({
       return;
     }
     if (!loading && profile && slug) {
-      if (!profile.claimed_venue_ids?.includes(slug) && profile.role !== 'admin') {
+      if (!profile.claimed_venue_ids?.includes(slug) && profile.role !== 'admin' && profile.role !== 'owner') {
         router.push(`/${locale}/profile`);
       }
     }

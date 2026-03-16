@@ -79,7 +79,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Redirect non-admin users
   useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'admin')) {
+    if (!loading && (!user || (profile?.role !== 'admin' && profile?.role !== 'owner'))) {
       router.push('/');
     }
   }, [loading, user, profile, router]);
@@ -100,7 +100,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => { cancelled = true; };
   }, [token]);
 
-  if (loading || !user || profile?.role !== 'admin') {
+  if (loading || !user || (profile?.role !== 'admin' && profile?.role !== 'owner')) {
     return (
       <div className="py-24 text-center">
         <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />

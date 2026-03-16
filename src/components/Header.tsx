@@ -171,7 +171,7 @@ export default function Header() {
             ))}
           </div>
         )}
-        {profile?.role === 'admin' && (
+        {(profile?.role === 'admin' || profile?.role === 'owner') && (
           <div className="border-t border-[var(--border)] py-1">
             <button
               onClick={() => { router.push(`/${locale}/admin`); setUserMenuOpen(false); }}

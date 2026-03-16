@@ -171,7 +171,13 @@
     "noBookmarks": "Belum ada acara yang disimpan.",
     "sendDM": "Pesan",
     "nav_settings": "Pengaturan",
-    "nav_inbox": "Kotak Masuk"
+    "nav_inbox": "Kotak Masuk",
+    "nav_members": "Anggota",
+    "ownerMembersTitle": "Kelola Anggota",
+    "ownerMembersDescription": "{count} anggota terdaftar",
+    "ownerSearchPlaceholder": "Cari berdasarkan nama, username, atau email...",
+    "ownerNoMembers": "Tidak ada anggota ditemukan.",
+    "ownerRoleUpdated": "Peran diperbarui!"
   },
   "regions": {
     "worldMap": "Peta Dunia",
@@ -438,6 +444,7 @@
     "role_artist": "Artis",
     "role_venue_owner": "Pemilik Venue",
     "role_admin": "Admin",
+    "role_owner": "Pemilik",
     "noMembers": "Anggota tidak ditemukan.",
     "memberBio": "Bio",
     "memberWebsite": "Situs Web",

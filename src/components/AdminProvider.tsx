@@ -14,6 +14,8 @@ const VENUE_TIER_CYCLE: ViewMode[] = ['admin', 'venue-tier0', 'venue-tier1', 've
 
 interface AdminContextType {
   isAdmin: boolean;
+  /** True only for owner role — can manage admin roles */
+  isOwner: boolean;
   /** Supabase access token — pass as Bearer token to admin API routes */
   token: string | null;
   /** Get a fresh (auto-refreshed) access token right before API calls */
@@ -47,7 +49,8 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   const [showLoginModal, setShowLoginModal] = useState(false);
 
   const adminModeEnabled = viewMode === 'admin';
-  const isAdmin = !!(profile?.role === 'admin' && adminModeEnabled);
+  const isAdmin = !!((profile?.role === 'admin' || profile?.role === 'owner') && adminModeEnabled);
+  const isOwner = profile?.role === 'owner';
 
   // Parse preview tiers from viewMode
   // Admin mode → max tier (all features unlocked)
@@ -106,7 +109,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       setShowAuthModal(true);
       return;
     }
-    if (profile?.role !== 'admin') return;
+    if (profile?.role !== 'admin' && profile?.role !== 'owner') return;
 
     setViewMode((prev) => {
       const idx = cycle.indexOf(prev);
@@ -146,6 +149,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     <AdminContext.Provider
       value={{
         isAdmin,
+        isOwner: !!isOwner,
         token,
         getFreshToken,
         adminModeEnabled,

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   }
 
   const isOwner = profile.claimed_artist_ids?.includes(artistId);
-  const isAdmin = profile.role === 'admin';
+  const isAdmin = profile.role === 'admin' || profile.role === 'owner';
   if (!isOwner && !isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }

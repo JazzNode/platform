@@ -175,7 +175,13 @@
     "noBookmarks": "No saved events yet.",
     "sendDM": "Message",
     "nav_settings": "Settings",
-    "nav_inbox": "Inbox"
+    "nav_inbox": "Inbox",
+    "nav_members": "Members",
+    "ownerMembersTitle": "Manage Members",
+    "ownerMembersDescription": "{count} registered members",
+    "ownerSearchPlaceholder": "Search by name, username, or email...",
+    "ownerNoMembers": "No members found.",
+    "ownerRoleUpdated": "Role updated!"
   },
   "regions": {
     "worldMap": "World Map",
@@ -442,6 +448,7 @@
     "role_artist": "Artist",
     "role_venue_owner": "Venue Owner",
     "role_admin": "Admin",
+    "role_owner": "Owner",
     "noMembers": "No members found.",
     "memberBio": "Bio",
     "memberWebsite": "Website",

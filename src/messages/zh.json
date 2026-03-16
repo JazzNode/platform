@@ -175,7 +175,13 @@
     "noBookmarks": "尚未收藏任何活動。",
     "sendDM": "私訊",
     "nav_settings": "個人設定",
-    "nav_inbox": "收件匣"
+    "nav_inbox": "收件匣",
+    "nav_members": "會員管理",
+    "ownerMembersTitle": "會員管理",
+    "ownerMembersDescription": "共 {count} 位會員",
+    "ownerSearchPlaceholder": "以姓名、帳號或信箱搜尋…",
+    "ownerNoMembers": "找不到會員。",
+    "ownerRoleUpdated": "角色已更新！"
   },
   "regions": {
     "worldMap": "世界版圖",
@@ -442,6 +448,7 @@
     "role_artist": "藝人",
     "role_venue_owner": "場地主",
     "role_admin": "管理員",
+    "role_owner": "擁有者",
     "noMembers": "找不到會員。",
     "memberBio": "簡介",
     "memberWebsite": "網站",
