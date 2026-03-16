@@ -39,14 +39,7 @@ export default function ProfilePage() {
     }
   }, [profile]);
 
-  // Redirect to home if not logged in
-  useEffect(() => {
-    if (!loading && !user) {
-      setShowComingSoon({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-      router.push('/');
-    }
-  }, [loading, user, router, setShowComingSoon]);
-
+  // Layout already handles auth redirect
   const validateUsername = (value: string) => {
     if (!value) return true; // username is optional
     return /^[a-z0-9_]{3,30}$/.test(value);

@@ -173,7 +173,9 @@
     "bookmarks": "收藏",
     "noFollows": "尚未追蹤任何藝人或場地。",
     "noBookmarks": "尚未收藏任何活動。",
-    "sendDM": "私訊"
+    "sendDM": "私訊",
+    "nav_settings": "個人設定",
+    "nav_inbox": "收件匣"
   },
   "regions": {
     "worldMap": "世界版圖",

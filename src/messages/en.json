@@ -173,7 +173,9 @@
     "bookmarks": "Saved",
     "noFollows": "Not following any artists or venues yet.",
     "noBookmarks": "No saved events yet.",
-    "sendDM": "Message"
+    "sendDM": "Message",
+    "nav_settings": "Settings",
+    "nav_inbox": "Inbox"
   },
   "regions": {
     "worldMap": "World Map",

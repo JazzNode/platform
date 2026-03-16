@@ -169,7 +169,9 @@
     "bookmarks": "保存済み",
     "noFollows": "アーティストや会場をまだフォローしていません。",
     "noBookmarks": "保存したイベントはまだありません。",
-    "sendDM": "メッセージ"
+    "sendDM": "メッセージ",
+    "nav_settings": "設定",
+    "nav_inbox": "受信トレイ"
   },
   "regions": {
     "worldMap": "世界地図",

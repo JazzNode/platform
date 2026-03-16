@@ -169,7 +169,9 @@
     "bookmarks": "Tersimpan",
     "noFollows": "Belum mengikuti artis atau venue.",
     "noBookmarks": "Belum ada acara yang disimpan.",
-    "sendDM": "Pesan"
+    "sendDM": "Pesan",
+    "nav_settings": "Pengaturan",
+    "nav_inbox": "Kotak Masuk"
   },
   "regions": {
     "worldMap": "Peta Dunia",

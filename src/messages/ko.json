@@ -169,7 +169,9 @@
     "bookmarks": "저장됨",
     "noFollows": "아직 팔로우하는 아티스트나 공연장이 없습니다.",
     "noBookmarks": "저장한 이벤트가 없습니다.",
-    "sendDM": "메시지"
+    "sendDM": "메시지",
+    "nav_settings": "설정",
+    "nav_inbox": "수신함"
   },
   "regions": {
     "worldMap": "세계 지도",
