@@ -56,8 +56,6 @@ export default function AdminMembersPage() {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    setLoading(true);
-
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
@@ -66,6 +64,7 @@ export default function AdminMembersPage() {
     if (role !== 'all') params.set('role', role);
 
     (async () => {
+      setLoading(true);
       try {
         const res = await fetch(`/api/admin/members?${params}`, {
           headers: { Authorization: `Bearer ${token}` },

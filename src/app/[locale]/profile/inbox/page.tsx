@@ -93,7 +93,7 @@ export default function FanInboxPage() {
   const [tab, setTab] = useState<Tab>('messages');
   const [filter, setFilter] = useState<FilterType>('all');
   const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
-  const [selectedConvo, setSelectedConvo] = useState<string | null>(null);
+  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => searchParams.get('convo'));
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -109,12 +109,6 @@ export default function FanInboxPage() {
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
-
-  // Handle deep link from DMButton (?tab=dm&convo=xxx)
-  useEffect(() => {
-    const convoParam = searchParams.get('convo');
-    if (convoParam) setSelectedConvo(convoParam);
-  }, [searchParams]);
 
   // Fetch ALL conversations (unified)
   useEffect(() => {
@@ -341,7 +335,7 @@ export default function FanInboxPage() {
 
   // DM search users
   useEffect(() => {
-    if (!dmSearch.trim() || !user) { setDmSearchResults([]); return; }
+    if (!dmSearch.trim() || !user) return;
     const timer = setTimeout(async () => {
       const supabase = createClient();
       const { data } = await supabase
@@ -530,7 +524,7 @@ export default function FanInboxPage() {
                         placeholder={t('fanInboxSearchUsers')} autoFocus
                         className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50"
                       />
-                      {dmSearchResults.map((u) => (
+                      {dmSearch.trim() && dmSearchResults.map((u) => (
                         <button key={u.id} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url)}
                           className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--muted)] transition-colors">
                           {u.avatar_url ? (
