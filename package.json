@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "schema-check": "node ../pipeline/scripts/dev/schema_alignment_check.js",
-    "prebuild": "npm run schema-check || true",
+    "prebuild": "test -f ../pipeline/scripts/dev/schema_alignment_check.js && npm run schema-check || true",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
