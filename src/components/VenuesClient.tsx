@@ -16,6 +16,7 @@ interface SerializedVenue {
   cityLabel: string;
   eventCount: number;
   jazzFrequency: string | null;
+  jazzFrequencyLabel: string | null;
   description: string | null;
   hasUpcomingJam?: boolean;
 }
@@ -240,7 +241,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 <div className="flex gap-3 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
                   {venue.cityLabel && <span>📍 {venue.cityLabel}</span>}
                   <span>{venue.eventCount} events</span>
-                  {venue.jazzFrequency && <span>🎵 {venue.jazzFrequency}</span>}
+                  {venue.jazzFrequencyLabel && <span>🎵 {venue.jazzFrequencyLabel}</span>}
                 </div>
                 {venue.description && (
                   <p className="text-xs text-[#8A8578] mt-3 line-clamp-2 leading-relaxed">

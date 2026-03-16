@@ -37,7 +37,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
   const venueCountsFallback = buildVenueEventCounts(events);
   // Only show venues that have at least one event
   const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
-  const sorted = [...venuesWithEvents].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
+  const sorted = [...venuesWithEvents].sort((a, b) => displayName(a.fields).localeCompare(displayName(b.fields)));
 
   // Build a set of venue IDs that have a jam session within the next 7 days
   const now = new Date();
@@ -55,6 +55,10 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
     }
   }
 
+  const jazzFreqLabel: Record<string, string> = {
+    nightly: t('jazzNightly'), weekends: t('jazzWeekends'), occasional: t('jazzOccasional'),
+  };
+
   const serializedVenues = sorted.map((venue) => {
     const f = venue.fields;
     const cityFields = f.city_id?.[0] ? cityMap.get(f.city_id[0]) : null;
@@ -66,6 +70,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       cityLabel: cityFields ? cityName(cityFields, locale) : '',
       eventCount: venueEventCount(venue, venueCountsFallback),
       jazzFrequency: f.jazz_frequency || null,
+      jazzFrequencyLabel: f.jazz_frequency ? (jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency) : null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
       hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
     };

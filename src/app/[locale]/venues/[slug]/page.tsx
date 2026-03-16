@@ -65,10 +65,10 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     notFound();
   }
 
-  // Compute prev/next venue — sorted by event count (descending), same as list page
+  // Compute prev/next venue — sorted alphabetically, same as list page
   const venueCountsFallback = buildVenueEventCounts(events);
   const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
-  const allSorted = [...venuesWithEvents].sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback));
+  const allSorted = [...venuesWithEvents].sort((a, b) => displayName(a.fields).localeCompare(displayName(b.fields)));
   const currentIdx = allSorted.findIndex((v) => v.id === venue.id);
   const prevVenue = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
   const nextVenue = currentIdx >= 0 && currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;

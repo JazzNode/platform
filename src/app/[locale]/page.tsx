@@ -56,6 +56,10 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   }
 
   const venueCountsFallback = buildVenueEventCounts(events);
+  const jazzFreqLabel: Record<string, string> = {
+    nightly: t('jazzNightly'), weekends: t('jazzWeekends'), occasional: t('jazzOccasional'),
+  };
+
   const featured = [...venuesWithEvents]
     .sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback))
     .slice(0, 6);
@@ -278,7 +282,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                   {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? cityName(c, locale) : ''; })()} · {venueEventCount(venue, venueCountsFallback)} events
                 </p>
                 {venue.fields.jazz_frequency && (
-                  <p className="mt-1 text-xs text-[#6A6560] capitalize">{venue.fields.jazz_frequency}</p>
+                  <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.fields.jazz_frequency] || venue.fields.jazz_frequency}</p>
                 )}
               </Link>
             ))}
