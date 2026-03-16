@@ -12,7 +12,7 @@ export interface UserProfile {
   avatar_url: string | null;
   bio: string | null;
   website: string | null;
-  role: 'member' | 'artist' | 'venue_owner' | 'admin' | 'owner';
+  role: 'member' | 'artist_manager' | 'venue_manager' | 'admin' | 'owner';
   social_links: Record<string, string>;
   claimed_artist_ids: string[];
   claimed_venue_ids: string[];

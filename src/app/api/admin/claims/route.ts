@@ -110,8 +110,9 @@ export async function PATCH(request: NextRequest) {
         .eq(targetPK, claim.target_id);
     }
 
-    // Upgrade user role to 'artist' if currently 'member'
-    if (claim.user_id && claim.target_type === 'artist') {
+    // Upgrade user role to artist_manager / venue_manager if currently 'member'
+    if (claim.user_id) {
+      const newRole = claim.target_type === 'artist' ? 'artist_manager' : 'venue_manager';
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
@@ -121,7 +122,7 @@ export async function PATCH(request: NextRequest) {
       if (profile?.role === 'member') {
         await supabase
           .from('profiles')
-          .update({ role: 'artist', updated_at: now })
+          .update({ role: newRole, updated_at: now })
           .eq('id', claim.user_id);
       }
     }

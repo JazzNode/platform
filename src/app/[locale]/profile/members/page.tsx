@@ -18,13 +18,13 @@ interface Member {
   created_at: string;
 }
 
-const SETTABLE_ROLES = ['member', 'artist', 'venue_owner', 'admin'] as const;
+const SETTABLE_ROLES = ['member', 'artist_manager', 'venue_manager', 'admin'] as const;
 
 const ROLE_STYLES: Record<string, string> = {
   owner: 'bg-red-400/10 text-red-400 border-red-400/20',
   admin: 'bg-purple-400/10 text-purple-400 border-purple-400/20',
-  artist: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border-[var(--color-gold)]/20',
-  venue_owner: 'bg-green-400/10 text-green-400 border-green-400/20',
+  artist_manager: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border-[var(--color-gold)]/20',
+  venue_manager: 'bg-green-400/10 text-green-400 border-green-400/20',
   member: 'bg-gray-400/10 text-gray-400 border-gray-400/20',
 };
 

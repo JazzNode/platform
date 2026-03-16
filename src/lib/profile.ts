@@ -8,7 +8,7 @@ export interface Profile {
   avatar_url: string | null;
   bio: string | null;
   website: string | null;
-  role: 'member' | 'artist' | 'venue_owner' | 'admin';
+  role: 'member' | 'artist_manager' | 'venue_manager' | 'admin';
   social_links: Record<string, string>;
   created_at: string;
   updated_at: string;

@@ -3,11 +3,11 @@ import { verifyOwnerToken } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { writeAuditLog } from '@/lib/audit-log';
 
-const ALLOWED_ROLES = ['member', 'artist', 'venue_owner', 'admin'] as const;
+const ALLOWED_ROLES = ['member', 'artist_manager', 'venue_manager', 'admin'] as const;
 
 /**
  * PATCH /api/owner/set-role — Owner-only: set a member's role
- * Body: { userId: string, role: 'member' | 'artist' | 'venue_owner' | 'admin' }
+ * Body: { userId: string, role: 'member' | 'artist_manager' | 'venue_manager' | 'admin' }
  *
  * Only the owner can use this endpoint. Cannot set someone to 'owner'.
  * Cannot change own role.
