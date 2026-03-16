@@ -5,6 +5,7 @@ import type { Profile } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
+import DMButton from '@/components/DMButton';
 
 interface Props {
   profile: Profile;
@@ -81,6 +82,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                 {t('memberSince', { date: memberSince })}
               </span>
+              <DMButton targetUserId={profile.id} />
             </div>
 
             {profile.bio && (

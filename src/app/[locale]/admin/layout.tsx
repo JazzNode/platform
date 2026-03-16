@@ -9,6 +9,8 @@ import { useAdmin } from '@/components/AdminProvider';
 
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
+  { key: 'inbox', icon: 'bell', path: '/inbox' },
+  { key: 'members', icon: 'users', path: '/members' },
   { key: 'claims', icon: 'shield', path: '/claims' },
   { key: 'artistTiers', icon: 'music', path: '/artist-tiers' },
   { key: 'venueTiers', icon: 'house', path: '/venue-tiers' },
@@ -45,6 +47,22 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
       );
+    case 'bell':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+      );
+    case 'users':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -56,7 +74,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const { user, profile, loading } = useAuth();
-  const { isAdmin } = useAdmin();
+  const { isAdmin, token } = useAdmin();
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Redirect non-admin users
   useEffect(() => {
@@ -64,6 +83,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       router.push('/');
     }
   }, [loading, user, profile, router]);
+
+  // Fetch unread notification + message count for inbox badge
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/notifications?limit=1', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!cancelled) setUnreadCount(data.unread || 0);
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [token]);
 
   if (loading || !user || profile?.role !== 'admin') {
     return (
@@ -121,6 +156,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   <NavIcon icon={item.icon} />
                   <span>{t(item.key)}</span>
+                  {item.key === 'inbox' && unreadCount > 0 && (
+                    <span className="ml-auto bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -151,6 +191,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 >
                   <NavIcon icon={item.icon} className="w-3.5 h-3.5" />
                   <span>{t(item.key)}</span>
+                  {item.key === 'inbox' && unreadCount > 0 && (
+                    <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
