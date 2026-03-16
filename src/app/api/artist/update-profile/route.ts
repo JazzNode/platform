@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    revalidateTag('artists');
+    revalidateTag('artists', { expire: 0 });
 
     writeAuditLog({
       adminUserId: userId,

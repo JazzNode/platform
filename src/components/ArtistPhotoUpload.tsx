@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import { useCanEdit } from '@/hooks/useCanEdit';
+import { createClient } from '@/utils/supabase/client';
 
 interface Props {
   artistId: string;
@@ -32,7 +33,16 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
   const handleFileChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file || !token) return;
+      if (!file) return;
+
+      // Get a fresh token to avoid expired JWT issues
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      const freshToken = session?.access_token;
+      if (!freshToken) {
+        handleUnauthorized();
+        return;
+      }
 
       // Client-side preview
       const objectUrl = URL.createObjectURL(file);
@@ -48,7 +58,7 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
         const endpoint = isAdmin ? '/api/admin/upload-photo' : '/api/artist/upload-photo';
         const res = await fetch(endpoint, {
           method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${freshToken}` },
           body: formData,
         });
 
@@ -75,7 +85,7 @@ export default function ArtistPhotoUpload({ artistId, artistName, currentPhotoUr
         if (fileInputRef.current) fileInputRef.current.value = '';
       }
     },
-    [artistId, token, handleUnauthorized],
+    [artistId, isAdmin, handleUnauthorized],
   );
 
   return (

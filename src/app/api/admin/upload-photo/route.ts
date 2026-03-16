@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Revalidate the artists cache
-    revalidateTag('artists');
+    revalidateTag('artists', { expire: 0 });
 
     writeAuditLog({
       adminUserId: userId,

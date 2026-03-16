@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       throw new Error(`Supabase update failed: ${updateError.message}`);
     }
 
-    revalidateTag('venues');
+    revalidateTag('venues', { expire: 0 });
 
     writeAuditLog({
       adminUserId: userId,
