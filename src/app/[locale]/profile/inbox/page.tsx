@@ -2,33 +2,26 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import SourceBadge from '@/components/inbox/SourceBadge';
+import BroadcastBubble from '@/components/inbox/BroadcastBubble';
+import FilterChips, { type FilterType } from '@/components/inbox/FilterChips';
 
-type Tab = 'messages' | 'broadcasts' | 'hq' | 'dm' | 'notifications';
+type Tab = 'messages' | 'notifications';
 
-interface Conversation {
+interface UnifiedConversation {
   id: string;
-  artist_id: string;
+  type: 'artist_fan' | 'member_hq' | 'member_member';
+  artist_id?: string;
+  peer_name: string;
+  peer_avatar: string | null;
+  last_message: string | null;
   last_message_at: string;
-  artist_name?: string;
-  artist_photo?: string | null;
-  last_message?: string;
   unread_count: number;
-}
-
-interface DMConversation {
-  id: string;
-  fan_user_id: string;
-  user_b_id: string;
-  last_message_at: string;
-  peer_name?: string;
-  peer_avatar?: string | null;
-  last_message?: string;
-  unread_count: number;
+  source_badge: 'hq' | 'artist' | 'venue' | null;
 }
 
 interface Message {
@@ -36,22 +29,11 @@ interface Message {
   conversation_id: string;
   sender_id: string;
   sender_role: string | null;
+  broadcast_id: string | null;
   body: string;
   read_at: string | null;
   created_at: string;
   sender_display?: string;
-}
-
-interface BroadcastItem {
-  id: string;
-  title: string;
-  body: string;
-  sent_at: string;
-  artist_id: string;
-  artist_name?: string;
-  artist_photo?: string | null;
-  read_at: string | null;
-  delivery_id: string;
 }
 
 interface NotificationItem {
@@ -101,79 +83,16 @@ function TranslateButton({ text, locale }: { text: string; locale: string }) {
   );
 }
 
-// Shared chat UI for message threads
-function ChatThread({
-  messages, userId, locale, selectedName, onBack, onSend, sending, newMessage, setNewMessage,
-  messagesEndRef, placeholder, showSenderLabel,
-}: {
-  messages: Message[]; userId: string; locale: string;
-  selectedName: string; onBack: () => void; onSend: () => void;
-  sending: boolean; newMessage: string; setNewMessage: (v: string) => void;
-  messagesEndRef: React.RefObject<HTMLDivElement | null>; placeholder: string;
-  showSenderLabel?: boolean;
-}) {
-  return (
-    <>
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)]">
-        <button onClick={onBack} className="sm:hidden text-[var(--muted-foreground)]">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <span className="text-sm font-semibold">{selectedName}</span>
-      </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((msg) => {
-          const isMe = msg.sender_id === userId;
-          return (
-            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
-                isMe ? 'bg-[var(--color-gold)]/15 text-[var(--foreground)]' : 'bg-[var(--muted)] text-[var(--foreground)]'
-              }`}>
-                {showSenderLabel && !isMe && msg.sender_role === 'admin' && msg.sender_display && (
-                  <p className="text-[10px] text-[var(--color-gold)]/60 font-semibold mb-0.5">
-                    JazzNode HQ · {msg.sender_display}
-                  </p>
-                )}
-                <div className="flex items-start gap-2">
-                  <p className="whitespace-pre-wrap break-words flex-1">{msg.body}</p>
-                  <TranslateButton text={msg.body} locale={locale} />
-                </div>
-                <p className={`text-[10px] mt-1 ${isMe ? 'text-[var(--color-gold)]/50' : 'text-[var(--muted-foreground)]/50'}`}>
-                  {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-        <div ref={messagesEndRef} />
-      </div>
-      <div className="p-3 border-t border-[var(--border)]">
-        <div className="flex gap-2">
-          <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && onSend()}
-            placeholder={placeholder}
-            className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
-          />
-          <button onClick={onSend} disabled={!newMessage.trim() || sending}
-            className="px-4 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30">
-            Send
-          </button>
-        </div>
-      </div>
-    </>
-  );
-}
-
 export default function FanInboxPage() {
   const t = useTranslations('artistStudio');
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, loading, setShowComingSoon } = useAuth();
 
   const [tab, setTab] = useState<Tab>('messages');
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [broadcasts, setBroadcasts] = useState<BroadcastItem[]>([]);
+  const [filter, setFilter] = useState<FilterType>('all');
+  const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
   const [selectedConvo, setSelectedConvo] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -181,291 +100,243 @@ export default function FanInboxPage() {
   const [fetching, setFetching] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // HQ conversation state
-  const [hqConvo, setHqConvo] = useState<{ id: string } | null>(null);
-  const [hqMessages, setHqMessages] = useState<Message[]>([]);
-  const [hqNewMessage, setHqNewMessage] = useState('');
-  const [hqSending, setHqSending] = useState(false);
-  const [hqLoading, setHqLoading] = useState(true);
-  const hqMessagesEndRef = useRef<HTMLDivElement>(null);
-
-  // DM state
-  const [dmConversations, setDmConversations] = useState<DMConversation[]>([]);
-  const [dmSelectedConvo, setDmSelectedConvo] = useState<string | null>(null);
-  const [dmMessages, setDmMessages] = useState<Message[]>([]);
-  const [dmNewMessage, setDmNewMessage] = useState('');
-  const [dmSending, setDmSending] = useState(false);
-  const [dmFetching, setDmFetching] = useState(true);
+  // "+" menu state
+  const [showNewMenu, setShowNewMenu] = useState(false);
+  const [showDmSearch, setShowDmSearch] = useState(false);
   const [dmSearch, setDmSearch] = useState('');
   const [dmSearchResults, setDmSearchResults] = useState<{ id: string; display_name: string | null; username: string | null; avatar_url: string | null }[]>([]);
-  const [showDmSearch, setShowDmSearch] = useState(false);
-  const dmMessagesEndRef = useRef<HTMLDivElement>(null);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
 
-  // Auth guard
+  // Handle deep link from DMButton (?tab=dm&convo=xxx)
   useEffect(() => {
-    if (!loading && !user) {
-      setShowComingSoon({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
-      router.push('/');
-    }
-  }, [loading, user, router, setShowComingSoon]);
+    const convoParam = searchParams.get('convo');
+    if (convoParam) setSelectedConvo(convoParam);
+  }, [searchParams]);
 
-  // Fetch artist conversations (as fan)
+  // Fetch ALL conversations (unified)
   useEffect(() => {
     if (!user) return;
     const supabase = createClient();
+    let cancelled = false;
 
-    supabase
-      .from('conversations')
-      .select('id, artist_id, last_message_at, fan_archived')
-      .eq('fan_user_id', user.id)
-      .eq('type', 'artist_fan')
-      .eq('fan_archived', false)
-      .order('last_message_at', { ascending: false })
-      .then(async ({ data: convos }) => {
-        if (!convos || convos.length === 0) {
-          setConversations([]);
-          setFetching(false);
-          return;
+    (async () => {
+      // Fetch all conversations where user is a participant
+      const { data: allConvos } = await supabase
+        .from('conversations')
+        .select('id, type, artist_id, fan_user_id, user_b_id, last_message_at')
+        .or(`fan_user_id.eq.${user.id},user_b_id.eq.${user.id}`)
+        .order('last_message_at', { ascending: false });
+
+      if (cancelled || !allConvos) { if (!cancelled) { setConversations([]); setFetching(false); } return; }
+
+      // Collect IDs for enrichment
+      const artistIds = new Set<string>();
+      const profileIds = new Set<string>();
+
+      allConvos.forEach((c) => {
+        if (c.type === 'artist_fan' && c.artist_id) artistIds.add(c.artist_id);
+        if (c.type === 'member_member') {
+          const peerId = c.fan_user_id === user.id ? c.user_b_id : c.fan_user_id;
+          if (peerId) profileIds.add(peerId);
         }
+      });
 
-        const artistIds = [...new Set(convos.map((c) => c.artist_id))];
+      // Batch fetch artists
+      let artistMap = new Map<string, { name: string; photo: string | null }>();
+      if (artistIds.size > 0) {
         const { data: artists } = await supabase
           .from('artists')
           .select('artist_id, display_name, name_local, name_en, photo_url')
-          .in('artist_id', artistIds);
-
-        const artistMap = new Map(
+          .in('artist_id', [...artistIds]);
+        artistMap = new Map(
           artists?.map((a) => [a.artist_id, {
             name: a.display_name || a.name_local || a.name_en || a.artist_id,
             photo: a.photo_url,
           }]) || []
         );
+      }
 
-        const enriched = await Promise.all(
-          convos.map(async (convo) => {
-            const { count } = await supabase
-              .from('messages')
-              .select('id', { count: 'exact', head: true })
-              .eq('conversation_id', convo.id)
-              .neq('sender_id', user.id)
-              .is('read_at', null);
-
-            const { data: lastMsg } = await supabase
-              .from('messages')
-              .select('body')
-              .eq('conversation_id', convo.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single();
-
-            const artistInfo = artistMap.get(convo.artist_id);
-            return {
-              ...convo,
-              artist_name: artistInfo?.name,
-              artist_photo: artistInfo?.photo,
-              last_message: lastMsg?.body,
-              unread_count: count || 0,
-            };
-          })
-        );
-
-        setConversations(enriched);
-        setFetching(false);
-      });
-
-    // Fetch broadcast deliveries
-    supabase
-      .from('broadcast_deliveries')
-      .select('id, broadcast_id, read_at, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .then(async ({ data: deliveries }) => {
-        if (!deliveries || deliveries.length === 0) { setBroadcasts([]); return; }
-
-        const broadcastIds = deliveries.map((d) => d.broadcast_id);
-        const { data: bcs } = await supabase
-          .from('broadcasts')
-          .select('id, title, body, sent_at, artist_id')
-          .in('id', broadcastIds);
-
-        if (!bcs) { setBroadcasts([]); return; }
-
-        const bcArtistIds = [...new Set(bcs.map((b) => b.artist_id))];
-        const { data: artists } = await supabase
-          .from('artists')
-          .select('artist_id, display_name, name_local, name_en, photo_url')
-          .in('artist_id', bcArtistIds);
-
-        const artistMap = new Map(
-          artists?.map((a) => [a.artist_id, {
-            name: a.display_name || a.name_local || a.name_en || a.artist_id,
-            photo: a.photo_url,
+      // Batch fetch profiles (for DM peers)
+      let profileMap = new Map<string, { name: string; avatar: string | null }>();
+      if (profileIds.size > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, display_name, username, avatar_url')
+          .in('id', [...profileIds]);
+        profileMap = new Map(
+          profiles?.map((p) => [p.id, {
+            name: p.display_name || p.username || 'Unknown',
+            avatar: p.avatar_url,
           }]) || []
         );
+      }
 
-        const bcMap = new Map(bcs.map((b) => [b.id, b]));
+      // Enrich each conversation
+      const enriched: UnifiedConversation[] = await Promise.all(
+        allConvos.map(async (convo) => {
+          // Unread count
+          const { count } = await supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('conversation_id', convo.id)
+            .neq('sender_id', user.id)
+            .is('read_at', null);
 
-        const items: BroadcastItem[] = deliveries
-          .map((d) => {
-            const bc = bcMap.get(d.broadcast_id);
-            if (!bc) return null;
-            const artistInfo = artistMap.get(bc.artist_id);
-            return {
-              id: bc.id, title: bc.title, body: bc.body, sent_at: bc.sent_at,
-              artist_id: bc.artist_id, artist_name: artistInfo?.name,
-              artist_photo: artistInfo?.photo, read_at: d.read_at, delivery_id: d.id,
-            };
-          })
-          .filter(Boolean) as BroadcastItem[];
+          // Last message
+          const { data: lastMsg } = await supabase
+            .from('messages')
+            .select('body')
+            .eq('conversation_id', convo.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle();
 
-        setBroadcasts(items);
-      });
+          let peer_name = '';
+          let peer_avatar: string | null = null;
+          let source_badge: 'hq' | 'artist' | 'venue' | null = null;
+
+          if (convo.type === 'artist_fan') {
+            const artist = artistMap.get(convo.artist_id!);
+            peer_name = artist?.name || convo.artist_id || 'Artist';
+            peer_avatar = artist?.photo || null;
+            source_badge = 'artist';
+          } else if (convo.type === 'member_hq') {
+            peer_name = 'JazzNode HQ';
+            peer_avatar = null;
+            source_badge = 'hq';
+          } else if (convo.type === 'member_member') {
+            const peerId = convo.fan_user_id === user.id ? convo.user_b_id : convo.fan_user_id;
+            const peer = profileMap.get(peerId!);
+            peer_name = peer?.name || 'Unknown';
+            peer_avatar = peer?.avatar || null;
+            source_badge = null;
+          }
+
+          return {
+            id: convo.id,
+            type: convo.type,
+            artist_id: convo.artist_id,
+            peer_name,
+            peer_avatar,
+            last_message: lastMsg?.body || null,
+            last_message_at: convo.last_message_at,
+            unread_count: count || 0,
+            source_badge,
+          };
+        })
+      );
+
+      if (!cancelled) { setConversations(enriched); setFetching(false); }
+    })();
+
+    return () => { cancelled = true; };
   }, [user]);
 
-  // Fetch HQ conversation
+  // Fetch messages for selected conversation
   useEffect(() => {
-    if (!user) return;
+    if (!selectedConvo || !user) return;
     const supabase = createClient();
-    supabase
-      .from('conversations')
-      .select('id')
-      .eq('fan_user_id', user.id)
-      .eq('type', 'member_hq')
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) setHqConvo(data);
-        setHqLoading(false);
-      });
-  }, [user]);
 
-  // Fetch HQ messages
-  useEffect(() => {
-    if (!hqConvo || !user) return;
-    const supabase = createClient();
     supabase
       .from('messages')
-      .select('*')
-      .eq('conversation_id', hqConvo.id)
+      .select('id, conversation_id, sender_id, sender_role, broadcast_id, body, read_at, created_at')
+      .eq('conversation_id', selectedConvo)
       .order('created_at', { ascending: true })
       .then(async ({ data }) => {
         if (!data) return;
-        // Enrich sender names for admin messages
+        // Enrich sender names for admin (HQ) messages
         const adminIds = [...new Set(data.filter((m) => m.sender_role === 'admin').map((m) => m.sender_id))];
-        let profileMap = new Map<string, string>();
+        let adminMap = new Map<string, string>();
         if (adminIds.length > 0) {
           const { data: profiles } = await supabase
             .from('profiles')
             .select('id, display_name, username')
             .in('id', adminIds);
-          profileMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Admin']));
+          adminMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Admin']));
         }
-        setHqMessages(data.map((m) => ({ ...m, sender_display: profileMap.get(m.sender_id) })));
+        setMessages(data.map((m) => ({ ...m, sender_display: adminMap.get(m.sender_id) })));
       });
 
-    // Mark HQ messages as read
+    // Mark messages as read
     supabase
       .from('messages')
       .update({ read_at: new Date().toISOString() })
-      .eq('conversation_id', hqConvo.id)
+      .eq('conversation_id', selectedConvo)
       .neq('sender_id', user.id)
-      .is('read_at', null);
-  }, [hqConvo, user]);
+      .is('read_at', null)
+      .then(() => {
+        setConversations((prev) =>
+          prev.map((c) => (c.id === selectedConvo ? { ...c, unread_count: 0 } : c))
+        );
+      });
+  }, [selectedConvo, user]);
 
   useEffect(() => {
-    hqMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [hqMessages]);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-  // Send HQ message
-  const handleHqSend = useCallback(async () => {
-    if (!hqNewMessage.trim() || !user || hqSending) return;
-    setHqSending(true);
+  // Send message
+  const handleSend = useCallback(async () => {
+    if (!newMessage.trim() || !selectedConvo || !user || sending) return;
+    setSending(true);
     const supabase = createClient();
-    const body = hqNewMessage.trim();
-    setHqNewMessage('');
-
-    let convoId = hqConvo?.id;
-    if (!convoId) {
-      const { data: newConvo } = await supabase
-        .from('conversations')
-        .insert({ type: 'member_hq', fan_user_id: user.id })
-        .select('id')
-        .single();
-      if (newConvo) {
-        convoId = newConvo.id;
-        setHqConvo(newConvo);
-      }
-    }
-    if (!convoId) { setHqSending(false); return; }
+    const body = newMessage.trim();
+    setNewMessage('');
 
     const { data: msg } = await supabase
       .from('messages')
-      .insert({ conversation_id: convoId, sender_id: user.id, body })
-      .select()
+      .insert({ conversation_id: selectedConvo, sender_id: user.id, body })
+      .select('id, conversation_id, sender_id, sender_role, broadcast_id, body, read_at, created_at')
       .single();
 
     if (msg) {
-      setHqMessages((prev) => [...prev, msg]);
-      await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', convoId);
+      setMessages((prev) => [...prev, msg]);
+      await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', selectedConvo);
     }
-    setHqSending(false);
-  }, [hqNewMessage, hqConvo, user, hqSending]);
+    setSending(false);
+  }, [newMessage, selectedConvo, user, sending]);
 
-  // Fetch DM conversations
-  useEffect(() => {
+  // Contact HQ (find or create)
+  const contactHQ = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
-    supabase
+    setShowNewMenu(false);
+
+    const { data: existing } = await supabase
       .from('conversations')
-      .select('id, fan_user_id, user_b_id, last_message_at')
-      .eq('type', 'member_member')
-      .or(`fan_user_id.eq.${user.id},user_b_id.eq.${user.id}`)
-      .order('last_message_at', { ascending: false })
-      .then(async ({ data: convos }) => {
-        if (!convos || convos.length === 0) { setDmConversations([]); setDmFetching(false); return; }
+      .select('id')
+      .eq('fan_user_id', user.id)
+      .eq('type', 'member_hq')
+      .maybeSingle();
 
-        const peerIds = convos.map((c) => c.fan_user_id === user.id ? c.user_b_id : c.fan_user_id);
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, display_name, username, avatar_url')
-          .in('id', peerIds);
-        const profileMap = new Map((profiles || []).map((p) => [p.id, p]));
+    if (existing) {
+      setSelectedConvo(existing.id);
+      return;
+    }
 
-        const enriched = await Promise.all(
-          convos.map(async (convo) => {
-            const peerId = convo.fan_user_id === user.id ? convo.user_b_id : convo.fan_user_id;
-            const { count } = await supabase
-              .from('messages')
-              .select('id', { count: 'exact', head: true })
-              .eq('conversation_id', convo.id)
-              .neq('sender_id', user.id)
-              .is('read_at', null);
+    const { data: newConvo } = await supabase
+      .from('conversations')
+      .insert({ type: 'member_hq', fan_user_id: user.id })
+      .select('id')
+      .single();
 
-            const { data: lastMsg } = await supabase
-              .from('messages')
-              .select('body')
-              .eq('conversation_id', convo.id)
-              .order('created_at', { ascending: false })
-              .limit(1)
-              .single();
-
-            const peer = profileMap.get(peerId);
-            return {
-              ...convo,
-              peer_name: peer?.display_name || peer?.username || 'Unknown',
-              peer_avatar: peer?.avatar_url || null,
-              last_message: lastMsg?.body,
-              unread_count: count || 0,
-            };
-          })
-        );
-
-        setDmConversations(enriched);
-        setDmFetching(false);
-      });
+    if (newConvo) {
+      setSelectedConvo(newConvo.id);
+      // Add to conversation list
+      setConversations((prev) => [{
+        id: newConvo.id,
+        type: 'member_hq',
+        peer_name: 'JazzNode HQ',
+        peer_avatar: null,
+        last_message: null,
+        last_message_at: new Date().toISOString(),
+        unread_count: 0,
+        source_badge: 'hq',
+      }, ...prev]);
+    }
   }, [user]);
 
   // DM search users
@@ -485,11 +356,10 @@ export default function FanInboxPage() {
   }, [dmSearch, user]);
 
   // Start DM with a user
-  const startDM = useCallback(async (peerId: string) => {
+  const startDM = useCallback(async (peerId: string, peerName: string, peerAvatar: string | null) => {
     if (!user) return;
     const supabase = createClient();
 
-    // Check if conversation already exists
     const { data: existing } = await supabase
       .from('conversations')
       .select('id')
@@ -498,8 +368,9 @@ export default function FanInboxPage() {
       .maybeSingle();
 
     if (existing) {
-      setDmSelectedConvo(existing.id);
+      setSelectedConvo(existing.id);
       setShowDmSearch(false);
+      setShowNewMenu(false);
       setDmSearch('');
       return;
     }
@@ -511,62 +382,22 @@ export default function FanInboxPage() {
       .single();
 
     if (newConvo) {
-      setDmSelectedConvo(newConvo.id);
+      setSelectedConvo(newConvo.id);
       setShowDmSearch(false);
+      setShowNewMenu(false);
       setDmSearch('');
-      // Refresh DM list
-      setDmFetching(true);
+      setConversations((prev) => [{
+        id: newConvo.id,
+        type: 'member_member',
+        peer_name: peerName,
+        peer_avatar: peerAvatar,
+        last_message: null,
+        last_message_at: new Date().toISOString(),
+        unread_count: 0,
+        source_badge: null,
+      }, ...prev]);
     }
   }, [user]);
-
-  // Fetch DM messages
-  useEffect(() => {
-    if (!dmSelectedConvo || !user) return;
-    const supabase = createClient();
-    supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', dmSelectedConvo)
-      .order('created_at', { ascending: true })
-      .then(({ data }) => { if (data) setDmMessages(data); });
-
-    supabase
-      .from('messages')
-      .update({ read_at: new Date().toISOString() })
-      .eq('conversation_id', dmSelectedConvo)
-      .neq('sender_id', user.id)
-      .is('read_at', null)
-      .then(() => {
-        setDmConversations((prev) =>
-          prev.map((c) => (c.id === dmSelectedConvo ? { ...c, unread_count: 0 } : c))
-        );
-      });
-  }, [dmSelectedConvo, user]);
-
-  useEffect(() => {
-    dmMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [dmMessages]);
-
-  // Send DM
-  const handleDmSend = useCallback(async () => {
-    if (!dmNewMessage.trim() || !dmSelectedConvo || !user || dmSending) return;
-    setDmSending(true);
-    const supabase = createClient();
-    const body = dmNewMessage.trim();
-    setDmNewMessage('');
-
-    const { data: msg } = await supabase
-      .from('messages')
-      .insert({ conversation_id: dmSelectedConvo, sender_id: user.id, body })
-      .select()
-      .single();
-
-    if (msg) {
-      setDmMessages((prev) => [...prev, msg]);
-      await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', dmSelectedConvo);
-    }
-    setDmSending(false);
-  }, [dmNewMessage, dmSelectedConvo, user, dmSending]);
 
   // Fetch notifications
   useEffect(() => {
@@ -591,62 +422,6 @@ export default function FanInboxPage() {
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read_at: new Date().toISOString() } : n));
   }, [user]);
 
-  // Fetch messages for selected artist conversation
-  useEffect(() => {
-    if (!selectedConvo || !user) return;
-    const supabase = createClient();
-
-    supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', selectedConvo)
-      .order('created_at', { ascending: true })
-      .then(({ data }) => { if (data) setMessages(data); });
-
-    supabase
-      .from('messages')
-      .update({ read_at: new Date().toISOString() })
-      .eq('conversation_id', selectedConvo)
-      .neq('sender_id', user.id)
-      .is('read_at', null)
-      .then(() => {
-        setConversations((prev) =>
-          prev.map((c) => (c.id === selectedConvo ? { ...c, unread_count: 0 } : c))
-        );
-      });
-  }, [selectedConvo, user]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const handleSend = useCallback(async () => {
-    if (!newMessage.trim() || !selectedConvo || !user || sending) return;
-    setSending(true);
-    const supabase = createClient();
-    const body = newMessage.trim();
-    setNewMessage('');
-
-    const { data: msg } = await supabase
-      .from('messages')
-      .insert({ conversation_id: selectedConvo, sender_id: user.id, body })
-      .select()
-      .single();
-
-    if (msg) {
-      setMessages((prev) => [...prev, msg]);
-      await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', selectedConvo);
-    }
-    setSending(false);
-  }, [newMessage, selectedConvo, user, sending]);
-
-  const markBroadcastRead = useCallback(async (deliveryId: string) => {
-    if (!user) return;
-    const supabase = createClient();
-    await supabase.from('broadcast_deliveries').update({ read_at: new Date().toISOString() }).eq('id', deliveryId);
-    setBroadcasts((prev) => prev.map((b) => (b.delivery_id === deliveryId ? { ...b, read_at: new Date().toISOString() } : b)));
-  }, [user]);
-
   if (loading || !user) {
     return (
       <div className="py-24 text-center">
@@ -655,31 +430,18 @@ export default function FanInboxPage() {
     );
   }
 
+  // Apply filter
+  const filteredConversations = conversations.filter((c) => {
+    if (filter === 'all') return true;
+    if (filter === 'hq') return c.type === 'member_hq';
+    if (filter === 'artist') return c.type === 'artist_fan';
+    if (filter === 'dm') return c.type === 'member_member';
+    return true;
+  });
+
   const selectedConversation = conversations.find((c) => c.id === selectedConvo);
   const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
-  const unreadBroadcasts = broadcasts.filter((b) => !b.read_at).length;
-  const dmTotalUnread = dmConversations.reduce((sum, c) => sum + c.unread_count, 0);
   const unreadNotifs = notifications.filter((n) => !n.read_at).length;
-  const selectedDmConvo = dmConversations.find((c) => c.id === dmSelectedConvo);
-
-  const tabButton = (key: Tab, label: string, badge: number) => (
-    <button
-      key={key}
-      onClick={() => { setTab(key); setSelectedConvo(null); setDmSelectedConvo(null); }}
-      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
-        tab === key
-          ? 'bg-[var(--card)] text-[var(--foreground)]'
-          : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-      }`}
-    >
-      {label}
-      {badge > 0 && (
-        <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-          {badge}
-        </span>
-      )}
-    </button>
-  );
 
   return (
     <div className="max-w-4xl mx-auto space-y-4">
@@ -687,219 +449,89 @@ export default function FanInboxPage() {
         <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('fanInbox')}</h1>
       </FadeUp>
 
-      {/* Tabs */}
+      {/* 2 Tabs */}
       <FadeUp>
-        <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1 overflow-x-auto no-scrollbar">
-          {tabButton('messages', t('fanInboxMessages'), totalUnread)}
-          {tabButton('broadcasts', t('fanInboxBroadcasts'), unreadBroadcasts)}
-          {tabButton('hq', t('fanInboxHQ'), 0)}
-          {tabButton('dm', t('fanInboxDM'), dmTotalUnread)}
-          {tabButton('notifications', t('fanInboxNotifications'), unreadNotifs)}
+        <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1">
+          {(['messages', 'notifications'] as Tab[]).map((key) => {
+            const badge = key === 'messages' ? totalUnread : unreadNotifs;
+            return (
+              <button
+                key={key}
+                onClick={() => { setTab(key); setSelectedConvo(null); }}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                  tab === key
+                    ? 'bg-[var(--card)] text-[var(--foreground)]'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                {t(key === 'messages' ? 'inboxMessages' : 'inboxNotifications')}
+                {badge > 0 && (
+                  <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                    {badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </FadeUp>
 
-      {/* Messages Tab (Artist conversations) */}
+      {/* Messages Tab */}
       {tab === 'messages' && (
         <FadeUp>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '400px' }}>
+          {/* Filter Chips */}
+          <div className="mb-3">
+            <FilterChips active={filter} onChange={setFilter} />
+          </div>
+
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
             <div className="flex h-full">
-              <div className={`${selectedConvo ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-72 border-r border-[var(--border)] shrink-0`}>
-                <div className="flex-1 overflow-y-auto">
-                  {fetching ? (
-                    <div className="p-6 text-center">
-                      <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
-                    </div>
-                  ) : conversations.length === 0 ? (
-                    <div className="p-6 text-center">
-                      <p className="text-sm text-[var(--muted-foreground)]">{t('noFanMessages')}</p>
-                      <p className="text-xs text-[var(--muted-foreground)]/60 mt-1">{t('noFanMessagesHint')}</p>
-                    </div>
-                  ) : (
-                    conversations.map((convo) => (
-                      <button key={convo.id} onClick={() => setSelectedConvo(convo.id)}
-                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''}`}>
-                        <div className="flex items-center gap-3">
-                          {convo.artist_photo ? (
-                            <img src={convo.artist_photo} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
-                          ) : (
-                            <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
-                              {(convo.artist_name || '?').charAt(0)}
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold truncate">{convo.artist_name}</p>
-                              {convo.unread_count > 0 && (
-                                <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
-                                  {convo.unread_count}
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-[var(--muted-foreground)] truncate">{convo.last_message || '...'}</p>
-                          </div>
+              {/* Conversation List */}
+              <div className={`${selectedConvo ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-80 border-r border-[var(--border)] shrink-0`}>
+                {/* "+" New Conversation button */}
+                <div className="p-3 border-b border-[var(--border)] relative">
+                  <button
+                    onClick={() => { setShowNewMenu(!showNewMenu); setShowDmSearch(false); }}
+                    className="w-full text-center py-2 rounded-xl border border-dashed border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/50 hover:text-[var(--color-gold)] transition-colors"
+                  >
+                    + {t('newConversation')}
+                  </button>
+
+                  {showNewMenu && !showDmSearch && (
+                    <div className="absolute top-full left-3 right-3 mt-1 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-lg z-10 overflow-hidden">
+                      <button
+                        onClick={contactHQ}
+                        className="w-full text-left px-4 py-3 text-xs hover:bg-[var(--muted)] transition-colors flex items-center gap-2"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-purple-400/15 flex items-center justify-center shrink-0">
+                          <svg className="w-3 h-3 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+                          </svg>
                         </div>
+                        <span>{t('contactHQ')}</span>
                       </button>
-                    ))
+                      <button
+                        onClick={() => setShowDmSearch(true)}
+                        className="w-full text-left px-4 py-3 text-xs hover:bg-[var(--muted)] transition-colors flex items-center gap-2 border-t border-[var(--border)]"
+                      >
+                        <div className="w-6 h-6 rounded-full bg-[var(--muted)] flex items-center justify-center shrink-0">
+                          <svg className="w-3 h-3 text-[var(--muted-foreground)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                          </svg>
+                        </div>
+                        <span>{t('fanInboxNewDM')}</span>
+                      </button>
+                    </div>
                   )}
-                </div>
-              </div>
-              <div className={`${selectedConvo ? 'flex' : 'hidden sm:flex'} flex-col flex-1 min-w-0`}>
-                {selectedConvo && selectedConversation ? (
-                  <ChatThread
-                    messages={messages} userId={user.id} locale={locale}
-                    selectedName={selectedConversation.artist_name || ''}
-                    onBack={() => setSelectedConvo(null)} onSend={handleSend}
-                    sending={sending} newMessage={newMessage} setNewMessage={setNewMessage}
-                    messagesEndRef={messagesEndRef} placeholder={t('typeMessage')}
-                  />
-                ) : (
-                  <div className="flex-1 flex items-center justify-center">
-                    <p className="text-sm text-[var(--muted-foreground)]">{t('selectConversation')}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </FadeUp>
-      )}
 
-      {/* Broadcasts Tab */}
-      {tab === 'broadcasts' && (
-        <FadeUp>
-          <div className="space-y-3">
-            {broadcasts.length === 0 ? (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 text-center">
-                <p className="text-sm text-[var(--muted-foreground)]">{t('noFanBroadcasts')}</p>
-                <p className="text-xs text-[var(--muted-foreground)]/60 mt-1">{t('noFanBroadcastsHint')}</p>
-              </div>
-            ) : (
-              broadcasts.map((bc) => (
-                <div key={`${bc.id}-${bc.delivery_id}`}
-                  className={`bg-[var(--card)] border rounded-2xl p-5 transition-colors ${bc.read_at ? 'border-[var(--border)]' : 'border-[var(--color-gold)]/20'}`}
-                  onClick={() => !bc.read_at && markBroadcastRead(bc.delivery_id)}>
-                  <div className="flex items-start gap-3">
-                    {bc.artist_photo ? (
-                      <img src={bc.artist_photo} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-[var(--muted)] flex items-center justify-center text-xs shrink-0">
-                        {(bc.artist_name || '?').charAt(0)}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <Link href={`/${locale}/artists/${bc.artist_id}`}
-                          className="text-xs text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors">
-                          {t('fromArtist', { name: bc.artist_name || '' })}
-                        </Link>
-                        <div className="flex items-center gap-2">
-                          {!bc.read_at && <span className="w-2 h-2 rounded-full bg-[var(--color-gold)]" />}
-                          <span className="text-xs text-[var(--muted-foreground)]">{new Date(bc.sent_at).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      <h3 className="text-sm font-semibold mb-1">{bc.title}</h3>
-                      <p className="text-sm text-[var(--muted-foreground)] line-clamp-3">{bc.body}</p>
-                    </div>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </FadeUp>
-      )}
-
-      {/* JazzNode HQ Tab */}
-      {tab === 'hq' && (
-        <FadeUp>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '400px' }}>
-            <div className="flex flex-col h-full">
-              <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)]">
-                <div className="w-8 h-8 rounded-full bg-[var(--color-gold)]/15 flex items-center justify-center">
-                  <svg className="w-4 h-4 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-semibold">JazzNode HQ</p>
-                  <p className="text-[10px] text-[var(--muted-foreground)]">{t('fanInboxHQHint')}</p>
-                </div>
-              </div>
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {hqLoading ? (
-                  <div className="flex-1 flex items-center justify-center py-12">
-                    <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
-                  </div>
-                ) : hqMessages.length === 0 ? (
-                  <div className="flex-1 flex items-center justify-center py-12">
-                    <div className="text-center">
-                      <p className="text-sm text-[var(--muted-foreground)]">{t('fanInboxHQEmpty')}</p>
-                      <p className="text-xs text-[var(--muted-foreground)]/60 mt-1">{t('fanInboxHQEmptyHint')}</p>
-                    </div>
-                  </div>
-                ) : (
-                  hqMessages.map((msg) => {
-                    const isMe = msg.sender_id === user.id;
-                    return (
-                      <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
-                          isMe ? 'bg-[var(--color-gold)]/15 text-[var(--foreground)]' : 'bg-[var(--muted)] text-[var(--foreground)]'
-                        }`}>
-                          {!isMe && msg.sender_role === 'admin' && msg.sender_display && (
-                            <p className="text-[10px] text-[var(--color-gold)]/60 font-semibold mb-0.5">
-                              JazzNode HQ · {msg.sender_display}
-                            </p>
-                          )}
-                          <div className="flex items-start gap-2">
-                            <p className="whitespace-pre-wrap break-words flex-1">{msg.body}</p>
-                            <TranslateButton text={msg.body} locale={locale} />
-                          </div>
-                          <p className={`text-[10px] mt-1 ${isMe ? 'text-[var(--color-gold)]/50' : 'text-[var(--muted-foreground)]/50'}`}>
-                            {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-                <div ref={hqMessagesEndRef} />
-              </div>
-              <div className="p-3 border-t border-[var(--border)]">
-                <div className="flex gap-2">
-                  <input type="text" value={hqNewMessage} onChange={(e) => setHqNewMessage(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleHqSend()}
-                    placeholder={t('fanInboxHQPlaceholder')}
-                    className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
-                  />
-                  <button onClick={handleHqSend} disabled={!hqNewMessage.trim() || hqSending}
-                    className="px-4 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30">
-                    {t('send')}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </FadeUp>
-      )}
-
-      {/* DM Tab */}
-      {tab === 'dm' && (
-        <FadeUp>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 280px)', minHeight: '400px' }}>
-            <div className="flex h-full">
-              <div className={`${dmSelectedConvo ? 'hidden sm:flex' : 'flex'} flex-col w-full sm:w-72 border-r border-[var(--border)] shrink-0`}>
-                {/* New DM button */}
-                <div className="p-3 border-b border-[var(--border)]">
-                  <button onClick={() => setShowDmSearch(!showDmSearch)}
-                    className="w-full text-center py-2 rounded-xl border border-dashed border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/50 hover:text-[var(--color-gold)] transition-colors">
-                    + {t('fanInboxNewDM')}
-                  </button>
                   {showDmSearch && (
                     <div className="mt-2 space-y-2">
                       <input type="text" value={dmSearch} onChange={(e) => setDmSearch(e.target.value)}
-                        placeholder={t('fanInboxSearchUsers')}
+                        placeholder={t('fanInboxSearchUsers')} autoFocus
                         className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50"
                       />
                       {dmSearchResults.map((u) => (
-                        <button key={u.id} onClick={() => startDM(u.id)}
+                        <button key={u.id} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url)}
                           className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--muted)] transition-colors">
                           {u.avatar_url ? (
                             <img src={u.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
@@ -911,24 +543,37 @@ export default function FanInboxPage() {
                           <span className="text-xs font-medium truncate">{u.display_name || u.username}</span>
                         </button>
                       ))}
+                      <button onClick={() => { setShowDmSearch(false); setShowNewMenu(false); setDmSearch(''); }}
+                        className="w-full text-center text-xs text-[var(--muted-foreground)] hover:text-[var(--foreground)] py-1">
+                        {t('cancel')}
+                      </button>
                     </div>
                   )}
                 </div>
+
+                {/* Conversation List */}
                 <div className="flex-1 overflow-y-auto">
-                  {dmFetching ? (
+                  {fetching ? (
                     <div className="p-6 text-center">
                       <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
                     </div>
-                  ) : dmConversations.length === 0 ? (
+                  ) : filteredConversations.length === 0 ? (
                     <div className="p-6 text-center">
-                      <p className="text-sm text-[var(--muted-foreground)]">{t('fanInboxNoDM')}</p>
+                      <p className="text-sm text-[var(--muted-foreground)]">{t('noFanMessages')}</p>
+                      <p className="text-xs text-[var(--muted-foreground)]/60 mt-1">{t('noFanMessagesHint')}</p>
                     </div>
                   ) : (
-                    dmConversations.map((convo) => (
-                      <button key={convo.id} onClick={() => setDmSelectedConvo(convo.id)}
-                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${dmSelectedConvo === convo.id ? 'bg-[var(--muted)]' : ''}`}>
+                    filteredConversations.map((convo) => (
+                      <button key={convo.id} onClick={() => { setSelectedConvo(convo.id); setShowNewMenu(false); setShowDmSearch(false); }}
+                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''}`}>
                         <div className="flex items-center gap-3">
-                          {convo.peer_avatar ? (
+                          {convo.source_badge === 'hq' ? (
+                            <div className="w-9 h-9 rounded-full bg-purple-400/15 flex items-center justify-center shrink-0">
+                              <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+                              </svg>
+                            </div>
+                          ) : convo.peer_avatar ? (
                             <img src={convo.peer_avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
                           ) : (
                             <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
@@ -936,10 +581,11 @@ export default function FanInboxPage() {
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
                               <p className="text-sm font-semibold truncate">{convo.peer_name}</p>
+                              <SourceBadge type={convo.source_badge} />
                               {convo.unread_count > 0 && (
-                                <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
+                                <span className="ml-auto bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
                                   {convo.unread_count}
                                 </span>
                               )}
@@ -952,15 +598,77 @@ export default function FanInboxPage() {
                   )}
                 </div>
               </div>
-              <div className={`${dmSelectedConvo ? 'flex' : 'hidden sm:flex'} flex-col flex-1 min-w-0`}>
-                {dmSelectedConvo && selectedDmConvo ? (
-                  <ChatThread
-                    messages={dmMessages} userId={user.id} locale={locale}
-                    selectedName={selectedDmConvo.peer_name || 'Unknown'}
-                    onBack={() => setDmSelectedConvo(null)} onSend={handleDmSend}
-                    sending={dmSending} newMessage={dmNewMessage} setNewMessage={setDmNewMessage}
-                    messagesEndRef={dmMessagesEndRef} placeholder={t('typeMessage')}
-                  />
+
+              {/* Chat Thread */}
+              <div className={`${selectedConvo ? 'flex' : 'hidden sm:flex'} flex-col flex-1 min-w-0`}>
+                {selectedConvo && selectedConversation ? (
+                  <>
+                    {/* Thread Header */}
+                    <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--border)]">
+                      <button onClick={() => setSelectedConvo(null)} className="sm:hidden text-[var(--muted-foreground)]">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                      </button>
+                      <span className="text-sm font-semibold">{selectedConversation.peer_name}</span>
+                      <SourceBadge type={selectedConversation.source_badge} />
+                    </div>
+
+                    {/* Messages */}
+                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                      {messages.map((msg) => {
+                        const isMe = msg.sender_id === user.id;
+
+                        // Broadcast message — special quote style
+                        if (msg.broadcast_id && !isMe) {
+                          return (
+                            <div key={msg.id} className="flex justify-start">
+                              <BroadcastBubble body={msg.body} createdAt={msg.created_at}>
+                                <TranslateButton text={msg.body} locale={locale} />
+                              </BroadcastBubble>
+                            </div>
+                          );
+                        }
+
+                        return (
+                          <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
+                              isMe ? 'bg-[var(--color-gold)]/15 text-[var(--foreground)]' : 'bg-[var(--muted)] text-[var(--foreground)]'
+                            }`}>
+                              {!isMe && msg.sender_role === 'admin' && msg.sender_display && (
+                                <p className="text-[10px] text-[var(--color-gold)]/60 font-semibold mb-0.5">
+                                  JazzNode HQ · {msg.sender_display}
+                                </p>
+                              )}
+                              <div className="flex items-start gap-2">
+                                <p className="whitespace-pre-wrap break-words flex-1">{msg.body}</p>
+                                <TranslateButton text={msg.body} locale={locale} />
+                              </div>
+                              <p className={`text-[10px] mt-1 ${isMe ? 'text-[var(--color-gold)]/50' : 'text-[var(--muted-foreground)]/50'}`}>
+                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    {/* Message Input */}
+                    <div className="p-3 border-t border-[var(--border)]">
+                      <div className="flex gap-2">
+                        <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                          placeholder={t('typeMessage')}
+                          className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
+                        />
+                        <button onClick={handleSend} disabled={!newMessage.trim() || sending}
+                          className="px-4 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30">
+                          {t('send')}
+                        </button>
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="flex-1 flex items-center justify-center">
                     <p className="text-sm text-[var(--muted-foreground)]">{t('selectConversation')}</p>

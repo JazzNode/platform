@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import BroadcastBubble from '@/components/inbox/BroadcastBubble';
 
 interface Conversation {
   id: string;
@@ -25,6 +26,7 @@ interface Message {
   id: string;
   conversation_id: string;
   sender_id: string;
+  broadcast_id: string | null;
   body: string;
   read_at: string | null;
   created_at: string;
@@ -113,7 +115,7 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
 
     supabase
       .from('messages')
-      .select('*')
+      .select('id, conversation_id, sender_id, broadcast_id, body, read_at, created_at')
       .eq('conversation_id', selectedConvo)
       .order('created_at', { ascending: true })
       .then(({ data }) => {
@@ -282,6 +284,16 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
                   <div className="flex-1 overflow-y-auto p-4 space-y-3">
                     {messages.map((msg) => {
                       const isMe = msg.sender_id === user?.id;
+
+                      // Broadcast message from artist (shown as quote style)
+                      if (msg.broadcast_id && isMe) {
+                        return (
+                          <div key={msg.id} className="flex justify-end">
+                            <BroadcastBubble body={msg.body} createdAt={msg.created_at} />
+                          </div>
+                        );
+                      }
+
                       return (
                         <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                           <div

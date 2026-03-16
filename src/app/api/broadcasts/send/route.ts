@@ -1,0 +1,149 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
+
+/**
+ * POST /api/broadcasts/send
+ * Creates a broadcast and inserts messages into each fan's artist_fan conversation.
+ *
+ * Body: { artistId, title, body, channel }
+ * Requires authenticated user who has claimed the artist.
+ */
+export async function POST(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { artistId, title, body, channel } = await request.json();
+  if (!artistId || !title?.trim() || !body?.trim()) {
+    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+  }
+
+  // Verify user has claimed this artist
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('claimed_artist_ids, role')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile) {
+    return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+  }
+
+  const isOwner = profile.claimed_artist_ids?.includes(artistId);
+  const isAdmin = profile.role === 'admin';
+  if (!isOwner && !isAdmin) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const adminClient = createAdminClient();
+
+  // 1. Create broadcast record
+  const { data: broadcast, error: broadcastError } = await adminClient
+    .from('broadcasts')
+    .insert({
+      artist_id: artistId,
+      sender_id: user.id,
+      title: title.trim(),
+      body: body.trim(),
+      channel: channel || 'inbox',
+      sent_at: new Date().toISOString(),
+    })
+    .select('id')
+    .single();
+
+  if (broadcastError || !broadcast) {
+    return NextResponse.json({ error: 'Failed to create broadcast' }, { status: 500 });
+  }
+
+  // 2. Get all fans who follow this artist
+  const { data: fans } = await adminClient
+    .from('follows')
+    .select('user_id')
+    .eq('target_type', 'artist')
+    .eq('target_id', artistId);
+
+  if (!fans || fans.length === 0) {
+    return NextResponse.json({
+      broadcastId: broadcast.id,
+      deliveryCount: 0,
+    });
+  }
+
+  // 3. Create broadcast_deliveries (for backwards compat / stats)
+  const deliveries = fans.map((f) => ({
+    broadcast_id: broadcast.id,
+    user_id: f.user_id,
+  }));
+  await adminClient.from('broadcast_deliveries').insert(deliveries);
+
+  // 4. For each fan, find or create artist_fan conversation, then insert message
+  const now = new Date().toISOString();
+  const messageBody = `${title.trim()}\n\n${body.trim()}`;
+  let insertedCount = 0;
+
+  // Batch: get all existing conversations for this artist with these fans
+  const fanIds = fans.map((f) => f.user_id);
+  const { data: existingConvos } = await adminClient
+    .from('conversations')
+    .select('id, fan_user_id')
+    .eq('type', 'artist_fan')
+    .eq('artist_id', artistId)
+    .in('fan_user_id', fanIds);
+
+  const convoByFan = new Map<string, string>();
+  existingConvos?.forEach((c) => convoByFan.set(c.fan_user_id, c.id));
+
+  // Find fans without existing conversations
+  const fansNeedingConvo = fanIds.filter((id) => !convoByFan.has(id));
+
+  // Batch create missing conversations
+  if (fansNeedingConvo.length > 0) {
+    const newConvos = fansNeedingConvo.map((fanId) => ({
+      type: 'artist_fan' as const,
+      artist_id: artistId,
+      fan_user_id: fanId,
+      last_message_at: now,
+    }));
+
+    const { data: created } = await adminClient
+      .from('conversations')
+      .insert(newConvos)
+      .select('id, fan_user_id');
+
+    created?.forEach((c) => convoByFan.set(c.fan_user_id, c.id));
+  }
+
+  // Batch insert messages
+  const messages = fanIds
+    .filter((fanId) => convoByFan.has(fanId))
+    .map((fanId) => ({
+      conversation_id: convoByFan.get(fanId)!,
+      sender_id: user.id,
+      broadcast_id: broadcast.id,
+      body: messageBody,
+      created_at: now,
+    }));
+
+  if (messages.length > 0) {
+    const { error: msgError } = await adminClient.from('messages').insert(messages);
+    if (!msgError) insertedCount = messages.length;
+  }
+
+  // Update last_message_at on all affected conversations
+  const convoIds = [...new Set(messages.map((m) => m.conversation_id))];
+  if (convoIds.length > 0) {
+    await adminClient
+      .from('conversations')
+      .update({ last_message_at: now })
+      .in('id', convoIds);
+  }
+
+  return NextResponse.json({
+    broadcastId: broadcast.id,
+    deliveryCount: fans.length,
+    messageCount: insertedCount,
+  });
+}

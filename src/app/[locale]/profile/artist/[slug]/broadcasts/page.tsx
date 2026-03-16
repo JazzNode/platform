@@ -103,53 +103,42 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
     if (!title.trim() || !body.trim() || !slug || !user || sending) return;
     setSending(true);
 
-    const supabase = createClient();
+    try {
+      const res = await fetch('/api/broadcasts/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          artistId: slug,
+          title: title.trim(),
+          body: body.trim(),
+          channel,
+        }),
+      });
 
-    // Create broadcast
-    const { data: broadcast } = await supabase
-      .from('broadcasts')
-      .insert({
-        artist_id: slug,
-        sender_id: user.id,
-        title: title.trim(),
-        body: body.trim(),
-        channel,
-        sent_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+      const data = await res.json();
 
-    if (broadcast) {
-      // Create delivery records for all fans
-      const { data: fans } = await supabase
-        .from('follows')
-        .select('user_id')
-        .eq('target_type', 'artist')
-        .eq('target_id', slug);
+      if (res.ok && data.broadcastId) {
+        setBroadcasts((prev) => [
+          {
+            id: data.broadcastId,
+            title: title.trim(),
+            body: body.trim(),
+            channel,
+            sent_at: new Date().toISOString(),
+            created_at: new Date().toISOString(),
+            delivery_count: data.deliveryCount || 0,
+            read_count: 0,
+          },
+          ...prev,
+        ]);
 
-      if (fans && fans.length > 0) {
-        const deliveries = fans.map((f) => ({
-          broadcast_id: broadcast.id,
-          user_id: f.user_id,
-        }));
-        await supabase.from('broadcast_deliveries').insert(deliveries);
+        // Reset form
+        setTitle('');
+        setBody('');
+        setChannel('inbox');
+        setComposing(false);
       }
-
-      setBroadcasts((prev) => [
-        {
-          ...broadcast,
-          delivery_count: fans?.length || 0,
-          read_count: 0,
-        },
-        ...prev,
-      ]);
-
-      // Reset form
-      setTitle('');
-      setBody('');
-      setChannel('inbox');
-      setComposing(false);
-    }
+    } catch {}
 
     setSending(false);
   }, [title, body, channel, slug, user, sending]);
