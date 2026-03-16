@@ -2,6 +2,8 @@
 
 import { useEffect, useCallback, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 
 const subscribe = () => () => {};
 const getSnapshot = () => true;
@@ -14,6 +16,13 @@ interface Props {
 
 export default function LegalModal({ isOpen, onClose }: Props) {
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const locale = useLocale();
+  const router = useRouter();
+
+  const handleContactHQ = useCallback(() => {
+    onClose();
+    router.push(`/${locale}/profile/inbox?contactHQ=1`);
+  }, [locale, router, onClose]);
 
   // ESC to close
   useEffect(() => {
@@ -100,8 +109,8 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. Your Music, Your Rules</h4>
-                  <p>If you&#39;re an artist or venue owner and prefer not to be listed on our platform, or if you spot a mistake, just drop a note to{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
+                  <p>If you&#39;re an artist or venue owner and prefer not to be listed on our platform, or if you spot a mistake, just{' '}
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">contact us</button>
                     . We will update or remove your profile unconditionally within 24 hours. No questions asked.
                   </p>
                 </div>
@@ -126,8 +135,8 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 你的音樂，你做主</h4>
-                  <p>如果您是場館經營者或音樂家，不希望您的資訊出現在 JazzNode 上，或者發現我們哪裡寫錯了，請隨時發信至{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
+                  <p>如果您是場館經營者或音樂家，不希望您的資訊出現在 JazzNode 上，或者發現我們哪裡寫錯了，請隨時
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">聯絡我們</button>
                     。我們會在 24 小時內無條件為您修正或將資訊撤下，絕不囉嗦。
                   </p>
                 </div>
@@ -152,9 +161,9 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. あなたの音楽、あなたのルール</h4>
-                  <p>もしあなたがアーティストや会場の運営者で、JazzNodeへの掲載を希望されない場合、または情報の訂正が必要な場合は、{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
-                    {' '}までご連絡ください。24時間以内に無条件で修正または削除いたします。
+                  <p>もしあなたがアーティストや会場の運営者で、JazzNodeへの掲載を希望されない場合、または情報の訂正が必要な場合は、
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">お問い合わせ</button>
+                    ください。24時間以内に無条件で修正または削除いたします。
                   </p>
                 </div>
               </div>
@@ -179,8 +188,8 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. 당신의 음악, 당신의 규칙</h4>
                   <p>아티스트나 공연장 관계자로서 플랫폼에 게재되는 것을 원치 않으시거나, 잘못된 정보를 발견하셨다면{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
-                    으로 연락해 주세요. 24시간 이내에 무조건 수정하거나 삭제해 드립니다. 어떠한 질문도 하지 않겠습니다.
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">문의하기</button>
+                    를 통해 연락해 주세요. 24시간 이내에 무조건 수정하거나 삭제해 드립니다. 어떠한 질문도 하지 않겠습니다.
                   </p>
                 </div>
               </div>
@@ -204,8 +213,8 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. ดนตรีของคุณ กฎของคุณ</h4>
-                  <p>หากคุณเป็นศิลปินหรือเจ้าของสถานที่และไม่ต้องการให้ข้อมูลปรากฏบนแพลตฟอร์มของเรา หรือพบข้อผิดพลาด เพียงส่งข้อความมาที่{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
+                  <p>หากคุณเป็นศิลปินหรือเจ้าของสถานที่และไม่ต้องการให้ข้อมูลปรากฏบนแพลตฟอร์มของเรา หรือพบข้อผิดพลาด เพียง
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">ติดต่อเรา</button>
                     {' '}เราจะอัปเดตหรือลบโปรไฟล์ของคุณโดยไม่มีเงื่อนไขภายใน 24 ชั่วโมง ไม่ถามคำถามใดๆ
                   </p>
                 </div>
@@ -230,8 +239,8 @@ export default function LegalModal({ isOpen, onClose }: Props) {
                 </div>
                 <div>
                   <h4 className="font-serif font-bold text-[var(--foreground)] mb-1">3. Musik Anda, Aturan Anda</h4>
-                  <p>Jika Anda seorang artis atau pemilik venue dan tidak ingin ditampilkan di platform kami, atau jika Anda menemukan kesalahan, cukup kirim pesan ke{' '}
-                    <a href="mailto:jazznode@gmail.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">jazznode@gmail.com</a>
+                  <p>Jika Anda seorang artis atau pemilik venue dan tidak ingin ditampilkan di platform kami, atau jika Anda menemukan kesalahan, cukup{' '}
+                    <button type="button" onClick={handleContactHQ} className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hubungi kami</button>
                     . Kami akan memperbarui atau menghapus profil Anda tanpa syarat dalam 24 jam. Tanpa pertanyaan.
                   </p>
                 </div>

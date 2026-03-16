@@ -333,6 +333,16 @@ export default function FanInboxPage() {
     }
   }, [user]);
 
+  // Auto-open HQ conversation when navigated with ?contactHQ=1
+  useEffect(() => {
+    if (!user || fetching) return;
+    if (searchParams.get('contactHQ')) {
+      contactHQ();
+      // Clean up the URL param
+      router.replace(`/${locale}/profile/inbox`, { scroll: false });
+    }
+  }, [user, fetching, searchParams, contactHQ, router, locale]);
+
   // DM search users
   useEffect(() => {
     if (!dmSearch.trim() || !user) return;
