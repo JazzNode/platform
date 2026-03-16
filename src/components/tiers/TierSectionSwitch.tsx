@@ -119,8 +119,8 @@ export default function TierSectionSwitch({
   filtered: SectionData;
   full: SectionData;
 }) {
-  const { adminModeEnabled } = useAdmin();
-  const data = adminModeEnabled ? full : filtered;
+  const { isAdmin } = useAdmin();
+  const data = isAdmin ? full : filtered;
 
   return (
     <section>
