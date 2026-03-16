@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 6. Revalidate the artists cache
-    updateTag('artists');
+    revalidateTag('artists');
 
     writeAuditLog({
       adminUserId: userId,

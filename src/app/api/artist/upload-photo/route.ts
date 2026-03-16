@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { verifyArtistClaimToken } from '@/lib/artist-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { uploadToR2 } from '@/lib/r2';
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       throw new Error(`Supabase update failed: ${updateErr.message}`);
     }
 
-    updateTag('artists');
+    revalidateTag('artists');
 
     writeAuditLog({
       adminUserId: userId,

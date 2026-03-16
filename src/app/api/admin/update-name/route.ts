@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateTag } from 'next/cache';
+import { revalidateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { createAdminClient } from '@/utils/supabase/admin';
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
       throw new Error(`Supabase update failed: ${updateError.message}`);
     }
 
-    updateTag(ENTITY_TAG[entityType]);
+    revalidateTag(ENTITY_TAG[entityType]);
 
     writeAuditLog({
       adminUserId: userId,
