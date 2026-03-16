@@ -16,6 +16,8 @@ interface AdminContextType {
   isAdmin: boolean;
   /** Supabase access token — pass as Bearer token to admin API routes */
   token: string | null;
+  /** Get a fresh (auto-refreshed) access token right before API calls */
+  getFreshToken: () => Promise<string | null>;
   /** Whether admin mode UI is active (admin may toggle it off to see regular view) */
   adminModeEnabled: boolean;
   /** @deprecated Use toggleArtistTier or toggleVenueTier instead */
@@ -80,6 +82,24 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
     setShowAuthModal(true);
   }, [setShowAuthModal]);
 
+  /** Refresh the Supabase session and return a fresh access token */
+  const getFreshToken = useCallback(async (): Promise<string | null> => {
+    if (!user) return null;
+    try {
+      const supabase = createClient();
+      const { data: { session }, error } = await supabase.auth.refreshSession();
+      if (error || !session) {
+        handleUnauthorized();
+        return null;
+      }
+      setToken(session.access_token);
+      return session.access_token;
+    } catch {
+      handleUnauthorized();
+      return null;
+    }
+  }, [user, handleUnauthorized]);
+
   /** Cycle through a specific tier cycle based on current viewMode */
   const cycleTier = useCallback((cycle: ViewMode[]) => {
     if (!user) {
@@ -127,6 +147,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       value={{
         isAdmin,
         token,
+        getFreshToken,
         adminModeEnabled,
         toggleAdmin,
         handleUnauthorized,

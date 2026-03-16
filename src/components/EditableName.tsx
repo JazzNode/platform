@@ -34,7 +34,7 @@ export default function EditableName({
   className = '',
   tag: Tag = 'p',
 }: EditableNameProps) {
-  const { isAdmin, token, handleUnauthorized } = useAdmin();
+  const { isAdmin, token, getFreshToken, handleUnauthorized } = useAdmin();
   const router = useRouter();
   const [picking, setPicking] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -89,11 +89,17 @@ export default function EditableName({
     setError(null);
 
     try {
+      // Always refresh token before API call to avoid stale token issues
+      const freshToken = await getFreshToken();
+      if (!freshToken) {
+        throw new Error('Token 已過期，請重新登入');
+      }
+
       const res = await fetch('/api/admin/update-name', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${freshToken}`,
         },
         body: JSON.stringify({
           entityType,
@@ -117,7 +123,7 @@ export default function EditableName({
     } finally {
       setSaving(false);
     }
-  }, [token, draft, value, activeField, fieldOptions, entityType, entityId, router, handleUnauthorized]);
+  }, [token, draft, value, activeField, fieldOptions, entityType, entityId, router, getFreshToken, handleUnauthorized]);
 
   const startEdit = () => {
     if (fieldOptions && fieldOptions.length > 1) {

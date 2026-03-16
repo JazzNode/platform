@@ -29,7 +29,7 @@ export default function EditableContent({
   shortContentClassName = '',
   wrapperClassName,
 }: EditableContentProps) {
-  const { canEdit, isAdmin, token, handleUnauthorized } = useCanEdit(
+  const { canEdit, isAdmin, token, getFreshToken, handleUnauthorized } = useCanEdit(
     entityType as 'artist' | 'venue',
     entityId,
   );
@@ -73,12 +73,18 @@ export default function EditableContent({
     setWarning(null);
 
     try {
+      // Always refresh token before API call to avoid stale token issues
+      const freshToken = await getFreshToken();
+      if (!freshToken) {
+        throw new Error('Token 已過期，請重新登入');
+      }
+
       const endpoint = isAdmin ? '/api/admin/update-content' : '/api/artist/update-content';
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${freshToken}`,
         },
         body: JSON.stringify({
           entityType,
@@ -116,7 +122,7 @@ export default function EditableContent({
     } finally {
       setSaving(false);
     }
-  }, [token, draft, entityType, entityId, fieldPrefix, locale, router, handleUnauthorized, t]);
+  }, [token, draft, entityType, entityId, fieldPrefix, locale, router, getFreshToken, handleUnauthorized, isAdmin, t]);
 
   // Cannot edit: render content as-is
   if (!canEdit) {
