@@ -8,8 +8,8 @@ import { displayName, artistDisplayName, artistDisplayNameField, formatDate, for
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import ArtistPhotoUpload from '@/components/ArtistPhotoUpload';
-import SocialIcons from '@/components/SocialIcons';
-import SocialIconsPlaceholder from '@/components/SocialIconsPlaceholder';
+import EditableSocialLinks from '@/components/EditableSocialLinks';
+import EditableInstruments from '@/components/EditableInstruments';
 import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
@@ -343,11 +343,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2">
-              {f.primary_instrument && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-gold/30 text-gold capitalize">
-                  {instLabel(f.primary_instrument)}
-                </span>
-              )}
+              <EditableInstruments
+                entityId={artist.id}
+                primaryInstrument={f.primary_instrument}
+                instrumentList={f.instrument_list}
+                primaryInstrumentLabel={f.primary_instrument ? instLabel(f.primary_instrument) : undefined}
+              />
               {f.type && (
                 <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                   {f.type === 'person' ? t('musicians') : f.type === 'big band' ? t('bigBands') : t('groups')}
@@ -398,18 +399,19 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               </div>
             )}
 
-            {/* Social Icons — show real links if available, otherwise placeholder for unclaimed */}
-            {(f.website_url || f.spotify_url || f.youtube_url || f.instagram || f.facebook_url) ? (
-              <SocialIcons
-                websiteUrl={f.website_url}
-                spotifyUrl={f.spotify_url}
-                youtubeUrl={f.youtube_url}
-                instagram={f.instagram}
-                facebookUrl={f.facebook_url}
-              />
-            ) : (
-              <SocialIconsPlaceholder artistName={artistDisplayName(f, locale)} />
-            )}
+            {/* Social Icons — admin-editable, with placeholder for unclaimed */}
+            <EditableSocialLinks
+              entityType="artist"
+              entityId={artist.id}
+              artistName={artistDisplayName(f, locale)}
+              fields={{
+                website_url: f.website_url,
+                spotify_url: f.spotify_url,
+                youtube_url: f.youtube_url,
+                instagram: f.instagram,
+                facebook_url: f.facebook_url,
+              }}
+            />
           </div>
         </div>
       </FadeUp>
