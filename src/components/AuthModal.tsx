@@ -10,18 +10,19 @@ const subscribe = () => () => {};
 const getSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-type Tab = 'signIn' | 'signUp';
+type Tab = 'signIn' | 'signUp' | 'forgotPassword';
 
 export default function AuthModal() {
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const t = useTranslations('auth');
-  const { showAuthModal, setShowAuthModal, signIn, signUp, signInWithGoogle } = useAuth();
+  const { showAuthModal, setShowAuthModal, signIn, signUp, signInWithGoogle, resetPassword } = useAuth();
   const [tab, setTab] = useState<Tab>('signIn');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   const resetForm = useCallback(() => {
     setEmail('');
@@ -29,6 +30,7 @@ export default function AuthModal() {
     setError('');
     setLoading(false);
     setConfirmationSent(false);
+    setResetEmailSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -59,6 +61,7 @@ export default function AuthModal() {
     setTab(newTab);
     setError('');
     setConfirmationSent(false);
+    setResetEmailSent(false);
   };
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
@@ -66,7 +69,12 @@ export default function AuthModal() {
     setLoading(true);
     setError('');
 
-    if (tab === 'signIn') {
+    if (tab === 'forgotPassword') {
+      const { error } = await resetPassword(email);
+      setLoading(false);
+      if (error) setError(t('genericError'));
+      else setResetEmailSent(true);
+    } else if (tab === 'signIn') {
       const { error } = await signIn(email, password);
       setLoading(false);
       if (error) setError(t('invalidCredentials'));
@@ -81,7 +89,7 @@ export default function AuthModal() {
         setConfirmationSent(true);
       }
     }
-  }, [tab, email, password, signIn, signUp, t]);
+  }, [tab, email, password, signIn, signUp, resetPassword, t]);
 
   const handleGoogle = useCallback(async () => {
     setLoading(true);
@@ -121,25 +129,35 @@ export default function AuthModal() {
         >
           {/* Tabs */}
           <div className="flex border-b border-[var(--border)]">
-            {(['signIn', 'signUp'] as Tab[]).map((t_) => (
-              <button
-                key={t_}
-                onClick={() => switchTab(t_)}
-                className={`flex-1 py-3.5 text-sm font-semibold tracking-wide transition-colors duration-300 relative ${
-                  tab === t_
-                    ? 'text-[var(--color-gold)]'
-                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-                }`}
-              >
-                {t(t_)}
-                {tab === t_ && (
-                  <span
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-12 rounded-full bg-[var(--color-gold)]"
-                    style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
-                  />
-                )}
-              </button>
-            ))}
+            {tab === 'forgotPassword' ? (
+              <div className="flex-1 py-3.5 text-sm font-semibold tracking-wide text-center text-[var(--color-gold)] relative">
+                {t('resetPassword')}
+                <span
+                  className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-12 rounded-full bg-[var(--color-gold)]"
+                  style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                />
+              </div>
+            ) : (
+              (['signIn', 'signUp'] as Tab[]).map((t_) => (
+                <button
+                  key={t_}
+                  onClick={() => switchTab(t_)}
+                  className={`flex-1 py-3.5 text-sm font-semibold tracking-wide transition-colors duration-300 relative ${
+                    tab === t_
+                      ? 'text-[var(--color-gold)]'
+                      : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                  }`}
+                >
+                  {t(t_)}
+                  {tab === t_ && (
+                    <span
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-[2px] w-12 rounded-full bg-[var(--color-gold)]"
+                      style={{ transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                    />
+                  )}
+                </button>
+              ))
+            )}
           </div>
 
           <div className="p-6">
@@ -161,6 +179,57 @@ export default function AuthModal() {
                   {t('close')}
                 </button>
               </div>
+            ) : resetEmailSent ? (
+              <div className="text-center py-4">
+                <div className="w-12 h-12 rounded-full bg-[var(--color-gold)]/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-[var(--color-gold)]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </div>
+                <h3 className="font-serif text-lg font-bold mb-2">{t('resetEmailSentTitle')}</h3>
+                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{t('resetEmailSentMessage')}</p>
+                <button
+                  onClick={handleClose}
+                  className="mt-6 text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-bright)] transition-colors"
+                >
+                  {t('close')}
+                </button>
+              </div>
+            ) : tab === 'forgotPassword' ? (
+              <>
+                <p className="text-sm text-[var(--muted-foreground)] mb-4">{t('forgotPasswordDescription')}</p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-[var(--muted-foreground)] mb-1.5 tracking-wide uppercase">{t('email')}</label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoFocus
+                      autoComplete="email"
+                      required
+                      className="w-full h-10 rounded-lg border border-[var(--border)] bg-transparent px-3 text-sm outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-colors placeholder:text-[var(--muted-foreground)]/50"
+                    />
+                  </div>
+
+                  {error && <p className="text-xs text-red-400">{error}</p>}
+
+                  <button
+                    type="submit"
+                    disabled={loading || !email}
+                    className="w-full h-10 rounded-lg bg-[var(--color-gold)] text-[#0A0A0A] text-sm font-bold tracking-wide transition-opacity hover:opacity-90 disabled:opacity-40"
+                  >
+                    {loading ? '...' : t('sendResetEmail')}
+                  </button>
+                </form>
+                <button
+                  onClick={() => switchTab('signIn')}
+                  className="mt-4 w-full text-center text-xs text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
+                >
+                  {t('backToSignIn')}
+                </button>
+              </>
             ) : (
               <>
                 {/* Form */}
@@ -200,6 +269,16 @@ export default function AuthModal() {
                     {loading ? '...' : tab === 'signIn' ? t('signIn') : t('createAccount')}
                   </button>
                 </form>
+
+                {/* Forgot password link (sign in tab only) */}
+                {tab === 'signIn' && (
+                  <button
+                    onClick={() => switchTab('forgotPassword')}
+                    className="mt-3 w-full text-center text-xs text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
+                  >
+                    {t('forgotPassword')}
+                  </button>
+                )}
 
                 {/* Divider */}
                 <div className="flex items-center gap-3 my-5">

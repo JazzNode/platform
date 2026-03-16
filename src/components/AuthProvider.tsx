@@ -29,6 +29,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
+  resetPassword: (email: string) => Promise<{ error: string | null }>;
   showAuthModal: boolean;
   setShowAuthModal: (show: boolean) => void;
   showComingSoon: { x: number; y: number } | null;
@@ -111,6 +112,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     });
   }, []);
 
+  const resetPassword = useCallback(async (email: string) => {
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + '/auth/callback?next=/update-password',
+    });
+    if (error) return { error: error.message };
+    return { error: null };
+  }, []);
+
   const signOut = useCallback(async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -120,7 +130,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, showAuthModal, setShowAuthModal, showComingSoon, setShowComingSoon }}
+      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, resetPassword, showAuthModal, setShowAuthModal, showComingSoon, setShowComingSoon }}
     >
       {children}
     </AuthContext.Provider>
