@@ -19,6 +19,7 @@ interface SerializedVenue {
   jazzFrequencyLabel: string | null;
   description: string | null;
   hasUpcomingJam?: boolean;
+  jamBadgeLabel?: string;
 }
 
 interface CityOption {
@@ -225,23 +226,23 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                     />
                     {venue.hasUpcomingJam && (
                       <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">
-                        🎷 本週有 Jam Session
+                        ♪ {venue.jamBadgeLabel}
                       </span>
                     )}
                   </div>
                 )}
                 {!venue.photoUrl && venue.hasUpcomingJam && (
                   <span className="inline-block mb-3 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18]">
-                    🎷 本週有 Jam Session
+                    ♪ {venue.jamBadgeLabel}
                   </span>
                 )}
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                   {venue.displayName}
                 </h3>
-                <div className="flex gap-3 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {venue.cityLabel && <span>📍 {venue.cityLabel}</span>}
+                <div className="flex items-center gap-1.5 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
+                  {venue.cityLabel && <><span>{venue.cityLabel}</span><span className="text-[#8A8578]/30">·</span></>}
                   <span>{venue.eventCount} events</span>
-                  {venue.jazzFrequencyLabel && <span>🎵 {venue.jazzFrequencyLabel}</span>}
+                  {venue.jazzFrequencyLabel && <><span className="text-[#8A8578]/30">·</span><span>{venue.jazzFrequencyLabel}</span></>}
                 </div>
                 {venue.description && (
                   <p className="text-xs text-[#8A8578] mt-3 line-clamp-2 leading-relaxed">

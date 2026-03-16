@@ -164,13 +164,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       {/* Status Banner */}
       {f.status === 'inactive' && (
         <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-amber-900/20 border border-amber-700/30 text-amber-400">
-          <span className="text-lg">⚠️</span>
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
           <span className="text-sm font-medium">{t('venueInactive')}</span>
         </div>
       )}
       {f.status === 'closed' && (
         <div className="flex items-center gap-3 px-5 py-4 rounded-2xl bg-red-900/20 border border-red-700/30 text-red-400">
-          <span className="text-lg">🚫</span>
+          <svg className="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"/></svg>
           <span className="text-sm font-medium">{t('venueClosed')}</span>
         </div>
       )}
@@ -183,8 +183,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <Image src={photoUrl(f.photo_url)!} alt={displayName(f)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
           </div>
         ) : (
-          <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center text-6xl border border-[var(--border)]">
-            🎵
+          <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center border border-[var(--border)]">
+            <svg className="w-16 h-16 text-[#8A8578]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
           </div>
         )}
 
@@ -203,23 +203,27 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {f.city_id?.[0] && cityMap.get(f.city_id[0]) && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                📍 {cityName(cityMap.get(f.city_id[0])!, locale)}
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C4.7 0 2 2.7 2 6c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6zm0 8.5c-1.4 0-2.5-1.1-2.5-2.5S6.6 3.5 8 3.5s2.5 1.1 2.5 2.5S9.4 8.5 8 8.5z"/></svg>
+                {cityName(cityMap.get(f.city_id[0])!, locale)}
               </span>
             )}
             {f.jazz_frequency && f.jazz_frequency !== 'none' && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                🎵 {jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency}
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                {jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency}
               </span>
             )}
             {f.capacity && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                👥 {f.capacity} {t('capacitySeats')}
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                {f.capacity} {t('capacitySeats')}
               </span>
             )}
             {f.currency && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
-                💰 {f.currency}
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M12 6v12M9 9.5c0-1 .9-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 2-3 1-3 2 .9 1.5 3 1.5 3-.5 3-1.5"/></svg>
+                {f.currency}
               </span>
             )}
             {f.is_gold_partner && (
@@ -244,14 +248,17 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {/* Vibe Check / Practical Info */}
           <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
             {f.payment_method?.map((pm) => (
-              <span key={pm} className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💳 {paymentLabel[pm] || pm}</span>
+              <span key={pm} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]">
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+                {paymentLabel[pm] || pm}
+              </span>
             ))}
-            {f.friendly_zh && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 中文友善</span>}
-            {f.friendly_en && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 English Friendly</span>}
-            {f.friendly_ja && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 日本語OK</span>}
-            {f.friendly_ko && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 한국어 가능</span>}
-            {f.friendly_th && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 ภาษาไทย</span>}
-            {f.friendly_id && <span className="px-3 py-1.5 rounded-xl border border-[var(--border)]">💬 Bahasa Indonesia</span>}
+            {f.friendly_zh && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> 中文友善</span>}
+            {f.friendly_en && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> English Friendly</span>}
+            {f.friendly_ja && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> 日本語OK</span>}
+            {f.friendly_ko && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> 한국어 가능</span>}
+            {f.friendly_th && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> ภาษาไทย</span>}
+            {f.friendly_id && <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]"><svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg> Bahasa Indonesia</span>}
           </div>
 
 {/* Badges */}
@@ -286,12 +293,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <div className="flex flex-wrap gap-4 text-sm text-[#C4BFB3]">
               {f.phone && (
                 <a href={`tel:${f.phone}`} className="flex items-center gap-2 hover:text-gold transition-colors">
-                  <span>📞</span> {f.phone}
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                  {f.phone}
                 </a>
               )}
               {f.contact_email && (
                 <a href={`mailto:${f.contact_email}`} className="flex items-center gap-2 hover:text-gold transition-colors">
-                  <span>✉️</span> {f.contact_email}
+                  <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                  {f.contact_email}
                 </a>
               )}
             </div>
@@ -301,7 +310,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {f.business_hour && (
             <div className="text-sm text-[#C4BFB3]">
               <span className="flex items-center gap-2 text-[#8A8578] mb-1">
-                <span>🕐</span> {t('businessHours')}
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
+                {t('businessHours')}
               </span>
               <p className="whitespace-pre-line ml-6">{f.business_hour}</p>
             </div>
@@ -317,7 +327,10 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
       {((f.lat && f.lng) || f.address_local || f.address_en) && (
         <FadeUp stagger={0.1}>
           <section className="border-t border-[var(--border)] pt-12">
-            <h2 className="font-serif text-2xl font-bold mb-8">📍 {t('locationMap')}</h2>
+            <h2 className="font-serif text-2xl font-bold mb-8 flex items-center gap-3">
+              <svg className="w-5 h-5 text-gold" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C4.7 0 2 2.7 2 6c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6zm0 8.5c-1.4 0-2.5-1.1-2.5-2.5S6.6 3.5 8 3.5s2.5 1.1 2.5 2.5S9.4 8.5 8 8.5z"/></svg>
+              {t('locationMap')}
+            </h2>
             {(f.address_local || f.address_en) && (
               <div className="mb-6 space-y-1">
                 {f.address_local && <p className="text-sm text-[#C4BFB3]">{f.address_local}</p>}
@@ -351,14 +364,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     target="_blank" rel="noreferrer"
                     className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
                   >
-                    🗺️ {t('openInGoogleMaps')}
+                    {t('openInGoogleMaps')}
                   </a>
                   <a
                     href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`}
                     target="_blank" rel="noreferrer"
                     className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
                   >
-                    🍎 {t('openInAppleMaps')}
+                    {t('openInAppleMaps')}
                   </a>
                 </div>
               </>
@@ -443,7 +456,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         return (
           <FadeUp stagger={0.1}>
             <section className="border-t border-[var(--border)] pt-12">
-              <h2 className="font-serif text-2xl font-bold mb-8">🎙️ Jam Sessions</h2>
+              <h2 className="font-serif text-2xl font-bold mb-8">Jam Sessions</h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {jams.slice(0, 3).map((event) => {
                   const tz = event.fields.timezone || 'Asia/Taipei';

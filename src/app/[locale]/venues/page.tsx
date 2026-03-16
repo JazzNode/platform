@@ -73,6 +73,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       jazzFrequencyLabel: f.jazz_frequency ? (jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency) : null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
       hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
+      jamBadgeLabel: t('jamThisWeek'),
     };
   });
 
