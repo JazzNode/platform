@@ -23,16 +23,17 @@ interface AdminEditedByBadgeProps {
 }
 
 export default function AdminEditedByBadge({ updatedBy }: AdminEditedByBadgeProps) {
-  const { isAdmin, getFreshToken } = useAdmin();
+  // Use `token` directly (kept in sync via onAuthStateChange) instead of
+  // getFreshToken(), which calls refreshSession() and may trigger
+  // handleUnauthorized() → login modal loop on mount.
+  const { isAdmin, token } = useAdmin();
   const [editor, setEditor] = useState<EditorInfo | null>(null);
 
   useEffect(() => {
-    if (!isAdmin || !updatedBy) return;
+    if (!isAdmin || !updatedBy || !token) return;
 
     let cancelled = false;
     (async () => {
-      const token = await getFreshToken();
-      if (!token || cancelled) return;
       try {
         const res = await fetch(`/api/admin/editor-profile?userId=${encodeURIComponent(updatedBy)}`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -41,11 +42,11 @@ export default function AdminEditedByBadge({ updatedBy }: AdminEditedByBadgeProp
         const data = await res.json();
         if (!cancelled) setEditor(data);
       } catch {
-        // silently ignore
+        // silently ignore — badge is cosmetic, never block UX
       }
     })();
     return () => { cancelled = true; };
-  }, [isAdmin, updatedBy, getFreshToken]);
+  }, [isAdmin, updatedBy, token]);
 
   if (!isAdmin || !updatedBy || !editor) return null;
 
