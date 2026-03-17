@@ -13,6 +13,7 @@ import ClaimButton from '@/components/ClaimButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
 import RecordNav from '@/components/RecordNav';
+import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -243,6 +244,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <p className="text-xs text-[#8A8578] italic">
               {t('unclaimedVenueNotice')}
             </p>
+          )}
+          {f.data_source === 'admin' && f.updated_by && (
+            <AdminEditedByBadge updatedBy={f.updated_by} />
           )}
 
           {/* Vibe Check / Practical Info */}

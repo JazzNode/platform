@@ -1,0 +1,71 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useAdmin } from './AdminProvider';
+
+interface EditorInfo {
+  display_name: string | null;
+  username: string | null;
+  role: string | null;
+  email: string | null;
+}
+
+const ROLE_LABELS: Record<string, string> = {
+  owner: 'Owner',
+  admin: 'Admin',
+  artist_manager: 'Artist Manager',
+  venue_manager: 'Venue Manager',
+  member: 'Member',
+};
+
+interface AdminEditedByBadgeProps {
+  updatedBy?: string | null;
+}
+
+export default function AdminEditedByBadge({ updatedBy }: AdminEditedByBadgeProps) {
+  const { isAdmin, getFreshToken } = useAdmin();
+  const [editor, setEditor] = useState<EditorInfo | null>(null);
+
+  useEffect(() => {
+    if (!isAdmin || !updatedBy) return;
+
+    let cancelled = false;
+    (async () => {
+      const token = await getFreshToken();
+      if (!token || cancelled) return;
+      try {
+        const res = await fetch(`/api/admin/editor-profile?userId=${encodeURIComponent(updatedBy)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok || cancelled) return;
+        const data = await res.json();
+        if (!cancelled) setEditor(data);
+      } catch {
+        // silently ignore
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [isAdmin, updatedBy, getFreshToken]);
+
+  if (!isAdmin || !updatedBy || !editor) return null;
+
+  const name = editor.display_name || editor.username || editor.email || updatedBy;
+  const roleLabel = editor.role ? (ROLE_LABELS[editor.role] ?? editor.role) : null;
+
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[11px] text-[#8A8578] select-none">
+      {/* Pencil icon */}
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="opacity-60 shrink-0">
+        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+        <path d="m15 5 4 4" />
+      </svg>
+      {roleLabel && (
+        <span className="uppercase tracking-wider text-[10px] text-[#6B6760] font-medium">
+          {roleLabel}
+        </span>
+      )}
+      {roleLabel && <span className="text-[#4A4845]">·</span>}
+      <span className="text-[#7A7570]">{name}</span>
+    </span>
+  );
+}

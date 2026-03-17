@@ -105,6 +105,7 @@ export interface Venue {
   tier?: number;
   // Data lineage
   data_source?: string;
+  updated_by?: string;
 }
 
 export interface Artist {
@@ -172,6 +173,7 @@ export interface Artist {
   tier?: number;
   // Data lineage
   data_source?: string;
+  updated_by?: string;
 }
 
 export interface Event {
