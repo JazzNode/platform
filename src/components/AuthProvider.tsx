@@ -60,17 +60,28 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   }, [user, fetchProfile]);
 
   useEffect(() => {
+    let cancelled = false;
     const supabase = createClient();
+    let initialDone = false;
 
     // Get initial session
     supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (cancelled) return;
       setUser(user);
       if (user) await fetchProfile(user.id);
+    }).catch(() => {
+      // Network error — treat as logged out
+    }).finally(() => {
+      if (cancelled) return;
+      initialDone = true;
       setLoading(false);
     });
 
-    // Listen for auth changes
+    // Listen for auth changes (skip redundant trigger during initial load)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (cancelled) return;
+      // During initial load, getUser() already handles the state
+      if (!initialDone) return;
       const newUser = session?.user ?? null;
       setUser(newUser);
       if (newUser) {
@@ -80,7 +91,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signIn = useCallback(async (email: string, password: string) => {
