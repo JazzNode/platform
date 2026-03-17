@@ -25,8 +25,14 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  // Refresh the session so it doesn't expire
-  await supabase.auth.getUser();
+  // Use getSession() instead of getUser() to avoid a network round-trip on
+  // every request. getUser() always hits the Supabase auth endpoint which can
+  // cause 504 MIDDLEWARE_INVOCATION_TIMEOUT on Vercel Edge when Supabase is slow.
+  // getSession() reads from the cookie and only makes a network call when the
+  // access token is expired and needs to be refreshed via the refresh token.
+  // Security: individual API routes call getUser() (via verifyAdminToken) for
+  // operations that require server-side token validation.
+  await supabase.auth.getSession();
 
   return response;
 }
