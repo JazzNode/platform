@@ -162,6 +162,22 @@
     "redirectingHome": "正在導向首頁...",
     "profile": "個人檔案"
   },
+  "onboarding": {
+    "title": "歡迎加入 JazzNode",
+    "subtitle": "告訴我們一點關於你的資訊，讓我們為你打造專屬體驗。",
+    "userTypeLabel": "我的身分",
+    "userType_fan": "爵士愛好者",
+    "userType_fan_desc": "我喜歡探索現場爵士演出與藝人",
+    "userType_industry": "樂手 / 產業人員",
+    "userType_industry_desc": "我是樂手、經紀人、場館經營者或產業相關人員",
+    "cityLabel": "我的主場城市（選填）",
+    "cityPlaceholder": "選擇城市",
+    "city_taipei": "台北",
+    "city_kaohsiung": "高雄",
+    "city_hong_kong": "香港",
+    "city_singapore": "新加坡",
+    "continue": "繼續"
+  },
   "profile": {
     "settings": "個人設定",
     "displayName": "顯示名稱",

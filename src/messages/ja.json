@@ -158,6 +158,22 @@
     "redirectingHome": "ホームにリダイレクト中...",
     "profile": "プロフィール"
   },
+  "onboarding": {
+    "title": "JazzNode へようこそ",
+    "subtitle": "あなたに合った体験をお届けするため、少しだけ教えてください。",
+    "userTypeLabel": "あなたは",
+    "userType_fan": "ジャズファン",
+    "userType_fan_desc": "ライブジャズイベントやアーティストを探すのが好き",
+    "userType_industry": "ミュージシャン / 業界関係者",
+    "userType_industry_desc": "ミュージシャン、ブッキングエージェント、会場オーナー、業界プロフェッショナル",
+    "cityLabel": "ホームシティ（任意）",
+    "cityPlaceholder": "都市を選択",
+    "city_taipei": "台北",
+    "city_kaohsiung": "高雄",
+    "city_hong_kong": "香港",
+    "city_singapore": "シンガポール",
+    "continue": "続ける"
+  },
   "profile": {
     "settings": "プロフィール設定",
     "displayName": "表示名",

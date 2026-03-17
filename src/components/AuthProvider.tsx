@@ -16,6 +16,8 @@ export interface UserProfile {
   social_links: Record<string, string>;
   claimed_artist_ids: string[];
   claimed_venue_ids: string[];
+  primary_city: string | null;
+  user_type: 'fan' | 'industry' | null;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +26,7 @@ interface AuthContextType {
   user: User | null;
   profile: UserProfile | null;
   loading: boolean;
+  needsOnboarding: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null; needsConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
@@ -144,9 +147,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setProfile(null);
   }, []);
 
+  const needsOnboarding = !!user && !!profile && profile.user_type === null;
+
   return (
     <AuthContext.Provider
-      value={{ user, profile, loading, signIn, signUp, signInWithGoogle, signOut, refreshProfile, resetPassword, showAuthModal, setShowAuthModal, showComingSoon, setShowComingSoon }}
+      value={{ user, profile, loading, needsOnboarding, signIn, signUp, signInWithGoogle, signOut, refreshProfile, resetPassword, showAuthModal, setShowAuthModal, showComingSoon, setShowComingSoon }}
     >
       {children}
     </AuthContext.Provider>

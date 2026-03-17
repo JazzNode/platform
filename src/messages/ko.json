@@ -158,6 +158,22 @@
     "redirectingHome": "홈으로 이동 중...",
     "profile": "프로필"
   },
+  "onboarding": {
+    "title": "JazzNode에 오신 것을 환영합니다",
+    "subtitle": "맞춤 경험을 위해 간단한 정보를 알려주세요.",
+    "userTypeLabel": "저는",
+    "userType_fan": "재즈 애호가",
+    "userType_fan_desc": "라이브 재즈 이벤트와 아티스트를 탐색하는 것을 좋아합니다",
+    "userType_industry": "뮤지션 / 업계 관계자",
+    "userType_industry_desc": "뮤지션, 부킹 에이전트, 공연장 운영자 또는 업계 전문가",
+    "cityLabel": "거주 도시 (선택)",
+    "cityPlaceholder": "도시 선택",
+    "city_taipei": "타이베이",
+    "city_kaohsiung": "가오슝",
+    "city_hong_kong": "홍콩",
+    "city_singapore": "싱가포르",
+    "continue": "계속"
+  },
   "profile": {
     "settings": "프로필 설정",
     "displayName": "표시 이름",

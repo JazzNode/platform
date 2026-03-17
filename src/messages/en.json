@@ -162,6 +162,22 @@
     "redirectingHome": "Redirecting to home...",
     "profile": "Profile"
   },
+  "onboarding": {
+    "title": "Welcome to JazzNode",
+    "subtitle": "Tell us a bit about yourself so we can personalize your experience.",
+    "userTypeLabel": "I am",
+    "userType_fan": "Jazz Enthusiast",
+    "userType_fan_desc": "I love discovering live jazz events and artists",
+    "userType_industry": "Musician / Industry",
+    "userType_industry_desc": "I'm a musician, booking agent, venue operator, or industry professional",
+    "cityLabel": "My home city (optional)",
+    "cityPlaceholder": "Select a city",
+    "city_taipei": "Taipei",
+    "city_kaohsiung": "Kaohsiung",
+    "city_hong_kong": "Hong Kong",
+    "city_singapore": "Singapore",
+    "continue": "Continue"
+  },
   "profile": {
     "settings": "Profile Settings",
     "displayName": "Display Name",

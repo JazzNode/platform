@@ -158,6 +158,22 @@
     "redirectingHome": "กำลังนำไปหน้าหลัก...",
     "profile": "โปรไฟล์"
   },
+  "onboarding": {
+    "title": "ยินดีต้อมรับสู่ JazzNode",
+    "subtitle": "บอกเราเกี่ยวกับตัวคุณเล็กน้อย เพื่อปรับแต่งประสบการณ์ให้เหมาะกับคุณ",
+    "userTypeLabel": "ฉันเป็น",
+    "userType_fan": "แฟนแจ๊ส",
+    "userType_fan_desc": "ฉันชอบค้นหาอีเวนต์แจ๊สสดและศิลปิน",
+    "userType_industry": "นักดนตรี / บุคลากรในอุตสาหกรรม",
+    "userType_industry_desc": "นักดนตรี ตัวแทนจอง เจ้าของสถานที่ หรือผู้เชี่ยวชาญในอุตสาหกรรม",
+    "cityLabel": "เมืองหลักของฉัน (ไม่บังคับ)",
+    "cityPlaceholder": "เลือกเมือง",
+    "city_taipei": "ไทเป",
+    "city_kaohsiung": "เกาสง",
+    "city_hong_kong": "ฮ่องกง",
+    "city_singapore": "สิงคโปร์",
+    "continue": "ดำเนินการต่อ"
+  },
   "profile": {
     "settings": "ตั้งค่าโปรไฟล์",
     "displayName": "ชื่อที่แสดง",

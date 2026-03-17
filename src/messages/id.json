@@ -158,6 +158,22 @@
     "redirectingHome": "Mengarahkan ke beranda...",
     "profile": "Profil"
   },
+  "onboarding": {
+    "title": "Selamat Datang di JazzNode",
+    "subtitle": "Ceritakan sedikit tentang diri Anda agar kami bisa menyesuaikan pengalaman untuk Anda.",
+    "userTypeLabel": "Saya adalah",
+    "userType_fan": "Penggemar Jazz",
+    "userType_fan_desc": "Saya suka menemukan acara jazz live dan artis",
+    "userType_industry": "Musisi / Profesional Industri",
+    "userType_industry_desc": "Musisi, agen booking, pengelola venue, atau profesional industri",
+    "cityLabel": "Kota utama saya (opsional)",
+    "cityPlaceholder": "Pilih kota",
+    "city_taipei": "Taipei",
+    "city_kaohsiung": "Kaohsiung",
+    "city_hong_kong": "Hong Kong",
+    "city_singapore": "Singapura",
+    "continue": "Lanjutkan"
+  },
   "profile": {
     "settings": "Pengaturan Profil",
     "displayName": "Nama Tampilan",
