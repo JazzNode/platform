@@ -7,6 +7,17 @@ import { createAdminClient } from '@/utils/supabase/admin';
 
 const LOCALES = ['en', 'zh', 'ja', 'ko', 'th', 'id'];
 
+// If a full bio is already shorter than the short bio target, reuse it directly
+const wordCount = (s: string) => s.trim().split(/\s+/).length;
+const SHORT_BIO_THRESHOLDS: Record<string, { src: string; max: number; measure: (s: string) => number }> = {
+  bio_short_zh: { src: 'bio_zh', max: 70, measure: (s) => s.length },
+  bio_short_en: { src: 'bio_en', max: 40, measure: wordCount },
+  bio_short_ja: { src: 'bio_ja', max: 100, measure: (s) => s.length },
+  bio_short_ko: { src: 'bio_ko', max: 90, measure: (s) => s.length },
+  bio_short_th: { src: 'bio_th', max: 110, measure: (s) => s.length },
+  bio_short_id: { src: 'bio_id', max: 40, measure: wordCount },
+};
+
 /**
  * Claimed artist can update their own bio.
  * Auto-detects source language and translates to all 6 locales.
@@ -66,6 +77,15 @@ export async function POST(req: NextRequest) {
         if (fieldPrefix === 'bio') {
           const shortKey = `bio_short_${locale}`;
           if (geminiResult[shortKey]) fields[shortKey] = geminiResult[shortKey];
+        }
+      }
+      // If full bio is already shorter than the short bio target, reuse it directly
+      if (fieldPrefix === 'bio') {
+        for (const [shortKey, cfg] of Object.entries(SHORT_BIO_THRESHOLDS)) {
+          const fullBio = fields[cfg.src];
+          if (fullBio && cfg.measure(fullBio) <= cfg.max) {
+            fields[shortKey] = fullBio;
+          }
         }
       }
     } else {
