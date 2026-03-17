@@ -196,6 +196,13 @@
     "learnMore": "인증 후 무엇을 할 수 있나요? 자세히 보기 →",
     "skip": "나중에 인증하기"
   },
+  "followGuide": {
+    "title": "최신 소식 받기",
+    "subtitle_1": "좋아하는 공연장과 아티스트를 팔로우하고",
+    "subtitle_2": "공연을 놓치지 마세요.",
+    "done": "완료",
+    "skip": "나중에"
+  },
   "profile": {
     "settings": "프로필 설정",
     "displayName": "표시 이름",

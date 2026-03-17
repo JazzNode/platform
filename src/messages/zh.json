@@ -200,6 +200,13 @@
     "learnMore": "認領後可以做什麼？了解更多 →",
     "skip": "先跳過，之後再認領"
   },
+  "followGuide": {
+    "title": "掌握最新動態",
+    "subtitle_1": "追蹤你喜歡的場地和藝人，",
+    "subtitle_2": "不再錯過任何一場演出。",
+    "done": "完成",
+    "skip": "先跳過"
+  },
   "profile": {
     "settings": "個人設定",
     "displayName": "顯示名稱",

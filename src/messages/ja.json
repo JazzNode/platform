@@ -196,6 +196,13 @@
     "learnMore": "認証後にできることは？詳しくはこちら →",
     "skip": "後で認証する"
   },
+  "followGuide": {
+    "title": "最新情報をキャッチ",
+    "subtitle_1": "お気に入りの会場やアーティストをフォローして、",
+    "subtitle_2": "ライブを見逃さないようにしましょう。",
+    "done": "完了",
+    "skip": "後で"
+  },
   "profile": {
     "settings": "プロフィール設定",
     "displayName": "表示名",

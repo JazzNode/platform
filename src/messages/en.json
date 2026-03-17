@@ -200,6 +200,13 @@
     "learnMore": "What can I do after claiming? Learn more →",
     "skip": "Skip for now, I'll claim later"
   },
+  "followGuide": {
+    "title": "Stay in the Loop",
+    "subtitle_1": "Follow your favorite venues and artists",
+    "subtitle_2": "to never miss a show.",
+    "done": "Done",
+    "skip": "Skip for now"
+  },
   "profile": {
     "settings": "Profile Settings",
     "displayName": "Display Name",

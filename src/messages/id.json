@@ -196,6 +196,13 @@
     "learnMore": "Apa yang bisa dilakukan setelah klaim? Pelajari lebih lanjut →",
     "skip": "Lewati, klaim nanti"
   },
+  "followGuide": {
+    "title": "Tetap Terhubung",
+    "subtitle_1": "Ikuti venue dan artis favorit Anda",
+    "subtitle_2": "agar tidak ketinggalan pertunjukan.",
+    "done": "Selesai",
+    "skip": "Lewati"
+  },
   "profile": {
     "settings": "Pengaturan Profil",
     "displayName": "Nama Tampilan",
