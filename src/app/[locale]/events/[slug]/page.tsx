@@ -11,6 +11,7 @@ import BookmarkButton from '@/components/BookmarkButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
+import EventPosterUpload from '@/components/EventPosterUpload';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -195,14 +196,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       {/* Hero section */}
       <FadeUp>
       <div className="flex flex-col lg:flex-row gap-10">
-        {/* Poster — only on detail page */}
-        {f.poster_url && (
-          <div className="w-full lg:w-[400px] shrink-0">
-            <div className="overflow-hidden rounded-2xl">
-              <Image src={f.poster_url} alt={eventTitle(f, locale)} width={800} height={600} className="w-full h-auto object-cover" sizes="(min-width: 1024px) 400px, 100vw" />
-            </div>
-          </div>
-        )}
+        {/* Poster — only on detail page (admin can upload/change) */}
+        <EventPosterUpload
+          eventId={event.id}
+          eventTitle={eventTitle(f, locale)}
+          currentPosterUrl={f.poster_url || null}
+        />
 
         {/* Info */}
         <div className="flex-1 space-y-6">

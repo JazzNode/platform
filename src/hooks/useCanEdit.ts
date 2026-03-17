@@ -5,7 +5,7 @@ import { useAuth } from '@/components/AuthProvider';
  * Determines if the current user can edit a given entity.
  * Returns true for admins (with admin mode enabled) or claimed users.
  */
-export function useCanEdit(entityType: 'artist' | 'venue', entityId: string) {
+export function useCanEdit(entityType: 'artist' | 'venue' | 'event', entityId: string) {
   const { isAdmin, token, getFreshToken, handleUnauthorized } = useAdmin();
   const { user, profile } = useAuth();
 
