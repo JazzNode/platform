@@ -5,8 +5,6 @@ import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resol
 import { displayName, artistDisplayName, formatDate, formatTime, cityName, eventTitle } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
-import FadeUp from '@/components/animations/FadeUp';
-import FadeUpItem from '@/components/animations/FadeUpItem';
 import ManifestoReveal from '@/components/animations/ManifestoReveal';
 import HomeEventsSection from '@/components/HomeEventsSection';
 
@@ -89,23 +87,67 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     };
   });
 
-  // Build region labels and order from events that actually exist
-  const regionCodesInUse = [...new Set(homeEvents.map((e) => e.country_code).filter(Boolean))];
+  // Serialize weekly jams with country_code
+  const homeJams = weeklyJams.map((event) => {
+    const tz = event.fields.timezone || 'Asia/Taipei';
+    const venue = resolveLinks(event.fields.venue_id, venueMap)[0];
+    const city = venue?.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
+    const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+    const eventLineups = (lineupsByEvent.get(event.id) || [])
+      .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+    const sidemen = eventLineups
+      .filter((l) => l.fields.role !== 'ensemble')
+      .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+      .filter(Boolean)
+      .filter((a) => a.id !== primaryArtist?.id)
+      .map((a) => artistDisplayName(a.fields, locale));
+    const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+      .map((tag) => tag.fields.name)
+      .filter(Boolean) as string[];
+    return {
+      id: event.id,
+      title: eventTitle(event.fields, locale),
+      start_at: event.fields.start_at || null,
+      venue_name: venue ? displayName(venue.fields) : '',
+      city_name: city ? cityName(city, locale) : '',
+      country_code: city?.country_code || '',
+      date_display: formatDate(event.fields.start_at, locale, tz),
+      time_display: formatTime(event.fields.start_at, tz),
+      sidemen,
+      tags: eventTags,
+    };
+  });
+
+  // Serialize featured venues with country_code
+  const venueCountsFallback = buildVenueEventCounts(events);
+  const featured = [...venuesWithEvents]
+    .sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback))
+    .slice(0, 12);
+
+  const homeVenues = featured.map((venue) => {
+    const city = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
+    return {
+      id: venue.id,
+      name: displayName(venue.fields),
+      city_name: city ? cityName(city, locale) : '',
+      country_code: city?.country_code || '',
+      event_count: venueEventCount(venue, venueCountsFallback),
+      jazz_frequency: venue.fields.jazz_frequency || null,
+    };
+  });
+
+  // Build region labels and order from all content
+  const allCountryCodes = [
+    ...homeEvents.map((e) => e.country_code),
+    ...homeJams.map((e) => e.country_code),
+    ...homeVenues.map((v) => v.country_code),
+  ].filter(Boolean);
+  const regionCodesInUse = [...new Set(allCountryCodes)];
   const homeRegionLabels: Record<string, string> = {};
   for (const code of regionCodesInUse) {
     try { homeRegionLabels[code] = tRegions(code as 'TW'); } catch { homeRegionLabels[code] = code; }
   }
-  // Stable region order: follow the order they appear in events (by soonest event first)
   const homeRegionOrder = regionCodesInUse;
-
-  const venueCountsFallback = buildVenueEventCounts(events);
-  const jazzFreqLabel: Record<string, string> = {
-    nightly: t('jazzNightly'), weekends: t('jazzWeekends'), occasional: t('jazzOccasional'),
-  };
-
-  const featured = [...venuesWithEvents]
-    .sort((a, b) => venueEventCount(b, venueCountsFallback) - venueEventCount(a, venueCountsFallback))
-    .slice(0, 6);
 
   return (
     <div className="space-y-24">
@@ -169,113 +211,26 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </ManifestoReveal>
       </section>
 
-      {/* ─── Upcoming Events (with region filter) ─── */}
+      {/* ─── Filterable Content (Events + Jams + Venues) ─── */}
       <HomeEventsSection
         locale={locale}
         events={homeEvents}
+        jams={homeJams}
+        venues={homeVenues}
         regionLabels={homeRegionLabels}
         regionOrder={homeRegionOrder}
-        sectionTitle={t('upcomingEvents')}
-        viewAllHref={`/${locale}/events`}
-        viewAllLabel={t('viewAll')}
-        noEventsLabel={t('noEvents')}
-        worldMapLabel={tRegions('worldMap')}
+        labels={{
+          upcomingEvents: t('upcomingEvents'),
+          weeklyJam: t('weeklyJam'),
+          featuredVenues: t('featuredVenues'),
+          viewAll: t('viewAll'),
+          noEvents: t('noEvents'),
+          worldMap: tRegions('worldMap'),
+          jazzNightly: t('jazzNightly'),
+          jazzWeekends: t('jazzWeekends'),
+          jazzOccasional: t('jazzOccasional'),
+        }}
       />
-
-      {/* ─── Weekly Open Jam ─── */}
-      {weeklyJams.length > 0 && (
-        <section>
-          <FadeUp>
-            <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
-              <h2 className="font-serif text-4xl sm:text-5xl font-bold">{t('weeklyJam')}</h2>
-              <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
-                {t('viewAll')} →
-              </Link>
-            </div>
-          </FadeUp>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {weeklyJams.map((event, i) => {
-              const tz = event.fields.timezone || 'Asia/Taipei';
-              const venue = resolveLinks(event.fields.venue_id, venues)[0];
-              const city = venue?.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
-              const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
-              const eventLineups = (lineupsByEvent.get(event.id) || [])
-                .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
-              const sidemen = eventLineups
-                .filter((l) => l.fields.role !== 'ensemble')
-                .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
-                .filter(Boolean)
-                .filter((a) => a.id !== primaryArtist?.id)
-                .map((a) => artistDisplayName(a.fields, locale));
-              const eventTags = resolveLinks(event.fields.tag_list, tagMap)
-                .map((tag) => tag.fields.name)
-                .filter(Boolean) as string[];
-
-              return (
-                <FadeUpItem key={event.id} delay={(i % 3) * 60}>
-                <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
-                  {venue && (
-                    <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{city ? `${cityName(city, locale)} · ` : ''}{displayName(venue.fields)}</p>
-                  )}
-                  <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                    {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
-                  </div>
-                  <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                    {eventTitle(event.fields, locale)}
-                  </h3>
-                  {sidemen.length > 0 && (
-                    <p className="text-xs text-[#6A6560] mt-2">
-                      w/ {sidemen.join(', ')}
-                    </p>
-                  )}
-                  {eventTags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {eventTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </Link>
-                </FadeUpItem>
-              );
-            })}
-          </div>
-        </section>
-      )}
-
-      {/* ─── Venues ─── */}
-      <section>
-        <FadeUp>
-          <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
-            <h2 className="font-serif text-4xl sm:text-5xl font-bold">{t('featuredVenues')}</h2>
-            <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
-              {t('viewAll')} →
-            </Link>
-          </div>
-        </FadeUp>
-        <FadeUp stagger={0.15}>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((venue) => (
-              <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[var(--card)] p-6 card-hover group border border-[var(--border)]">
-                <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
-                  {displayName(venue.fields)}
-                </h3>
-                <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                  {(() => { const c = venue.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null; return c ? cityName(c, locale) : ''; })()} · {venueEventCount(venue, venueCountsFallback)} events
-                </p>
-                {venue.fields.jazz_frequency && (
-                  <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.fields.jazz_frequency] || venue.fields.jazz_frequency}</p>
-                )}
-              </Link>
-            ))}
-          </div>
-        </FadeUp>
-      </section>
     </div>
   );
 }
