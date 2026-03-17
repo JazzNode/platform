@@ -26,7 +26,7 @@ import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
-  const artists = await getArtists();
+  const artists = await getArtists().catch(() => []);
   const artist = artists.find((a) => a.id === slug);
   const name = artist ? artistDisplayName(artist.fields, locale) : 'Artist';
   const bio = artist ? (localized(artist.fields as Record<string, unknown>, 'bio', locale) || localized(artist.fields as Record<string, unknown>, 'bio_short', locale) || '') : '';

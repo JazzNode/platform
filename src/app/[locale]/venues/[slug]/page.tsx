@@ -17,7 +17,7 @@ import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
-  const [venues, cities] = await Promise.all([getVenues(), getCities()]);
+  const [venues, cities] = await Promise.all([getVenues().catch(() => []), getCities().catch(() => [])]);
   const venue = venues.find((v) => v.id === slug);
   if (!venue) return { title: 'Venue' };
   const f = venue.fields;
