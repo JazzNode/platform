@@ -79,11 +79,17 @@ export async function POST(req: NextRequest) {
           if (geminiResult[shortKey]) fields[shortKey] = geminiResult[shortKey];
         }
       }
-      // If full bio is already shorter than the short bio target, reuse it directly
+      // If the ORIGINAL user input is already short, reuse translated bio as short_bio
+      // (prevents Gemini from expanding a short input into a long bio_short)
       if (fieldPrefix === 'bio') {
+        const srcWordCount = content.trim().split(/\s+/).length;
+        const srcCharCount = content.trim().length;
+        // Use English word-count threshold as the universal check for the source input
+        const isSourceShort = srcWordCount <= 40 && srcCharCount <= 110;
+
         for (const [shortKey, cfg] of Object.entries(SHORT_BIO_THRESHOLDS)) {
           const fullBio = fields[cfg.src];
-          if (fullBio && cfg.measure(fullBio) <= cfg.max) {
+          if (fullBio && (isSourceShort || cfg.measure(fullBio) <= cfg.max)) {
             fields[shortKey] = fullBio;
           }
         }
