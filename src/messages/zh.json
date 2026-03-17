@@ -189,6 +189,16 @@
     "region_other": "其他",
     "continue": "繼續"
   },
+  "claimGuide": {
+    "title": "認領你的頁面",
+    "subtitle_1": "作為產業人員，你可以認領自己的",
+    "subtitle_2": "藝人或場館頁面，開始管理你的線上形象。",
+    "searchPlaceholder": "搜尋你的名字或場館...",
+    "goToClaim": "前往認領",
+    "notFoundTitle": "找不到嗎？",
+    "notFoundDesc": "我們的資料庫每天都在擴充中。你隨時可以從任何藝人或場館頁面進行認領。",
+    "skip": "先跳過，之後再認領"
+  },
   "profile": {
     "settings": "個人設定",
     "displayName": "顯示名稱",

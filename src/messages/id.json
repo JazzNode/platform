@@ -185,6 +185,16 @@
     "region_other": "Lainnya",
     "continue": "Lanjutkan"
   },
+  "claimGuide": {
+    "title": "Klaim Halaman Anda",
+    "subtitle_1": "Sebagai profesional industri, Anda dapat mengklaim",
+    "subtitle_2": "halaman artis atau venue untuk mengelola profil online Anda.",
+    "searchPlaceholder": "Cari nama atau venue Anda...",
+    "goToClaim": "Klaim",
+    "notFoundTitle": "Belum ditemukan?",
+    "notFoundDesc": "Database kami terus berkembang setiap hari. Anda dapat mengklaim kapan saja dari halaman artis atau venue.",
+    "skip": "Lewati, klaim nanti"
+  },
   "profile": {
     "settings": "Pengaturan Profil",
     "displayName": "Nama Tampilan",

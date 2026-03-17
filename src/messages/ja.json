@@ -185,6 +185,16 @@
     "region_other": "その他",
     "continue": "続ける"
   },
+  "claimGuide": {
+    "title": "あなたのページを認証",
+    "subtitle_1": "業界関係者として、あなたのアーティストや",
+    "subtitle_2": "会場ページを認証して、オンラインプレゼンスを管理できます。",
+    "searchPlaceholder": "名前や会場を検索...",
+    "goToClaim": "認証へ",
+    "notFoundTitle": "見つかりませんか？",
+    "notFoundDesc": "データベースは日々拡大しています。いつでもアーティストや会場ページから認証できます。",
+    "skip": "後で認証する"
+  },
   "profile": {
     "settings": "プロフィール設定",
     "displayName": "表示名",

@@ -189,6 +189,16 @@
     "region_other": "Other",
     "continue": "Continue"
   },
+  "claimGuide": {
+    "title": "Claim Your Page",
+    "subtitle_1": "As an industry professional, you can claim your",
+    "subtitle_2": "artist or venue page to manage your online presence.",
+    "searchPlaceholder": "Search your name or venue...",
+    "goToClaim": "Claim",
+    "notFoundTitle": "Not found yet?",
+    "notFoundDesc": "Our database is growing every day. You can always claim later from any artist or venue page.",
+    "skip": "Skip for now, I'll claim later"
+  },
   "profile": {
     "settings": "Profile Settings",
     "displayName": "Display Name",

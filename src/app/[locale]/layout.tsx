@@ -16,6 +16,7 @@ import ClaimsProvider from '@/components/ClaimsProvider';
 import TierConfigProvider from '@/components/TierConfigProvider';
 import AuthModal from '@/components/AuthModal';
 import OnboardingModal from '@/components/OnboardingModal';
+import ClaimGuideModal from '@/components/ClaimGuideModal';
 import ComingSoonToast from '@/components/ComingSoonToast';
 import CatEasterEgg from '@/components/CatEasterEgg';
 import dynamic from 'next/dynamic';
@@ -91,6 +92,7 @@ export default async function LocaleLayout({
                   <AdminBadge />
                   <AuthModal />
                   <OnboardingModal />
+                  <ClaimGuideModal />
                   <ComingSoonToast />
                   <CatEasterEgg />
               </TierConfigProvider>
