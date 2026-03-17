@@ -192,6 +192,16 @@ export default function ClaimGuideModal() {
               </div>
             )}
 
+            {/* Learn more link */}
+            <a
+              href={`/${locale}/tiers`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center text-xs text-[var(--color-gold)]/70 hover:text-[var(--color-gold)] transition-colors"
+            >
+              {t('learnMore')}
+            </a>
+
             {/* Skip */}
             <button
               onClick={handleSkip}
