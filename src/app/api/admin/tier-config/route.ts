@@ -24,7 +24,13 @@ export async function GET() {
     };
   }
 
-  return NextResponse.json(config);
+  // Cache for 5 min, serve stale up to 10 min while revalidating.
+  // Tier config rarely changes — no need to hit Supabase on every page load.
+  return NextResponse.json(config, {
+    headers: {
+      'Cache-Control': 'public, max-age=300, stale-while-revalidate=600',
+    },
+  });
 }
 
 /**
