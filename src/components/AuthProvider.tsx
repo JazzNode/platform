@@ -64,13 +64,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const supabase = createClient();
     let initialDone = false;
 
-    // Get initial session
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
+    // Get initial session from local storage — no network round-trip needed.
+    // getSession() is safe client-side; the server middleware (middleware.ts)
+    // already validates & refreshes the token on every request via getUser().
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (cancelled) return;
-      setUser(user);
-      if (user) await fetchProfile(user.id);
+      setUser(session?.user ?? null);
+      if (session?.user) await fetchProfile(session.user.id);
     }).catch(() => {
-      // Network error — treat as logged out
+      // Storage read error — treat as logged out
     }).finally(() => {
       if (cancelled) return;
       initialDone = true;
@@ -80,7 +82,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     // Listen for auth changes (skip redundant trigger during initial load)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (cancelled) return;
-      // During initial load, getUser() already handles the state
+      // During initial load, getSession() already handles the state
       if (!initialDone) return;
       const newUser = session?.user ?? null;
       setUser(newUser);

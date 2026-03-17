@@ -36,14 +36,19 @@ export async function GET(request: NextRequest) {
   const { data: profiles, count, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Fetch emails from auth.users for these profiles
+  // Fetch emails for only the current page's users in parallel.
+  // Previously used listUsers({ perPage: 1000 }) which fetched ALL users
+  // and filtered client-side — O(n) and slow as user count grows.
   const userIds = (profiles || []).map((p) => p.id);
   let emailMap = new Map<string, string>();
 
   if (userIds.length > 0) {
-    const { data: { users } } = await supabase.auth.admin.listUsers({ perPage: 1000 });
-    const relevantUsers = (users || []).filter((u) => userIds.includes(u.id));
-    emailMap = new Map(relevantUsers.map((u) => [u.id, u.email || '']));
+    const results = await Promise.all(
+      userIds.map((id) => supabase.auth.admin.getUserById(id)),
+    );
+    for (const { data: { user } } of results) {
+      if (user?.email) emailMap.set(user.id, user.email);
+    }
   }
 
   const members = (profiles || []).map((p) => ({

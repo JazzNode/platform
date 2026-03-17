@@ -208,7 +208,9 @@ export default function Header() {
   /* Shared user button render helper — called as function, NOT as <Component />,
      to avoid unmount/remount on every Header re-render */
   function renderUserButton(mobile?: boolean) {
-    if (authLoading) return null;
+    if (authLoading) return (
+      <div className="w-7 h-7 rounded-full bg-[rgba(240,237,230,0.08)] animate-pulse" />
+    );
 
     if (!user) {
       return (
