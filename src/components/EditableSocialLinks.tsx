@@ -61,19 +61,6 @@ export default function EditableSocialLinks({
 
   const hasAny = fields.website_url || fields.spotify_url || fields.youtube_url || fields.instagram || fields.facebook_url;
 
-  useEffect(() => {
-    if (!editing) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !saving) {
-        setEditing(false);
-        setDraft(withDefaults(fields));
-        setError(null);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [editing, saving, fields]);
-
   const handleSave = useCallback(async () => {
     setSaving(true);
     setError(null);
@@ -118,6 +105,21 @@ export default function EditableSocialLinks({
       setSaving(false);
     }
   }, [draft, entityType, entityId, getFreshToken, handleUnauthorized, router]);
+
+  useEffect(() => {
+    if (!editing) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !saving) {
+        setEditing(false);
+        setDraft(withDefaults(fields));
+        setError(null);
+      } else if (e.key === 'Enter' && !saving) {
+        handleSave();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [editing, saving, fields, handleSave]);
 
   if (!isAdmin) {
     return hasAny ? (
