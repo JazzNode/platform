@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
     const sb = getSupabaseAdmin();
     const { error: updateErr } = await sb
       .from('events')
-      .update({ poster_url: posterUrl, data_source: 'admin', updated_by: userId })
+      .update({ poster_url: posterUrl })
       .eq('event_id', eventId);
 
     if (updateErr) {
