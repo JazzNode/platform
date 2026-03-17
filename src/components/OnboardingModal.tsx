@@ -10,13 +10,23 @@ const subscribe = () => () => {};
 const getSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-const CITIES = ['taipei', 'kaohsiung', 'hong_kong', 'singapore'] as const;
+/* Regions grouped: active markets first, then continents */
+const REGIONS_ACTIVE = [
+  'taiwan', 'hong_kong', 'singapore', 'malaysia', 'japan',
+  'south_korea', 'thailand', 'indonesia', 'philippines',
+] as const;
+
+const REGIONS_CONTINENT = [
+  'asia_other', 'north_america', 'europe', 'oceania', 'other',
+] as const;
+
+const ALL_REGIONS = [...REGIONS_ACTIVE, ...REGIONS_CONTINENT] as const;
 
 export default function OnboardingModal() {
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const t = useTranslations('onboarding');
   const { needsOnboarding, user, refreshProfile } = useAuth();
-  const [city, setCity] = useState('');
+  const [region, setRegion] = useState('');
   const [userType, setUserType] = useState<'fan' | 'industry' | ''>('');
   const [saving, setSaving] = useState(false);
 
@@ -28,7 +38,7 @@ export default function OnboardingModal() {
 
   if (!mounted || !needsOnboarding) return null;
 
-  const canSubmit = userType !== '';
+  const canSubmit = userType !== '' && region !== '';
 
   const handleSubmit = async () => {
     if (!canSubmit || !user) return;
@@ -37,7 +47,7 @@ export default function OnboardingModal() {
     await supabase
       .from('profiles')
       .update({
-        primary_city: city || null,
+        region,
         user_type: userType,
       })
       .eq('id', user.id);
@@ -70,9 +80,11 @@ export default function OnboardingModal() {
             </span>
           </div>
 
-          <div className="p-6 space-y-6">
+          <div className="p-6 space-y-5">
             <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">
-              {t('subtitle')}
+              {t('subtitle_1')}
+              <br />
+              {t('subtitle_2')}
             </p>
 
             {/* User Type — required */}
@@ -98,19 +110,23 @@ export default function OnboardingModal() {
               </div>
             </div>
 
-            {/* City — optional */}
+            {/* Region — required */}
             <div>
               <label className="block text-xs text-[var(--muted-foreground)] mb-1.5 tracking-wide uppercase">
-                {t('cityLabel')}
+                {t('regionLabel')} <span className="text-[var(--color-gold)]">*</span>
               </label>
               <select
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
+                value={region}
+                onChange={(e) => setRegion(e.target.value)}
                 className="w-full h-10 rounded-lg border border-[var(--border)] bg-transparent px-3 text-sm outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-colors text-[var(--foreground)]"
               >
-                <option value="">{t('cityPlaceholder')}</option>
-                {CITIES.map((c) => (
-                  <option key={c} value={c}>{t(`city_${c}`)}</option>
+                <option value="">{t('regionPlaceholder')}</option>
+                {REGIONS_ACTIVE.map((r) => (
+                  <option key={r} value={r}>{t(`region_${r}`)}</option>
+                ))}
+                <option disabled>──────────</option>
+                {REGIONS_CONTINENT.map((r) => (
+                  <option key={r} value={r}>{t(`region_${r}`)}</option>
                 ))}
               </select>
             </div>
