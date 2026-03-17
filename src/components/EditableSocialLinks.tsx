@@ -22,12 +22,28 @@ interface EditableSocialLinksProps {
 }
 
 const SOCIAL_CONFIGS = [
-  { key: 'website_url' as const, label: 'Website', placeholder: 'https://example.com' },
-  { key: 'spotify_url' as const, label: 'Spotify', placeholder: 'https://open.spotify.com/artist/...' },
-  { key: 'youtube_url' as const, label: 'YouTube', placeholder: 'https://youtube.com/...' },
-  { key: 'instagram' as const, label: 'Instagram', placeholder: '@username' },
-  { key: 'facebook_url' as const, label: 'Facebook', placeholder: 'https://facebook.com/...' },
+  { key: 'website_url' as const, label: 'Website', placeholder: 'https://example.com', defaultPrefix: 'https://' },
+  { key: 'spotify_url' as const, label: 'Spotify', placeholder: 'https://open.spotify.com/artist/...', defaultPrefix: 'https://' },
+  { key: 'youtube_url' as const, label: 'YouTube', placeholder: 'https://youtube.com/...', defaultPrefix: 'https://' },
+  { key: 'instagram' as const, label: 'Instagram', placeholder: '@username', defaultPrefix: '@' },
+  { key: 'facebook_url' as const, label: 'Facebook', placeholder: 'https://facebook.com/...', defaultPrefix: 'https://' },
 ] as const;
+
+function withDefaults(fields: SocialFields): SocialFields {
+  const result = { ...fields };
+  for (const { key, defaultPrefix } of SOCIAL_CONFIGS) {
+    if (!result[key]) result[key] = defaultPrefix;
+  }
+  return result;
+}
+
+function stripDefaults(fields: SocialFields): SocialFields {
+  const result = { ...fields };
+  for (const { key, defaultPrefix } of SOCIAL_CONFIGS) {
+    if (result[key] === defaultPrefix) result[key] = undefined;
+  }
+  return result;
+}
 
 export default function EditableSocialLinks({
   entityType,
@@ -50,7 +66,7 @@ export default function EditableSocialLinks({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !saving) {
         setEditing(false);
-        setDraft({ ...fields });
+        setDraft(withDefaults(fields));
         setError(null);
       }
     };
@@ -74,13 +90,16 @@ export default function EditableSocialLinks({
         body: JSON.stringify({
           entityType,
           entityId,
-          fields: {
-            website_url: draft.website_url || null,
-            spotify_url: draft.spotify_url || null,
-            youtube_url: draft.youtube_url || null,
-            instagram: draft.instagram || null,
-            facebook_url: draft.facebook_url || null,
-          },
+          fields: (() => {
+            const clean = stripDefaults(draft);
+            return {
+              website_url: clean.website_url || null,
+              spotify_url: clean.spotify_url || null,
+              youtube_url: clean.youtube_url || null,
+              instagram: clean.instagram || null,
+              facebook_url: clean.facebook_url || null,
+            };
+          })(),
         }),
       });
 
@@ -141,7 +160,7 @@ export default function EditableSocialLinks({
             {saving ? '儲存中...' : '儲存'}
           </button>
           <button
-            onClick={() => { setEditing(false); setDraft({ ...fields }); setError(null); }}
+            onClick={() => { setEditing(false); setDraft(withDefaults(fields)); setError(null); }}
             disabled={saving}
             className="text-xs px-3 py-1.5 rounded-lg border border-[#8A8578]/30 text-[#8A8578] hover:text-[#F0EDE6] hover:border-[#F0EDE6]/30"
           >
@@ -166,7 +185,7 @@ export default function EditableSocialLinks({
         <SocialIconsPlaceholder artistName={artistName} />
       )}
       <button
-        onClick={() => { setDraft({ ...fields }); setEditing(true); }}
+        onClick={() => { setDraft(withDefaults(fields)); setEditing(true); }}
         className="absolute -top-1 -right-6 opacity-0 group-hover/social:opacity-100 transition-opacity p-1 rounded-lg bg-[var(--color-gold)]/20 text-[var(--color-gold)] border border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/30"
         title="Edit social links"
       >
