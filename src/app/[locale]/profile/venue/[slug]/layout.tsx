@@ -155,10 +155,11 @@ export default function VenueDashboardLayout({
 
   const isActive = (navPath: string) => {
     const fullPath = basePath + navPath;
+    const decodedPathname = decodeURIComponent(pathname);
     if (navPath === '') {
-      return pathname === fullPath || pathname === basePath;
+      return decodedPathname === fullPath || decodedPathname === basePath;
     }
-    return pathname.startsWith(fullPath);
+    return decodedPathname.startsWith(fullPath);
   };
 
   return (

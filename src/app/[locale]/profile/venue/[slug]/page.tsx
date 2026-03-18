@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import VenueBadgeShowcase from '@/components/VenueBadgeShowcase';
 
 export default function VenueOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
@@ -95,6 +96,11 @@ export default function VenueOverviewPage({ params }: { params: Promise<{ slug: 
           </div>
         </FadeUp>
       </div>
+
+      {/* Badge Overview */}
+      <FadeUp>
+        <VenueBadgeShowcase venueId={slug} />
+      </FadeUp>
 
       {/* Quick Actions */}
       <FadeUp>

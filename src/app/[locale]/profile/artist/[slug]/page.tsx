@@ -8,6 +8,7 @@ import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import ArtistBadgeShowcase from '@/components/ArtistBadgeShowcase';
 
 interface FanStats {
   totalFans: number;
@@ -180,6 +181,11 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
             icon="views"
           />
         </div>
+      </FadeUp>
+
+      {/* ─── Badge Overview ─── */}
+      <FadeUp>
+        <ArtistBadgeShowcase artistId={slug} />
       </FadeUp>
 
       {/* ─── Fan Growth Trend (Mini Chart) ─── */}
