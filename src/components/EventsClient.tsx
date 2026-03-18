@@ -424,10 +424,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                     </div>
                     {event.venue_name && (
                       <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">
-                        {event.city_record_id && cityById.get(event.city_record_id) && (
-                          <span className="text-[#6A6560]">{cityById.get(event.city_record_id)} · </span>
-                        )}
-                        {event.venue_name}
+                        {event.city_record_id && cityById.get(event.city_record_id) ? `${cityById.get(event.city_record_id)} · ` : ''}{event.venue_name}
                       </p>
                     )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
