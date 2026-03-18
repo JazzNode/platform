@@ -7,6 +7,7 @@ import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import ManifestoReveal from '@/components/animations/ManifestoReveal';
 import HomeEventsSection from '@/components/HomeEventsSection';
+import RegionExploreRow from '@/components/RegionExploreRow';
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -136,18 +137,17 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     };
   });
 
-  // Build region labels and order from all content
+  // Collect region codes that have actual content (for RegionExploreRow + fallback)
   const allCountryCodes = [
     ...homeEvents.map((e) => e.country_code),
     ...homeJams.map((e) => e.country_code),
     ...homeVenues.map((v) => v.country_code),
   ].filter(Boolean);
   const regionCodesInUse = [...new Set(allCountryCodes)];
-  const homeRegionLabels: Record<string, string> = {};
+  const regionLabelsMap: Record<string, string> = {};
   for (const code of regionCodesInUse) {
-    try { homeRegionLabels[code] = tRegions(code as 'TW'); } catch { homeRegionLabels[code] = code; }
+    try { regionLabelsMap[code] = tRegions(code as 'TW'); } catch { regionLabelsMap[code] = code; }
   }
-  const homeRegionOrder = regionCodesInUse;
 
   return (
     <div className="space-y-24">
@@ -211,21 +211,25 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </ManifestoReveal>
       </section>
 
+      {/* ─── Region Explore Row ─── */}
+      <RegionExploreRow
+        regionCodes={regionCodesInUse}
+        regionLabels={regionLabelsMap}
+        worldMapLabel={tRegions('worldMap')}
+      />
+
       {/* ─── Filterable Content (Events + Jams + Venues) ─── */}
       <HomeEventsSection
         locale={locale}
         events={homeEvents}
         jams={homeJams}
         venues={homeVenues}
-        regionLabels={homeRegionLabels}
-        regionOrder={homeRegionOrder}
         labels={{
           upcomingEvents: t('upcomingEvents'),
           weeklyJam: t('weeklyJam'),
           featuredVenues: t('featuredVenues'),
           viewAll: t('viewAll'),
           noEvents: t('noEvents'),
-          worldMap: tRegions('worldMap'),
           jazzNightly: t('jazzNightly'),
           jazzWeekends: t('jazzWeekends'),
           jazzOccasional: t('jazzOccasional'),

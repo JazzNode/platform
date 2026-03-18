@@ -15,10 +15,22 @@ export default async function middleware(request: NextRequest) {
     // 1. Update Supabase session (refreshes auth cookie if needed)
     const supabaseResponse = await updateSession(request);
 
-    // 2. Run next-intl middleware
+    // 2. Set geo cookie from Vercel IP detection (only if not already set)
+    const geo = request.headers.get('x-vercel-ip-country');
+
+    // 3. Run next-intl middleware
     const intlResponse = intlMiddleware(request);
 
-    // 3. Merge Supabase cookies into the final response
+    // 4. Set jn-geo cookie if detected and not already present
+    if (geo && !request.cookies.has('jn-geo')) {
+      intlResponse.cookies.set('jn-geo', geo, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        sameSite: 'lax',
+      });
+    }
+
+    // 5. Merge Supabase cookies into the final response
     const supabaseCookies = supabaseResponse.headers.getSetCookie();
     if (supabaseCookies && supabaseCookies.length > 0) {
       supabaseCookies.forEach((cookie) => {

@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
 import { useFollows } from '@/components/FollowsProvider';
+import { useRegion } from '@/components/RegionProvider';
 
 
 interface SerializedEvent {
@@ -75,8 +76,10 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 
 export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
+  const { region: globalRegion } = useRegion();
+  const hasInteracted = useRef(false);
 
-  // Derive initial region/city from venue or city filter
+  // Derive initial region/city from venue or city filter, falling back to global region
   const [activeRegion, setActiveRegion] = useState<string | null>(() => {
     if (initialFilters?.venue) {
       const v = venues.find((x) => x.recordId === initialFilters.venue);
@@ -91,6 +94,13 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     }
     return null;
   });
+
+  // Sync with global region when it changes (only if user hasn't interacted with page filters)
+  useEffect(() => {
+    if (!hasInteracted.current && !initialFilters?.venue && !initialFilters?.city) {
+      setActiveRegion(globalRegion);
+    }
+  }, [globalRegion, initialFilters?.venue, initialFilters?.city]);
   const [selectedCity, setSelectedCity] = useState<string | null>(() => {
     if (initialFilters?.venue) {
       const v = venues.find((x) => x.recordId === initialFilters.venue);
@@ -134,6 +144,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
+    hasInteracted.current = true;
     if (activeRegion === code) {
       // Click active region → deselect back to world map
       setActiveRegion(null);
@@ -152,6 +163,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, []);
 
   const handleWorldMapClick = useCallback(() => {
+    hasInteracted.current = true;
     setActiveRegion(null);
     setSelectedCity(null);
     setSelectedVenues(new Set());

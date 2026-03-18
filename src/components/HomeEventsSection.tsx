@@ -1,23 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
-import { useAuth } from './AuthProvider';
-
-/** Mapping from user profile region → event country_code */
-const REGION_TO_COUNTRY: Record<string, string> = {
-  taiwan: 'TW',
-  hong_kong: 'HK',
-  singapore: 'SG',
-  malaysia: 'MY',
-  japan: 'JP',
-  south_korea: 'KR',
-  thailand: 'TH',
-  indonesia: 'ID',
-  philippines: 'PH',
-};
+import { useRegion } from './RegionProvider';
 
 interface HomeEvent {
   id: string;
@@ -47,7 +34,6 @@ interface Labels {
   featuredVenues: string;
   viewAll: string;
   noEvents: string;
-  worldMap: string;
   jazzNightly: string;
   jazzWeekends: string;
   jazzOccasional: string;
@@ -58,8 +44,6 @@ interface Props {
   events: HomeEvent[];
   jams: HomeEvent[];
   venues: HomeVenue[];
-  regionLabels: Record<string, string>;
-  regionOrder: string[];
   labels: Labels;
 }
 
@@ -96,31 +80,24 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
 }
 
 export default function HomeEventsSection({
-  locale, events, jams, venues, regionLabels, regionOrder, labels,
+  locale, events, jams, venues, labels,
 }: Props) {
-  const { profile } = useAuth();
-
-  const defaultRegion = useMemo(() => {
-    if (!profile?.region) return null;
-    return REGION_TO_COUNTRY[profile.region] || null;
-  }, [profile?.region]);
-
-  const [activeRegion, setActiveRegion] = useState<string | null>(defaultRegion);
+  const { region } = useRegion();
 
   const filteredEvents = useMemo(() => {
-    if (!activeRegion) return events;
-    return events.filter((e) => e.country_code === activeRegion);
-  }, [events, activeRegion]);
+    if (!region) return events;
+    return events.filter((e) => e.country_code === region);
+  }, [events, region]);
 
   const filteredJams = useMemo(() => {
-    if (!activeRegion) return jams;
-    return jams.filter((e) => e.country_code === activeRegion);
-  }, [jams, activeRegion]);
+    if (!region) return jams;
+    return jams.filter((e) => e.country_code === region);
+  }, [jams, region]);
 
   const filteredVenues = useMemo(() => {
-    if (!activeRegion) return venues;
-    return venues.filter((v) => v.country_code === activeRegion);
-  }, [venues, activeRegion]);
+    if (!region) return venues;
+    return venues.filter((v) => v.country_code === region);
+  }, [venues, region]);
 
   const jazzFreqLabel: Record<string, string> = {
     nightly: labels.jazzNightly,
@@ -128,44 +105,8 @@ export default function HomeEventsSection({
     occasional: labels.jazzOccasional,
   };
 
-  const pillBase = 'px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light cursor-pointer';
-  const pillActive = 'bg-gold/20 border-gold text-gold';
-  const pillInactive = 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]';
-
   return (
     <div className="space-y-24">
-      {/* ─── Global Region Filter ─── */}
-      <FadeUp>
-        <div className="relative py-6">
-          {/* Subtle glow backdrop */}
-          <div
-            className="absolute inset-0 -mx-4 sm:-mx-8 rounded-2xl"
-            style={{
-              background: 'linear-gradient(135deg, rgba(200,170,110,0.04) 0%, transparent 50%, rgba(200,170,110,0.02) 100%)',
-              border: '1px solid rgba(200,170,110,0.08)',
-            }}
-          />
-          <div className="relative flex flex-wrap items-center gap-2">
-            <button
-              onClick={() => setActiveRegion(null)}
-              className={`${pillBase} ${!activeRegion ? pillActive : pillInactive}`}
-            >
-              {labels.worldMap}
-            </button>
-            <span className="text-gold/20 text-xs select-none mx-0.5">│</span>
-            {regionOrder.map((code) => (
-              <button
-                key={code}
-                onClick={() => setActiveRegion(activeRegion === code ? null : code)}
-                className={`${pillBase} ${activeRegion === code ? pillActive : pillInactive}`}
-              >
-                {regionLabels[code] || code}
-              </button>
-            ))}
-          </div>
-        </div>
-      </FadeUp>
-
       {/* ─── Upcoming Events ─── */}
       <section>
         <FadeUp>

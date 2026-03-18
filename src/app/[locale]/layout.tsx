@@ -11,6 +11,7 @@ import AdminProvider from '@/components/AdminProvider';
 import AdminLoginModal from '@/components/AdminLoginModal';
 import AdminBadge from '@/components/AdminBadge';
 import AuthProvider from '@/components/AuthProvider';
+import RegionProvider from '@/components/RegionProvider';
 import FollowsProvider from '@/components/FollowsProvider';
 import ClaimsProvider from '@/components/ClaimsProvider';
 import TierConfigProvider from '@/components/TierConfigProvider';
@@ -79,6 +80,7 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <SearchProvider locale={locale}>
               <AuthProvider>
+              <RegionProvider>
               <FollowsProvider>
               <ClaimsProvider>
               <AdminProvider>
@@ -101,6 +103,7 @@ export default async function LocaleLayout({
               </AdminProvider>
               </ClaimsProvider>
               </FollowsProvider>
+              </RegionProvider>
               </AuthProvider>
             </SearchProvider>
           </ThemeProvider>

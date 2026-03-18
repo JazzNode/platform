@@ -7,10 +7,11 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useSearch } from './SearchProvider';
 import { useAuth } from './AuthProvider';
+import { useRegion } from './RegionProvider';
 
 import { createClient } from '@/utils/supabase/client';
+import { ACTIVE_COUNTRY_CODES } from '@/lib/regions';
 
-const localeLabels: Record<string, string> = { en: 'EN', zh: '中', ja: '日', ko: '한', th: 'ไท', id: 'ID' };
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
 const localeList = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 
@@ -27,16 +28,18 @@ function UserIcon({ className }: { className?: string }) {
 export default function Header() {
   const t = useTranslations('common');
   const tAuth = useTranslations('auth');
+  const tRegions = useTranslations('regions');
   const locale = useLocale();
   const pathname = usePathname();
   const router = useRouter();
   const { open: openSearch } = useSearch();
   const { user, profile, loading: authLoading, signOut, setShowAuthModal } = useAuth();
+  const { region, setRegion } = useRegion();
   const [scrolled, setScrolled] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
+  const [selectorOpen, setSelectorOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const langRefDesktop = useRef<HTMLDivElement>(null);
-  const langRefMobile = useRef<HTMLDivElement>(null);
+  const selectorRefDesktop = useRef<HTMLDivElement>(null);
+  const selectorRefMobile = useRef<HTMLDivElement>(null);
   const userMenuRefDesktop = useRef<HTMLDivElement>(null);
   const userMenuRefMobile = useRef<HTMLDivElement>(null);
 
@@ -46,18 +49,18 @@ export default function Header() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close language dropdown on outside click
+  // Close selector dropdown on outside click
   useEffect(() => {
-    if (!langOpen) return;
+    if (!selectorOpen) return;
     const handler = (e: MouseEvent) => {
       const t = e.target as Node;
-      const inDesktop = langRefDesktop.current?.contains(t);
-      const inMobile = langRefMobile.current?.contains(t);
-      if (!inDesktop && !inMobile) setLangOpen(false);
+      const inDesktop = selectorRefDesktop.current?.contains(t);
+      const inMobile = selectorRefMobile.current?.contains(t);
+      if (!inDesktop && !inMobile) setSelectorOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [langOpen]);
+  }, [selectorOpen]);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -80,6 +83,76 @@ export default function Header() {
     const segments = pathname.split('/');
     segments[1] = newLocale;
     router.push(segments.join('/'));
+  }
+
+  const regionLabel = region
+    ? (() => { try { return tRegions(region as 'TW'); } catch { return region; } })()
+    : tRegions('worldMap');
+
+  function renderSelectorDropdown() {
+    return (
+      <div className="absolute right-0 top-full mt-2 min-w-[180px] max-h-[70vh] overflow-y-auto rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+        {/* Region section */}
+        <p className="px-4 pt-2 pb-1.5 text-[10px] uppercase tracking-[0.15em] text-[var(--muted-foreground)]/60 select-none">{tRegions('sectionRegion')}</p>
+        <button
+          onClick={() => { setRegion(null); }}
+          className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
+            !region
+              ? 'text-[var(--color-gold)] font-semibold'
+              : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
+          }`}
+        >
+          <span>{tRegions('worldMap')}</span>
+          {!region && (
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          )}
+        </button>
+        {ACTIVE_COUNTRY_CODES.map((code) => (
+          <button
+            key={code}
+            onClick={() => { setRegion(code); }}
+            className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
+              region === code
+                ? 'text-[var(--color-gold)] font-semibold'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
+            }`}
+          >
+            <span>{(() => { try { return tRegions(code as 'TW'); } catch { return code; } })()}</span>
+            {region === code && (
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            )}
+          </button>
+        ))}
+
+        {/* Divider */}
+        <div className="my-1.5 border-t border-[var(--border)]" />
+
+        {/* Language section */}
+        <p className="px-4 pt-2 pb-1.5 text-[10px] uppercase tracking-[0.15em] text-[var(--muted-foreground)]/60 select-none">{tRegions('sectionLanguage')}</p>
+        {localeList.map((l) => (
+          <button
+            key={l}
+            onClick={() => { switchLocale(l); setSelectorOpen(false); }}
+            className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
+              locale === l
+                ? 'text-[var(--color-gold)] font-semibold'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
+            }`}
+          >
+            <span>{localeFullNames[l]}</span>
+            {locale === l && (
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 6L9 17l-5-5" />
+              </svg>
+            )}
+          </button>
+        ))}
+      </div>
+    );
   }
 
   // Fetch display names for claimed artists/venues
@@ -290,44 +363,23 @@ export default function Header() {
 
             {renderUserButton()}
 
-            <div ref={langRefDesktop} className="relative">
+            <div ref={selectorRefDesktop} className="relative">
               <button
-                onClick={() => setLangOpen(!langOpen)}
+                onClick={() => setSelectorOpen(!selectorOpen)}
                 className="flex items-center gap-1.5 px-2 py-1.5 text-xs tracking-wider rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300"
-                aria-label="Switch language"
+                aria-label="Region & language"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20" />
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                 </svg>
-                <span className="font-semibold">{localeLabels[locale]}</span>
-                <svg className={`w-3 h-3 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <span className="font-semibold">{regionLabel}</span>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${selectorOpen ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 5l3 3 3-3" />
                 </svg>
               </button>
-              {langOpen && (
-                <div className="absolute right-0 top-full mt-2 min-w-[140px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  {localeList.map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => { switchLocale(l); setLangOpen(false); }}
-                      className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
-                        locale === l
-                          ? 'text-[var(--color-gold)] font-semibold'
-                          : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
-                      }`}
-                    >
-                      <span>{localeFullNames[l]}</span>
-                      {locale === l && (
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 6L9 17l-5-5" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {selectorOpen && renderSelectorDropdown()}
             </div>
             </div>
           </nav>
@@ -356,44 +408,22 @@ export default function Header() {
               )}
             </div>
 
-            <div ref={langRefMobile} className="relative">
+            <div ref={selectorRefMobile} className="relative">
               <button
-                onClick={() => setLangOpen(!langOpen)}
-                className="flex items-center gap-1.5 px-2 py-1.5 text-xs tracking-wider rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300"
-                aria-label="Switch language"
+                onClick={() => setSelectorOpen(!selectorOpen)}
+                className="flex items-center gap-1 px-2 py-1.5 text-xs tracking-wider rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300"
+                aria-label="Region & language"
               >
                 <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" />
                   <path d="M2 12h20" />
                   <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                 </svg>
-                <span className="font-semibold">{localeLabels[locale]}</span>
-                <svg className={`w-3 h-3 transition-transform duration-200 ${langOpen ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className={`w-3 h-3 transition-transform duration-200 ${selectorOpen ? 'rotate-180' : ''}`} viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 5l3 3 3-3" />
                 </svg>
               </button>
-              {langOpen && (
-                <div className="absolute right-0 top-full mt-2 min-w-[140px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  {localeList.map((l) => (
-                    <button
-                      key={l}
-                      onClick={() => { switchLocale(l); setLangOpen(false); }}
-                      className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-colors duration-200 ${
-                        locale === l
-                          ? 'text-[var(--color-gold)] font-semibold'
-                          : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)]'
-                      }`}
-                    >
-                      <span>{localeFullNames[l]}</span>
-                      {locale === l && (
-                        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M20 6L9 17l-5-5" />
-                        </svg>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              )}
+              {selectorOpen && renderSelectorDropdown()}
             </div>
           </div>
         </div>

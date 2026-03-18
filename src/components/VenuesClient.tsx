@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
 import { useFollows } from '@/components/FollowsProvider';
+import { useRegion } from '@/components/RegionProvider';
 
 interface SerializedVenue {
   id: string;
@@ -48,8 +49,17 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 
 export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
   const { isFollowing } = useFollows();
+  const { region: globalRegion } = useRegion();
+  const hasInteracted = useRef(false);
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
+
+  // Sync with global region when it changes (only if user hasn't interacted)
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      setActiveRegion(globalRegion);
+    }
+  }, [globalRegion]);
 
   // Group cities by country code
   const regionGroups = useMemo(() => {
@@ -76,6 +86,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
+    hasInteracted.current = true;
     if (activeRegion === code) {
       setActiveRegion(null);
       setSelectedCity(null);
@@ -90,6 +101,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   }, []);
 
   const handleWorldMapClick = useCallback(() => {
+    hasInteracted.current = true;
     setActiveRegion(null);
     setSelectedCity(null);
   }, []);
