@@ -331,8 +331,8 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
         </div>
         </FadeUpItem>
 
-        {/* Venue pills — only show when there are venues to filter */}
-        {visibleVenues.length > 0 && (
+        {/* Venue pills — only show when a region is selected and there are venues */}
+        {visibleVenues.length > 0 && activeRegion && (
           <FadeUpItem delay={180}>
           <div className="flex flex-wrap gap-x-2 gap-y-3">
             <button
