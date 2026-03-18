@@ -207,7 +207,8 @@
     "notFoundTitle": "找不到嗎？",
     "notFoundDesc": "我們的資料庫每天都在擴充中。你隨時可以從任何藝人或場館頁面進行認領。",
     "learnMore": "認領後可以做什麼？了解更多 →",
-    "skip": "先跳過，之後再認領"
+    "skip": "先跳過，之後再認領",
+    "dontRemind": "不再提醒我"
   },
   "followGuide": {
     "title": "掌握最新動態",

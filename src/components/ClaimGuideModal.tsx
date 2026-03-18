@@ -27,7 +27,14 @@ export default function ClaimGuideModal() {
   const inputRef = useRef<HTMLInputElement>(null);
   const hasShown = useRef(false);
 
-  // Show modal when: industry user + no claims yet + hasn't been shown this session
+  const STORAGE_KEY = 'claimGuideLastShown';
+  const DISMISS_KEY = 'claimGuideDismissed';
+  const COUNT_KEY = 'claimGuideShowCount';
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+  const [showCount, setShowCount] = useState(0);
+
+  // Show modal when: industry user + no claims yet + not dismissed + not shown in the last 24 hours
   useEffect(() => {
     if (
       profile &&
@@ -36,9 +43,18 @@ export default function ClaimGuideModal() {
       profile.claimed_venue_ids.length === 0 &&
       !hasShown.current
     ) {
+      if (localStorage.getItem(DISMISS_KEY)) return;
+      const lastShown = localStorage.getItem(STORAGE_KEY);
+      if (lastShown && Date.now() - Number(lastShown) < ONE_DAY_MS) return;
+
+      const count = Number(localStorage.getItem(COUNT_KEY) || '0') + 1;
+      localStorage.setItem(COUNT_KEY, String(count));
+
       // Small delay to let onboarding modal close first
       const timer = setTimeout(() => {
         hasShown.current = true;
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
+        setShowCount(count);
         setShow(true);
       }, 600);
       return () => clearTimeout(timer);
@@ -80,6 +96,10 @@ export default function ClaimGuideModal() {
   }, [locale, router]);
 
   const handleSkip = useCallback(() => setShow(false), []);
+  const handleDismissForever = useCallback(() => {
+    localStorage.setItem(DISMISS_KEY, '1');
+    setShow(false);
+  }, []);
 
   // Lock body scroll
   useEffect(() => {
@@ -205,6 +225,16 @@ export default function ClaimGuideModal() {
             >
               {t('skip')}
             </button>
+
+            {/* Don't remind me again — only from 2nd showing */}
+            {showCount >= 2 && (
+              <button
+                onClick={handleDismissForever}
+                className="w-full text-center text-[10px] text-[var(--muted-foreground)]/50 hover:text-[var(--muted-foreground)] transition-colors pb-1"
+              >
+                {t('dontRemind')}
+              </button>
+            )}
           </div>
         </div>
       </div>
