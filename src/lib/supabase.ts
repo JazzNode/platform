@@ -866,3 +866,24 @@ export function venueEventCount(
   if (linked > 0) return linked;
   return fallbackCounts?.get(venue.id) || 0;
 }
+
+/** Country codes that have at least one city with an active venue (venue with events). */
+export const getActiveRegionCodes = cache(
+  unstable_cache(
+    async (): Promise<string[]> => {
+      const [cities, venues] = await Promise.all([getCities(), getVenues()]);
+      const codes = new Set<string>();
+      for (const city of cities) {
+        const hasActiveVenue = venues.some(
+          (v) => v.fields.city_id?.includes(city.id) && v.fields.event_list && v.fields.event_list.length > 0,
+        );
+        if (hasActiveVenue && city.fields.country_code) {
+          codes.add(city.fields.country_code);
+        }
+      }
+      return [...codes];
+    },
+    ['supabase-active-region-codes'],
+    { revalidate: REVALIDATE.cities, tags: ['cities', 'venues'] },
+  ),
+);

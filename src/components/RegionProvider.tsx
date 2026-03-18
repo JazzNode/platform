@@ -16,6 +16,8 @@ interface RegionContextType {
   setRegion: (code: string | null) => void;
   /** Whether the region has been resolved from any source yet */
   ready: boolean;
+  /** Country codes that actually have content (cities with active venues) */
+  availableRegions: string[];
 }
 
 const RegionContext = createContext<RegionContextType | null>(null);
@@ -87,7 +89,8 @@ export default function RegionProvider({ children, availableRegions }: RegionPro
     }
   }, []);
 
-  const value = useMemo(() => ({ region, setRegion, ready }), [region, setRegion, ready]);
+  const availableList = useMemo(() => [...available], [available]);
+  const value = useMemo(() => ({ region, setRegion, ready, availableRegions: availableList }), [region, setRegion, ready, availableList]);
 
   return (
     <RegionContext.Provider value={value}>

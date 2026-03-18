@@ -4,6 +4,7 @@ import { getMessages } from 'next-intl/server';
 import { Inter } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { getActiveRegionCodes } from '@/lib/supabase';
 import MobileTabBar from '@/components/MobileTabBar';
 import ThemeProvider from '@/components/ThemeProvider';
 import SearchProvider from '@/components/SearchProvider';
@@ -71,7 +72,10 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const messages = await getMessages();
+  const [messages, activeRegions] = await Promise.all([
+    getMessages(),
+    getActiveRegionCodes(),
+  ]);
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -80,7 +84,7 @@ export default async function LocaleLayout({
           <ThemeProvider>
             <SearchProvider locale={locale}>
               <AuthProvider>
-              <RegionProvider>
+              <RegionProvider availableRegions={activeRegions}>
               <FollowsProvider>
               <ClaimsProvider>
               <AdminProvider>

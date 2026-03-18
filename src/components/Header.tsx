@@ -34,7 +34,7 @@ export default function Header() {
   const router = useRouter();
   const { open: openSearch } = useSearch();
   const { user, profile, loading: authLoading, signOut, setShowAuthModal } = useAuth();
-  const { region, setRegion } = useRegion();
+  const { region, setRegion, availableRegions } = useRegion();
   const [scrolled, setScrolled] = useState(false);
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -109,7 +109,7 @@ export default function Header() {
             </svg>
           )}
         </button>
-        {ACTIVE_COUNTRY_CODES.map((code) => (
+        {ACTIVE_COUNTRY_CODES.filter((code) => availableRegions.includes(code)).map((code) => (
           <button
             key={code}
             onClick={() => { setRegion(code); }}
