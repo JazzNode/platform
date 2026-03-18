@@ -133,7 +133,12 @@
     "acceptingStudents": "生徒募集中",
     "lessonPriceRange": "レッスン料金",
     "gear": "ギア",
-    "premiumComingSoon": "Premiumは近日公開予定です。お楽しみに！"
+    "premiumComingSoon": "Premiumは近日公開予定です。お楽しみに！",
+    "searchHeadline": "今夜、ジャズはどこで？",
+    "searchQuickJam": "ジャムセッション",
+    "searchQuickTonight": "今夜のライブ",
+    "searchQuickCities": "都市を探す",
+    "searchQuickOr": "または都市から探す"
   },
   "auth": {
     "signIn": "ログイン",

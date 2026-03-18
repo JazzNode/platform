@@ -137,7 +137,12 @@
     "acceptingStudents": "招收學生中",
     "lessonPriceRange": "課程費用",
     "gear": "器材",
-    "premiumComingSoon": "Premium 即將推出，敬請期待！"
+    "premiumComingSoon": "Premium 即將推出，敬請期待！",
+    "searchHeadline": "今晚，想在哪裡微醺？",
+    "searchQuickJam": "Jam Session",
+    "searchQuickTonight": "今晚有演出",
+    "searchQuickCities": "探索城市",
+    "searchQuickOr": "或按城市瀏覽"
   },
   "auth": {
     "signIn": "登入",

@@ -137,7 +137,12 @@
     "acceptingStudents": "Accepting Students",
     "lessonPriceRange": "Lesson Price Range",
     "gear": "Gear",
-    "premiumComingSoon": "Premium is coming soon — stay tuned!"
+    "premiumComingSoon": "Premium is coming soon — stay tuned!",
+    "searchHeadline": "Tonight, where's the jazz?",
+    "searchQuickJam": "Jam Session",
+    "searchQuickTonight": "Tonight's Shows",
+    "searchQuickCities": "Explore Cities",
+    "searchQuickOr": "or browse by city"
   },
   "auth": {
     "signIn": "Sign In",

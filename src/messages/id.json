@@ -133,7 +133,12 @@
     "acceptingStudents": "Menerima Murid",
     "lessonPriceRange": "Tarif Les",
     "gear": "Peralatan",
-    "premiumComingSoon": "Premium segera hadir — nantikan!"
+    "premiumComingSoon": "Premium segera hadir — nantikan!",
+    "searchHeadline": "Malam ini, jazz di mana?",
+    "searchQuickJam": "Jam Session",
+    "searchQuickTonight": "Pertunjukan Malam Ini",
+    "searchQuickCities": "Jelajahi Kota",
+    "searchQuickOr": "atau telusuri berdasarkan kota"
   },
   "auth": {
     "signIn": "Masuk",

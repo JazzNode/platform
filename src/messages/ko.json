@@ -133,7 +133,12 @@
     "acceptingStudents": "학생 모집 중",
     "lessonPriceRange": "레슨 요금",
     "gear": "장비",
-    "premiumComingSoon": "Premium이 곧 출시됩니다. 기대해 주세요!"
+    "premiumComingSoon": "Premium이 곧 출시됩니다. 기대해 주세요!",
+    "searchHeadline": "오늘 밤, 재즈는 어디서?",
+    "searchQuickJam": "잼 세션",
+    "searchQuickTonight": "오늘 밤 공연",
+    "searchQuickCities": "도시 탐색",
+    "searchQuickOr": "또는 도시별로 찾기"
   },
   "auth": {
     "signIn": "로그인",

@@ -133,7 +133,12 @@
     "acceptingStudents": "เปิดรับนักเรียน",
     "lessonPriceRange": "ค่าเรียน",
     "gear": "อุปกรณ์",
-    "premiumComingSoon": "Premium กำลังจะมาเร็วๆ นี้ — โปรดติดตาม!"
+    "premiumComingSoon": "Premium กำลังจะมาเร็วๆ นี้ — โปรดติดตาม!",
+    "searchHeadline": "คืนนี้ แจ๊สอยู่ที่ไหน?",
+    "searchQuickJam": "แจมเซสชัน",
+    "searchQuickTonight": "โชว์คืนนี้",
+    "searchQuickCities": "สำรวจเมือง",
+    "searchQuickOr": "หรือเลือกตามเมือง"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",

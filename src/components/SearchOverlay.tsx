@@ -33,6 +33,13 @@ const SECTION_LABELS: Record<string, Record<string, string>> = {
   member: { en: 'MEMBERS', zh: '會員', ja: 'メンバー', ko: '멤버' },
 };
 
+const QUICK_LABELS: Record<string, Record<string, string>> = {
+  headline:  { en: 'Tonight, where\'s the jazz?', zh: '今晚，想在哪裡微醺？', ja: '今夜、ジャズはどこで？', ko: '오늘 밤, 재즈는 어디서?', th: 'คืนนี้ แจ๊สอยู่ที่ไหน?', id: 'Malam ini, jazz di mana?' },
+  jam:       { en: 'Jam Session', zh: 'Jam Session', ja: 'ジャムセッション', ko: '잼 세션', th: 'แจมเซสชัน', id: 'Jam Session' },
+  tonight:   { en: 'Tonight\'s Shows', zh: '今晚有演出', ja: '今夜のライブ', ko: '오늘 밤 공연', th: 'โชว์คืนนี้', id: 'Pertunjukan Malam Ini' },
+  orCity:    { en: 'or browse by city', zh: '或按城市瀏覽', ja: 'または都市から探す', ko: '또는 도시별로 찾기', th: 'หรือเลือกตามเมือง', id: 'atau telusuri berdasarkan kota' },
+};
+
 export default function SearchOverlay() {
   const { isOpen, close, data, loading } = useSearch();
   const locale = useLocale();
@@ -72,6 +79,11 @@ export default function SearchOverlay() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, close]);
+
+  // Top cities sorted by venue count for quick-action buttons
+  const topCities = useMemo(() => {
+    return [...data.cities].sort((a, b) => b.venueCount - a.venueCount).slice(0, 6);
+  }, [data.cities]);
 
   const results = useMemo(() => {
     return search(query, data, filter);
@@ -366,12 +378,54 @@ export default function SearchOverlay() {
                 </p>
               </div>
             ) : query.length === 0 ? (
-              /* Empty state — keyboard hint */
-              <div className="flex flex-col items-center justify-center py-16 text-[var(--muted-foreground)]">
-                <p className="text-sm">
-                  {locale === 'zh' ? '輸入關鍵字開始搜尋' : locale === 'ja' ? 'キーワードを入力して検索' : locale === 'ko' ? '키워드를 입력하여 검색' : 'Start typing to search'}
+              /* Empty state — intent-based quick actions */
+              <div className="px-5 py-6">
+                {/* Headline */}
+                <p className="font-serif text-lg sm:text-xl text-[var(--foreground)] text-center mb-5">
+                  {QUICK_LABELS.headline[locale] || QUICK_LABELS.headline.en}
                 </p>
-                <div className="hidden sm:flex items-center gap-2 mt-3 text-xs">
+
+                {/* Quick action buttons */}
+                <div className="flex flex-wrap justify-center gap-2 mb-5">
+                  <button
+                    onClick={() => { setQuery('jam session'); setFilter('event'); }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/5 text-sm font-medium text-gold hover:bg-[var(--color-gold)]/15 hover:border-[var(--color-gold)]/50 transition-all duration-200 active:scale-95"
+                  >
+                    <span>🎷</span>
+                    <span>{QUICK_LABELS.jam[locale] || QUICK_LABELS.jam.en}</span>
+                  </button>
+                  <button
+                    onClick={() => { close(); router.push(`/${locale}/events`); }}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-full border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/5 text-sm font-medium text-gold hover:bg-[var(--color-gold)]/15 hover:border-[var(--color-gold)]/50 transition-all duration-200 active:scale-95"
+                  >
+                    <span>🎵</span>
+                    <span>{QUICK_LABELS.tonight[locale] || QUICK_LABELS.tonight.en}</span>
+                  </button>
+                </div>
+
+                {/* City quick links — dynamic from search data */}
+                {topCities.length > 0 && (
+                  <div>
+                    <p className="text-xs text-center text-[var(--muted-foreground)] uppercase tracking-widest mb-3">
+                      {QUICK_LABELS.orCity[locale] || QUICK_LABELS.orCity.en}
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {topCities.map((city) => (
+                        <button
+                          key={city.id}
+                          onClick={() => { close(); router.push(`/${locale}/cities/${city.citySlug}`); }}
+                          className="px-3.5 py-2 rounded-xl border border-[var(--border)] text-sm text-[var(--foreground)] hover:border-[var(--color-gold)]/40 hover:bg-[var(--color-gold)]/5 hover:text-gold transition-all duration-200 active:scale-95"
+                        >
+                          <span className="font-serif font-medium">{city.name}</span>
+                          <span className="ml-1.5 text-xs text-[var(--muted-foreground)]">{city.venueCount}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Keyboard hints (desktop only) */}
+                <div className="hidden sm:flex items-center justify-center gap-2 mt-5 text-xs text-[var(--muted-foreground)]">
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)]">↑↓</kbd>
                   <span>{locale === 'zh' ? '瀏覽' : locale === 'ja' ? 'ナビゲート' : locale === 'ko' ? '이동' : 'Navigate'}</span>
                   <kbd className="px-1.5 py-0.5 rounded bg-[var(--card)] border border-[var(--border)]">↵</kbd>
