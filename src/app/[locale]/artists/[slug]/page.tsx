@@ -354,32 +354,30 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
           <div className="flex-1 space-y-5">
             <div>
-              <div className="flex items-start justify-between gap-4">
-                <EditableName
-                  entityType="artist"
-                  entityId={artist.id}
-                  field={artistDisplayNameField(f, locale)}
-                  value={artistDisplayName(f, locale)}
-                  fieldOptions={[
-                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
-                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
-                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
-                  ]}
-                  className="font-serif text-4xl sm:text-5xl font-bold"
-                  tag="h1"
-                />
-                <div className="flex items-center gap-2 shrink-0">
-                  <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
-                    {f.available_for_hire && (
-                      <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
-                    )}
-                  </TierGate>
-                  <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
-                    <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
-                  </TierGate>
-                  <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
-                  <FollowButton itemType="artist" itemId={artist.id} variant="full" />
-                </div>
+              <EditableName
+                entityType="artist"
+                entityId={artist.id}
+                field={artistDisplayNameField(f, locale)}
+                value={artistDisplayName(f, locale)}
+                fieldOptions={[
+                  { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                  { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                  { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                ]}
+                className="font-serif text-4xl sm:text-5xl font-bold"
+                tag="h1"
+              />
+              <div className="flex items-center gap-2 flex-wrap mt-3">
+                <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
+                  {f.available_for_hire && (
+                    <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
+                  )}
+                </TierGate>
+                <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
+                  <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
+                </TierGate>
+                <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
+                <FollowButton itemType="artist" itemId={artist.id} variant="full" />
               </div>
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName

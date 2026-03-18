@@ -251,9 +251,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         )}
 
         <div className="flex-1 space-y-6">
-          <div className="flex items-start justify-between gap-4">
+          <div>
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 flex-wrap mt-3">
               <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}>
                 <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
               </TierGate>
