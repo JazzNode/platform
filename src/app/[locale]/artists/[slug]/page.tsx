@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
-import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap, getArtistGear } from '@/lib/supabase';
+import { getArtists, getEvents, getVenues, getBadges, getLineups, getCities, getTags, resolveLinks, buildMap, getArtistGear, getFollowerCount } from '@/lib/supabase';
 import { displayName, artistDisplayName, artistDisplayNameField, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey, parseSpotifyEmbedUrl, parseYouTubeVideoId } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -72,8 +72,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     notFound();
   }
 
-  // Fetch gear for this artist
-  const artistGear = await getArtistGear(artist.id);
+  // Fetch gear and follower count for this artist
+  const [artistGear, followerCount] = await Promise.all([
+    getArtistGear(artist.id),
+    getFollowerCount('artist', slug),
+  ]);
 
   // Compute prev/next artist — alphabetical by displayName
   const allSorted = [...artists].sort((a, b) =>
@@ -424,7 +427,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
               </TierGate>
               <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
-              <FollowButton itemType="artist" itemId={artist.id} variant="full" />
+              <FollowButton itemType="artist" itemId={artist.id} variant="full" followerCount={followerCount} />
             </div>
 
             {/* Data source notice */}

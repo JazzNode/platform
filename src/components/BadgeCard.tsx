@@ -239,7 +239,7 @@ export default function BadgeCard({ badge }: { badge: BadgeProgress }) {
       )}
 
       {/* Earned glow indicator */}
-      {earned && (
+      {earned && badge.earned_at && (
         <div className="mt-3 flex items-center gap-1.5">
           <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]" />
           <span className="text-[10px] text-[var(--color-gold)]/70">
