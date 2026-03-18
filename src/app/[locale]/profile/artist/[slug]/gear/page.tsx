@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
@@ -22,6 +23,7 @@ const GEAR_TYPES = ['instrument', 'amp', 'effect', 'accessory', 'other'] as cons
 
 export default function ArtistGearPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
+  const locale = useLocale();
   const { user } = useAuth();
   const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
@@ -229,9 +231,9 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
         <FadeUp>
           <div className="bg-gradient-to-br from-[var(--color-gold)]/5 to-[var(--color-gold)]/10 border border-[var(--color-gold)]/20 rounded-2xl p-6 text-center">
             <p className="text-sm mb-3">{t('gearLimitReached')}</p>
-            <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <Link href={`/${locale}/tiers`} className="inline-block px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
-            </button>
+            </Link>
           </div>
         </FadeUp>
       )}

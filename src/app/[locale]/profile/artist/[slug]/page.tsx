@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
@@ -22,6 +23,7 @@ interface UnreadStats {
 
 export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
+  const locale = useLocale();
   const { user, loading } = useAuth();
   const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
@@ -255,9 +257,9 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
               <div className="text-center">
                 <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
-                <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                <Link href={`/${locale}/tiers`} className="inline-block px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                   {t('upgradePremium')}
-                </button>
+                </Link>
               </div>
             </div>
           )}
@@ -302,9 +304,9 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
                 </div>
               ))}
             </div>
-            <button disabled className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <Link href={`/${locale}/tiers`} className="inline-block mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
-            </button>
+            </Link>
           </div>
         </FadeUp>
       )}

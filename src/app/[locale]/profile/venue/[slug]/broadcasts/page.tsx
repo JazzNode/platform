@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
@@ -22,6 +23,7 @@ interface Broadcast {
 export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const tBroadcast = useTranslations('artistStudio');
+  const locale = useLocale();
   const { user, loading } = useAuth();
   const { previewVenueTier, adminModeEnabled } = useAdmin();
   const { isUnlocked, minTier } = useTierConfig();
@@ -175,9 +177,9 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('premiumLockedHint')}
             </p>
-            <button disabled className="px-6 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
-              {t('upgradePremium')}
-            </button>
+            <Link href={`/${locale}/tiers`} className="inline-block px-6 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+              {broadcastMinTier <= 2 ? t('upgradePremium') : t('upgradeElite')}
+            </Link>
           </div>
         </FadeUp>
       </div>

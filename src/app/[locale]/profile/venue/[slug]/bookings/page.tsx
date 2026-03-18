@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
+import Link from 'next/link';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
@@ -9,6 +10,7 @@ import FadeUp from '@/components/animations/FadeUp';
 
 export default function VenueBookingsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
+  const locale = useLocale();
   const { previewVenueTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
@@ -59,9 +61,9 @@ export default function VenueBookingsPage({ params }: { params: Promise<{ slug: 
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('premiumLockedHint')}
             </p>
-            <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
-              {t('upgradePremium')}
-            </button>
+            <Link href={`/${locale}/tiers`} className="inline-block px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+              {t('upgradeElite')}
+            </Link>
           </div>
         </FadeUp>
       </div>
