@@ -68,7 +68,7 @@ export async function getUserBadgeProgress(
     sb.from('user_badges').select('*').eq('user_id', userId),
     sb.from('follows').select('target_id, target_type').eq('user_id', userId),
     sb.from('favorites').select('item_id, item_type').eq('user_id', userId),
-    sb.from('profiles').select('display_name, bio, avatar_url, website').eq('id', userId).single(),
+    sb.from('profiles').select('display_name, bio, avatar_url, website, created_at').eq('id', userId).single(),
     sb.from('conversations').select('id').or(`fan_user_id.eq.${userId},user_b_id.eq.${userId}`),
     sb.from('messages').select('id').eq('sender_id', userId).limit(1),
   ]);
@@ -151,6 +151,10 @@ export async function getUserBadgeProgress(
   const p = profile;
   const profileComplete = !!(p?.display_name && p?.bio && p?.avatar_url && p?.website);
 
+  // Early adopter: account created before June 2026
+  const GENESIS_NODE_CUTOFF = '2026-06-01T00:00:00Z';
+  const isEarlyAdopter = !!(p?.created_at && new Date(p.created_at) < new Date(GENESIS_NODE_CUTOFF));
+
   // Messages
   const hasMessage = (messageCheck || []).length > 0;
   const conversationCount = (conversations || []).length;
@@ -167,7 +171,7 @@ export async function getUserBadgeProgress(
       profileComplete, hasMessage, conversationCount,
     }, badge.criteria_target);
 
-    const isEarned = earnedMap.has(bid) || (progress ? progress.current >= progress.target : checkBinaryBadge(bid, { profileComplete }));
+    const isEarned = earnedMap.has(bid) || (progress ? progress.current >= progress.target : checkBinaryBadge(bid, { profileComplete, isEarlyAdopter }));
 
     // Auto-persist newly earned badges
     if (isEarned && !earnedMap.has(bid)) {
@@ -278,11 +282,13 @@ function computeProgress(
 
 function checkBinaryBadge(
   badgeId: string,
-  ctx: { profileComplete: boolean },
+  ctx: { profileComplete: boolean; isEarlyAdopter: boolean },
 ): boolean {
   switch (badgeId) {
     case 'usr_profile_complete':
       return ctx.profileComplete;
+    case 'usr_genesis_node':
+      return ctx.isEarlyAdopter;
     default:
       return false;
   }

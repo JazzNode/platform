@@ -30,7 +30,7 @@ async function fetchBadgeProgress(
     sb.from('user_badges').select('*').eq('user_id', userId),
     sb.from('follows').select('target_id, target_type').eq('user_id', userId),
     sb.from('favorites').select('item_id, item_type').eq('user_id', userId),
-    sb.from('profiles').select('display_name, bio, avatar_url, website').eq('id', userId).single(),
+    sb.from('profiles').select('display_name, bio, avatar_url, website, created_at').eq('id', userId).single(),
     sb.from('conversations').select('id').or(`fan_user_id.eq.${userId},user_b_id.eq.${userId}`),
     sb.from('messages').select('id').eq('sender_id', userId).limit(1),
   ]);
@@ -83,6 +83,10 @@ async function fetchBadgeProgress(
   const hasMessage = (messageCheck || []).length > 0;
   const conversationCount = (conversations || []).length;
 
+  // Early adopter: account created before June 2026
+  const GENESIS_NODE_CUTOFF = '2026-06-01T00:00:00Z';
+  const isEarlyAdopter = !!(p?.created_at && new Date(p.created_at) < new Date(GENESIS_NODE_CUTOFF));
+
   const nameKey = `name_${locale === 'zh' ? 'zh' : locale}`;
   const descKey = `description_${locale === 'zh' ? 'zh' : locale}`;
 
@@ -110,6 +114,8 @@ async function fetchBadgeProgress(
         progress = { current: lateEventCount, target: target || 5 }; break;
       case 'usr_profile_complete':
         binaryEarned = profileComplete; break;
+      case 'usr_genesis_node':
+        binaryEarned = isEarlyAdopter; break;
       case 'usr_first_message':
         progress = { current: hasMessage ? 1 : 0, target: target || 1 }; break;
       case 'usr_social_butterfly':
