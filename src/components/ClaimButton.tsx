@@ -123,7 +123,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
           </span>
           <button
             onClick={handleAlsoClaim}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--color-gold)]/25 text-[var(--color-gold-dim)] hover:text-gold hover:border-gold/40 hover:bg-gold/5"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -197,7 +197,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     <>
       <button
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--color-gold)]/25 text-[var(--color-gold-dim)] hover:text-gold hover:border-gold/40 hover:bg-gold/5"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
