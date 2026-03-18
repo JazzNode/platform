@@ -14,6 +14,7 @@ const NAV_ITEMS = [
   { key: 'claims', icon: 'shield', path: '/claims' },
   { key: 'artistTiers', icon: 'music', path: '/artist-tiers' },
   { key: 'venueTiers', icon: 'house', path: '/venue-tiers' },
+  { key: 'badges', icon: 'badge', path: '/badges' },
 ] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -61,6 +62,14 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <circle cx="9" cy="7" r="4" />
           <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
+    case 'badge':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 15l-3.5 2 .9-3.9L6 10.1l4-.3L12 6l2 3.8 4 .3-3.4 3 .9 3.9z" />
+          <path d="M8 21l1-6" />
+          <path d="M16 21l-1-6" />
         </svg>
       );
     default:
