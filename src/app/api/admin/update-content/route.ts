@@ -7,15 +7,26 @@ import { createAdminClient } from '@/utils/supabase/admin';
 
 const LOCALES = ['en', 'zh', 'ja', 'ko', 'th', 'id'];
 
-// If the original user input is already short, reuse translated bio as short_bio
+// If the original content is already short, reuse translated full text as short version
 const wordCount = (s: string) => s.trim().split(/\s+/).length;
-const SHORT_BIO_THRESHOLDS: Record<string, { src: string; max: number; measure: (s: string) => number }> = {
+type ThresholdMap = Record<string, { src: string; max: number; measure: (s: string) => number }>;
+
+const SHORT_BIO_THRESHOLDS: ThresholdMap = {
   bio_short_zh: { src: 'bio_zh', max: 70, measure: (s) => s.length },
   bio_short_en: { src: 'bio_en', max: 40, measure: wordCount },
   bio_short_ja: { src: 'bio_ja', max: 100, measure: (s) => s.length },
   bio_short_ko: { src: 'bio_ko', max: 90, measure: (s) => s.length },
   bio_short_th: { src: 'bio_th', max: 110, measure: (s) => s.length },
   bio_short_id: { src: 'bio_id', max: 40, measure: wordCount },
+};
+
+const SHORT_DESC_THRESHOLDS: ThresholdMap = {
+  description_short_zh: { src: 'description_zh', max: 200, measure: (s) => s.length },
+  description_short_en: { src: 'description_en', max: 80, measure: wordCount },
+  description_short_ja: { src: 'description_ja', max: 200, measure: (s) => s.length },
+  description_short_ko: { src: 'description_ko', max: 120, measure: (s) => s.length },
+  description_short_th: { src: 'description_th', max: 150, measure: (s) => s.length },
+  description_short_id: { src: 'description_id', max: 80, measure: wordCount },
 };
 
 const ENTITY_TABLE: Record<string, string> = {
@@ -138,16 +149,21 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      // If original input is short, override short_bio with translated full bio
-      if (fieldPrefix === 'bio') {
+      // If translated full text is already short enough, use it directly as the short version
+      const thresholds = fieldPrefix === 'bio' ? SHORT_BIO_THRESHOLDS
+        : fieldPrefix === 'description' ? SHORT_DESC_THRESHOLDS : null;
+      if (thresholds) {
         const srcWordCount = wordCount(content);
         const srcCharCount = content.trim().length;
-        const isSourceShort = srcWordCount <= 40 && srcCharCount <= 110;
+        // Universal short-input check based on English word-count threshold
+        const isSourceShort = fieldPrefix === 'bio'
+          ? (srcWordCount <= 40 && srcCharCount <= 110)
+          : (srcWordCount <= 80 && srcCharCount <= 200);
 
-        for (const [shortKey, cfg] of Object.entries(SHORT_BIO_THRESHOLDS)) {
-          const fullBio = fields[cfg.src];
-          if (fullBio && (isSourceShort || cfg.measure(fullBio) <= cfg.max)) {
-            fields[shortKey] = fullBio;
+        for (const [shortKey, cfg] of Object.entries(thresholds)) {
+          const fullText = fields[cfg.src];
+          if (fullText && (isSourceShort || cfg.measure(fullText) <= cfg.max)) {
+            fields[shortKey] = fullText;
           }
         }
       }

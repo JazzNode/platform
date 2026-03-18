@@ -95,6 +95,7 @@ ${content}
 ${translateTargets}
 
 == Task 2: Generate short summaries for ALL 6 languages (including source) ==
+If the source bio is already short (roughly within the target length), use the translated full bio as-is for the short version — do NOT pad or expand it.
 ${shortTargets}
 
 Rules:
@@ -135,6 +136,7 @@ For the detected source language, keep the original content as-is. For others, t
 ${allTargets}
 
 == Task 2: Generate short summaries for ALL 6 languages ==
+If the source bio is already short (roughly within the target length), use the translated full bio as-is for the short version — do NOT pad or expand it.
 ${shortTargets}
 
 Rules:
@@ -167,7 +169,9 @@ function buildDescriptionPrompt(content: string, sourceLocale: Locale, entityTyp
         case 'id': return `- description_short_id: Ringkasan Bahasa Indonesia, ~60-80 kata.`;
       }
     }).join('\n');
-    shortSection = `\n== Task 2: Generate short summaries for ALL 6 languages (including source) ==\n${shortTargets}`;
+    shortSection = `\n== Task 2: Generate short summaries for ALL 6 languages (including source) ==
+If the source description is already short (roughly within the target length), use the translated full description as-is for the short version — do NOT pad or expand it.
+${shortTargets}`;
   }
 
   const label = entityType === 'event' ? 'event description' : 'venue description';
