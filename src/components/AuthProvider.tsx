@@ -114,7 +114,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) {
-      const code = (error as any).code ?? '';
+      const code = error.code ?? '';
       if (code === 'over_email_send_rate_limit' || error.message.includes('rate limit')) {
         return { error: 'rateLimited', needsConfirmation: false };
       }
