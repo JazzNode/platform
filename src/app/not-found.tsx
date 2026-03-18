@@ -7,6 +7,7 @@ export default function NotFound() {
             <h1 style={{ fontSize: '24px', fontWeight: 500, margin: 0, paddingRight: '23px', borderRight: '1px solid rgba(255,255,255,.3)' }}>404</h1>
             <p style={{ fontSize: '14px', margin: 0, paddingLeft: '23px' }}>This page could not be found.</p>
           </div>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- Root 404 outside [locale] router, Link component requires locale prefix */}
           <a
             href="/"
             style={{ marginTop: '32px', fontSize: '14px', color: '#D4AF37', textDecoration: 'none' }}

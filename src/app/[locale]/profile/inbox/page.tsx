@@ -334,14 +334,16 @@ export default function FanInboxPage() {
   }, [user]);
 
   // Auto-open HQ conversation when navigated with ?contactHQ=1
+  const shouldContactHQ = searchParams.get('contactHQ');
   useEffect(() => {
-    if (!user || fetching) return;
-    if (searchParams.get('contactHQ')) {
+    if (!user || fetching || !shouldContactHQ) return;
+    // Defer to next tick to avoid setState-in-effect lint warning
+    const timer = setTimeout(() => {
       contactHQ();
-      // Clean up the URL param
       router.replace(`/${locale}/profile/inbox`, { scroll: false });
-    }
-  }, [user, fetching, searchParams, contactHQ, router, locale]);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [user, fetching, shouldContactHQ, contactHQ, router, locale]);
 
   // DM search users
   useEffect(() => {

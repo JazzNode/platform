@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
   // Previously used listUsers({ perPage: 1000 }) which fetched ALL users
   // and filtered client-side — O(n) and slow as user count grows.
   const userIds = (profiles || []).map((p) => p.id);
-  let emailMap = new Map<string, string>();
+  const emailMap = new Map<string, string>();
 
   if (userIds.length > 0) {
     const results = await Promise.all(

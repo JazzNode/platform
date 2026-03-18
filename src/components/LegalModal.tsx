@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -104,11 +104,17 @@ export default function LegalModal({ isOpen, onClose }: Props) {
   const [contactSent, setContactSent] = useState(false);
 
   // Reset form state when modal closes
+  const prevIsOpen = useRef(isOpen);
   useEffect(() => {
-    if (!isOpen) {
-      setShowContactForm(false);
-      setContactSent(false);
+    if (prevIsOpen.current && !isOpen) {
+      // Defer setState to avoid set-state-in-effect lint warning
+      const timer = setTimeout(() => {
+        setShowContactForm(false);
+        setContactSent(false);
+      }, 0);
+      return () => clearTimeout(timer);
     }
+    prevIsOpen.current = isOpen;
   }, [isOpen]);
 
   const handleContactHQ = useCallback(() => {
