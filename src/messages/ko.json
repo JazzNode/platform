@@ -231,7 +231,13 @@
     "sendDM": "메시지",
     "nav_settings": "설정",
     "nav_inbox": "수신함",
+    "nav_badges": "배지",
     "nav_members": "회원",
+    "badgesTitle": "나의 배지",
+    "badgesEarned": "획득",
+    "badgesCategoryMilestone": "마일스톤",
+    "badgesCategoryCommunity": "커뮤니티",
+    "badgesViewAll": "모든 배지 보기",
     "ownerMembersTitle": "회원 관리",
     "ownerMembersDescription": "{count}명의 등록 회원",
     "ownerSearchPlaceholder": "이름, 사용자명 또는 이메일로 검색...",
@@ -247,7 +253,9 @@
     "ID": "인도네시아",
     "KR": "한국",
     "TH": "태국",
-    "SG": "싱가포르"
+    "SG": "싱가포르",
+    "sectionRegion": "지역",
+    "sectionLanguage": "언어"
   },
   "instruments": {
     "piano": "피아노",

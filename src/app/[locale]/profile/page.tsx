@@ -8,6 +8,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import AvatarCropModal from '@/components/AvatarCropModal';
 import FadeUp from '@/components/animations/FadeUp';
+import BadgeShowcase from '@/components/BadgeShowcase';
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
@@ -154,6 +155,11 @@ export default function ProfilePage() {
     <div className="max-w-2xl mx-auto space-y-8">
       <FadeUp>
         <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('settings')}</h1>
+      </FadeUp>
+
+      {/* Badge Showcase */}
+      <FadeUp>
+        <BadgeShowcase />
       </FadeUp>
 
       <FadeUp>

@@ -235,7 +235,13 @@
     "sendDM": "Message",
     "nav_settings": "Settings",
     "nav_inbox": "Inbox",
+    "nav_badges": "Badges",
     "nav_members": "Members",
+    "badgesTitle": "Your Badges",
+    "badgesEarned": "earned",
+    "badgesCategoryMilestone": "Milestones",
+    "badgesCategoryCommunity": "Community",
+    "badgesViewAll": "View all badges",
     "ownerMembersTitle": "Manage Members",
     "ownerMembersDescription": "{count} registered members",
     "ownerSearchPlaceholder": "Search by name, username, or email...",
@@ -251,7 +257,9 @@
     "ID": "Indonesia",
     "KR": "South Korea",
     "TH": "Thailand",
-    "SG": "Singapore"
+    "SG": "Singapore",
+    "sectionRegion": "Region",
+    "sectionLanguage": "Language"
   },
   "instruments": {
     "piano": "Piano",

@@ -231,7 +231,13 @@
     "sendDM": "Pesan",
     "nav_settings": "Pengaturan",
     "nav_inbox": "Kotak Masuk",
+    "nav_badges": "Lencana",
     "nav_members": "Anggota",
+    "badgesTitle": "Lencana Anda",
+    "badgesEarned": "diperoleh",
+    "badgesCategoryMilestone": "Pencapaian",
+    "badgesCategoryCommunity": "Komunitas",
+    "badgesViewAll": "Lihat semua lencana",
     "ownerMembersTitle": "Kelola Anggota",
     "ownerMembersDescription": "{count} anggota terdaftar",
     "ownerSearchPlaceholder": "Cari berdasarkan nama, username, atau email...",
@@ -247,7 +253,9 @@
     "ID": "Indonesia",
     "KR": "Korea Selatan",
     "TH": "Thailand",
-    "SG": "Singapura"
+    "SG": "Singapura",
+    "sectionRegion": "Wilayah",
+    "sectionLanguage": "Bahasa"
   },
   "instruments": {
     "piano": "Piano",

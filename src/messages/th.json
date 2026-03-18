@@ -231,7 +231,13 @@
     "sendDM": "ส่งข้อความ",
     "nav_settings": "ตั้งค่า",
     "nav_inbox": "กล่องข้อความ",
+    "nav_badges": "เหรียญตรา",
     "nav_members": "สมาชิก",
+    "badgesTitle": "เหรียญตราของคุณ",
+    "badgesEarned": "ได้รับแล้ว",
+    "badgesCategoryMilestone": "เป้าหมาย",
+    "badgesCategoryCommunity": "ชุมชน",
+    "badgesViewAll": "ดูเหรียญตราทั้งหมด",
     "ownerMembersTitle": "จัดการสมาชิก",
     "ownerMembersDescription": "สมาชิกที่ลงทะเบียน {count} คน",
     "ownerSearchPlaceholder": "ค้นหาด้วยชื่อ ชื่อผู้ใช้ หรืออีเมล...",
@@ -247,7 +253,9 @@
     "ID": "อินโดนีเซีย",
     "KR": "เกาหลีใต้",
     "TH": "ไทย",
-    "SG": "สิงคโปร์"
+    "SG": "สิงคโปร์",
+    "sectionRegion": "ภูมิภาค",
+    "sectionLanguage": "ภาษา"
   },
   "instruments": {
     "piano": "เปียโน",

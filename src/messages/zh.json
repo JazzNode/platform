@@ -235,7 +235,13 @@
     "sendDM": "私訊",
     "nav_settings": "個人設定",
     "nav_inbox": "收件匣",
+    "nav_badges": "徽章",
     "nav_members": "會員管理",
+    "badgesTitle": "你的徽章",
+    "badgesEarned": "已獲得",
+    "badgesCategoryMilestone": "里程碑",
+    "badgesCategoryCommunity": "社群互動",
+    "badgesViewAll": "查看所有徽章",
     "ownerMembersTitle": "會員管理",
     "ownerMembersDescription": "共 {count} 位會員",
     "ownerSearchPlaceholder": "以姓名、帳號或信箱搜尋…",
@@ -251,7 +257,9 @@
     "ID": "印尼",
     "KR": "韓國",
     "TH": "泰國",
-    "SG": "新加坡"
+    "SG": "新加坡",
+    "sectionRegion": "地區",
+    "sectionLanguage": "語言"
   },
   "instruments": {
     "piano": "鋼琴",

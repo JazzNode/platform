@@ -231,7 +231,13 @@
     "sendDM": "メッセージ",
     "nav_settings": "設定",
     "nav_inbox": "受信トレイ",
+    "nav_badges": "バッジ",
     "nav_members": "メンバー",
+    "badgesTitle": "あなたのバッジ",
+    "badgesEarned": "獲得済み",
+    "badgesCategoryMilestone": "マイルストーン",
+    "badgesCategoryCommunity": "コミュニティ",
+    "badgesViewAll": "すべてのバッジを見る",
     "ownerMembersTitle": "メンバー管理",
     "ownerMembersDescription": "{count} 人の登録メンバー",
     "ownerSearchPlaceholder": "名前、ユーザー名、メールで検索...",
@@ -247,7 +253,9 @@
     "ID": "インドネシア",
     "KR": "韓国",
     "TH": "タイ",
-    "SG": "シンガポール"
+    "SG": "シンガポール",
+    "sectionRegion": "地域",
+    "sectionLanguage": "言語"
   },
   "instruments": {
     "piano": "ピアノ",

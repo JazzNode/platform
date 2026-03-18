@@ -14,6 +14,7 @@ import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
 import RecordNav from '@/components/RecordNav';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
+import BadgeDock from '@/components/BadgeDock';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -267,13 +268,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
 {/* Badges */}
           {venueBadges.length > 0 && (
-            <div className="flex gap-2">
-              {venueBadges.map((b) => (
-                <span key={b.id} className="text-xs px-3 py-1.5 rounded-xl bg-[#1A1A1A] text-gold border border-gold/20">
-                  {localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en}
-                </span>
-              ))}
-            </div>
+            <BadgeDock
+              badges={venueBadges.map((b) => ({
+                id: b.id,
+                badgeId: b.fields.badge_id,
+                name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
+                description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en,
+              }))}
+            />
           )}
 
           <EditableContent

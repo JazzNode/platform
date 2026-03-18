@@ -225,6 +225,10 @@ export interface BadgeDef {
   description_th?: string;
   description_id?: string;
   icon_url?: string;
+  category?: string;
+  target_type?: string;
+  sort_order?: number;
+  criteria_target?: number;
 }
 
 export interface City {
@@ -441,6 +445,10 @@ interface BadgeRow {
   description_id: string | null;
   icon_url: string | null;
   criteria: string | null;
+  category: string | null;
+  target_type: string | null;
+  sort_order: number | null;
+  criteria_target: number | null;
 }
 
 interface TagRow {
