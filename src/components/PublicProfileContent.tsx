@@ -81,7 +81,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                 </h1>
                 <div className="flex items-center gap-2 shrink-0">
                   <DMButton targetUserId={profile.id} />
-                  <FollowButton itemType="user" itemId={profile.id} variant="full" />
+                  <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
                 </div>
               </div>
               {profile.display_name && profile.username && (

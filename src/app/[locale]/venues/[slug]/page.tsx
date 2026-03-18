@@ -107,12 +107,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
   // ── Venue badge progress (all venue badges, earned + unearned) ──
   const earnedVenueBadgeIds = new Set(venueBadges.map((b) => b.fields.badge_id));
-  // DEBUG
-  console.log('[BADGE DEBUG] total badges:', badges.length, 'sample target_types:', badges.slice(0, 5).map(b => ({ id: b.id, target_type: b.fields.target_type })));
   const allVenueBadgeDefs = badges
     .filter((b) => b.fields.target_type === 'venue')
     .sort((a, b) => (a.fields.sort_order || 0) - (b.fields.sort_order || 0));
-  console.log('[BADGE DEBUG] allVenueBadgeDefs:', allVenueBadgeDefs.length);
 
   // Stats for venue badge progress
   const totalVenueEvents = venueEvents.length;
