@@ -204,10 +204,10 @@ export default function BadgeCard({ badge }: { badge: BadgeProgress }) {
             }`}>
               {name}
             </h3>
-            {earned && (
-              <svg className="w-3.5 h-3.5 text-[var(--color-gold)] shrink-0" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
-              </svg>
+            {earned && badge.earned_at && (
+              <span className="text-[10px] text-[var(--color-gold)]/60 whitespace-nowrap shrink-0">
+                {new Date(badge.earned_at).toLocaleDateString('zh-TW', { year: 'numeric', month: 'numeric', day: 'numeric' }).replace(/\//g, '.')} 獲取
+              </span>
             )}
           </div>
           <p className={`text-xs mt-0.5 line-clamp-2 ${
@@ -238,17 +238,6 @@ export default function BadgeCard({ badge }: { badge: BadgeProgress }) {
         </div>
       )}
 
-      {/* Earned glow indicator */}
-      {earned && badge.earned_at && (
-        <div className="mt-3 flex items-center gap-1.5">
-          <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-gold)]" />
-          <span className="text-[10px] text-[var(--color-gold)]/70">
-            {badge.earned_at
-              ? new Date(badge.earned_at).toLocaleDateString()
-              : ''}
-          </span>
-        </div>
-      )}
     </div>
   );
 }
