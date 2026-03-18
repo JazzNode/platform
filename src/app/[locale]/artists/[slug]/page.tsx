@@ -972,6 +972,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               title={t('badgesCategoryRecognition')}
               categoryKey="recognition"
               badges={artistBadgeProgress}
+              earnedOnly
             />
           </section>
         </FadeUp>

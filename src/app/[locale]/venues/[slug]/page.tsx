@@ -336,6 +336,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               title={t('badgesCategoryVenueExcellence')}
               categoryKey="venue_excellence"
               badges={venueBadgeProgress}
+              earnedOnly
             />
           )}
 

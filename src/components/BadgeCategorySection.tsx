@@ -14,17 +14,23 @@ interface BadgeCategorySectionProps {
   title: string;
   categoryKey: string;
   badges: BadgeProgress[];
+  /** When true, only earned badges are shown and unearned ones are hidden */
+  earnedOnly?: boolean;
 }
 
 export default function BadgeCategorySection({
   title,
   categoryKey,
   badges,
+  earnedOnly = false,
 }: BadgeCategorySectionProps) {
   if (badges.length === 0) return null;
 
   const meta = CATEGORY_META[categoryKey] || { icon: '🎯', color: 'text-[var(--foreground)]' };
   const earnedCount = badges.filter(b => b.earned).length;
+  const displayBadges = earnedOnly ? badges.filter(b => b.earned) : badges;
+
+  if (earnedOnly && displayBadges.length === 0) return null;
 
   return (
     <section>
@@ -35,13 +41,13 @@ export default function BadgeCategorySection({
           <h2 className={`text-base font-bold ${meta.color}`}>{title}</h2>
         </div>
         <span className="text-xs text-[var(--muted-foreground)] bg-[var(--muted)] px-2.5 py-1 rounded-full">
-          {earnedCount}/{badges.length}
+          {earnedOnly ? earnedCount : `${earnedCount}/${badges.length}`}
         </span>
       </div>
 
       {/* Badge grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {badges.map((badge) => (
+        {displayBadges.map((badge) => (
           <BadgeCard key={badge.badge_id} badge={badge} />
         ))}
       </div>
