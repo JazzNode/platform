@@ -3,7 +3,7 @@
 import type { BadgeProgress } from '@/lib/badges';
 
 // Badge icon mapping — reuses existing icons from BadgeDock + new ones for user badges
-const BADGE_ICONS: Record<string, React.ReactNode> = {
+export const BADGE_ICONS: Record<string, React.ReactNode> = {
   // User — Milestones
   usr_first_follow: (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
