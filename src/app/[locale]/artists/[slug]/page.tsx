@@ -354,33 +354,19 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
           <div className="flex-1 space-y-5">
             <div>
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-4">
-                <EditableName
-                  entityType="artist"
-                  entityId={artist.id}
-                  field={artistDisplayNameField(f, locale)}
-                  value={artistDisplayName(f, locale)}
-                  fieldOptions={[
-                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
-                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
-                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
-                  ]}
-                  className="font-serif text-4xl sm:text-5xl font-bold"
-                  tag="h1"
-                />
-                <div className="flex items-center gap-2 flex-wrap mt-3 md:mt-0 md:shrink-0">
-                <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
-                  {f.available_for_hire && (
-                    <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
-                  )}
-                </TierGate>
-                <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
-                  <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
-                </TierGate>
-                <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
-                <FollowButton itemType="artist" itemId={artist.id} variant="full" />
-              </div>
-            </div>
+              <EditableName
+                entityType="artist"
+                entityId={artist.id}
+                field={artistDisplayNameField(f, locale)}
+                value={artistDisplayName(f, locale)}
+                fieldOptions={[
+                  { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                  { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                  { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                ]}
+                className="font-serif text-4xl sm:text-5xl font-bold"
+                tag="h1"
+              />
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName
                   entityType="artist"
@@ -398,8 +384,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               )}
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2">
+            {/* Tags + Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
               <EditableInstruments
                 entityId={artist.id}
                 primaryInstrument={f.primary_instrument}
@@ -428,6 +414,17 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   </span>
                 )}
               </TierGate>
+              <span className="text-[#8A8578]/30 select-none">|</span>
+              <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
+                {f.available_for_hire && (
+                  <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
+                )}
+              </TierGate>
+              <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
+                <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
+              </TierGate>
+              <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
+              <FollowButton itemType="artist" itemId={artist.id} variant="full" />
             </div>
 
             {/* Data source notice */}

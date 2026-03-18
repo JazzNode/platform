@@ -251,22 +251,15 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         )}
 
         <div className="flex-1 space-y-6">
-          <div className="flex flex-col md:flex-row md:items-start md:justify-between md:gap-4">
+          <div>
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
-            <div className="flex items-center gap-2 flex-wrap mt-3 md:mt-0 md:shrink-0">
-              <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}>
-                <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
-              </TierGate>
-              <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
-              <FollowButton itemType="venue" itemId={venue.id} variant="full" />
-            </div>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
             <p className="text-xl text-[#8A8578]">{f.name_en}</p>
           )}
 
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2">
+          {/* Tags + Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2">
             {f.city_id?.[0] && cityMap.get(f.city_id[0]) && (
               <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                 <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C4.7 0 2 2.7 2 6c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6zm0 8.5c-1.4 0-2.5-1.1-2.5-2.5S6.6 3.5 8 3.5s2.5 1.1 2.5 2.5S9.4 8.5 8 8.5z"/></svg>
@@ -303,6 +296,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 </span>
               )}
             </TierGate>
+              <span className="text-[#8A8578]/30 select-none">|</span>
+              <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}>
+                <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
+              </TierGate>
+              <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
+              <FollowButton itemType="venue" itemId={venue.id} variant="full" />
           </div>
 
           {/* Unclaimed notice */}
