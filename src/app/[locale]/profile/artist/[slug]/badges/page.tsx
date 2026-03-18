@@ -21,7 +21,7 @@ async function fetchArtistBadgeProgress(
     { data: cities },
   ] = await Promise.all([
     sb.from('badges').select('*').eq('target_type', 'artist').order('sort_order'),
-    sb.from('artists').select('*').eq('artist_id', artistId).single(),
+    sb.from('artists').select('*').eq('artist_id', artistId).maybeSingle(),
     sb.from('events').select('event_id, start_at, venue_id').limit(500),
     sb.from('lineups').select('lineup_id, event_id, artist_id, role').eq('artist_id', artistId),
     sb.from('cities').select('city_id, country_code').limit(500),
@@ -108,9 +108,10 @@ export default function ArtistBadgesPage() {
 
   useEffect(() => {
     if (!params.slug) return;
+    const artistId = decodeURIComponent(params.slug);
     let cancelled = false;
 
-    fetchArtistBadgeProgress(params.slug, locale).then((data) => {
+    fetchArtistBadgeProgress(artistId, locale).then((data) => {
       if (!cancelled) {
         setBadges(data);
         setLoading(false);

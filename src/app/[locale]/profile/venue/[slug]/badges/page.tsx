@@ -116,9 +116,10 @@ export default function VenueBadgesPage() {
 
   useEffect(() => {
     if (!params.slug) return;
+    const venueId = decodeURIComponent(params.slug);
     let cancelled = false;
 
-    fetchVenueBadgeProgress(params.slug, locale).then((data) => {
+    fetchVenueBadgeProgress(venueId, locale).then((data) => {
       if (!cancelled) {
         setBadges(data);
         setLoading(false);
