@@ -29,6 +29,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
   const { locale } = await params;
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
+  const tRegions = await getTranslations('regions');
 
   const [artists, cities, venues] = await Promise.all([
     getArtists(), getCities(), getVenues(),
@@ -78,6 +79,13 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       a.countryCode.localeCompare(b.countryCode)
       || b.artistCount - a.artistCount
     );
+
+  // Build region labels from i18n (same pattern as events page)
+  const regionCodes = [...new Set(cityOptions.map((c) => c.countryCode).filter((c) => c !== 'ZZ'))];
+  const regionLabels: Record<string, string> = {};
+  for (const code of regionCodes) {
+    try { regionLabels[code] = tRegions(code as 'TW' | 'JP' | 'HK'); } catch { regionLabels[code] = code; }
+  }
 
   // Build city record-id → name/country lookup for venue labels & sorting
   const cityNameMap = new Map<string, string>();
@@ -135,6 +143,8 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       instrumentNames={instrumentNames}
       cityOptions={cityOptions}
       venueOptions={venueOptions}
+      regionLabels={regionLabels}
+      worldMapLabel={tRegions('worldMap')}
       labels={{
         artists: t('artists'),
         allInstruments: t('allInstruments'),
@@ -143,10 +153,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
         groups: t('groups'),
         bigBands: t('bigBands'),
         noArtists: t('noArtists'),
-        cityFootprint: t('cityFootprint'),
-        venueFootprint: t('venueFootprint'),
         artistFootprint: t('artistFootprint'),
-        allCities: t('allCities'),
         allVenues: t('allVenues'),
       }}
     />

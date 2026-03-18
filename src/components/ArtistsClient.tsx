@@ -7,6 +7,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
 import { useFollows } from '@/components/FollowsProvider';
+import { useRegion } from '@/components/RegionProvider';
 import { normalizeInstrumentKey } from '@/lib/helpers';
 
 interface SerializedArtist {
@@ -45,6 +46,8 @@ interface Props {
   cityOptions: CityOption[];
   venueOptions: VenueOption[];
   locale: string;
+  regionLabels: Record<string, string>;  // e.g. { TW: '台灣', JP: '日本' }
+  worldMapLabel: string;                  // e.g. '世界版圖'
   labels: {
     artists: string;
     allInstruments: string;
@@ -53,23 +56,105 @@ interface Props {
     groups: string;
     bigBands: string;
     noArtists: string;
-    cityFootprint: string;
-    venueFootprint: string;
     artistFootprint: string;
-    allCities: string;
     allVenues: string;
   };
 }
 
-export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, labels }: Props) {
+// Shared pill base: invisible ::after extends touch target to 44px minimum
+const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
+
+export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, labels }: Props) {
   const { isFollowing } = useFollows();
+  const { region: globalRegion } = useRegion();
+  const hasInteracted = useRef(false);
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); return instrumentNames[k] || k; };
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
-  const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set());
-  const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
-  const [venueDropdownOpen, setVenueDropdownOpen] = useState(false);
-  const venueDropdownRef = useRef<HTMLDivElement>(null);
+
+  // ── Region hierarchy state (matching EventsClient) ──
+  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
+
+  // Sync with global region when it changes (only if user hasn't interacted)
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      setActiveRegion(globalRegion);
+    }
+  }, [globalRegion]);
+
+  // Group cities by country code
+  const regionGroups = useMemo(() => {
+    const map: Record<string, CityOption[]> = {};
+    for (const c of cityOptions) {
+      const code = c.countryCode;
+      if (!code || code === 'ZZ') continue;
+      if (!map[code]) map[code] = [];
+      map[code].push(c);
+    }
+    return map;
+  }, [cityOptions]);
+
+  const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
+
+  // Derive effective city set for filtering
+  const effectiveCities = useMemo(() => {
+    if (selectedCity) return new Set([selectedCity]);
+    if (activeRegion && regionGroups[activeRegion]) {
+      return new Set(regionGroups[activeRegion].map((c) => c.recordId));
+    }
+    return new Set<string>();
+  }, [selectedCity, activeRegion, regionGroups]);
+
+  const handleRegionClick = useCallback((code: string) => {
+    hasInteracted.current = true;
+    if (activeRegion === code) {
+      setActiveRegion(null);
+      setSelectedCity(null);
+      setSelectedVenues(new Set());
+      return;
+    }
+    setActiveRegion(code);
+    setSelectedCity(null);
+    setSelectedVenues(new Set());
+  }, [activeRegion]);
+
+  const handleCityClick = useCallback((recordId: string) => {
+    setSelectedCity((prev) => prev === recordId ? null : recordId);
+    setSelectedVenues(new Set());
+  }, []);
+
+  const handleWorldMapClick = useCallback(() => {
+    hasInteracted.current = true;
+    setActiveRegion(null);
+    setSelectedCity(null);
+    setSelectedVenues(new Set());
+  }, []);
+
+  const toggleVenue = useCallback((recordId: string) => {
+    setSelectedVenues((prev) => {
+      const next = new Set(prev);
+      if (next.has(recordId)) next.delete(recordId);
+      else next.add(recordId);
+      return next;
+    });
+    // Reverse sync: selecting a venue syncs region + city
+    const venue = venueOptions.find((v) => v.recordId === recordId);
+    if (venue?.cityRecordIds?.[0]) {
+      const city = cityOptions.find((c) => c.recordId === venue.cityRecordIds[0]);
+      if (city) {
+        setActiveRegion(city.countryCode || null);
+        setSelectedCity(city.recordId);
+      }
+    }
+  }, [venueOptions, cityOptions]);
+
+  // Filter venues by selected cities
+  const visibleVenues = useMemo(() => {
+    if (effectiveCities.size === 0) return venueOptions;
+    return venueOptions.filter((v) => v.cityRecordIds.some((cid) => effectiveCities.has(cid)));
+  }, [venueOptions, effectiveCities]);
 
   const toggleInstrument = useCallback((inst: string) => {
     setSelectedInstruments((prev) => {
@@ -79,37 +164,6 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       return next;
     });
   }, []);
-
-  const toggleCity = useCallback((id: string) => {
-    setSelectedCities((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-    // Mutual exclusion: selecting a city clears venue
-    setSelectedVenue(null);
-  }, []);
-
-  // Venue/City filters are independent — no linked filtering
-  const activeVenue = selectedVenue;
-
-  // Whether each filter group is "disabled" by the other being active
-  const venueDisabled = selectedCities.size > 0;
-  const cityDisabled = !!activeVenue;
-
-  // Close venue dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (venueDropdownRef.current && !venueDropdownRef.current.contains(e.target as Node)) {
-        setVenueDropdownOpen(false);
-      }
-    }
-    if (venueDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
-  }, [venueDropdownOpen]);
 
   const filteredArtists = useMemo(() => {
     return artists.filter((a) => {
@@ -126,27 +180,20 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         const hasMatch = a.instrumentList.some((i) => selectedInstruments.has(i));
         if (!hasMatch) return false;
       }
-      // City filter — AND logic (intersection): artist must have ALL selected cities
-      if (selectedCities.size > 0) {
-        const hasAll = [...selectedCities].every((c) => a.cityList.includes(c));
-        if (!hasAll) return false;
-      }
-      // Venue filter — single select
-      if (activeVenue) {
-        if (!a.venueList.includes(activeVenue)) return false;
+      // Venue filter
+      if (selectedVenues.size > 0) {
+        if (!a.venueList.some((v) => selectedVenues.has(v))) return false;
+      } else if (effectiveCities.size > 0) {
+        // City/region filter — artist must have at least one matching city
+        if (!a.cityList.some((c) => effectiveCities.has(c))) return false;
       }
       return true;
     });
-  }, [artists, selectedType, selectedInstruments, selectedCities, activeVenue]);
+  }, [artists, selectedType, selectedInstruments, selectedVenues, effectiveCities]);
 
   /* Shared pill style helpers */
   const pillActive = 'bg-gold/10 border-gold/60 text-gold';
   const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
-
-  const selectedVenueObj = activeVenue ? venueOptions.find((v) => v.recordId === activeVenue) : null;
-  const selectedVenueLabel = selectedVenueObj
-    ? (selectedVenueObj.cityLabel ? `${selectedVenueObj.cityLabel} · ${selectedVenueObj.label}` : selectedVenueObj.label)
-    : labels.allVenues;
 
   return (
     <div className="space-y-12">
@@ -220,98 +267,117 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         </div>
 
         {/* ── Divider ── */}
-        {cityOptions.length > 0 && (
+        {regionOrder.length > 0 && (
         <FadeUpItem delay={340}>
           <div className="border-t border-[var(--border)] my-1" />
         </FadeUpItem>
         )}
 
-        {/* ── Footprint row: label | venue dropdown | city chips ── */}
-        {cityOptions.length > 0 && (
+        {/* ── Footprint: World Map │ Region › City hierarchy ── */}
+        {regionOrder.length > 0 && (
         <FadeUpItem delay={380}>
-        <div className="relative z-20 flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
           {/* Section label */}
           <span className="text-[10px] uppercase tracking-[0.15em] text-[#8A8578] font-medium mr-1 shrink-0">
             {labels.artistFootprint}
           </span>
 
-          {/* Venue dropdown — fades out when city filter is active */}
-          <div
-            className="relative shrink-0"
-            ref={venueDropdownRef}
-            style={{
-              opacity: venueDisabled ? 0.25 : 1,
-              pointerEvents: venueDisabled ? 'none' : 'auto',
-              transition: 'opacity 0.3s ease',
-            }}
+          {/* World Map pill */}
+          <button
+            onClick={handleWorldMapClick}
+            className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
+              !activeRegion
+                ? 'bg-gold/20 border-gold text-gold'
+                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+            }`}
           >
-            <button
-              onClick={() => setVenueDropdownOpen((prev) => !prev)}
-              className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border inline-flex items-center gap-1.5 ${
-                activeVenue ? pillActive : pillInactive
-              }`}
-            >
-              {selectedVenueLabel}
-              <svg className="w-3 h-3 opacity-50 shrink-0" viewBox="0 0 12 12" fill="none">
-                <path d="M3 5L6 8L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            {venueDropdownOpen && (
-              <div className="absolute top-full left-0 mt-1 z-50 w-72 max-h-60 overflow-y-auto rounded-xl border border-[var(--border)] bg-[var(--card)] shadow-xl py-1">
-                {/* All venues option */}
+            {worldMapLabel}
+          </button>
+
+          {/* Region pills with drill-down */}
+          {regionOrder.map((code, regionIdx) => {
+            const isActive = activeRegion === code;
+            const citiesInRegion = regionGroups[code] || [];
+
+            // Hide non-active regions when drilled into
+            if (activeRegion && !isActive) return null;
+
+            return (
+              <span key={`${code}-${activeRegion || 'w'}`} className="contents">
+                {isActive && (
+                  <span
+                    className="text-gold/40 text-xs select-none mx-0.5"
+                    style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both' }}
+                  >│</span>
+                )}
+
                 <button
-                  onClick={() => { setSelectedVenue(null); setVenueDropdownOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
-                    !activeVenue ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
+                  onClick={() => handleRegionClick(code)}
+                  style={{ animation: `geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) ${regionIdx * 0.04}s both` }}
+                  className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
+                    isActive
+                      ? 'bg-gold/20 border-gold text-gold'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
                   }`}
                 >
-                  {labels.allVenues}
+                  {regionLabels[code] || code}
                 </button>
-                {venueOptions.map((venue) => (
-                  <button
-                    key={venue.recordId}
-                    onClick={() => { setSelectedVenue(venue.recordId); setSelectedCities(new Set()); setVenueDropdownOpen(false); }}
-                    className={`w-full text-left px-3 py-2 text-xs tracking-widest transition-colors ${
-                      activeVenue === venue.recordId ? 'text-gold bg-gold/10' : 'text-[#8A8578] hover:bg-[rgba(240,237,230,0.06)]'
-                    }`}
-                  >
-                    {venue.cityLabel && (
-                      <span className="opacity-40 mr-1">{venue.cityLabel}</span>
-                    )}
-                    {venue.label}
-                    <span className="ml-1.5 opacity-40 text-[10px]">{venue.artistCount}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* Divider dot */}
-          <span className="text-[#8A8578] opacity-30 mx-0.5">·</span>
+                {/* City sub-pills */}
+                {isActive && !(citiesInRegion.length === 1 && citiesInRegion[0].label === (regionLabels[code] || code)) && (
+                  <>
+                    <span
+                      className="text-gold/40 text-xs select-none mx-0.5"
+                      style={{ animation: 'geo-fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both' }}
+                    >›</span>
+                    {citiesInRegion.map((city, i) => (
+                      <button
+                        key={city.recordId}
+                        onClick={() => handleCityClick(city.recordId)}
+                        style={{ animation: `geo-pill-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) ${(i + 1) * 0.07}s both` }}
+                        className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
+                          selectedCity === city.recordId
+                            ? 'bg-gold/15 border-gold/70 text-gold'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
+                        }`}
+                      >
+                        {city.label}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </span>
+            );
+          })}
+        </div>
+        </FadeUpItem>
+        )}
 
-          {/* City chips — fade out when venue filter is active */}
-          <div
-            className="flex flex-wrap gap-2"
-            style={{
-              opacity: cityDisabled ? 0.25 : 1,
-              pointerEvents: cityDisabled ? 'none' : 'auto',
-              transition: 'opacity 0.3s ease',
-            }}
-          >
-            {cityOptions.map((city) => (
+        {/* Venue pills — show when region/city selected and venues exist */}
+        {visibleVenues.length > 0 && activeRegion && (
+          <FadeUpItem delay={440}>
+          <div className="flex flex-wrap gap-x-2 gap-y-3">
+            <button
+              onClick={() => setSelectedVenues(new Set())}
+              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
+                selectedVenues.size === 0 ? pillActive : pillInactive
+              }`}
+            >
+              {labels.allVenues}
+            </button>
+            {visibleVenues.map((venue) => (
               <button
-                key={city.recordId}
-                onClick={() => toggleCity(city.recordId)}
-                className={`px-3 py-1.5 rounded-full text-xs tracking-widest transition-all duration-200 border ${
-                  selectedCities.has(city.recordId) ? pillActive : pillInactive
+                key={venue.recordId}
+                onClick={() => toggleVenue(venue.recordId)}
+                className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
+                  selectedVenues.has(venue.recordId) ? pillActive : pillInactive
                 }`}
               >
-                {city.label}
+                {venue.label}
               </button>
             ))}
           </div>
-        </div>
-        </FadeUpItem>
+          </FadeUpItem>
         )}
       </div>
 
