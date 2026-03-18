@@ -32,7 +32,7 @@ interface Claim {
 type TabFilter = 'pending' | 'approved' | 'rejected' | 'all';
 
 export default function AdminClaimsPage() {
-  const { isAdmin, token } = useAdmin();
+  const { isAdmin, token, getFreshToken, handleUnauthorized } = useAdmin();
   const { loading: authLoading } = useAuth();
   const router = useRouter();
   const t = useTranslations('claim');
@@ -67,14 +67,21 @@ export default function AdminClaimsPage() {
   useEffect(() => { fetchClaims(); }, [fetchClaims]);
 
   const handleAction = async (claimId: string, action: 'approve' | 'reject', rejectionReason?: string) => {
-    if (!token) return;
     setActionLoading(claimId);
 
     try {
+      // Always get a fresh token to avoid stale/expired token failures
+      const freshToken = await getFreshToken();
+      if (!freshToken) {
+        handleUnauthorized();
+        setActionLoading(null);
+        return;
+      }
+
       const res = await fetch('/api/admin/claims', {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${freshToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ claimId, action, rejectionReason }),
@@ -91,9 +98,15 @@ export default function AdminClaimsPage() {
         );
         setRejectingId(null);
         setRejectReason('');
+      } else if (res.status === 401) {
+        handleUnauthorized();
+      } else {
+        const data = await res.json().catch(() => ({ error: 'Unknown error' }));
+        alert(`Action failed: ${data.error || res.statusText}`);
       }
     } catch (err) {
       console.error('Action failed:', err);
+      alert('Network error — please try again.');
     }
     setActionLoading(null);
   };
