@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
-import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
@@ -10,7 +9,6 @@ import FadeUp from '@/components/animations/FadeUp';
 
 export default function VenueBookingsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
-  const { setShowComingSoon } = useAuth();
   const { previewVenueTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
@@ -61,7 +59,7 @@ export default function VenueBookingsPage({ params }: { params: Promise<{ slug: 
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('premiumLockedHint')}
             </p>
-            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

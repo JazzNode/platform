@@ -22,7 +22,7 @@ interface Broadcast {
 export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const tBroadcast = useTranslations('artistStudio');
-  const { user, loading, setShowComingSoon } = useAuth();
+  const { user, loading } = useAuth();
   const { previewVenueTier, adminModeEnabled } = useAdmin();
   const { isUnlocked, minTier } = useTierConfig();
 
@@ -175,7 +175,7 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('premiumLockedHint')}
             </p>
-            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button disabled className="px-6 py-2.5 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

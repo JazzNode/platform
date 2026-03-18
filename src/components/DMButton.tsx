@@ -12,14 +12,14 @@ interface DMButtonProps {
 }
 
 export default function DMButton({ targetUserId, className }: DMButtonProps) {
-  const { user, setShowComingSoon } = useAuth();
+  const { user, setShowAuthModal } = useAuth();
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations('profile');
 
   const handleDM = useCallback(async () => {
     if (!user) {
-      setShowComingSoon({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
+      setShowAuthModal(true);
       return;
     }
 
@@ -50,7 +50,7 @@ export default function DMButton({ targetUserId, className }: DMButtonProps) {
     if (newConvo) {
       router.push(`/${locale}/profile/inbox?tab=dm&convo=${newConvo.id}`);
     }
-  }, [user, targetUserId, locale, router, setShowComingSoon]);
+  }, [user, targetUserId, locale, router, setShowAuthModal]);
 
   return (
     <button

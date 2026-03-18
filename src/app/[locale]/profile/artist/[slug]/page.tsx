@@ -22,7 +22,7 @@ interface UnreadStats {
 
 export default function ArtistOverviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
-  const { user, loading, setShowComingSoon } = useAuth();
+  const { user, loading } = useAuth();
   const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked } = useTierConfig();
 
@@ -255,7 +255,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
               <div className="text-center">
                 <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
-                <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
                   {t('upgradePremium')}
                 </button>
               </div>
@@ -302,7 +302,7 @@ export default function ArtistOverviewPage({ params }: { params: Promise<{ slug:
                 </div>
               ))}
             </div>
-            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button disabled className="mt-4 px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {t('upgradePremium')}
             </button>
           </div>

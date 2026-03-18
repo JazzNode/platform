@@ -61,16 +61,15 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { user, profile, loading, setShowComingSoon } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Redirect if not logged in
   useEffect(() => {
     if (!loading && !user) {
-      setShowComingSoon({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
       router.push('/');
     }
-  }, [loading, user, router, setShowComingSoon]);
+  }, [loading, user, router]);
 
   // Fetch unread message count
   useEffect(() => {

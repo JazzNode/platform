@@ -21,7 +21,7 @@ interface Broadcast {
 
 export default function BroadcastsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
-  const { user, loading, setShowComingSoon } = useAuth();
+  const { user, loading } = useAuth();
   const { previewArtistTier, adminModeEnabled } = useAdmin();
   const { isUnlocked, minTier } = useTierConfig();
 
@@ -174,7 +174,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
             <p className="text-xs text-[var(--muted-foreground)]/60 mb-6">
               {t('broadcastLockedHint')}
             </p>
-            <button onClick={() => setShowComingSoon({ x: 0, y: 0 })} className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+            <button disabled className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
               {broadcastMinTier <= 1 ? t('upgradePremium') : t('upgradePremium')}
             </button>
           </div>

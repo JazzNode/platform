@@ -14,7 +14,7 @@ export default function ProfilePage() {
   const t = useTranslations('profile');
   const locale = useLocale();
   const router = useRouter();
-  const { user, profile, loading, refreshProfile, setShowComingSoon } = useAuth();
+  const { user, profile, loading, refreshProfile } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');

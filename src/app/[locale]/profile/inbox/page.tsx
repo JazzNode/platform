@@ -89,7 +89,7 @@ export default function FanInboxPage() {
   const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, loading, setShowComingSoon } = useAuth();
+  const { user, loading } = useAuth();
 
   const [tab, setTab] = useState<Tab>('messages');
   const [filter, setFilter] = useState<FilterType>('all');
