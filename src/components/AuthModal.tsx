@@ -171,7 +171,7 @@ export default function AuthModal() {
                   </svg>
                 </div>
                 <h3 className="font-serif text-lg font-bold mb-2">{t('checkEmailTitle')}</h3>
-                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{t('checkEmailMessage')}</p>
+                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed whitespace-pre-line">{t('checkEmailMessage')}</p>
                 <button
                   onClick={handleClose}
                   className="mt-6 text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-bright)] transition-colors"
@@ -188,7 +188,7 @@ export default function AuthModal() {
                   </svg>
                 </div>
                 <h3 className="font-serif text-lg font-bold mb-2">{t('resetEmailSentTitle')}</h3>
-                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{t('resetEmailSentMessage')}</p>
+                <p className="text-sm text-[var(--muted-foreground)] leading-relaxed whitespace-pre-line">{t('resetEmailSentMessage')}</p>
                 <button
                   onClick={handleClose}
                   className="mt-6 text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-bright)] transition-colors"
