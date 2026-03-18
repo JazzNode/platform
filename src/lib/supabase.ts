@@ -867,6 +867,17 @@ export function venueEventCount(
   return fallbackCounts?.get(venue.id) || 0;
 }
 
+/** Get follower count for a venue or artist. */
+export async function getFollowerCount(targetType: 'artist' | 'venue', targetId: string): Promise<number> {
+  const sb = getSupabase();
+  const { count } = await sb
+    .from('follows')
+    .select('id', { count: 'exact', head: true })
+    .eq('target_type', targetType)
+    .eq('target_id', targetId);
+  return count ?? 0;
+}
+
 /** Country codes that have at least one city with an active venue (venue with events). */
 export const getActiveRegionCodes = cache(
   unstable_cache(

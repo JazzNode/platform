@@ -3,7 +3,7 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
-import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
+import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, resolveLinks, buildVenueEventCounts, venueEventCount, getFollowerCount } from '@/lib/supabase';
 import { displayName, artistDisplayName, formatDate, formatTime, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import SocialIcons from '@/components/SocialIcons';
@@ -64,6 +64,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   if (!venue) {
     notFound();
   }
+
+  const followerCount = await getFollowerCount('venue', slug);
 
   // Compute prev/next venue — sorted alphabetically, same as list page
   const venueCountsFallback = buildVenueEventCounts(events);
@@ -301,7 +303,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
               </TierGate>
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
-              <FollowButton itemType="venue" itemId={venue.id} variant="full" />
+              <FollowButton itemType="venue" itemId={venue.id} variant="full" followerCount={followerCount} />
           </div>
 
           {/* Unclaimed notice */}

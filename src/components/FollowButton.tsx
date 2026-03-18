@@ -12,9 +12,11 @@ interface FollowButtonProps {
   variant?: 'compact' | 'full';
   /** Adds frosted glass backdrop — best for overlaying photos */
   glass?: boolean;
+  /** Server-fetched follower count — shown in full variant only */
+  followerCount?: number;
 }
 
-export default function FollowButton({ itemType, itemId, variant = 'compact', glass = false }: FollowButtonProps) {
+export default function FollowButton({ itemType, itemId, variant = 'compact', glass = false, followerCount }: FollowButtonProps) {
   const { user, setShowAuthModal } = useAuth();
   const { isFollowing, toggleFollow } = useFollows();
   const t = useTranslations('common');
@@ -121,6 +123,9 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
         )}
       </span>
       <span className="uppercase tracking-widest text-xs relative">{active ? t('following') : t('follow')}</span>
+      {followerCount != null && followerCount > 0 && (
+        <span className="text-[10px] text-[#8A8578] tabular-nums">{followerCount}</span>
+      )}
     </button>
   );
 }
