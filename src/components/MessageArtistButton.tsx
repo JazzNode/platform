@@ -12,9 +12,6 @@ interface MessageArtistButtonProps {
 }
 
 export default function MessageArtistButton({ artistId, claimed }: MessageArtistButtonProps) {
-  // Only show for claimed artists (tier >= 1)
-  if (!claimed) return null;
-
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
@@ -22,6 +19,7 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
   const [loading, setLoading] = useState(false);
 
   const handleClick = useCallback(async () => {
+    if (!claimed) return;
     if (!user) {
       setShowAuthModal?.(true);
       return;
@@ -61,7 +59,33 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
     }
 
     setLoading(false);
-  }, [user, artistId, locale, router, setShowAuthModal]);
+  }, [claimed, user, artistId, locale, router, setShowAuthModal]);
+
+  const icon = (
+    <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+
+  // Unclaimed: show faded button with tooltip
+  if (!claimed) {
+    return (
+      <div className="relative group/msg inline-flex">
+        <button
+          disabled
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-600/30 bg-zinc-700/10 text-zinc-500 text-xs font-semibold cursor-not-allowed opacity-50"
+          aria-label={t('messageArtistDisabledLabel')}
+        >
+          {icon}
+          <span className="hidden sm:inline">{t('messageArtist')}</span>
+        </button>
+        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 text-center opacity-0 pointer-events-none group-hover/msg:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+          {t('messageArtistDisabled')}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-700" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <button
@@ -73,9 +97,7 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
       {loading ? (
         <div className="w-3.5 h-3.5 border border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
       ) : (
-        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
+        icon
       )}
       <span className="hidden sm:inline">{t('messageArtist')}</span>
     </button>
