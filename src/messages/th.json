@@ -574,7 +574,9 @@
     "statusPending": "รอดำเนินการ",
     "statusApproved": "อนุมัติแล้ว",
     "statusRejected": "ถูกปฏิเสธ",
-    "statusAll": "ทั้งหมด"
+    "statusAll": "ทั้งหมด",
+    "alsoClaim": "ร่วมจัดการ",
+    "managerCount": "{count} ผู้จัดการ"
   },
   "artistStudio": {
     "overview": "ภาพรวม",

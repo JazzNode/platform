@@ -578,7 +578,9 @@
     "statusPending": "待審核",
     "statusApproved": "已通過",
     "statusRejected": "已拒絕",
-    "statusAll": "全部"
+    "statusAll": "全部",
+    "alsoClaim": "加入管理",
+    "managerCount": "{count} 位經理人"
   },
   "artistStudio": {
     "overview": "總覽",

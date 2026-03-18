@@ -15,7 +15,7 @@ interface ClaimButtonProps {
 
 export default function ClaimButton({ targetType, targetId, targetName }: ClaimButtonProps) {
   const { user, setShowAuthModal } = useAuth();
-  const { getMyClaimStatus, isClaimed, cancelClaim } = useClaims();
+  const { getMyClaimStatus, isClaimed, getManagerCount, cancelClaim } = useClaims();
   const t = useTranslations('claim');
   const locale = useLocale();
   const [showModal, setShowModal] = useState(false);
@@ -30,32 +30,85 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
   }, [cancelClaim, targetType, targetId]);
 
   const myStatus = user ? getMyClaimStatus(targetType, targetId) : null;
-  const claimedByOther = isClaimed(targetType, targetId) && myStatus !== 'approved';
+  const entityIsClaimed = isClaimed(targetType, targetId);
+  const managerCount = getManagerCount(targetType, targetId);
+  const claimedByOther = entityIsClaimed && myStatus !== 'approved';
+
+  const dashboardPath = targetType === 'artist'
+    ? `/${locale}/profile/artist/${targetId}`
+    : `/${locale}/profile/venue/${targetId}`;
 
   // Already approved for this user — show "You manage this page" linking to dashboard
+  // + show co-manager count if there are other managers
   if (myStatus === 'approved') {
     return (
-      <Link
-        href={`/${locale}/profile/artist/${targetId}`}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-        {t('managedByYou')}
-      </Link>
+      <div className="inline-flex items-center gap-2">
+        <Link
+          href={dashboardPath}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          {t('managedByYou')}
+        </Link>
+        {managerCount > 1 && (
+          <span className="text-[11px] text-[#8A8578]/60">
+            {t('managerCount', { count: managerCount })}
+          </span>
+        )}
+      </div>
     );
   }
 
-  // Claimed by someone else — show verified badge
-  if (claimedByOther) {
+  // Claimed by someone else — show verified badge + "Also Claim" button
+  if (claimedByOther && myStatus !== 'pending') {
+    const handleAlsoClaim = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+      setShowModal(true);
+    };
+
     return (
-      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-[#8A8578] border border-[var(--border)]">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-        {t('verified')}
-      </span>
+      <>
+        <div className="inline-flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-[#8A8578] border border-[var(--border)]">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            {t('verified')}
+            {managerCount > 0 && (
+              <span className="text-[#8A8578]/50 ml-0.5">
+                &middot; {t('managerCount', { count: managerCount })}
+              </span>
+            )}
+          </span>
+          <button
+            onClick={handleAlsoClaim}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+              <circle cx="9" cy="7" r="4" />
+              <line x1="19" y1="8" x2="19" y2="14" />
+              <line x1="22" y1="11" x2="16" y2="11" />
+            </svg>
+            {t('alsoClaim')}
+          </button>
+        </div>
+        {showModal && (
+          <ClaimModal
+            targetType={targetType}
+            targetId={targetId}
+            targetName={targetName}
+            onClose={() => setShowModal(false)}
+          />
+        )}
+      </>
     );
   }
 

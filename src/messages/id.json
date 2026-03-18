@@ -574,7 +574,9 @@
     "statusPending": "Menunggu",
     "statusApproved": "Disetujui",
     "statusRejected": "Ditolak",
-    "statusAll": "Semua"
+    "statusAll": "Semua",
+    "alsoClaim": "Ikut Kelola",
+    "managerCount": "{count} manajer"
   },
   "artistStudio": {
     "overview": "Ringkasan",

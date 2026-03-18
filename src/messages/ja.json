@@ -574,7 +574,9 @@
     "statusPending": "審査中",
     "statusApproved": "承認済み",
     "statusRejected": "却下",
-    "statusAll": "すべて"
+    "statusAll": "すべて",
+    "alsoClaim": "管理に参加",
+    "managerCount": "{count}人のマネージャー"
   },
   "artistStudio": {
     "overview": "概要",

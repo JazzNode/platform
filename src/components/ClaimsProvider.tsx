@@ -18,6 +18,8 @@ interface ClaimsContextType {
   getMyClaimStatus: (type: TargetType, id: string) => ClaimStatus | null;
   /** Check if a target has been claimed by anyone (approved) */
   isClaimed: (type: TargetType, id: string) => boolean;
+  /** Get the number of approved managers for a target */
+  getManagerCount: (type: TargetType, id: string) => number;
   /** Submit a new claim */
   submitClaim: (type: TargetType, id: string, evidenceText: string) => Promise<{ error?: string }>;
   /** Cancel a pending claim */
@@ -30,7 +32,7 @@ const ClaimsContext = createContext<ClaimsContextType | null>(null);
 export default function ClaimsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const [myClaims, setMyClaims] = useState<ClaimRecord[]>([]);
-  const [approvedKeys, setApprovedKeys] = useState<Set<string>>(new Set());
+  const [approvedCounts, setApprovedCounts] = useState<Map<string, number>>(new Map());
   const [fetched, setFetched] = useState(false);
 
   // Fetch user's own claims + all approved claims
@@ -47,7 +49,7 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
       .select('target_type, target_id, status')
       .eq('user_id', user.id);
 
-    // Fetch all approved claims (public via RLS)
+    // Fetch all approved claims (public via RLS) — now there can be multiple per entity
     const fetchApproved = supabase
       .from('claims')
       .select('target_type, target_id')
@@ -59,7 +61,12 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
         setMyClaims(myRes.data as ClaimRecord[]);
       }
       if (approvedRes.data) {
-        setApprovedKeys(new Set(approvedRes.data.map((r) => `${r.target_type}:${r.target_id}`)));
+        const counts = new Map<string, number>();
+        for (const r of approvedRes.data) {
+          const key = `${r.target_type}:${r.target_id}`;
+          counts.set(key, (counts.get(key) || 0) + 1);
+        }
+        setApprovedCounts(counts);
       }
       setFetched(true);
     });
@@ -86,8 +93,13 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
   );
 
   const isClaimed = useCallback(
-    (type: TargetType, id: string) => approvedKeys.has(`${type}:${id}`),
-    [approvedKeys],
+    (type: TargetType, id: string) => (approvedCounts.get(`${type}:${id}`) || 0) > 0,
+    [approvedCounts],
+  );
+
+  const getManagerCount = useCallback(
+    (type: TargetType, id: string) => approvedCounts.get(`${type}:${id}`) || 0,
+    [approvedCounts],
   );
 
   const submitClaim = useCallback(
@@ -146,7 +158,7 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
   );
 
   return (
-    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, submitClaim, cancelClaim, loading }}>
+    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, getManagerCount, submitClaim, cancelClaim, loading }}>
       {children}
     </ClaimsContext.Provider>
   );

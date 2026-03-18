@@ -578,7 +578,9 @@
     "statusPending": "Pending",
     "statusApproved": "Approved",
     "statusRejected": "Rejected",
-    "statusAll": "All"
+    "statusAll": "All",
+    "alsoClaim": "Also Manage",
+    "managerCount": "{count, plural, one {# manager} other {# managers}}"
   },
   "artistStudio": {
     "overview": "Overview",
