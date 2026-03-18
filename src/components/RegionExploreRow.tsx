@@ -25,23 +25,24 @@ export default function RegionExploreRow({ regionCodes, regionLabels, worldMapLa
 
   return (
     <FadeUp>
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="flex flex-col items-center gap-3">
         <button
           onClick={() => setRegion(null)}
           className={`${pillBase} ${!effectiveRegion ? pillActive : pillInactive}`}
         >
           {worldMapLabel}
         </button>
-        <span className="text-gold/20 text-xs select-none mx-0.5">│</span>
-        {regionCodes.map((code) => (
-          <button
-            key={code}
-            onClick={() => setRegion(region === code ? null : code)}
-            className={`${pillBase} ${effectiveRegion === code ? pillActive : pillInactive}`}
-          >
-            {regionLabels[code] || code}
-          </button>
-        ))}
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          {regionCodes.map((code) => (
+            <button
+              key={code}
+              onClick={() => setRegion(region === code ? null : code)}
+              className={`${pillBase} ${effectiveRegion === code ? pillActive : pillInactive}`}
+            >
+              {regionLabels[code] || code}
+            </button>
+          ))}
+        </div>
       </div>
     </FadeUp>
   );
