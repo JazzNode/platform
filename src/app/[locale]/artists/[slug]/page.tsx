@@ -21,7 +21,6 @@ import MessageArtistButton from '@/components/MessageArtistButton';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
-import ContactArtistButton from '@/components/ContactArtistButton';
 import PageViewTracker from '@/components/PageViewTracker';
 import HireMeButton from '@/components/HireMeButton';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
@@ -378,7 +377,6 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                     <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   )}
                   <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
-                  <ContactArtistButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
                   <FollowButton itemType="artist" itemId={artist.id} variant="full" />
                 </div>
