@@ -6,14 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 
-interface MessageVenueButtonProps {
-  venueId: string;
+interface MessageArtistButtonProps {
+  artistId: string;
   claimed?: boolean;
 }
 
-export default function MessageVenueButton({ venueId, claimed }: MessageVenueButtonProps) {
-  // Only show for claimed venues (tier >= 1)
+export default function MessageArtistButton({ artistId, claimed }: MessageArtistButtonProps) {
+  // Only show for claimed artists (tier >= 1)
   if (!claimed) return null;
+
   const t = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
@@ -29,12 +30,12 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
     setLoading(true);
     const supabase = createClient();
 
-    // Find or create venue_fan conversation
+    // Find or create artist_fan conversation
     const { data: existing } = await supabase
       .from('conversations')
       .select('id')
-      .eq('type', 'venue_fan')
-      .eq('venue_id', venueId)
+      .eq('type', 'artist_fan')
+      .eq('artist_id', artistId)
       .eq('fan_user_id', user.id)
       .maybeSingle();
 
@@ -48,8 +49,8 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
     const { data: newConvo } = await supabase
       .from('conversations')
       .insert({
-        type: 'venue_fan',
-        venue_id: venueId,
+        type: 'artist_fan',
+        artist_id: artistId,
         fan_user_id: user.id,
       })
       .select('id')
@@ -60,23 +61,23 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
     }
 
     setLoading(false);
-  }, [user, venueId, locale, router, setShowAuthModal]);
+  }, [user, artistId, locale, router, setShowAuthModal]);
 
   return (
     <button
       onClick={handleClick}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-400/20 transition-colors disabled:opacity-50"
-      title={t('messageVenue')}
+      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs font-semibold hover:bg-[var(--color-gold)]/20 transition-colors disabled:opacity-50"
+      title={t('messageArtist')}
     >
       {loading ? (
-        <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+        <div className="w-3.5 h-3.5 border border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
       ) : (
         <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       )}
-      <span className="hidden sm:inline">{t('messageVenue')}</span>
+      <span className="hidden sm:inline">{t('messageArtist')}</span>
     </button>
   );
 }

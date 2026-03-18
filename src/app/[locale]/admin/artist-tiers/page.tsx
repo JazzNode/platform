@@ -43,10 +43,10 @@ const ARTIST_FEATURES: FeatureKey[] = [
   { key: 'gear_showcase', labelKey: 'af_gearLimited', categoryKey: 'ac_claimed' },
   { key: 'epk_basic', labelKey: 'af_epkBasic', categoryKey: 'ac_claimed' },
   { key: 'analytics_basic', labelKey: 'af_analyticsBasic', categoryKey: 'ac_claimed' },
+  { key: 'inbox', labelKey: 'af_inbox', categoryKey: 'ac_claimed' },
   // Tier 2 — Premium (proactive reach)
   { key: 'broadcasts', labelKey: 'af_broadcasts', categoryKey: 'ac_premium' },
   { key: 'featured_wall', labelKey: 'af_featuredWall', categoryKey: 'ac_premium' },
-  { key: 'inbox', labelKey: 'af_inbox', categoryKey: 'ac_premium' },
   { key: 'available_for_hire', labelKey: 'af_availableForHire', categoryKey: 'ac_premium' },
   { key: 'analytics_advanced', labelKey: 'af_analyticsAdvanced', categoryKey: 'ac_premium' },
   { key: 'epk_full', labelKey: 'af_epkFull', categoryKey: 'ac_premium' },

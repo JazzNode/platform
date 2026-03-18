@@ -15,6 +15,9 @@ import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
 import UnclaimedNotice from '@/components/UnclaimedNotice';
 import BadgeDock from '@/components/BadgeDock';
+import BadgeCategorySection from '@/components/BadgeCategorySection';
+import type { BadgeProgress } from '@/lib/badges';
+import MessageArtistButton from '@/components/MessageArtistButton';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
@@ -113,9 +116,63 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     }
   }
 
-  // ── Badges ──
-  const artistBadges = resolveLinks(f.badge_list, badges);
-  const badgeItems = artistBadges.map((b) => ({
+  // ── Badges: full progress for all artist badges ──
+  const earnedBadgeIds = new Set(
+    resolveLinks(f.badge_list, badges).map((b) => b.fields.badge_id),
+  );
+  const allArtistBadgeDefs = badges
+    .filter((b) => b.fields.target_type === 'artist')
+    .sort((a, b) => (a.fields.sort_order || 0) - (b.fields.sort_order || 0));
+
+  // Compute stats for progress
+  const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+  const recentEventCount = allEvents.filter(
+    (e) => e.fields.start_at && new Date(e.fields.start_at) >= ninetyDaysAgo,
+  ).length;
+
+  const badgeCityLinks = resolveLinks(f.city_list, cities);
+  const badgeCountryCount = new Set(
+    badgeCityLinks.map((c) => (c.fields as Record<string, unknown>).country_code).filter(Boolean),
+  ).size;
+
+  const badgeLineups = lineups.filter((l) => l.fields.artist_id?.includes(artist.id));
+  const bandleaderCount = badgeLineups.filter((l) => l.fields.role === 'bandleader').length;
+  const badgeDistinctRoles = new Set(badgeLineups.map((l) => l.fields.role).filter(Boolean)).size;
+  const instrumentCount = (f.instrument_list || []).length;
+
+  const artistBadgeProgress: BadgeProgress[] = allArtistBadgeDefs.map((b) => {
+    const bid = b.fields.badge_id || b.id;
+    const target = b.fields.criteria_target as number | null;
+    const isEarned = earnedBadgeIds.has(bid);
+
+    let progress: { current: number; target: number } | null = null;
+    switch (bid) {
+      case 'art_gig_warrior':
+        progress = { current: recentEventCount, target: target || 8 }; break;
+      case 'art_globetrotter':
+        progress = { current: badgeCountryCount, target: target || 3 }; break;
+      case 'art_bandleader':
+        progress = { current: bandleaderCount, target: target || 3 }; break;
+      case 'art_versatile':
+        progress = { current: badgeDistinctRoles, target: target || 3 }; break;
+      case 'art_multi_instrumentalist':
+        progress = { current: instrumentCount, target: target || 3 }; break;
+    }
+
+    return {
+      badge_id: bid,
+      category: (b.fields.category || 'recognition') as BadgeProgress['category'],
+      name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
+      description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en || '',
+      earned: isEarned || (progress ? progress.current >= progress.target : false),
+      earned_at: null,
+      progress,
+      sort_order: b.fields.sort_order || 0,
+    } as BadgeProgress;
+  });
+
+  // Legacy badgeItems for BadgeDock (kept for backward compat if needed elsewhere)
+  const badgeItems = resolveLinks(f.badge_list, badges).map((b) => ({
     id: b.id,
     badgeId: b.fields.badge_id,
     name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
@@ -320,6 +377,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   {f.available_for_hire && (
                     <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   )}
+                  <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
                   <ContactArtistButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                   <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
                   <FollowButton itemType="artist" itemId={artist.id} variant="full" />
@@ -903,11 +961,15 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         </FadeUp>
       )}
 
-      {/* ═══ Badge Dock ═══ */}
-      {badgeItems.length > 0 && (
+      {/* ═══ Badges ═══ */}
+      {artistBadgeProgress.length > 0 && (
         <FadeUp>
           <section className="pt-4">
-            <BadgeDock badges={badgeItems} />
+            <BadgeCategorySection
+              title={t('badgesCategoryRecognition')}
+              categoryKey="recognition"
+              badges={artistBadgeProgress}
+            />
           </section>
         </FadeUp>
       )}

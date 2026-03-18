@@ -37,12 +37,12 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'verified_badge', labelKey: 'vf_verifiedBadge', categoryKey: 'vc_claimed' },
   { key: 'photos', labelKey: 'vf_photos', categoryKey: 'vc_claimed' },
   { key: 'description', labelKey: 'vf_description', categoryKey: 'vc_claimed' },
+  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_claimed' },
   // Tier 2 — Premium (operational tools)
   { key: 'schedule_manager', labelKey: 'vf_scheduleManager', categoryKey: 'vc_premium' },
   { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_premium' },
   { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_premium' },
   { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_premium' },
-  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_premium' },
   { key: 'artist_discovery', labelKey: 'vf_artistDiscovery', categoryKey: 'vc_premium' },
   { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_premium' },
   { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_premium' },

@@ -24,17 +24,17 @@ const DEFAULT_ARTIST: TierFeatures = {
   public_profile: 0, search_listing: 0, event_association: 0,
   collaboration_graph: 0, follower_count_display: 0, tags_badges: 0, performance_history: 0,
   edit_profile: 1, verified_badge: 1, custom_bio: 1, social_links: 1,
-  teaching_section: 1, gear_showcase: 1, epk_basic: 1, analytics_basic: 1,
-  broadcasts: 2, featured_wall: 2, inbox: 2, available_for_hire: 2,
+  teaching_section: 1, gear_showcase: 1, epk_basic: 1, analytics_basic: 1, inbox: 1,
+  broadcasts: 2, featured_wall: 2, available_for_hire: 2,
   analytics_advanced: 2, epk_full: 2, gear_unlimited: 2, priority_search: 2,
   custom_domain: 3, custom_theme: 3, broadcasts_unlimited: 3,
   booking_requests: 3, epk_branded_pdf: 3, spotlight: 3, data_export: 3,
 };
 const DEFAULT_VENUE: TierFeatures = {
   public_listing: 0, search_listing: 0, map_pin: 0, event_showcase: 0, venue_tags: 0,
-  edit_profile: 1, verified_badge: 1, photos: 1, description: 1,
+  edit_profile: 1, verified_badge: 1, photos: 1, description: 1, inbox: 1,
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
-  inbox: 2, artist_discovery: 2, broadcasts: 2, priority_search: 2,
+  artist_discovery: 2, broadcasts: 2, priority_search: 2,
   custom_domain: 3, custom_theme: 3, ticketing: 3, broadcasts_unlimited: 3,
   booking_management: 3, revenue_analytics: 3, multi_location: 3, ical_api: 3,
 };
@@ -147,6 +147,7 @@ function buildArtistSection(
           { name: t('artistGearShowcase'), tiers: gearRow },
           { name: t('artistEPK'), tiers: epkRow },
           { name: t('artistAnalyticsBasic'), tiers: tierRow(features, 'analytics_basic', visible) },
+          { name: t('artistInbox'), tiers: tierRow(features, 'inbox', visible) },
         ],
       },
       {
@@ -154,7 +155,6 @@ function buildArtistSection(
         items: [
           { name: t('artistBroadcasts'), tiers: broadcastRow },
           { name: t('artistFeaturedWall'), tiers: tierRow(features, 'featured_wall', visible) },
-          { name: t('artistInbox'), tiers: tierRow(features, 'inbox', visible) },
           { name: t('artistAvailableForHire'), tiers: tierRow(features, 'available_for_hire', visible) },
           { name: t('artistAnalyticsAdvanced'), tiers: tierRow(features, 'analytics_advanced', visible) },
           { name: t('artistPrioritySearch'), tiers: tierRow(features, 'priority_search', visible) },
@@ -224,6 +224,7 @@ function buildVenueSection(
           { name: t('venueVerifiedBadge'), tiers: tierRow(features, 'verified_badge', visible) },
           { name: t('venuePhotos'), tiers: tierRow(features, 'photos', visible) },
           { name: t('venueDescription'), tiers: tierRow(features, 'description', visible) },
+          { name: t('venueInbox'), tiers: tierRow(features, 'inbox', visible) },
         ],
       },
       {
@@ -233,7 +234,6 @@ function buildVenueSection(
           { name: t('venueBackline'), tiers: tierRow(features, 'backline', visible) },
           { name: t('venueAnalyticsBasic'), tiers: tierRow(features, 'analytics_basic', visible) },
           { name: t('venueAnalyticsAdvanced'), tiers: tierRow(features, 'analytics_advanced', visible) },
-          { name: t('venueInbox'), tiers: tierRow(features, 'inbox', visible) },
           { name: t('venueArtistDiscovery'), tiers: tierRow(features, 'artist_discovery', visible) },
           { name: t('venueBroadcasts'), tiers: broadcastRow },
           { name: t('venuePrioritySearch'), tiers: tierRow(features, 'priority_search', visible) },

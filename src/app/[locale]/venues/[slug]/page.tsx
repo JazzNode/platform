@@ -15,6 +15,8 @@ import EditableContent from '@/components/EditableContent';
 import RecordNav from '@/components/RecordNav';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import BadgeDock from '@/components/BadgeDock';
+import BadgeCategorySection from '@/components/BadgeCategorySection';
+import type { BadgeProgress } from '@/lib/badges';
 import MessageVenueButton from '@/components/MessageVenueButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -102,6 +104,71 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     }
   }
   const artistMap = new Map(artists.map(a => [a.id, a]));
+
+  // ── Venue badge progress (all venue badges, earned + unearned) ──
+  const earnedVenueBadgeIds = new Set(venueBadges.map((b) => b.fields.badge_id));
+  // DEBUG
+  console.log('[BADGE DEBUG] total badges:', badges.length, 'sample target_types:', badges.slice(0, 5).map(b => ({ id: b.id, target_type: b.fields.target_type })));
+  const allVenueBadgeDefs = badges
+    .filter((b) => b.fields.target_type === 'venue')
+    .sort((a, b) => (a.fields.sort_order || 0) - (b.fields.sort_order || 0));
+  console.log('[BADGE DEBUG] allVenueBadgeDefs:', allVenueBadgeDefs.length);
+
+  // Stats for venue badge progress
+  const totalVenueEvents = venueEvents.length;
+  const distinctArtistIds = new Set<string>();
+  const distinctArtistCountries = new Set<string>();
+  for (const l of lineups) {
+    if (!l.fields.event_id?.some(eid => venueEventIds.has(eid))) continue;
+    for (const aid of l.fields.artist_id || []) {
+      distinctArtistIds.add(aid);
+      const art = artistMap.get(aid);
+      if (art?.fields.country_code) distinctArtistCountries.add(art.fields.country_code);
+    }
+  }
+  const friendlyLangCount = [f.friendly_en, f.friendly_ja, f.friendly_ko, f.friendly_th, f.friendly_id]
+    .filter(Boolean).length;
+
+  // Compute unique genre tags across venue events
+  let uniqueTagCount = 0;
+  if (venueEvents.length > 0) {
+    const tagSet = new Set<string>();
+    for (const ev of venueEvents) {
+      for (const tid of ev.fields.tag_list || []) tagSet.add(tid);
+    }
+    uniqueTagCount = tagSet.size;
+  }
+
+  const venueBadgeProgress: BadgeProgress[] = allVenueBadgeDefs.map((b) => {
+    const bid = b.fields.badge_id || b.id;
+    const target = b.fields.criteria_target as number | null;
+    const isEarned = earnedVenueBadgeIds.has(bid);
+
+    let progress: { current: number; target: number } | null = null;
+    switch (bid) {
+      case 'ven_genre_explorer':
+        progress = { current: uniqueTagCount, target: target || 5 }; break;
+      case 'ven_artist_magnet':
+        progress = { current: distinctArtistIds.size, target: target || 10 }; break;
+      case 'ven_world_stage':
+        progress = { current: distinctArtistCountries.size, target: target || 3 }; break;
+      case 'ven_multilingual':
+        progress = { current: friendlyLangCount, target: target || 2 }; break;
+      case 'ven_marathon':
+        progress = { current: totalVenueEvents, target: target || 20 }; break;
+    }
+
+    return {
+      badge_id: bid,
+      category: (b.fields.category || 'venue_excellence') as BadgeProgress['category'],
+      name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
+      description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en || '',
+      earned: isEarned || (progress ? progress.current >= progress.target : false),
+      earned_at: null,
+      progress,
+      sort_order: b.fields.sort_order || 0,
+    } as BadgeProgress;
+  });
   const topPerformers = [...artistCounts.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10)
@@ -195,7 +262,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
             <div className="flex items-center gap-2 shrink-0">
-              <MessageVenueButton venueId={venue.id} />
+              <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" />
             </div>
@@ -269,14 +336,11 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           </div>
 
 {/* Badges */}
-          {venueBadges.length > 0 && (
-            <BadgeDock
-              badges={venueBadges.map((b) => ({
-                id: b.id,
-                badgeId: b.fields.badge_id,
-                name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
-                description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en,
-              }))}
+          {venueBadgeProgress.length > 0 && (
+            <BadgeCategorySection
+              title={t('badgesCategoryVenueExcellence')}
+              categoryKey="venue_excellence"
+              badges={venueBadgeProgress}
             />
           )}
 
