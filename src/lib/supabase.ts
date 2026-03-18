@@ -91,6 +91,7 @@ export interface Venue {
   capacity?: number;
   event_list?: string[];     // derived: event IDs at this venue
   badge_list?: string[];     // derived: from venue_badges junction
+  badge_earned_at?: Record<string, string>; // derived: badge_id → earned_at ISO string
   verification_status?: string;
   currency?: string;
   phone?: string;
@@ -136,6 +137,7 @@ export interface Artist {
   youtube_url?: string;
   event_list?: string[];      // derived: from lineups
   badge_list?: string[];      // derived: from artist_badges junction
+  badge_earned_at?: Record<string, string>; // derived: badge_id → earned_at ISO string
   venue_list?: string[];      // derived: from lineups→events
   city_list?: string[];       // derived: from lineups→events→venues
   as_bandleader_list?: string[];   // derived: from lineups
@@ -475,8 +477,8 @@ function stripNulls(obj: Record<string, unknown>): Record<string, unknown> {
 // ----- Junction data (shared across enrichment) -----
 
 interface JunctionData {
-  artistBadges: { artist_id: string; badge_id: string }[];
-  venueBadges: { venue_id: string; badge_id: string }[];
+  artistBadges: { artist_id: string; badge_id: string; earned_at: string | null }[];
+  venueBadges: { venue_id: string; badge_id: string; earned_at: string | null }[];
   artistTags: { artist_id: string; tag_id: string }[];
   eventTags: { event_id: string; tag_id: string }[];
   eventPromoters: { event_id: string; promoter_id: string }[];
@@ -486,8 +488,8 @@ const getJunctionData = cache(
   unstable_cache(
     async (): Promise<JunctionData> => {
       const [artistBadges, venueBadges, artistTags, eventTags, eventPromoters] = await Promise.all([
-        fetchAll<{ artist_id: string; badge_id: string }>('artist_badges'),
-        fetchAll<{ venue_id: string; badge_id: string }>('venue_badges'),
+        fetchAll<{ artist_id: string; badge_id: string; earned_at: string | null }>('artist_badges'),
+        fetchAll<{ venue_id: string; badge_id: string; earned_at: string | null }>('venue_badges'),
         fetchAll<{ artist_id: string; tag_id: string }>('artist_tags'),
         fetchAll<{ event_id: string; tag_id: string }>('event_tags'),
         fetchAll<{ event_id: string; promoter_id: string }>('event_promoters'),
@@ -590,10 +592,16 @@ export const getVenues = cache(
 
       // Build venue→badges from junction
       const venueBadges = new Map<string, string[]>();
+      const venueBadgeEarnedAt = new Map<string, Record<string, string>>();
       for (const jn of junctions.venueBadges) {
         const arr = venueBadges.get(jn.venue_id) || [];
         arr.push(jn.badge_id);
         venueBadges.set(jn.venue_id, arr);
+        if (jn.earned_at) {
+          const map = venueBadgeEarnedAt.get(jn.venue_id) || {};
+          map[jn.badge_id] = jn.earned_at;
+          venueBadgeEarnedAt.set(jn.venue_id, map);
+        }
       }
 
       return rows.map((r) => ({
@@ -603,6 +611,7 @@ export const getVenues = cache(
           city_id: wrapFK(r.city_id),
           event_list: venueEvents.get(r.venue_id),
           badge_list: venueBadges.get(r.venue_id),
+          badge_earned_at: venueBadgeEarnedAt.get(r.venue_id),
         } as Record<string, unknown>) as Venue,
       }));
     },
@@ -710,10 +719,16 @@ export const getArtists = cache(
 
       // Build artist→badges from junction
       const aBadges = new Map<string, string[]>();
+      const aBadgeEarnedAt = new Map<string, Record<string, string>>();
       for (const jn of junctions.artistBadges) {
         const arr = aBadges.get(jn.artist_id) || [];
         arr.push(jn.badge_id);
         aBadges.set(jn.artist_id, arr);
+        if (jn.earned_at) {
+          const map = aBadgeEarnedAt.get(jn.artist_id) || {};
+          map[jn.badge_id] = jn.earned_at;
+          aBadgeEarnedAt.set(jn.artist_id, map);
+        }
       }
 
       // Build artist→tags from junction
@@ -735,6 +750,7 @@ export const getArtists = cache(
             city_list: artistCities.has(r.artist_id) ? [...artistCities.get(r.artist_id)!] : undefined,
             lineup_list: artistLineups.get(r.artist_id),
             badge_list: aBadges.get(r.artist_id),
+            badge_earned_at: aBadgeEarnedAt.get(r.artist_id),
             tag_list: aTags.get(r.artist_id),
             as_bandleader_list: rl?.bandleader.size ? [...rl.bandleader] : undefined,
             as_sideman_list: rl?.sideman.size ? [...rl.sideman] : undefined,

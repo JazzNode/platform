@@ -157,13 +157,14 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         progress = { current: instrumentCount, target: target || 3 }; break;
     }
 
+    const computedEarned = isEarned || (progress ? progress.current >= progress.target : false);
     return {
       badge_id: bid,
       category: (b.fields.category || 'recognition') as BadgeProgress['category'],
       name: localized(b.fields as Record<string, unknown>, 'name', locale) || b.fields.name_en || '',
       description: localized(b.fields as Record<string, unknown>, 'description', locale) || b.fields.description_en || '',
-      earned: isEarned || (progress ? progress.current >= progress.target : false),
-      earned_at: null,
+      earned: computedEarned,
+      earned_at: f.badge_earned_at?.[bid] ?? (computedEarned ? new Date().toISOString() : null),
       progress,
       sort_order: b.fields.sort_order || 0,
     } as BadgeProgress;
