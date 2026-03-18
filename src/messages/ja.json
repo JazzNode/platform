@@ -576,6 +576,15 @@
     "statusRejected": "却下",
     "statusAll": "すべて",
     "alsoClaim": "管理に参加",
+    "withdrawClaim": "管理を放棄",
+    "withdrawConfirm": "本当によろしいですか？",
+    "withdrawConfirmDetail": "このページの管理権限を失います。後から再申請できます。",
+    "confirmWithdraw": "放棄する",
+    "statusWithdrawn": "撤回済み",
+    "statusRevoked": "取り消し",
+    "revoke": "取り消す",
+    "confirmRevoke": "取り消しを確認",
+    "revokeReasonPlaceholder": "この申請を取り消す理由は？",
     "managerCount": "{count}人のマネージャー"
   },
   "artistStudio": {

@@ -581,6 +581,15 @@
     "statusRejected": "已拒絕",
     "statusAll": "全部",
     "alsoClaim": "加入管理",
+    "withdrawClaim": "放棄管理",
+    "withdrawConfirm": "確定放棄？",
+    "withdrawConfirmDetail": "你將失去此頁面的管理權限，之後可以重新提交認領。",
+    "confirmWithdraw": "放棄",
+    "statusWithdrawn": "已放棄",
+    "statusRevoked": "已撤銷",
+    "revoke": "撤銷",
+    "confirmRevoke": "確認撤銷",
+    "revokeReasonPlaceholder": "撤銷認領的原因？",
     "managerCount": "{count} 位經理人"
   },
   "artistStudio": {

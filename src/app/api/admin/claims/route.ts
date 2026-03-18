@@ -46,7 +46,7 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const { claimId, action, rejectionReason } = body as {
     claimId: string;
-    action: 'approve' | 'reject';
+    action: 'approve' | 'reject' | 'revoke';
     rejectionReason?: string;
   };
 
@@ -67,8 +67,12 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Claim not found' }, { status: 404 });
   }
 
-  if (claim.status !== 'pending') {
+  // Validate action vs current status
+  if ((action === 'approve' || action === 'reject') && claim.status !== 'pending') {
     return NextResponse.json({ error: `Claim already ${claim.status}` }, { status: 400 });
+  }
+  if (action === 'revoke' && claim.status !== 'approved') {
+    return NextResponse.json({ error: 'Only approved claims can be revoked' }, { status: 400 });
   }
 
   const now = new Date().toISOString();
@@ -168,6 +172,35 @@ export async function PATCH(request: NextRequest) {
 
     console.log(JSON.stringify({ action: 'reject_claim', actor: adminUserId, target: claim.target_id, claimId, userId: claim.user_id, status: 'success' }));
     return NextResponse.json({ status: 'rejected' });
+  }
+
+  if (action === 'revoke') {
+    const { error: updateError } = await supabase
+      .from('claims')
+      .update({
+        status: 'revoked',
+        reviewed_at: now,
+        reviewed_by: adminUserId,
+        rejection_reason: rejectionReason || null,
+      })
+      .eq('claim_id', claimId);
+
+    if (updateError) {
+      console.log(JSON.stringify({ action: 'revoke_claim', actor: adminUserId, target: claim.target_id, claimId, status: 'fail', error: updateError.message }));
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
+
+    writeAuditLog({
+      adminUserId,
+      action: 'revoke_claim',
+      entityType: claim.target_type,
+      entityId: claim.target_id,
+      details: { claimId, userId: claim.user_id, reason: rejectionReason },
+      ipAddress: request.headers.get('x-forwarded-for'),
+    });
+
+    console.log(JSON.stringify({ action: 'revoke_claim', actor: adminUserId, target: claim.target_id, claimId, userId: claim.user_id, status: 'success' }));
+    return NextResponse.json({ status: 'revoked' });
   }
 
   return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

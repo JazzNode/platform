@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/client';
 import { useAuth } from './AuthProvider';
 
 type TargetType = 'artist' | 'venue';
-type ClaimStatus = 'pending' | 'approved' | 'rejected';
+type ClaimStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'revoked';
 
 interface ClaimRecord {
   target_type: TargetType;
@@ -24,6 +24,8 @@ interface ClaimsContextType {
   submitClaim: (type: TargetType, id: string, evidenceText: string) => Promise<{ error?: string }>;
   /** Cancel a pending claim */
   cancelClaim: (type: TargetType, id: string) => Promise<{ error?: string }>;
+  /** Withdraw an approved claim (give up management) */
+  withdrawClaim: (type: TargetType, id: string) => Promise<{ error?: string }>;
   loading: boolean;
 }
 
@@ -157,8 +159,49 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
     [user],
   );
 
+  const withdrawClaim = useCallback(
+    async (type: TargetType, id: string): Promise<{ error?: string }> => {
+      if (!user) return { error: 'Not logged in' };
+
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('claims')
+        .update({ status: 'withdrawn' })
+        .eq('user_id', user.id)
+        .eq('target_type', type)
+        .eq('target_id', id)
+        .eq('status', 'approved');
+
+      if (error) {
+        console.error('Claim withdrawal failed:', error);
+        return { error: error.message };
+      }
+
+      // Optimistic update — mark as withdrawn locally
+      setMyClaims((prev) =>
+        prev.map((c) =>
+          c.target_type === type && c.target_id === id && c.status === 'approved'
+            ? { ...c, status: 'withdrawn' as ClaimStatus }
+            : c,
+        ),
+      );
+      // Decrement approved count
+      setApprovedCounts((prev) => {
+        const next = new Map(prev);
+        const key = `${type}:${id}`;
+        const count = (next.get(key) || 1) - 1;
+        if (count <= 0) next.delete(key);
+        else next.set(key, count);
+        return next;
+      });
+
+      return {};
+    },
+    [user],
+  );
+
   return (
-    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, getManagerCount, submitClaim, cancelClaim, loading }}>
+    <ClaimsContext.Provider value={{ getMyClaimStatus, isClaimed, getManagerCount, submitClaim, cancelClaim, withdrawClaim, loading }}>
       {children}
     </ClaimsContext.Provider>
   );

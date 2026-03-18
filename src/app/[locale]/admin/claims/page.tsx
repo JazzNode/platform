@@ -21,7 +21,7 @@ interface Claim {
   user_id: string | null;
   target_type: 'artist' | 'venue';
   target_id: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'revoked';
   evidence_text: string | null;
   submitted_at: string;
   reviewed_at: string | null;
@@ -29,7 +29,7 @@ interface Claim {
   user_profile: ClaimProfile | null;
 }
 
-type TabFilter = 'pending' | 'approved' | 'rejected' | 'all';
+type TabFilter = 'pending' | 'approved' | 'rejected' | 'withdrawn' | 'revoked' | 'all';
 
 export default function AdminClaimsPage() {
   const { isAdmin, token, getFreshToken, handleUnauthorized } = useAdmin();
@@ -66,7 +66,10 @@ export default function AdminClaimsPage() {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { fetchClaims(); }, [fetchClaims]);
 
-  const handleAction = async (claimId: string, action: 'approve' | 'reject', rejectionReason?: string) => {
+  const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [revokeReason, setRevokeReason] = useState('');
+
+  const handleAction = async (claimId: string, action: 'approve' | 'reject' | 'revoke', rejectionReason?: string) => {
     setActionLoading(claimId);
 
     try {
@@ -89,15 +92,18 @@ export default function AdminClaimsPage() {
 
       if (res.ok) {
         // Update local state
+        const newStatus = action === 'approve' ? 'approved' : action === 'revoke' ? 'revoked' : 'rejected';
         setClaims((prev) =>
           prev.map((c) =>
             c.claim_id === claimId
-              ? { ...c, status: action === 'approve' ? 'approved' : 'rejected', reviewed_at: new Date().toISOString(), rejection_reason: rejectionReason || null }
+              ? { ...c, status: newStatus as Claim['status'], reviewed_at: new Date().toISOString(), rejection_reason: rejectionReason || null }
               : c,
           ),
         );
         setRejectingId(null);
         setRejectReason('');
+        setRevokingId(null);
+        setRevokeReason('');
       } else if (res.status === 401) {
         handleUnauthorized();
       } else {
@@ -125,7 +131,7 @@ export default function AdminClaimsPage() {
 
       {/* Tabs */}
       <div className="flex gap-2 border-b border-[var(--border)] pb-px">
-        {(['pending', 'approved', 'rejected', 'all'] as const).map((f) => (
+        {(['pending', 'approved', 'rejected', 'withdrawn', 'revoked', 'all'] as const).map((f) => (
           <button
             key={f}
             onClick={() => setTab(f)}
@@ -135,7 +141,7 @@ export default function AdminClaimsPage() {
                 : 'text-[#8A8578] hover:text-[var(--foreground)]'
             }`}
           >
-            {f === 'pending' ? t('statusPending') : f === 'approved' ? t('statusApproved') : f === 'rejected' ? t('statusRejected') : t('statusAll')}
+            {f === 'pending' ? t('statusPending') : f === 'approved' ? t('statusApproved') : f === 'rejected' ? t('statusRejected') : f === 'withdrawn' ? t('statusWithdrawn') : f === 'revoked' ? t('statusRevoked') : t('statusAll')}
             {f === 'pending' && pendingCount > 0 && (
               <span className="ml-1.5 inline-flex items-center justify-center w-5 h-5 rounded-full bg-gold text-[#0A0A0A] text-xs font-bold">
                 {pendingCount}
@@ -189,9 +195,11 @@ export default function AdminClaimsPage() {
                 <span className={`text-xs px-2.5 py-1 rounded-lg font-medium ${
                   claim.status === 'pending' ? 'bg-amber-400/10 text-amber-400 border border-amber-400/20' :
                   claim.status === 'approved' ? 'bg-green-400/10 text-green-400 border border-green-400/20' :
+                  claim.status === 'withdrawn' ? 'bg-gray-400/10 text-gray-400 border border-gray-400/20' :
+                  claim.status === 'revoked' ? 'bg-orange-400/10 text-orange-400 border border-orange-400/20' :
                   'bg-red-400/10 text-red-400 border border-red-400/20'
                 }`}>
-                  {claim.status === 'pending' ? t('statusPending') : claim.status === 'approved' ? t('statusApproved') : t('statusRejected')}
+                  {claim.status === 'pending' ? t('statusPending') : claim.status === 'approved' ? t('statusApproved') : claim.status === 'withdrawn' ? t('statusWithdrawn') : claim.status === 'revoked' ? t('statusRevoked') : t('statusRejected')}
                 </span>
               </div>
 
@@ -223,10 +231,49 @@ export default function AdminClaimsPage() {
                 )}
               </div>
 
-              {/* Rejection reason */}
-              {claim.status === 'rejected' && claim.rejection_reason && (
-                <div className="text-sm text-red-400/80">
+              {/* Rejection / revocation reason */}
+              {(claim.status === 'rejected' || claim.status === 'revoked') && claim.rejection_reason && (
+                <div className={`text-sm ${claim.status === 'revoked' ? 'text-orange-400/80' : 'text-red-400/80'}`}>
                   <span className="font-medium">{t('rejectionReason')}:</span> {claim.rejection_reason}
+                </div>
+              )}
+
+              {/* Revoke button (approved only) */}
+              {claim.status === 'approved' && (
+                <div className="flex gap-3 pt-2">
+                  {revokingId === claim.claim_id ? (
+                    <div className="flex-1 space-y-2">
+                      <textarea
+                        value={revokeReason}
+                        onChange={(e) => setRevokeReason(e.target.value)}
+                        placeholder={t('revokeReasonPlaceholder')}
+                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-orange-400/50 resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleAction(claim.claim_id, 'revoke', revokeReason)}
+                          disabled={actionLoading === claim.claim_id}
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-orange-500/20 text-orange-400 border border-orange-400/30 hover:bg-orange-500/30 transition-colors disabled:opacity-40"
+                        >
+                          {t('confirmRevoke')}
+                        </button>
+                        <button
+                          onClick={() => { setRevokingId(null); setRevokeReason(''); }}
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8A8578] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
+                        >
+                          {t('cancelAction')}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setRevokingId(claim.claim_id)}
+                      disabled={actionLoading === claim.claim_id}
+                      className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-orange-400 border border-orange-400/30 hover:bg-orange-500/10 transition-colors disabled:opacity-40"
+                    >
+                      {t('revoke')}
+                    </button>
+                  )}
                 </div>
               )}
 

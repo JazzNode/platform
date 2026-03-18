@@ -576,6 +576,15 @@
     "statusRejected": "거절됨",
     "statusAll": "전체",
     "alsoClaim": "함께 관리",
+    "withdrawClaim": "관리 포기",
+    "withdrawConfirm": "정말 포기하시겠습니까?",
+    "withdrawConfirmDetail": "이 페이지의 관리 권한을 잃게 됩니다. 나중에 다시 신청할 수 있습니다.",
+    "confirmWithdraw": "포기",
+    "statusWithdrawn": "철회됨",
+    "statusRevoked": "취소됨",
+    "revoke": "취소",
+    "confirmRevoke": "취소 확인",
+    "revokeReasonPlaceholder": "이 신청을 취소하는 이유는?",
     "managerCount": "매니저 {count}명"
   },
   "artistStudio": {

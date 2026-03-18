@@ -576,6 +576,15 @@
     "statusRejected": "ถูกปฏิเสธ",
     "statusAll": "ทั้งหมด",
     "alsoClaim": "ร่วมจัดการ",
+    "withdrawClaim": "ยกเลิกการจัดการ",
+    "withdrawConfirm": "คุณแน่ใจหรือไม่?",
+    "withdrawConfirmDetail": "คุณจะสูญเสียสิทธิ์การจัดการหน้านี้ สามารถยื่นคำขอใหม่ได้ภายหลัง",
+    "confirmWithdraw": "ยกเลิก",
+    "statusWithdrawn": "ถอนแล้ว",
+    "statusRevoked": "ถูกเพิกถอน",
+    "revoke": "เพิกถอน",
+    "confirmRevoke": "ยืนยันการเพิกถอน",
+    "revokeReasonPlaceholder": "เหตุผลที่เพิกถอนคำขอนี้?",
     "managerCount": "{count} ผู้จัดการ"
   },
   "artistStudio": {

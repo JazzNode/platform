@@ -581,6 +581,15 @@
     "statusRejected": "Rejected",
     "statusAll": "All",
     "alsoClaim": "Also Manage",
+    "withdrawClaim": "Give Up Management",
+    "withdrawConfirm": "Are you sure?",
+    "withdrawConfirmDetail": "You'll lose management access to this page. You can submit a new claim later.",
+    "confirmWithdraw": "Give Up",
+    "statusWithdrawn": "Withdrawn",
+    "statusRevoked": "Revoked",
+    "revoke": "Revoke",
+    "confirmRevoke": "Confirm Revoke",
+    "revokeReasonPlaceholder": "Why is this claim being revoked?",
     "managerCount": "{count, plural, one {# manager} other {# managers}}"
   },
   "artistStudio": {

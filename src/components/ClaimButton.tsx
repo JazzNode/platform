@@ -15,11 +15,13 @@ interface ClaimButtonProps {
 
 export default function ClaimButton({ targetType, targetId, targetName }: ClaimButtonProps) {
   const { user, setShowAuthModal } = useAuth();
-  const { getMyClaimStatus, isClaimed, cancelClaim } = useClaims();
+  const { getMyClaimStatus, isClaimed, cancelClaim, withdrawClaim } = useClaims();
   const t = useTranslations('claim');
   const locale = useLocale();
   const [showModal, setShowModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
+  const [withdrawing, setWithdrawing] = useState(false);
 
   const handleCancel = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -29,6 +31,13 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     setCancelling(false);
   }, [cancelClaim, targetType, targetId]);
 
+  const handleWithdraw = useCallback(async () => {
+    setWithdrawing(true);
+    await withdrawClaim(targetType, targetId);
+    setWithdrawing(false);
+    setShowWithdrawConfirm(false);
+  }, [withdrawClaim, targetType, targetId]);
+
   const myStatus = user ? getMyClaimStatus(targetType, targetId) : null;
   const entityIsClaimed = isClaimed(targetType, targetId);
   const claimedByOther = entityIsClaimed && myStatus !== 'approved';
@@ -37,18 +46,57 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     ? `/${locale}/profile/artist/${targetId}`
     : `/${locale}/profile/venue/${targetId}`;
 
-  // Already approved for this user — show "You manage this page" linking to dashboard
+  // Already approved for this user — show "You manage this page" linking to dashboard + withdraw option
   if (myStatus === 'approved') {
     return (
-      <Link
-        href={dashboardPath}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
-      >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>
-        {t('managedByYou')}
-      </Link>
+      <>
+        <span className="inline-flex items-center rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30">
+          <Link
+            href={dashboardPath}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-gold/25 transition-colors rounded-l-xl"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+            {t('managedByYou')}
+          </Link>
+          <button
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowWithdrawConfirm(true); }}
+            className="inline-flex items-center gap-1 px-2 py-1.5 border-l border-gold/30 text-gold/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl"
+            title={t('withdrawClaim')}
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </span>
+
+        {/* Withdraw confirmation modal */}
+        {showWithdrawConfirm && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowWithdrawConfirm(false)}>
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 max-w-sm mx-4 space-y-4" onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-serif text-lg font-bold">{t('withdrawConfirm')}</h3>
+              <p className="text-sm text-[#8A8578]">{t('withdrawConfirmDetail')}</p>
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleWithdraw}
+                  disabled={withdrawing}
+                  className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-red-500/20 text-red-400 border border-red-400/30 hover:bg-red-500/30 transition-colors disabled:opacity-40"
+                >
+                  {withdrawing ? '...' : t('confirmWithdraw')}
+                </button>
+                <button
+                  onClick={() => setShowWithdrawConfirm(false)}
+                  className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8A8578] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
+                >
+                  {t('cancelAction')}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
@@ -154,7 +202,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
-        {myStatus === 'rejected' ? t('claimAgain') : t('claimPage')}
+        {myStatus === 'rejected' || myStatus === 'withdrawn' || myStatus === 'revoked' ? t('claimAgain') : t('claimPage')}
       </button>
 
       {showModal && (

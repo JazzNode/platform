@@ -576,6 +576,15 @@
     "statusRejected": "Ditolak",
     "statusAll": "Semua",
     "alsoClaim": "Ikut Kelola",
+    "withdrawClaim": "Lepas Pengelolaan",
+    "withdrawConfirm": "Apakah Anda yakin?",
+    "withdrawConfirmDetail": "Anda akan kehilangan akses pengelolaan halaman ini. Anda dapat mengajukan klaim baru nanti.",
+    "confirmWithdraw": "Lepaskan",
+    "statusWithdrawn": "Ditarik",
+    "statusRevoked": "Dicabut",
+    "revoke": "Cabut",
+    "confirmRevoke": "Konfirmasi Cabut",
+    "revokeReasonPlaceholder": "Mengapa klaim ini dicabut?",
     "managerCount": "{count} manajer"
   },
   "artistStudio": {
