@@ -60,12 +60,6 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venue = venues.find((v) => v.id === slug);
 
-  // Legacy URL redirect: old Airtable record IDs → semantic slugs
-  if (!venue && slug.startsWith('rec')) {
-    const legacy = venues.find((v) => (v.fields as Record<string, unknown>).airtable_record_id === slug);
-    if (legacy) redirect(`/${locale}/venues/${legacy.id}`);
-  }
-
   if (!venue) {
     notFound();
   }

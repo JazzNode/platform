@@ -62,12 +62,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   ]);
   const event = events.find((e) => e.id === slug);
 
-  // Legacy URL redirect: old Airtable record IDs → semantic slugs
-  if (!event && slug.startsWith('rec')) {
-    const legacy = events.find((e) => (e.fields as Record<string, unknown>).airtable_record_id === slug);
-    if (legacy) redirect(`/${locale}/events/${legacy.id}`);
-  }
-
   if (!event) {
     notFound();
   }

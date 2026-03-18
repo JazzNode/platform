@@ -67,12 +67,6 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   ]);
   const artist = artists.find((a) => a.id === slug);
 
-  // Legacy URL redirect: old Airtable record IDs → semantic slugs
-  if (!artist && slug.startsWith('rec')) {
-    const legacy = artists.find((a) => (a.fields as Record<string, unknown>).airtable_record_id === slug);
-    if (legacy) redirect(`/${locale}/artists/${legacy.id}`);
-  }
-
   if (!artist) {
     notFound();
   }
