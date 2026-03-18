@@ -67,13 +67,6 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
   // Local region state that syncs with global
   const [activeRegion, setActiveRegionState] = useState<string | null>(null);
 
-  // Sync with global region
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegionState(globalRegion);
-    }
-  }, [globalRegion]);
-
   const setActiveRegion = useCallback((code: string | null) => {
     hasInteracted.current = true;
     setActiveRegionState(code);
@@ -84,6 +77,13 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
     const codes = [...new Set(cities.map((c) => c.countryCode).filter(Boolean))];
     return codes.sort();
   }, [cities]);
+
+  // Sync with global region — fall back to null if globalRegion has no content on this page
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      setActiveRegionState(globalRegion && regionOrder.includes(globalRegion) ? globalRegion : null);
+    }
+  }, [globalRegion, regionOrder]);
 
   // Filter cities by active region
   const filteredCities = useMemo(() => {

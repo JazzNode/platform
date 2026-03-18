@@ -77,13 +77,6 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
 
-  // Sync with global region when it changes (only if user hasn't interacted)
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegion(globalRegion);
-    }
-  }, [globalRegion]);
-
   // Group cities by country code
   const regionGroups = useMemo(() => {
     const map: Record<string, CityOption[]> = {};
@@ -95,6 +88,14 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     }
     return map;
   }, [cityOptions]);
+
+  // Sync with global region when it changes (only if user hasn't interacted)
+  // Fall back to null if globalRegion has no content on this page
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
+    }
+  }, [globalRegion, regionGroups]);
 
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 

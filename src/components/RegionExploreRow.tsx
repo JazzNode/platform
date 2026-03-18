@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { useRegion } from './RegionProvider';
 import FadeUp from '@/components/animations/FadeUp';
 
@@ -16,12 +17,18 @@ const pillInactive = 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A85
 export default function RegionExploreRow({ regionCodes, regionLabels, worldMapLabel }: Props) {
   const { region, setRegion } = useRegion();
 
+  // Treat region as null (world map) if it has no content on this page
+  const effectiveRegion = useMemo(
+    () => (region && regionCodes.includes(region) ? region : null),
+    [region, regionCodes],
+  );
+
   return (
     <FadeUp>
       <div className="flex flex-wrap items-center justify-center gap-2">
         <button
           onClick={() => setRegion(null)}
-          className={`${pillBase} ${!region ? pillActive : pillInactive}`}
+          className={`${pillBase} ${!effectiveRegion ? pillActive : pillInactive}`}
         >
           {worldMapLabel}
         </button>
@@ -30,7 +37,7 @@ export default function RegionExploreRow({ regionCodes, regionLabels, worldMapLa
           <button
             key={code}
             onClick={() => setRegion(region === code ? null : code)}
-            className={`${pillBase} ${region === code ? pillActive : pillInactive}`}
+            className={`${pillBase} ${effectiveRegion === code ? pillActive : pillInactive}`}
           >
             {regionLabels[code] || code}
           </button>

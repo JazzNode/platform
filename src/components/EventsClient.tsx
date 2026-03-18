@@ -95,12 +95,6 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     return null;
   });
 
-  // Sync with global region when it changes (only if user hasn't interacted with page filters)
-  useEffect(() => {
-    if (!hasInteracted.current && !initialFilters?.venue && !initialFilters?.city) {
-      setActiveRegion(globalRegion);
-    }
-  }, [globalRegion, initialFilters?.venue, initialFilters?.city]);
   const [selectedCity, setSelectedCity] = useState<string | null>(() => {
     if (initialFilters?.venue) {
       const v = venues.find((x) => x.recordId === initialFilters.venue);
@@ -132,6 +126,14 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
 
   // Stable region order
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
+
+  // Sync with global region when it changes (only if user hasn't interacted with page filters)
+  // Fall back to null if globalRegion has no content on this page
+  useEffect(() => {
+    if (!hasInteracted.current && !initialFilters?.venue && !initialFilters?.city) {
+      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
+    }
+  }, [globalRegion, regionGroups, initialFilters?.venue, initialFilters?.city]);
 
   // Derive selectedCities set for filtering (from region or single city)
   // When a region is active but no city is explicitly selected, filter by all cities in that region

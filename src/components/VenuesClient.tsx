@@ -54,13 +54,6 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   const [activeRegion, setActiveRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-  // Sync with global region when it changes (only if user hasn't interacted)
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegion(globalRegion);
-    }
-  }, [globalRegion]);
-
   // Group cities by country code
   const regionGroups = useMemo(() => {
     const map: Record<string, CityOption[]> = {};
@@ -75,6 +68,14 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
 
   // Stable region order
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
+
+  // Sync with global region when it changes (only if user hasn't interacted)
+  // Fall back to null if globalRegion has no content on this page
+  useEffect(() => {
+    if (!hasInteracted.current) {
+      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
+    }
+  }, [globalRegion, regionGroups]);
 
   // Derive selectedCities set for filtering
   const selectedCities = useMemo(() => {
