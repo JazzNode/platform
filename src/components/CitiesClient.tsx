@@ -91,6 +91,9 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
     return cities.filter((c) => c.countryCode === activeRegion);
   }, [cities, activeRegion]);
 
+  // Key for re-triggering card animations on filter change
+  const filterKey = useMemo(() => `cities_${activeRegion || 'world'}`, [activeRegion]);
+
   return (
     <div className="space-y-12">
       <FadeUp>
@@ -134,12 +137,11 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
         </FadeUpItem>
       )}
 
-      <FadeUp stagger={0.15}>
-        <div className="grid gap-6 sm:grid-cols-2">
-          {filteredCities.map((city) => (
+      <div key={filterKey} className="grid gap-6 sm:grid-cols-2">
+          {filteredCities.map((city, i) => (
+            <FadeUpItem key={city.id} delay={(i % 2) * 60}>
             <div
-              key={city.id}
-              className="fade-up-item relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group card-hover"
+              className="relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group card-hover"
             >
               {/* Venue photo strip */}
               {city.venuePhotos.length > 0 && (
@@ -234,9 +236,9 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
                 {labels.exploreCityEvents} →
               </Link>
             </div>
+            </FadeUpItem>
           ))}
-        </div>
-      </FadeUp>
+      </div>
     </div>
   );
 }
