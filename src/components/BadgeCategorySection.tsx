@@ -6,6 +6,8 @@ import BadgeCard from './BadgeCard';
 const CATEGORY_META: Record<string, { icon: string; color: string }> = {
   milestone: { icon: '🏆', color: 'text-[var(--color-gold)]' },
   community: { icon: '💬', color: 'text-blue-400' },
+  recognition: { icon: '🎵', color: 'text-[var(--color-gold)]' },
+  venue_excellence: { icon: '🏠', color: 'text-[var(--color-gold)]' },
 };
 
 interface BadgeCategorySectionProps {

@@ -6,6 +6,8 @@ import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } f
 import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import DMButton from '@/components/DMButton';
+import FollowButton from '@/components/FollowButton';
+import SocialIcons from '@/components/SocialIcons';
 
 interface Props {
   profile: Profile;
@@ -71,43 +73,44 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
           </div>
 
           <div className="flex-1 space-y-5">
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold">
-              {profile.display_name || `@${username}`}
-            </h1>
-            {profile.display_name && profile.username && (
-              <p className="text-xl text-[#8A8578]">@{profile.username}</p>
-            )}
+            {/* Name + Action Buttons */}
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="font-serif text-4xl sm:text-5xl font-bold">
+                  {profile.display_name || `@${username}`}
+                </h1>
+                <div className="flex items-center gap-2 shrink-0">
+                  <DMButton targetUserId={profile.id} />
+                  <FollowButton itemType="user" itemId={profile.id} variant="full" />
+                </div>
+              </div>
+              {profile.display_name && profile.username && (
+                <p className="mt-1 text-xl text-[#8A8578]">@{profile.username}</p>
+              )}
+            </div>
 
+            {/* Tags */}
             <div className="flex flex-wrap gap-2">
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                 {t('memberSince', { date: memberSince })}
               </span>
-              <DMButton targetUserId={profile.id} />
             </div>
 
+            {/* Bio */}
             {profile.bio && (
               <div className="border-t border-[var(--border)] pt-5">
                 <p className="text-[#C4BFB3] leading-relaxed whitespace-pre-line">{profile.bio}</p>
               </div>
             )}
 
-            {profile.website && (
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-[#8A8578]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M2 12h20" />
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-                </svg>
-                <a
-                  href={profile.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[var(--color-gold)] hover:text-[var(--color-gold-bright)] transition-colors link-lift"
-                >
-                  {profile.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-                </a>
-              </div>
-            )}
+            {/* Social Icons */}
+            <SocialIcons
+              websiteUrl={profile.website || profile.social_links?.website_url}
+              spotifyUrl={profile.social_links?.spotify_url}
+              youtubeUrl={profile.social_links?.youtube_url}
+              instagram={profile.social_links?.instagram}
+              facebookUrl={profile.social_links?.facebook_url}
+            />
           </div>
         </div>
       </FadeUp>
