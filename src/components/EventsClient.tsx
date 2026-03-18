@@ -220,6 +220,13 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     return `${activeRegion}_${selectedCity}_${[...selectedVenues].sort().join(',')}_${selectedCategory}`;
   }, [activeRegion, selectedCity, selectedVenues, selectedCategory]);
 
+  // City lookup by record ID
+  const cityById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const c of cities) map.set(c.recordId, c.label);
+    return map;
+  }, [cities]);
+
   // Group by month
   const byMonth = useMemo(() => {
     const map = new Map<string, SerializedEvent[]>();
@@ -416,7 +423,12 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                       <BookmarkButton itemId={event.id} />
                     </div>
                     {event.venue_name && (
-                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{event.venue_name}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">
+                        {event.city_record_id && cityById.get(event.city_record_id) && (
+                          <span className="text-[#6A6560]">{cityById.get(event.city_record_id)} · </span>
+                        )}
+                        {event.venue_name}
+                      </p>
                     )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {event.tags.includes('matinee') && '☀️ '}{event.date_display} · {event.time_display}

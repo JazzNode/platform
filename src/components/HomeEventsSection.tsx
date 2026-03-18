@@ -84,20 +84,32 @@ export default function HomeEventsSection({
 }: Props) {
   const { region } = useRegion();
 
+  // Fall back to world map (null) when the selected region has no content
+  // on this page — mirrors the visual logic in RegionExploreRow
+  const availableCodes = useMemo(() => {
+    const codes = new Set<string>();
+    for (const e of events) if (e.country_code) codes.add(e.country_code);
+    for (const e of jams) if (e.country_code) codes.add(e.country_code);
+    for (const v of venues) if (v.country_code) codes.add(v.country_code);
+    return codes;
+  }, [events, jams, venues]);
+
+  const effectiveRegion = region && availableCodes.has(region) ? region : null;
+
   const filteredEvents = useMemo(() => {
-    if (!region) return events;
-    return events.filter((e) => e.country_code === region);
-  }, [events, region]);
+    if (!effectiveRegion) return events;
+    return events.filter((e) => e.country_code === effectiveRegion);
+  }, [events, effectiveRegion]);
 
   const filteredJams = useMemo(() => {
-    if (!region) return jams;
-    return jams.filter((e) => e.country_code === region);
-  }, [jams, region]);
+    if (!effectiveRegion) return jams;
+    return jams.filter((e) => e.country_code === effectiveRegion);
+  }, [jams, effectiveRegion]);
 
   const filteredVenues = useMemo(() => {
-    if (!region) return venues;
-    return venues.filter((v) => v.country_code === region);
-  }, [venues, region]);
+    if (!effectiveRegion) return venues;
+    return venues.filter((v) => v.country_code === effectiveRegion);
+  }, [venues, effectiveRegion]);
 
   const jazzFreqLabel: Record<string, string> = {
     nightly: labels.jazzNightly,
