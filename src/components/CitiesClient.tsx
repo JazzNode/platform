@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useRef, useEffect } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRegion } from '@/components/RegionProvider';
@@ -62,14 +62,14 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 
 export default function CitiesClient({ cities, locale, regionLabels, worldMapLabel, labels }: Props) {
   const { region: globalRegion } = useRegion();
-  const hasInteracted = useRef(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Local region state that syncs with global
-  const [activeRegion, setActiveRegionState] = useState<string | null>(null);
+  // Local region state (user's explicit choice)
+  const [userRegion, setUserRegionState] = useState<string | null>(null);
 
   const setActiveRegion = useCallback((code: string | null) => {
-    hasInteracted.current = true;
-    setActiveRegionState(code);
+    setHasInteracted(true);
+    setUserRegionState(code);
   }, []);
 
   // Derive region order from available cities
@@ -78,12 +78,10 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
     return codes.sort();
   }, [cities]);
 
-  // Sync with global region — fall back to null if globalRegion has no content on this page
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegionState(globalRegion && regionOrder.includes(globalRegion) ? globalRegion : null);
-    }
-  }, [globalRegion, regionOrder]);
+  // Derive effective region: prefer user selection, fall back to global
+  const activeRegion = hasInteracted
+    ? userRegion
+    : (globalRegion && regionOrder.includes(globalRegion) ? globalRegion : null);
 
   // Filter cities by active region
   const filteredCities = useMemo(() => {

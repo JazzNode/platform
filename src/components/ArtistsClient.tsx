@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -67,13 +67,13 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
-  const hasInteracted = useRef(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); return instrumentNames[k] || k; };
   const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
   const [selectedType, setSelectedType] = useState<string>('all');
 
   // ── Region hierarchy state (matching EventsClient) ──
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [userRegion, setUserRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
 
@@ -89,13 +89,10 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     return map;
   }, [cityOptions]);
 
-  // Sync with global region when it changes (only if user hasn't interacted)
-  // Fall back to null if globalRegion has no content on this page
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
-    }
-  }, [globalRegion, regionGroups]);
+  // Derive effective region: prefer user selection, fall back to global
+  const activeRegion = hasInteracted
+    ? userRegion
+    : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
@@ -109,14 +106,14 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
-    hasInteracted.current = true;
+    setHasInteracted(true);
     if (activeRegion === code) {
-      setActiveRegion(null);
+      setUserRegion(null);
       setSelectedCity(null);
       setSelectedVenues(new Set());
       return;
     }
-    setActiveRegion(code);
+    setUserRegion(code);
     setSelectedCity(null);
     setSelectedVenues(new Set());
   }, [activeRegion]);
@@ -127,8 +124,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   }, []);
 
   const handleWorldMapClick = useCallback(() => {
-    hasInteracted.current = true;
-    setActiveRegion(null);
+    setHasInteracted(true);
+    setUserRegion(null);
     setSelectedCity(null);
     setSelectedVenues(new Set());
   }, []);
@@ -145,7 +142,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     if (venue?.cityRecordIds?.[0]) {
       const city = cityOptions.find((c) => c.recordId === venue.cityRecordIds[0]);
       if (city) {
-        setActiveRegion(city.countryCode || null);
+        setUserRegion(city.countryCode || null);
         setSelectedCity(city.recordId);
       }
     }

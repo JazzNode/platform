@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -20,12 +20,10 @@ export default function ClaimGuideModal() {
 
   const [show, setShow] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [searchData, setSearchData] = useState<{
     artists: SearchableArtist[];
     venues: SearchableVenue[];
   } | null>(null);
-  const [loadingData, setLoadingData] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const hasShown = useRef(false);
 
@@ -47,16 +45,17 @@ export default function ClaimGuideModal() {
     }
   }, [profile]);
 
+  // Derive loading state from whether we need data but don't have it yet
+  const loadingData = show && !searchData;
+
   // Fetch search data on mount
   useEffect(() => {
     if (!show || searchData) return;
-    setLoadingData(true);
     fetch(`/api/search-data?locale=${locale}`)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (data) setSearchData({ artists: data.artists, venues: data.venues });
-      })
-      .finally(() => setLoadingData(false));
+      });
   }, [show, locale, searchData]);
 
   // Focus input when shown
@@ -64,18 +63,15 @@ export default function ClaimGuideModal() {
     if (show) setTimeout(() => inputRef.current?.focus(), 100);
   }, [show]);
 
-  // Search on query change
-  useEffect(() => {
-    if (!query.trim() || !searchData) {
-      setResults([]);
-      return;
-    }
+  // Derive search results from query + data
+  const results = useMemo(() => {
+    if (!query.trim() || !searchData) return [] as SearchResult[];
     const allResults = search(
       query,
       { events: [], artists: searchData.artists, venues: searchData.venues, cities: [], members: [] },
       'all',
     );
-    setResults(allResults.slice(0, 6));
+    return allResults.slice(0, 6);
   }, [query, searchData]);
 
   const handleNavigate = useCallback((type: string, id: string) => {

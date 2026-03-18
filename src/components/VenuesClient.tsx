@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -50,8 +50,8 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
-  const hasInteracted = useRef(false);
-  const [activeRegion, setActiveRegion] = useState<string | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const [userRegion, setUserRegion] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   // Group cities by country code
@@ -69,13 +69,10 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   // Stable region order
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
-  // Sync with global region when it changes (only if user hasn't interacted)
-  // Fall back to null if globalRegion has no content on this page
-  useEffect(() => {
-    if (!hasInteracted.current) {
-      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
-    }
-  }, [globalRegion, regionGroups]);
+  // Derive effective region: prefer user selection, fall back to global
+  const activeRegion = hasInteracted
+    ? userRegion
+    : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 
   // Derive selectedCities set for filtering
   const selectedCities = useMemo(() => {
@@ -87,13 +84,13 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
-    hasInteracted.current = true;
+    setHasInteracted(true);
     if (activeRegion === code) {
-      setActiveRegion(null);
+      setUserRegion(null);
       setSelectedCity(null);
       return;
     }
-    setActiveRegion(code);
+    setUserRegion(code);
     setSelectedCity(null);
   }, [activeRegion]);
 
@@ -102,8 +99,8 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   }, []);
 
   const handleWorldMapClick = useCallback(() => {
-    hasInteracted.current = true;
-    setActiveRegion(null);
+    setHasInteracted(true);
+    setUserRegion(null);
     setSelectedCity(null);
   }, []);
 

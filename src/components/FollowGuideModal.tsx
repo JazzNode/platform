@@ -33,7 +33,6 @@ export default function FollowGuideModal() {
 
   const [show, setShow] = useState(false);
   const [items, setItems] = useState<RecommendItem[]>([]);
-  const [loadingData, setLoadingData] = useState(false);
   const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
   const hasShown = useRef(false);
 
@@ -52,10 +51,12 @@ export default function FollowGuideModal() {
     }
   }, [profile]);
 
+  // Derive loading state
+  const loadingData = show && items.length === 0;
+
   // Fetch recommendations
   useEffect(() => {
     if (!show || items.length > 0) return;
-    setLoadingData(true);
     fetch(`/api/search-data?locale=${locale}`)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
@@ -98,8 +99,7 @@ export default function FollowGuideModal() {
         }
 
         setItems(recs);
-      })
-      .finally(() => setLoadingData(false));
+      });
   }, [show, locale, profile?.region, items.length]);
 
   const handleToggle = async (type: 'venue' | 'artist', id: string) => {

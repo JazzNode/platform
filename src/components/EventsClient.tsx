@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -77,10 +77,10 @@ const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px
 export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
-  const hasInteracted = useRef(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
-  // Derive initial region/city from venue or city filter, falling back to global region
-  const [activeRegion, setActiveRegion] = useState<string | null>(() => {
+  // Derive initial region/city from venue or city filter
+  const [userRegion, setUserRegion] = useState<string | null>(() => {
     if (initialFilters?.venue) {
       const v = venues.find((x) => x.recordId === initialFilters.venue);
       if (v?.cityRecordId) {
@@ -127,13 +127,10 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   // Stable region order
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
-  // Sync with global region when it changes (only if user hasn't interacted with page filters)
-  // Fall back to null if globalRegion has no content on this page
-  useEffect(() => {
-    if (!hasInteracted.current && !initialFilters?.venue && !initialFilters?.city) {
-      setActiveRegion(globalRegion && regionGroups[globalRegion] ? globalRegion : null);
-    }
-  }, [globalRegion, regionGroups, initialFilters?.venue, initialFilters?.city]);
+  // Derive effective region: prefer user/initial selection, fall back to global
+  const activeRegion = (hasInteracted || initialFilters?.venue || initialFilters?.city)
+    ? userRegion
+    : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 
   // Derive selectedCities set for filtering (from region or single city)
   // When a region is active but no city is explicitly selected, filter by all cities in that region
@@ -146,15 +143,15 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, [selectedCity, activeRegion, regionGroups]);
 
   const handleRegionClick = useCallback((code: string) => {
-    hasInteracted.current = true;
+    setHasInteracted(true);
     if (activeRegion === code) {
       // Click active region → deselect back to world map
-      setActiveRegion(null);
+      setUserRegion(null);
       setSelectedCity(null);
       setSelectedVenues(new Set());
       return;
     }
-    setActiveRegion(code);
+    setUserRegion(code);
     setSelectedCity(null);
     setSelectedVenues(new Set());
   }, [activeRegion]);
@@ -165,8 +162,8 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   }, []);
 
   const handleWorldMapClick = useCallback(() => {
-    hasInteracted.current = true;
-    setActiveRegion(null);
+    setHasInteracted(true);
+    setUserRegion(null);
     setSelectedCity(null);
     setSelectedVenues(new Set());
   }, []);
@@ -183,7 +180,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     if (venue?.cityRecordId) {
       const city = cities.find((c) => c.recordId === venue.cityRecordId);
       if (city) {
-        setActiveRegion(city.countryCode || null);
+        setUserRegion(city.countryCode || null);
         setSelectedCity(city.recordId);
       }
     }
