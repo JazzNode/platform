@@ -106,6 +106,7 @@
     "bandleader": "Pemimpin",
     "venueInactive": "Tempat ini sedang tutup sementara",
     "venueClosed": "Tempat ini sudah tutup permanen",
+    "messageVenue": "Pesan",
     "contact": "Kontak",
     "goldPartner": "Mitra Emas",
     "locationMap": "Lokasi & Peta",
@@ -374,7 +375,10 @@
     "bookingsLocked": "Manajemen Pemesanan",
     "bookingsLockedDesc": "Upgrade ke Premium Venue untuk membuka sistem manajemen pemesanan.",
     "broadcastsLocked": "Siaran Pemasaran",
-    "broadcastsLockedDesc": "Upgrade ke Premium Venue untuk membuka alat siaran pemasaran."
+    "broadcastsLockedDesc": "Upgrade ke Premium Venue untuk membuka alat siaran pemasaran.",
+    "noConversations": "Belum ada pesan.",
+    "noConversationsHint": "Penggemar dapat mengirim pesan dari halaman venue Anda.",
+    "archive": "Arsipkan"
   },
   "admin": {
     "saveAndTranslate": "Simpan & Terjemahkan",

@@ -15,6 +15,7 @@ import EditableContent from '@/components/EditableContent';
 import RecordNav from '@/components/RecordNav';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import BadgeDock from '@/components/BadgeDock';
+import MessageVenueButton from '@/components/MessageVenueButton';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -194,6 +195,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
             <div className="flex items-center gap-2 shrink-0">
+              <MessageVenueButton venueId={venue.id} />
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" />
             </div>

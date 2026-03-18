@@ -106,6 +106,7 @@
     "bandleader": "リーダー",
     "venueInactive": "この会場は一時休業中です",
     "venueClosed": "この会場は閉業しました",
+    "messageVenue": "メッセージ",
     "contact": "連絡先",
     "goldPartner": "ゴールドパートナー",
     "locationMap": "場所 & 地図",
@@ -374,7 +375,10 @@
     "bookingsLocked": "予約管理",
     "bookingsLockedDesc": "プレミアム会場にアップグレードして予約管理システムを解除しましょう。",
     "broadcastsLocked": "マーケティングブロードキャスト",
-    "broadcastsLockedDesc": "プレミアム会場にアップグレードしてマーケティングブロードキャストツールを解除しましょう。"
+    "broadcastsLockedDesc": "プレミアム会場にアップグレードしてマーケティングブロードキャストツールを解除しましょう。",
+    "noConversations": "まだメッセージはありません。",
+    "noConversationsHint": "ファンが会場ページからメッセージを送ることができます。",
+    "archive": "アーカイブ"
   },
   "admin": {
     "saveAndTranslate": "保存して翻訳",

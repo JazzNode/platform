@@ -110,6 +110,7 @@
     "bandleader": "Leader",
     "venueInactive": "This venue is temporarily closed",
     "venueClosed": "This venue is permanently closed",
+    "messageVenue": "Message",
     "contact": "Contact",
     "goldPartner": "Gold Partner",
     "locationMap": "Location & Map",
@@ -378,7 +379,10 @@
     "bookingsLocked": "Booking Management",
     "bookingsLockedDesc": "Upgrade to Premium Venue to unlock the booking management system.",
     "broadcastsLocked": "Marketing Broadcasts",
-    "broadcastsLockedDesc": "Upgrade to Premium Venue to unlock marketing broadcast tools."
+    "broadcastsLockedDesc": "Upgrade to Premium Venue to unlock marketing broadcast tools.",
+    "noConversations": "No messages yet.",
+    "noConversationsHint": "Fans can message you from your venue page.",
+    "archive": "Archive"
   },
   "admin": {
     "saveAndTranslate": "Save & Translate",

@@ -21,25 +21,19 @@ export default function FilterChips({ active, onChange }: FilterChipsProps) {
   const t = useTranslations('artistStudio');
   return (
     <div className="flex gap-1.5 overflow-x-auto no-scrollbar py-1">
-      {FILTERS.map((f) => {
-        const isDisabled = f === 'venue'; // future — not yet implemented
-        return (
+      {FILTERS.map((f) => (
           <button
             key={f}
-            onClick={() => !isDisabled && onChange(f)}
-            disabled={isDisabled}
+            onClick={() => onChange(f)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
               active === f
                 ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
-                : isDisabled
-                  ? 'text-[var(--muted-foreground)]/30 cursor-not-allowed'
-                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
             }`}
           >
             {t(LABEL_KEYS[f])}
           </button>
-        );
-      })}
+      ))}
     </div>
   );
 }

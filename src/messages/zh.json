@@ -110,6 +110,7 @@
     "bandleader": "團長",
     "venueInactive": "此場地目前暫停營業",
     "venueClosed": "此場地已永久關閉",
+    "messageVenue": "傳訊息",
     "contact": "聯絡方式",
     "goldPartner": "金牌認證夥伴",
     "locationMap": "位置與地圖",
@@ -378,7 +379,10 @@
     "bookingsLocked": "預訂管理",
     "bookingsLockedDesc": "升級至 Premium 場地以解鎖預訂管理系統。",
     "broadcastsLocked": "行銷廣播",
-    "broadcastsLockedDesc": "升級至 Premium 場地以解鎖行銷廣播工具。"
+    "broadcastsLockedDesc": "升級至 Premium 場地以解鎖行銷廣播工具。",
+    "noConversations": "目前沒有訊息。",
+    "noConversationsHint": "粉絲可從你的場地頁面傳訊息給你。",
+    "archive": "封存"
   },
   "admin": {
     "saveAndTranslate": "儲存並翻譯",

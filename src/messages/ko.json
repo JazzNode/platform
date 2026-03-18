@@ -106,6 +106,7 @@
     "bandleader": "리더",
     "venueInactive": "이 공연장은 일시 휴업 중입니다",
     "venueClosed": "이 공연장은 영구 폐업했습니다",
+    "messageVenue": "메시지",
     "contact": "연락처",
     "goldPartner": "골드 파트너",
     "locationMap": "위치 & 지도",
@@ -374,7 +375,10 @@
     "bookingsLocked": "예약 관리",
     "bookingsLockedDesc": "프리미엄 공연장으로 업그레이드하여 예약 관리 시스템을 잠금 해제하세요.",
     "broadcastsLocked": "마케팅 방송",
-    "broadcastsLockedDesc": "프리미엄 공연장으로 업그레이드하여 마케팅 방송 도구를 잠금 해제하세요."
+    "broadcastsLockedDesc": "프리미엄 공연장으로 업그레이드하여 마케팅 방송 도구를 잠금 해제하세요.",
+    "noConversations": "아직 메시지가 없습니다.",
+    "noConversationsHint": "팬들이 공연장 페이지에서 메시지를 보낼 수 있습니다.",
+    "archive": "보관"
   },
   "admin": {
     "saveAndTranslate": "저장 및 번역",

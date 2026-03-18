@@ -4,10 +4,10 @@ import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
  * POST /api/broadcasts/send
- * Creates a broadcast and inserts messages into each fan's artist_fan conversation.
+ * Creates a broadcast and inserts messages into each fan's conversation.
  *
- * Body: { artistId, title, body, channel }
- * Requires authenticated user who has claimed the artist.
+ * Body: { artistId, title, body, channel } OR { venueId, title, body, channel }
+ * Requires authenticated user who has claimed the artist or venue.
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -16,15 +16,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { artistId, title, body, channel } = await request.json();
-  if (!artistId || !title?.trim() || !body?.trim()) {
+  const { artistId, venueId, title, body, channel } = await request.json();
+
+  const isVenue = !!venueId;
+  const targetId = venueId || artistId;
+
+  if (!targetId || !title?.trim() || !body?.trim()) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   }
 
-  // Verify user has claimed this artist
+  // Verify user has claimed this artist or venue
   const { data: profile } = await supabase
     .from('profiles')
-    .select('claimed_artist_ids, role')
+    .select('claimed_artist_ids, claimed_venue_ids, role')
     .eq('id', user.id)
     .single();
 
@@ -32,7 +36,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
   }
 
-  const isOwner = profile.claimed_artist_ids?.includes(artistId);
+  const isOwner = isVenue
+    ? profile.claimed_venue_ids?.includes(targetId)
+    : profile.claimed_artist_ids?.includes(targetId);
   const isAdmin = profile.role === 'admin' || profile.role === 'owner';
   if (!isOwner && !isAdmin) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -41,16 +47,23 @@ export async function POST(request: NextRequest) {
   const adminClient = createAdminClient();
 
   // 1. Create broadcast record
+  const broadcastData: Record<string, unknown> = {
+    sender_id: user.id,
+    title: title.trim(),
+    body: body.trim(),
+    channel: channel || 'inbox',
+    sent_at: new Date().toISOString(),
+  };
+
+  if (isVenue) {
+    broadcastData.venue_id = targetId;
+  } else {
+    broadcastData.artist_id = targetId;
+  }
+
   const { data: broadcast, error: broadcastError } = await adminClient
     .from('broadcasts')
-    .insert({
-      artist_id: artistId,
-      sender_id: user.id,
-      title: title.trim(),
-      body: body.trim(),
-      channel: channel || 'inbox',
-      sent_at: new Date().toISOString(),
-    })
+    .insert(broadcastData)
     .select('id')
     .single();
 
@@ -58,12 +71,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create broadcast' }, { status: 500 });
   }
 
-  // 2. Get all fans who follow this artist
+  // 2. Get all fans who follow this entity
   const { data: fans } = await adminClient
     .from('follows')
     .select('user_id')
-    .eq('target_type', 'artist')
-    .eq('target_id', artistId);
+    .eq('target_type', isVenue ? 'venue' : 'artist')
+    .eq('target_id', targetId);
 
   if (!fans || fans.length === 0) {
     return NextResponse.json({
@@ -72,25 +85,28 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  // 3. Create broadcast_deliveries (for backwards compat / stats)
+  // 3. Create broadcast_deliveries (for stats)
   const deliveries = fans.map((f) => ({
     broadcast_id: broadcast.id,
     user_id: f.user_id,
   }));
   await adminClient.from('broadcast_deliveries').insert(deliveries);
 
-  // 4. For each fan, find or create artist_fan conversation, then insert message
+  // 4. For each fan, find or create conversation, then insert message
   const now = new Date().toISOString();
   const messageBody = `${title.trim()}\n\n${body.trim()}`;
   let insertedCount = 0;
 
-  // Batch: get all existing conversations for this artist with these fans
+  const conversationType = isVenue ? 'venue_fan' : 'artist_fan';
+  const entityIdField = isVenue ? 'venue_id' : 'artist_id';
+
+  // Batch: get all existing conversations for this entity with these fans
   const fanIds = fans.map((f) => f.user_id);
   const { data: existingConvos } = await adminClient
     .from('conversations')
     .select('id, fan_user_id')
-    .eq('type', 'artist_fan')
-    .eq('artist_id', artistId)
+    .eq('type', conversationType)
+    .eq(entityIdField, targetId)
     .in('fan_user_id', fanIds);
 
   const convoByFan = new Map<string, string>();
@@ -102,8 +118,8 @@ export async function POST(request: NextRequest) {
   // Batch create missing conversations
   if (fansNeedingConvo.length > 0) {
     const newConvos = fansNeedingConvo.map((fanId) => ({
-      type: 'artist_fan' as const,
-      artist_id: artistId,
+      type: conversationType,
+      [entityIdField]: targetId,
       fan_user_id: fanId,
       last_message_at: now,
     }));

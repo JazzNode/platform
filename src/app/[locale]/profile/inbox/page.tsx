@@ -14,8 +14,9 @@ type Tab = 'messages' | 'notifications';
 
 interface UnifiedConversation {
   id: string;
-  type: 'artist_fan' | 'member_hq' | 'member_member';
+  type: 'artist_fan' | 'member_hq' | 'member_member' | 'venue_fan';
   artist_id?: string;
+  venue_id?: string;
   peer_name: string;
   peer_avatar: string | null;
   last_message: string | null;
@@ -120,7 +121,7 @@ export default function FanInboxPage() {
       // Fetch all conversations where user is a participant
       const { data: allConvos } = await supabase
         .from('conversations')
-        .select('id, type, artist_id, fan_user_id, user_b_id, last_message_at')
+        .select('id, type, artist_id, venue_id, fan_user_id, user_b_id, last_message_at')
         .or(`fan_user_id.eq.${user.id},user_b_id.eq.${user.id}`)
         .order('last_message_at', { ascending: false });
 
@@ -128,10 +129,12 @@ export default function FanInboxPage() {
 
       // Collect IDs for enrichment
       const artistIds = new Set<string>();
+      const venueIds = new Set<string>();
       const profileIds = new Set<string>();
 
       allConvos.forEach((c) => {
         if (c.type === 'artist_fan' && c.artist_id) artistIds.add(c.artist_id);
+        if (c.type === 'venue_fan' && c.venue_id) venueIds.add(c.venue_id);
         if (c.type === 'member_member') {
           const peerId = c.fan_user_id === user.id ? c.user_b_id : c.fan_user_id;
           if (peerId) profileIds.add(peerId);
@@ -149,6 +152,21 @@ export default function FanInboxPage() {
           artists?.map((a) => [a.artist_id, {
             name: a.display_name || a.name_local || a.name_en || a.artist_id,
             photo: a.photo_url,
+          }]) || []
+        );
+      }
+
+      // Batch fetch venues
+      let venueMap = new Map<string, { name: string; photo: string | null }>();
+      if (venueIds.size > 0) {
+        const { data: venues } = await supabase
+          .from('venues')
+          .select('venue_id, display_name, name_local, name_en, photo_url')
+          .in('venue_id', [...venueIds]);
+        venueMap = new Map(
+          venues?.map((v) => [v.venue_id, {
+            name: v.display_name || v.name_local || v.name_en || v.venue_id,
+            photo: v.photo_url,
           }]) || []
         );
       }
@@ -197,6 +215,11 @@ export default function FanInboxPage() {
             peer_name = artist?.name || convo.artist_id || 'Artist';
             peer_avatar = artist?.photo || null;
             source_badge = 'artist';
+          } else if (convo.type === 'venue_fan') {
+            const venue = venueMap.get(convo.venue_id!);
+            peer_name = venue?.name || convo.venue_id || 'Venue';
+            peer_avatar = venue?.photo || null;
+            source_badge = 'venue';
           } else if (convo.type === 'member_hq') {
             peer_name = 'JazzNode HQ';
             peer_avatar = null;
@@ -213,6 +236,7 @@ export default function FanInboxPage() {
             id: convo.id,
             type: convo.type,
             artist_id: convo.artist_id,
+            venue_id: convo.venue_id,
             peer_name,
             peer_avatar,
             last_message: lastMsg?.body || null,
@@ -441,6 +465,7 @@ export default function FanInboxPage() {
     if (filter === 'all') return true;
     if (filter === 'hq') return c.type === 'member_hq';
     if (filter === 'artist') return c.type === 'artist_fan';
+    if (filter === 'venue') return c.type === 'venue_fan';
     if (filter === 'dm') return c.type === 'member_member';
     return true;
   });
@@ -577,6 +602,12 @@ export default function FanInboxPage() {
                             <div className="w-9 h-9 rounded-full bg-purple-400/15 flex items-center justify-center shrink-0">
                               <svg className="w-4 h-4 text-purple-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" />
+                              </svg>
+                            </div>
+                          ) : convo.source_badge === 'venue' && !convo.peer_avatar ? (
+                            <div className="w-9 h-9 rounded-full bg-emerald-400/15 flex items-center justify-center shrink-0">
+                              <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
                               </svg>
                             </div>
                           ) : convo.peer_avatar ? (
