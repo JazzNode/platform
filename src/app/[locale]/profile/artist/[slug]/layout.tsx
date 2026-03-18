@@ -19,6 +19,7 @@ interface ArtistBasic {
 
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
+  { key: 'badges', icon: 'badges', path: '/badges' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
   { key: 'bookings', icon: 'calendar', path: '/bookings' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
@@ -71,6 +72,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
           <path d="M7 14l4-4 4 4 6-6" />
+        </svg>
+      );
+    case 'badges':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="8" r="7" />
+          <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
         </svg>
       );
     case 'edit':
