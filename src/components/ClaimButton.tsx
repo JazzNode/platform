@@ -15,7 +15,7 @@ interface ClaimButtonProps {
 
 export default function ClaimButton({ targetType, targetId, targetName }: ClaimButtonProps) {
   const { user, setShowAuthModal } = useAuth();
-  const { getMyClaimStatus, isClaimed, getManagerCount, cancelClaim } = useClaims();
+  const { getMyClaimStatus, isClaimed, cancelClaim } = useClaims();
   const t = useTranslations('claim');
   const locale = useLocale();
   const [showModal, setShowModal] = useState(false);
@@ -31,7 +31,6 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
 
   const myStatus = user ? getMyClaimStatus(targetType, targetId) : null;
   const entityIsClaimed = isClaimed(targetType, targetId);
-  const managerCount = getManagerCount(targetType, targetId);
   const claimedByOther = entityIsClaimed && myStatus !== 'approved';
 
   const dashboardPath = targetType === 'artist'
@@ -39,25 +38,17 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     : `/${locale}/profile/venue/${targetId}`;
 
   // Already approved for this user — show "You manage this page" linking to dashboard
-  // + show co-manager count if there are other managers
   if (myStatus === 'approved') {
     return (
-      <div className="inline-flex items-center gap-2">
-        <Link
-          href={dashboardPath}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M20 6L9 17l-5-5" />
-          </svg>
-          {t('managedByYou')}
-        </Link>
-        {managerCount > 1 && (
-          <span className="text-[11px] text-[#8A8578]/60">
-            {t('managerCount', { count: managerCount })}
-          </span>
-        )}
-      </div>
+      <Link
+        href={dashboardPath}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30 hover:bg-gold/25 transition-colors"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+        {t('managedByYou')}
+      </Link>
     );
   }
 
@@ -81,11 +72,6 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
               <path d="M20 6L9 17l-5-5" />
             </svg>
             {t('verified')}
-            {managerCount > 0 && (
-              <span className="text-[#8A8578]/50 ml-0.5">
-                &middot; {t('managerCount', { count: managerCount })}
-              </span>
-            )}
           </span>
           <button
             onClick={handleAlsoClaim}
