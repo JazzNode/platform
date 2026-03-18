@@ -439,6 +439,8 @@
     "hiddenFeatures": "非表示の機能",
     "hiddenMsg": "フロントエンドに表示されません",
     "featureDisabledHint": "機能は非表示です — 任意のティアをクリックして再有効化",
+    "notImplemented": "未実装",
+    "notImplementedHint": "この機能はまだ開発されていません",
     "tierHideHint": "クリックして公開ページからこのティアを非表示にする",
     "tierShowHint": "クリックして公開ページにこのティアを表示する",
     "cancel": "キャンセル",

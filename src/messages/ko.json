@@ -439,6 +439,8 @@
     "hiddenFeatures": "숨겨진 기능",
     "hiddenMsg": "프론트엔드에 표시되지 않음",
     "featureDisabledHint": "기능이 숨겨져 있습니다 — 아무 티어를 클릭하여 다시 활성화",
+    "notImplemented": "미구현",
+    "notImplementedHint": "이 기능은 아직 개발되지 않았습니다",
     "tierHideHint": "클릭하여 공개 페이지에서 이 티어를 숨기기",
     "tierShowHint": "클릭하여 공개 페이지에 이 티어를 표시하기",
     "cancel": "취소",

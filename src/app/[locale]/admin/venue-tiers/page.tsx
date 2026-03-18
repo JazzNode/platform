@@ -25,6 +25,23 @@ interface FeatureKey {
   categoryKey: string;
 }
 
+/** Features listed in the tier config but not yet built in the frontend */
+const NOT_IMPLEMENTED = new Set([
+  'photos',
+  'schedule_manager',
+  'backline',
+  'artist_discovery',
+  'priority_search',
+  'custom_domain',
+  'custom_theme',
+  'ticketing',
+  'broadcasts_unlimited',
+  'booking_management',
+  'revenue_analytics',
+  'multi_location',
+  'ical_api',
+]);
+
 const VENUE_FEATURES: FeatureKey[] = [
   // Tier 0 — Fan-facing (always visible)
   { key: 'public_listing', labelKey: 'vf_publicListing', categoryKey: 'vc_fanFacing' },
@@ -246,10 +263,11 @@ export default function VenueTiersPage() {
                 {VENUE_FEATURES.filter((f) => f.categoryKey === cat).map((feat, fi) => {
                   const minTier = features[feat.key] ?? 0;
                   const disabled = minTier < 0;
+                  const notImpl = NOT_IMPLEMENTED.has(feat.key);
                   return (
                     <tr
                       key={feat.key}
-                      className={`${disabled ? 'opacity-40' : ''} ${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
+                      className={`${disabled ? 'opacity-40' : ''} ${notImpl ? 'opacity-60' : ''} ${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
                     >
                       <td className="py-3 px-4 text-sm text-[var(--foreground)]">
                         <span className={disabled ? 'line-through' : ''}>{t(feat.labelKey)}</span>
@@ -258,33 +276,48 @@ export default function VenueTiersPage() {
                             {t('hidden')}
                           </span>
                         )}
+                        {notImpl && (
+                          <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
+                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 4l7.53 13H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+                            {t('notImplemented')}
+                          </span>
+                        )}
                       </td>
                       {TIER_NAMES.map((_, tierIdx) => {
                         const unlocked = !disabled && tierIdx >= minTier;
                         return (
                           <td key={tierIdx} className="py-3 px-2 text-center">
-                            <button
-                              onClick={() => handleTierClick(feat.key, tierIdx)}
-                              className={`w-8 h-8 rounded-lg transition-all inline-flex items-center justify-center ${
-                                unlocked
-                                  ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
-                                  : disabled
-                                    ? 'bg-red-500/10 text-red-400/50 hover:bg-red-500/20 border border-red-500/20'
-                                    : 'bg-zinc-800/50 text-zinc-600 hover:bg-zinc-700/50 border border-zinc-700/30'
-                              }`}
-                              title={disabled ? t('featureDisabledHint') : unlocked ? `Unlocked at Tier ${minTier}` : `Locked (requires Tier ${minTier})`}
-                            >
-                              {unlocked ? (
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                  <polyline points="20 6 9 17 4 12" />
-                                </svg>
-                              ) : (
-                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <line x1="18" y1="6" x2="6" y2="18" />
-                                  <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                              )}
-                            </button>
+                            {notImpl ? (
+                              <span
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center bg-yellow-500/10 text-yellow-500/40 border border-yellow-500/20 cursor-not-allowed"
+                                title={t('notImplementedHint')}
+                              >
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm-1 9v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+                              </span>
+                            ) : (
+                              <button
+                                onClick={() => handleTierClick(feat.key, tierIdx)}
+                                className={`w-8 h-8 rounded-lg transition-all inline-flex items-center justify-center ${
+                                  unlocked
+                                    ? 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'
+                                    : disabled
+                                      ? 'bg-red-500/10 text-red-400/50 hover:bg-red-500/20 border border-red-500/20'
+                                      : 'bg-zinc-800/50 text-zinc-600 hover:bg-zinc-700/50 border border-zinc-700/30'
+                                }`}
+                                title={disabled ? t('featureDisabledHint') : unlocked ? `Unlocked at Tier ${minTier}` : `Locked (requires Tier ${minTier})`}
+                              >
+                                {unlocked ? (
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="20 6 9 17 4 12" />
+                                  </svg>
+                                ) : (
+                                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                  </svg>
+                                )}
+                              </button>
+                            )}
                           </td>
                         );
                       })}

@@ -439,6 +439,8 @@
     "hiddenFeatures": "Fitur Tersembunyi",
     "hiddenMsg": "Tidak ditampilkan di frontend",
     "featureDisabledHint": "Fitur disembunyikan — klik tier mana saja untuk mengaktifkan kembali",
+    "notImplemented": "Belum Dibangun",
+    "notImplementedHint": "Fitur ini belum dikembangkan",
     "tierHideHint": "Klik untuk menyembunyikan tier ini dari halaman publik",
     "tierShowHint": "Klik untuk menampilkan tier ini di halaman publik",
     "cancel": "Batal",
