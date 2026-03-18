@@ -18,6 +18,7 @@ import BadgeDock from '@/components/BadgeDock';
 import BadgeCategorySection from '@/components/BadgeCategorySection';
 import type { BadgeProgress } from '@/lib/badges';
 import MessageVenueButton from '@/components/MessageVenueButton';
+import TierGate from '@/components/TierGate';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -253,7 +254,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
             <div className="flex items-center gap-2 shrink-0">
-              <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
+              <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}>
+                <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
+              </TierGate>
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" />
             </div>
@@ -293,11 +296,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 ★ {t('goldPartner')}
               </span>
             )}
-            {f.verification_status === 'Verified' && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
-                ✓ {t('verified')}
-              </span>
-            )}
+            <TierGate entityType="venue" featureKey="verified_badge" currentTier={f.tier ?? 0}>
+              {f.verification_status === 'Verified' && (
+                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
+                  ✓ {t('verified')}
+                </span>
+              )}
+            </TierGate>
           </div>
 
           {/* Unclaimed notice */}
@@ -335,21 +340,25 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             />
           )}
 
-          <EditableContent
-            entityType="venue"
-            entityId={venue.id}
-            fieldPrefix="description"
-            locale={locale}
-            content={desc}
-            contentClassName="text-[#C4BFB3] leading-relaxed"
-          />
+          <TierGate entityType="venue" featureKey="description" currentTier={f.tier ?? 0}>
+            <EditableContent
+              entityType="venue"
+              entityId={venue.id}
+              fieldPrefix="description"
+              locale={locale}
+              content={desc}
+              contentClassName="text-[#C4BFB3] leading-relaxed"
+            />
+          </TierGate>
 
           {/* Links */}
-          <SocialIcons
-            websiteUrl={f.website_url}
-            instagram={f.instagram}
-            facebookUrl={f.facebook_url}
-          />
+          <TierGate entityType="venue" featureKey="edit_profile" currentTier={f.tier ?? 0}>
+            <SocialIcons
+              websiteUrl={f.website_url}
+              instagram={f.instagram}
+              facebookUrl={f.facebook_url}
+            />
+          </TierGate>
 
           {/* Contact Info */}
           {(f.phone || f.contact_email) && (

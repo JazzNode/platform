@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
+import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
@@ -36,8 +37,10 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
   const t = useTranslations('venueDashboard');
   const tInbox = useTranslations('artistStudio');
   const { user, loading } = useAuth();
+  const { isUnlocked } = useTierConfig();
 
   const [slug, setSlug] = useState('');
+  const [tier, setTier] = useState(0);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConvo, setSelectedConvo] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,6 +52,14 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
+
+  // Fetch venue tier
+  useEffect(() => {
+    if (!slug) return;
+    const supabase = createClient();
+    supabase.from('venues').select('tier').eq('venue_id', slug).single()
+      .then(({ data }) => { if (data) setTier(data.tier); });
+  }, [slug]);
 
   // Fetch conversations
   useEffect(() => {
@@ -203,6 +214,14 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
     return (
       <div className="py-24 text-center">
         <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  if (!isUnlocked('venue', 'inbox', tier)) {
+    return (
+      <div className="py-24 text-center text-[var(--muted-foreground)]">
+        <p>{t('featureNotAvailable')}</p>
       </div>
     );
   }

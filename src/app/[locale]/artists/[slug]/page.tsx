@@ -24,6 +24,7 @@ import RecordNav from '@/components/RecordNav';
 import PageViewTracker from '@/components/PageViewTracker';
 import HireMeButton from '@/components/HireMeButton';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
+import TierGate from '@/components/TierGate';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -118,6 +119,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     .sort((a, b) => (a.fields.sort_order || 0) - (b.fields.sort_order || 0));
 
   // Compute stats for progress
+  // eslint-disable-next-line react-hooks/purity -- server component; Date.now() is stable per request
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   const recentEventCount = allEvents.filter(
     (e) => e.fields.start_at && new Date(e.fields.start_at) >= ninetyDaysAgo,
@@ -367,10 +369,14 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   tag="h1"
                 />
                 <div className="flex items-center gap-2 shrink-0">
-                  {f.available_for_hire && (
-                    <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
-                  )}
-                  <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
+                  <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
+                    {f.available_for_hire && (
+                      <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
+                    )}
+                  </TierGate>
+                  <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
+                    <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
+                  </TierGate>
                   <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
                   <FollowButton itemType="artist" itemId={artist.id} variant="full" />
                 </div>
@@ -415,11 +421,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   Master
                 </span>
               )}
-              {f.verification_status === 'Verified' && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
-                  &#10003; {t('verified')}
-                </span>
-              )}
+              <TierGate entityType="artist" featureKey="verified_badge" currentTier={f.tier ?? 0}>
+                {f.verification_status === 'Verified' && (
+                  <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
+                    &#10003; {t('verified')}
+                  </span>
+                )}
+              </TierGate>
             </div>
 
             {/* Data source notice */}
@@ -454,18 +462,20 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
             )}
 
             {/* Social Icons — admin-editable, with placeholder for unclaimed */}
-            <EditableSocialLinks
-              entityType="artist"
-              entityId={artist.id}
-              artistName={artistDisplayName(f, locale)}
-              fields={{
-                website_url: f.website_url,
-                spotify_url: f.spotify_url,
-                youtube_url: f.youtube_url,
-                instagram: f.instagram,
-                facebook_url: f.facebook_url,
-              }}
-            />
+            <TierGate entityType="artist" featureKey="social_links" currentTier={f.tier ?? 0}>
+              <EditableSocialLinks
+                entityType="artist"
+                entityId={artist.id}
+                artistName={artistDisplayName(f, locale)}
+                fields={{
+                  website_url: f.website_url,
+                  spotify_url: f.spotify_url,
+                  youtube_url: f.youtube_url,
+                  instagram: f.instagram,
+                  facebook_url: f.facebook_url,
+                }}
+              />
+            </TierGate>
           </div>
         </div>
       </FadeUp>
@@ -896,6 +906,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       )}
 
       {/* ═══ Teaching Section ═══ */}
+      <TierGate entityType="artist" featureKey="teaching_section" currentTier={f.tier ?? 0}>
       {f.accepting_students && (
         <FadeUp>
           <section className="space-y-4">
@@ -922,8 +933,10 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </section>
         </FadeUp>
       )}
+      </TierGate>
 
       {/* ═══ Gear Section ═══ */}
+      <TierGate entityType="artist" featureKey="gear_showcase" currentTier={f.tier ?? 0}>
       {artistGear.length > 0 && (
         <FadeUp>
           <section className="space-y-4">
@@ -952,6 +965,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           </section>
         </FadeUp>
       )}
+      </TierGate>
 
       {/* ═══ Badges ═══ */}
       {artistBadgeProgress.length > 0 && (
