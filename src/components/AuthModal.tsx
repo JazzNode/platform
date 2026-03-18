@@ -83,6 +83,7 @@ export default function AuthModal() {
       setLoading(false);
       if (error) {
         if (error === 'emailInUse') setError(t('emailInUse'));
+        else if (error === 'rateLimited') setError(t('rateLimited'));
         else if (error.toLowerCase().includes('password')) setError(t('weakPassword'));
         else setError(t('genericError'));
       } else if (needsConfirmation) {

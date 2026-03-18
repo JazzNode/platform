@@ -154,6 +154,7 @@
     "invalidCredentials": "電子信箱或密碼不正確。",
     "emailInUse": "此信箱已被註冊。",
     "weakPassword": "密碼需至少 6 個字元。",
+    "rateLimited": "嘗試次數過多，請等待 60 秒後再試。",
     "genericError": "發生錯誤，請稍後再試。",
     "forgotPassword": "忘記密碼？",
     "resetPassword": "重設密碼",
@@ -256,7 +257,13 @@
     "ownerMembersDescription": "共 {count} 位會員",
     "ownerSearchPlaceholder": "以姓名、帳號或信箱搜尋…",
     "ownerNoMembers": "找不到會員。",
-    "ownerRoleUpdated": "角色已更新！"
+    "ownerRoleUpdated": "角色已更新！",
+    "ownerSetRole": "設定角色",
+    "ownerDeleteMember": "刪除帳號",
+    "ownerConfirmDelete": "確定要刪除此帳號？",
+    "ownerDeleteConfirm": "確認刪除",
+    "ownerDeleteCancel": "取消",
+    "ownerMemberDeleted": "帳號已刪除！"
   },
   "regions": {
     "worldMap": "世界版圖",

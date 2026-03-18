@@ -150,6 +150,7 @@
     "invalidCredentials": "이메일 또는 비밀번호가 올바르지 않습니다.",
     "emailInUse": "이미 등록된 이메일입니다.",
     "weakPassword": "비밀번호는 6자 이상이어야 합니다.",
+    "rateLimited": "시도 횟수가 너무 많습니다. 60초 후에 다시 시도해주세요.",
     "genericError": "문제가 발생했습니다. 다시 시도해주세요.",
     "forgotPassword": "비밀번호를 잊으셨나요?",
     "resetPassword": "비밀번호 재설정",
@@ -252,7 +253,13 @@
     "ownerMembersDescription": "{count}명의 등록 회원",
     "ownerSearchPlaceholder": "이름, 사용자명 또는 이메일로 검색...",
     "ownerNoMembers": "회원을 찾을 수 없습니다.",
-    "ownerRoleUpdated": "역할이 업데이트되었습니다!"
+    "ownerRoleUpdated": "역할이 업데이트되었습니다!",
+    "ownerSetRole": "역할 설정",
+    "ownerDeleteMember": "계정 삭제",
+    "ownerConfirmDelete": "정말 삭제하시겠습니까?",
+    "ownerDeleteConfirm": "확인",
+    "ownerDeleteCancel": "취소",
+    "ownerMemberDeleted": "계정이 삭제되었습니다!"
   },
   "regions": {
     "worldMap": "세계 지도",

@@ -113,7 +113,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const signUp = useCallback(async (email: string, password: string) => {
     const supabase = createClient();
     const { data, error } = await supabase.auth.signUp({ email, password });
-    if (error) return { error: error.message, needsConfirmation: false };
+    if (error) {
+      const code = (error as any).code ?? '';
+      if (code === 'over_email_send_rate_limit' || error.message.includes('rate limit')) {
+        return { error: 'rateLimited', needsConfirmation: false };
+      }
+      return { error: error.message, needsConfirmation: false };
+    }
     // If user exists but identities is empty, email is already taken
     if (data.user && data.user.identities && data.user.identities.length === 0) {
       return { error: 'emailInUse', needsConfirmation: false };

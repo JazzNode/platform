@@ -150,6 +150,7 @@
     "invalidCredentials": "Email atau kata sandi salah.",
     "emailInUse": "Email ini sudah terdaftar.",
     "weakPassword": "Kata sandi harus minimal 6 karakter.",
+    "rateLimited": "Terlalu banyak percobaan. Silakan tunggu 60 detik sebelum mencoba lagi.",
     "genericError": "Terjadi kesalahan. Silakan coba lagi.",
     "forgotPassword": "Lupa Kata Sandi?",
     "resetPassword": "Atur Ulang Kata Sandi",
@@ -252,7 +253,13 @@
     "ownerMembersDescription": "{count} anggota terdaftar",
     "ownerSearchPlaceholder": "Cari berdasarkan nama, username, atau email...",
     "ownerNoMembers": "Tidak ada anggota ditemukan.",
-    "ownerRoleUpdated": "Peran diperbarui!"
+    "ownerRoleUpdated": "Peran diperbarui!",
+    "ownerSetRole": "Atur Peran",
+    "ownerDeleteMember": "Hapus Akun",
+    "ownerConfirmDelete": "Yakin ingin menghapus?",
+    "ownerDeleteConfirm": "Konfirmasi",
+    "ownerDeleteCancel": "Batal",
+    "ownerMemberDeleted": "Akun telah dihapus!"
   },
   "regions": {
     "worldMap": "Peta Dunia",

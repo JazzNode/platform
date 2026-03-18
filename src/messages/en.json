@@ -154,6 +154,7 @@
     "invalidCredentials": "Invalid email or password.",
     "emailInUse": "This email is already registered.",
     "weakPassword": "Password must be at least 6 characters.",
+    "rateLimited": "Too many attempts. Please wait 60 seconds before trying again.",
     "genericError": "Something went wrong. Please try again.",
     "forgotPassword": "Forgot Password?",
     "resetPassword": "Reset Password",
@@ -256,7 +257,13 @@
     "ownerMembersDescription": "{count} registered members",
     "ownerSearchPlaceholder": "Search by name, username, or email...",
     "ownerNoMembers": "No members found.",
-    "ownerRoleUpdated": "Role updated!"
+    "ownerRoleUpdated": "Role updated!",
+    "ownerSetRole": "Set Role",
+    "ownerDeleteMember": "Delete Account",
+    "ownerConfirmDelete": "Are you sure?",
+    "ownerDeleteConfirm": "Confirm",
+    "ownerDeleteCancel": "Cancel",
+    "ownerMemberDeleted": "Account deleted!"
   },
   "regions": {
     "worldMap": "World Map",

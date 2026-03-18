@@ -150,6 +150,7 @@
     "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
     "emailInUse": "このメールアドレスは既に登録されています。",
     "weakPassword": "パスワードは6文字以上にしてください。",
+    "rateLimited": "試行回数が多すぎます。60秒後にもう一度お試しください。",
     "genericError": "エラーが発生しました。もう一度お試しください。",
     "forgotPassword": "パスワードをお忘れですか？",
     "resetPassword": "パスワードリセット",
@@ -252,7 +253,13 @@
     "ownerMembersDescription": "{count} 人の登録メンバー",
     "ownerSearchPlaceholder": "名前、ユーザー名、メールで検索...",
     "ownerNoMembers": "メンバーが見つかりません。",
-    "ownerRoleUpdated": "ロールを更新しました！"
+    "ownerRoleUpdated": "ロールを更新しました！",
+    "ownerSetRole": "ロール設定",
+    "ownerDeleteMember": "アカウント削除",
+    "ownerConfirmDelete": "本当に削除しますか？",
+    "ownerDeleteConfirm": "確認",
+    "ownerDeleteCancel": "キャンセル",
+    "ownerMemberDeleted": "アカウントが削除されました！"
   },
   "regions": {
     "worldMap": "世界地図",

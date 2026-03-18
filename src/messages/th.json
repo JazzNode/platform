@@ -150,6 +150,7 @@
     "invalidCredentials": "อีเมลหรือรหัสผ่านไม่ถูกต้อง",
     "emailInUse": "อีเมลนี้ถูกลงทะเบียนแล้ว",
     "weakPassword": "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร",
+    "rateLimited": "ลองหลายครั้งเกินไป กรุณารอ 60 วินาทีแล้วลองอีกครั้ง",
     "genericError": "เกิดข้อผิดพลาด กรุณาลองอีกครั้ง",
     "forgotPassword": "ลืมรหัสผ่าน?",
     "resetPassword": "รีเซ็ตรหัสผ่าน",
@@ -252,7 +253,13 @@
     "ownerMembersDescription": "สมาชิกที่ลงทะเบียน {count} คน",
     "ownerSearchPlaceholder": "ค้นหาด้วยชื่อ ชื่อผู้ใช้ หรืออีเมล...",
     "ownerNoMembers": "ไม่พบสมาชิก",
-    "ownerRoleUpdated": "อัปเดตบทบาทแล้ว!"
+    "ownerRoleUpdated": "อัปเดตบทบาทแล้ว!",
+    "ownerSetRole": "ตั้งค่าบทบาท",
+    "ownerDeleteMember": "ลบบัญชี",
+    "ownerConfirmDelete": "แน่ใจหรือไม่?",
+    "ownerDeleteConfirm": "ยืนยัน",
+    "ownerDeleteCancel": "ยกเลิก",
+    "ownerMemberDeleted": "ลบบัญชีแล้ว!"
   },
   "regions": {
     "worldMap": "แผนที่โลก",
