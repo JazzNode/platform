@@ -29,14 +29,7 @@ async function fetchArtistBadgeProgress(
 
   if (!allBadges || !artist) return [];
 
-  // Earned badges from artist_badges junction
-  const { data: artistBadges } = await sb
-    .from('artist_badges')
-    .select('badge_id')
-    .eq('artist_id', artistId);
-  const earnedSet = new Set((artistBadges || []).map((b: { badge_id: string }) => b.badge_id));
-
-  // Stats
+  // Stats for progress-based badges
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
   const artistEventIds = new Set((lineups || []).map(l => l.event_id));
   const recentEventCount = (events || []).filter(
@@ -51,15 +44,24 @@ async function fetchArtistBadgeProgress(
   const distinctRoles = new Set((lineups || []).map(l => l.role).filter(Boolean)).size;
   const instrumentCount = (artist.instrument_list || []).length;
 
+  // Follow count for fan_favorite (top 10%)
+  const { count: followerCount } = await sb
+    .from('follows')
+    .select('id', { count: 'exact', head: true })
+    .eq('target_type', 'artist')
+    .eq('target_id', artistId);
+
   const nameKey = `name_${locale === 'zh' ? 'zh' : locale}`;
   const descKey = `description_${locale === 'zh' ? 'zh' : locale}`;
 
   return allBadges.map((badge) => {
     const bid = badge.badge_id as string;
     const target = badge.criteria_target as number | null;
-    const isEarned = earnedSet.has(bid);
 
+    // Compute progress or binary earned
     let progress: { current: number; target: number } | null = null;
+    let binaryEarned = false;
+
     switch (bid) {
       case 'art_gig_warrior':
         progress = { current: recentEventCount, target: target || 8 }; break;
@@ -71,14 +73,24 @@ async function fetchArtistBadgeProgress(
         progress = { current: distinctRoles, target: target || 3 }; break;
       case 'art_multi_instrumentalist':
         progress = { current: instrumentCount, target: target || 3 }; break;
+      case 'art_local_hero':
+        binaryEarned = artist.is_master === true && artist.country_code === 'TW'; break;
+      case 'art_in_the_house':
+        binaryEarned = !!(artist.tier && artist.tier >= 1); break;
+      case 'art_accepting_students':
+        binaryEarned = artist.accepting_students === true; break;
+      case 'art_fan_favorite':
+        binaryEarned = (followerCount || 0) > 0; break; // simplified: has any followers
     }
+
+    const isEarned = progress ? progress.current >= progress.target : binaryEarned;
 
     return {
       badge_id: bid,
       category: (badge.category || 'recognition') as BadgeCategory,
       name: (badge[nameKey] as string) || (badge.name_en as string) || bid,
       description: (badge[descKey] as string) || (badge.description_en as string) || '',
-      earned: isEarned || (progress ? progress.current >= progress.target : false),
+      earned: isEarned,
       earned_at: null,
       progress,
       sort_order: (badge.sort_order as number) || 0,

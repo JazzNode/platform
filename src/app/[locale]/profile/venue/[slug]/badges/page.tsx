@@ -25,13 +25,6 @@ async function fetchVenueBadgeProgress(
 
   if (!allBadges || !venue) return [];
 
-  // Earned badges from venue_badges junction
-  const { data: venueBadges } = await sb
-    .from('venue_badges')
-    .select('badge_id')
-    .eq('venue_id', venueId);
-  const earnedSet = new Set((venueBadges || []).map((b: { badge_id: string }) => b.badge_id));
-
   // Stats
   const totalEvents = (events || []).length;
 
@@ -75,9 +68,10 @@ async function fetchVenueBadgeProgress(
   return allBadges.map((badge) => {
     const bid = badge.badge_id as string;
     const target = badge.criteria_target as number | null;
-    const isEarned = earnedSet.has(bid);
 
     let progress: { current: number; target: number } | null = null;
+    let binaryEarned = false;
+
     switch (bid) {
       case 'ven_genre_explorer':
         progress = { current: uniqueTagCount, target: target || 5 }; break;
@@ -89,14 +83,22 @@ async function fetchVenueBadgeProgress(
         progress = { current: friendlyLangCount, target: target || 2 }; break;
       case 'ven_marathon':
         progress = { current: totalEvents, target: target || 20 }; break;
+      case 'ven_jazz_hub':
+        binaryEarned = venue.jazz_frequency === 'nightly'; break;
+      case 'ven_crowd_magnet':
+        binaryEarned = false; break; // requires global ranking, computed by pipeline
+      case 'ven_house_keys':
+        binaryEarned = !!(venue.tier && venue.tier >= 1); break;
     }
+
+    const isEarned = progress ? progress.current >= progress.target : binaryEarned;
 
     return {
       badge_id: bid,
       category: (badge.category || 'venue_excellence') as BadgeCategory,
       name: (badge[nameKey] as string) || (badge.name_en as string) || bid,
       description: (badge[descKey] as string) || (badge.description_en as string) || '',
-      earned: isEarned || (progress ? progress.current >= progress.target : false),
+      earned: isEarned,
       earned_at: null,
       progress,
       sort_order: (badge.sort_order as number) || 0,
