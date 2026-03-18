@@ -90,7 +90,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
       className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
-          : 'border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30'
+          : 'border border-[var(--color-gold)]/25 text-[var(--color-gold-dim)] hover:text-gold hover:border-gold/40 hover:bg-gold/5'
       }`}
       style={animating ? { animation: 'fav-btn-pop 0.4s ease-out' } : undefined}
     >
