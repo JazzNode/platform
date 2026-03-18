@@ -30,6 +30,7 @@ const NOT_IMPLEMENTED = new Set([
   'collaboration_graph',
   'featured_wall',
   'analytics_advanced',
+  'epk_basic',
   'epk_full',
   'priority_search',
   'custom_domain',
