@@ -97,30 +97,24 @@ export default function AuthModal() {
     await signInWithGoogle();
   }, [signInWithGoogle]);
 
-  if (!mounted) return null;
+  if (!mounted || !showAuthModal) return null;
 
   return createPortal(
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[70] transition-opacity duration-300 ${
-          showAuthModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className="fixed inset-0 z-[70] opacity-100 pointer-events-auto"
         style={{ background: 'rgba(0, 0, 0, 0.6)', backdropFilter: 'blur(8px)' }}
         onClick={handleClose}
       />
 
       {/* Modal */}
       <div
-        className={`fixed inset-0 z-[71] flex items-center justify-center transition-all duration-300 ${
-          showAuthModal ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-        }`}
+        className="fixed inset-0 z-[71] flex items-center justify-center opacity-100 pointer-events-auto"
         onClick={handleClose}
       >
         <div
-          className={`relative w-full max-w-sm mx-4 rounded-2xl border border-[var(--border)] shadow-2xl transition-all duration-300 overflow-hidden ${
-            showAuthModal ? 'translate-y-0 scale-100' : '-translate-y-4 scale-[0.98]'
-          }`}
+          className="relative w-full max-w-sm mx-4 rounded-2xl border border-[var(--border)] shadow-2xl overflow-hidden"
           style={{
             background: 'color-mix(in srgb, var(--background) 95%, transparent)',
             backdropFilter: 'blur(40px) saturate(1.6)',
