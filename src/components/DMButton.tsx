@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
@@ -14,7 +13,6 @@ interface DMButtonProps {
 export default function DMButton({ targetUserId, className }: DMButtonProps) {
   const { user, setShowAuthModal } = useAuth();
   const locale = useLocale();
-  const router = useRouter();
   const t = useTranslations('profile');
   const [loading, setLoading] = useState(false);
 
@@ -39,8 +37,8 @@ export default function DMButton({ targetUserId, className }: DMButtonProps) {
         .maybeSingle();
 
       if (existing) {
-        router.push(`/${locale}/profile/inbox?tab=dm&convo=${existing.id}`);
-        return; // keep loading=true until page navigates
+        window.location.href = `/${locale}/profile/inbox?tab=dm&convo=${existing.id}`;
+        return;
       }
 
       // Create new conversation
@@ -51,14 +49,17 @@ export default function DMButton({ targetUserId, className }: DMButtonProps) {
         .single();
 
       if (newConvo) {
-        router.push(`/${locale}/profile/inbox?tab=dm&convo=${newConvo.id}`);
-        return; // keep loading=true until page navigates
+        window.location.href = `/${locale}/profile/inbox?tab=dm&convo=${newConvo.id}`;
+        return;
       }
-      setLoading(false);
+
+      // Fallback: navigate to inbox even if conversation creation failed
+      window.location.href = `/${locale}/profile/inbox?tab=dm`;
     } catch {
-      setLoading(false);
+      // Fallback: navigate to inbox on error
+      window.location.href = `/${locale}/profile/inbox?tab=dm`;
     }
-  }, [user, targetUserId, locale, router, setShowAuthModal]);
+  }, [user, targetUserId, locale, setShowAuthModal]);
 
   const icon = (
     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">

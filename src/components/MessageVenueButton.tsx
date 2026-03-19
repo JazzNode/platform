@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 
@@ -14,7 +13,6 @@ interface MessageVenueButtonProps {
 export default function MessageVenueButton({ venueId, claimed }: MessageVenueButtonProps) {
   const t = useTranslations('common');
   const locale = useLocale();
-  const router = useRouter();
   const { user, setShowAuthModal } = useAuth();
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +37,7 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
         .maybeSingle();
 
       if (existing) {
-        router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
+        window.location.href = `/${locale}/profile/inbox?convo=${existing.id}`;
         return;
       }
 
@@ -55,7 +53,7 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
         .single();
 
       if (newConvo) {
-        router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
+        window.location.href = `/${locale}/profile/inbox?convo=${newConvo.id}`;
         return;
       }
 
@@ -69,15 +67,18 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
           .eq('fan_user_id', user.id)
           .maybeSingle();
         if (retry) {
-          router.push(`/${locale}/profile/inbox?convo=${retry.id}`);
+          window.location.href = `/${locale}/profile/inbox?convo=${retry.id}`;
           return;
         }
       }
-      setLoading(false);
+
+      // Fallback: navigate to inbox even if conversation creation failed
+      window.location.href = `/${locale}/profile/inbox`;
     } catch {
-      setLoading(false);
+      // Fallback: navigate to inbox on error
+      window.location.href = `/${locale}/profile/inbox`;
     }
-  }, [claimed, user, venueId, locale, router, setShowAuthModal]);
+  }, [claimed, user, venueId, locale, setShowAuthModal]);
 
   const icon = (
     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
