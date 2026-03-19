@@ -111,7 +111,7 @@ function NotionBlock({ block }: { block: BlockObjectResponse & { children?: Bloc
       );
     case 'code':
       return (
-        <pre className="rounded-xl bg-[var(--card)] border border-[var(--border)] p-4 my-4 overflow-x-auto">
+        <pre className="rounded-xl bg-[var(--card)] border border-[var(--border)] p-4 my-4 overflow-x-auto no-scrollbar">
           <code className="text-sm text-zinc-300 font-mono">
             {richTextToPlain(block.code.rich_text)}
           </code>

@@ -82,7 +82,7 @@ export default function BadgeDock({ badges }: BadgeDockProps) {
       )}
 
       {/* Dock */}
-      <div className="flex items-center gap-2 overflow-x-auto py-3 px-4 bg-[#0A0A0A]/80 backdrop-blur-xl border border-[var(--border)] rounded-2xl scrollbar-hide">
+      <div className="flex items-center gap-2 overflow-x-auto py-3 px-4 bg-[#0A0A0A]/80 backdrop-blur-xl border border-[var(--border)] rounded-2xl no-scrollbar">
         {badges.map((badge) => (
           <div
             key={badge.id}

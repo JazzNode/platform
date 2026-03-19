@@ -214,7 +214,7 @@ export default function VenueTiersPage() {
       </div>
 
       {/* Interactive Table */}
-      <div className="overflow-x-auto -mx-4 sm:mx-0">
+      <div className="overflow-x-auto no-scrollbar -mx-4 sm:mx-0">
         <table className="w-full min-w-[640px] border-collapse">
           <thead>
             <tr>

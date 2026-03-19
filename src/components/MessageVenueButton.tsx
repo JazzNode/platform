@@ -40,11 +40,11 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
 
       if (existing) {
         router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
-        return; // keep loading=true until page navigates
+        return;
       }
 
       // Create new conversation
-      const { data: newConvo } = await supabase
+      const { data: newConvo, error } = await supabase
         .from('conversations')
         .insert({
           type: 'venue_fan',
@@ -56,7 +56,22 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
 
       if (newConvo) {
         router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
-        return; // keep loading=true until page navigates
+        return;
+      }
+
+      // Insert failed (e.g. unique constraint) — retry finding it
+      if (error) {
+        const { data: retry } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('type', 'venue_fan')
+          .eq('venue_id', venueId)
+          .eq('fan_user_id', user.id)
+          .maybeSingle();
+        if (retry) {
+          router.push(`/${locale}/profile/inbox?convo=${retry.id}`);
+          return;
+        }
       }
       setLoading(false);
     } catch {

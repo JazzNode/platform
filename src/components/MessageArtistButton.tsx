@@ -44,7 +44,7 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
       }
 
       // Create new conversation
-      const { data: newConvo } = await supabase
+      const { data: newConvo, error } = await supabase
         .from('conversations')
         .insert({
           type: 'artist_fan',
@@ -56,9 +56,24 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
 
       if (newConvo) {
         router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
-        return; // keep loading=true until page navigates
+        return;
       }
-      setLoading(false); // only reset if no navigation happened
+
+      // Insert failed (e.g. unique constraint) — retry finding it
+      if (error) {
+        const { data: retry } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('type', 'artist_fan')
+          .eq('artist_id', artistId)
+          .eq('fan_user_id', user.id)
+          .maybeSingle();
+        if (retry) {
+          router.push(`/${locale}/profile/inbox?convo=${retry.id}`);
+          return;
+        }
+      }
+      setLoading(false);
     } catch {
       setLoading(false);
     }
