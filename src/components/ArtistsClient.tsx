@@ -211,13 +211,17 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   }, [venueOptions, effectiveCities]);
 
   const toggleInstrument = useCallback((inst: string) => {
+    if (!hasInteracted) {
+      setHasInteracted(true);
+      if (!userRegion && activeRegion) setUserRegion(activeRegion);
+    }
     setSelectedInstruments((prev) => {
       const next = new Set(prev);
       if (next.has(inst)) next.delete(inst);
       else next.add(inst);
       return next;
     });
-  }, []);
+  }, [hasInteracted, userRegion, activeRegion]);
 
   const filteredArtists = useMemo(() => {
     return artists.filter((a) => {
@@ -276,7 +280,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
           ] as const).map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => { setSelectedType(key); if (key !== 'musicians' && key !== 'all' && key !== 'claimed') setSelectedInstruments(new Set()); }}
+              onClick={() => { if (!hasInteracted) { setHasInteracted(true); if (!userRegion && activeRegion) setUserRegion(activeRegion); } setSelectedType(key); if (key !== 'musicians' && key !== 'all' && key !== 'claimed') setSelectedInstruments(new Set()); }}
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
@@ -301,7 +305,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         <FadeUpItem delay={220}>
         <div className="flex flex-wrap gap-2">
           <button
-            onClick={() => setSelectedInstruments(new Set())}
+            onClick={() => { if (!hasInteracted) { setHasInteracted(true); if (!userRegion && activeRegion) setUserRegion(activeRegion); } setSelectedInstruments(new Set()); }}
             className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
               selectedInstruments.size === 0 ? pillActive : pillInactive
             }`}
@@ -469,7 +473,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 )}
                 <div>
                   <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
-                    {artist.displayName}{artist.tier >= 1 && <VerifiedBadge size="sm" className={/[a-z]$/.test(artist.displayName) ? '' : '!-top-0.5'} />}
+                    {artist.displayName}{artist.tier >= 1 && <VerifiedBadge size="sm" className={/[a-z]$/.test(artist.displayName) ? '' : '!top-0'} />}
                   </h3>
                   {artist.type && artist.type !== 'person' ? (
                     <p className="text-xs uppercase tracking-widest text-gold capitalize">{artist.type}</p>
