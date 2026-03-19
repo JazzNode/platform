@@ -124,5 +124,12 @@ export async function GET() {
 
   const total = Object.values(breakdown).reduce((sum, n) => sum + n, 0);
 
-  return NextResponse.json({ total, breakdown });
+  // 5. Unread notifications count
+  const { count: notifCount } = await supabase
+    .from('notifications')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .is('read_at', null);
+
+  return NextResponse.json({ total, breakdown, notifications: notifCount || 0 });
 }

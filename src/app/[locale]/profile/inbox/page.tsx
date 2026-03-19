@@ -123,6 +123,8 @@ export default function FanInboxPage() {
       startTransition(() => setSelectedConvo(urlConvo));
     }
     if (urlTab === 'dm') startTransition(() => setFilter('dm'));
+    if (urlTab === 'messages') startTransition(() => setTab('messages'));
+    if (urlTab === 'notifications') startTransition(() => setTab('notifications'));
   }, [urlConvo, urlTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-set filter when selectedConvo is resolved in conversations list

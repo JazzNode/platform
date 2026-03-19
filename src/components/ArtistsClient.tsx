@@ -61,6 +61,7 @@ interface Props {
   locale: string;
   regionLabels: Record<string, string>;  // e.g. { TW: '台灣', JP: '日本' }
   worldMapLabel: string;                  // e.g. '世界版圖'
+  badgeNameMap?: Record<string, string>;
   initialFilters?: InitialFilters;
   labels: {
     artists: string;
@@ -79,7 +80,7 @@ interface Props {
 // Shared pill base: invisible ::after extends touch target to 44px minimum
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
+export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, badgeNameMap = {}, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
   const [hasInteracted, setHasInteracted] = useState(!!initialFilters);
@@ -483,10 +484,12 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                   {artist.badgeList.slice(0, 5).map((badgeId) => (
                     <span
                       key={badgeId}
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-gold/10 text-gold/80 shrink-0"
-                      title={badgeId.replace(/^art_/, '').replace(/_/g, ' ')}
+                      className="group/badge relative inline-flex items-center justify-center w-6 h-6 rounded-md bg-gold/10 text-gold/80 shrink-0 hover:bg-gold/25 hover:text-gold transition-all duration-200 cursor-default"
                     >
                       <span className="[&_svg]:!w-3.5 [&_svg]:!h-3.5">{BADGE_ICONS[badgeId] || BADGE_ICONS.art_in_the_house}</span>
+                      <span className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#1a1a18] px-2 py-1 text-[10px] text-gold/90 opacity-0 group-hover/badge:opacity-100 transition-opacity duration-200 shadow-lg border border-gold/10 z-20">
+                        {badgeNameMap[badgeId] || badgeId.replace(/^art_/, '').replace(/_/g, ' ')}
+                      </span>
                     </span>
                   ))}
                   {artist.badgeList.length > 5 && (

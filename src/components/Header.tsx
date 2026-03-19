@@ -161,7 +161,7 @@ export default function Header() {
   const [claimedVenues, setClaimedVenues] = useState<{ id: string; name: string }[]>([]);
 
   // Inbox unread count badge
-  const { total: unreadTotal, breakdown: unreadBreakdown } = useUnreadCount(!!user);
+  const { total: unreadTotal, breakdown: unreadBreakdown, notifications: unreadNotifications } = useUnreadCount(!!user);
 
   useEffect(() => {
     if (!profile) return;
@@ -300,6 +300,46 @@ export default function Header() {
     );
   }
 
+  /* Inbox shortcut icons — message bubble + bell, each with own badge */
+  function renderInboxIcons() {
+    if (!user) return null;
+    return (
+      <>
+        {/* Messages */}
+        <Link
+          href={`/${locale}/profile/inbox?tab=messages`}
+          className="relative text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)]"
+          aria-label="Messages"
+        >
+          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          {unreadTotal > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-[4px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none border-[1.5px] border-[var(--background)]">
+              {unreadTotal > 99 ? '99+' : unreadTotal}
+            </span>
+          )}
+        </Link>
+        {/* Notifications */}
+        <Link
+          href={`/${locale}/profile/inbox?tab=notifications`}
+          className="relative text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 p-1.5 rounded-lg hover:bg-[rgba(240,237,230,0.06)]"
+          aria-label="Notifications"
+        >
+          <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          {unreadNotifications > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-[4px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none border-[1.5px] border-[var(--background)]">
+              {unreadNotifications > 99 ? '99+' : unreadNotifications}
+            </span>
+          )}
+        </Link>
+      </>
+    );
+  }
+
   const userInitial = user?.email?.charAt(0).toUpperCase() || '?';
 
   /* Shared user button render helper — called as function, NOT as <Component />,
@@ -335,11 +375,7 @@ export default function Header() {
               userInitial
             )}
           </span>
-          {unreadTotal > 0 && (
-            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-[5px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none shadow-sm border-2 border-[var(--background)]">
-              {unreadTotal > 99 ? '99+' : unreadTotal}
-            </span>
-          )}
+          {/* Badge moved to dedicated inbox icons */}
         </button>
         {userMenuOpen && !mobile && (
           <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
@@ -392,6 +428,8 @@ export default function Header() {
               </svg>
             </button>
 
+            {renderInboxIcons()}
+
             {renderUserButton()}
 
             <div ref={selectorRefDesktop} className="relative">
@@ -427,6 +465,8 @@ export default function Header() {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </button>
+
+            {renderInboxIcons()}
 
             {/* User (mobile) */}
             <div ref={userMenuRefMobile} className="relative">

@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getVenues, getEvents, getCities, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
+import { getVenues, getEvents, getCities, getBadges, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
 import { displayName, photoUrl, localized, cityName } from '@/lib/helpers';
 import VenuesClient from '@/components/VenuesClient';
 
@@ -31,7 +31,13 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
   const t = await getTranslations('common');
   const tRegions = await getTranslations('regions');
 
-  const [venues, events, cities] = await Promise.all([getVenues(), getEvents(), getCities()]);
+  const [venues, events, cities, badges] = await Promise.all([getVenues(), getEvents(), getCities(), getBadges()]);
+
+  // Build badge name map (badge_id → localized name)
+  const badgeNameMap: Record<string, string> = {};
+  for (const b of badges) {
+    badgeNameMap[b.id] = localized(b.fields as Record<string, unknown>, 'name', locale) || b.id;
+  }
 
   // Serialize venues
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
@@ -76,6 +82,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
       hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
       jamBadgeLabel: t('jamThisWeek'),
       tier: f.tier || 0,
+      badgeList: f.badge_list || [],
     };
   });
 
@@ -108,6 +115,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
       locale={locale}
       regionLabels={regionLabels}
       worldMapLabel={tRegions('worldMap')}
+      badgeNameMap={badgeNameMap}
       initialFilters={initialFilters}
       labels={{
         venues: t('venues'),

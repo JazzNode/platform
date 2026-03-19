@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 interface UnreadCountData {
   total: number;
   breakdown: Record<string, number>;
+  notifications: number;
 }
 
 /**
@@ -14,14 +15,14 @@ interface UnreadCountData {
  * breakdown keys: "profile", "artist:<id>", "venue:<id>", "hq"
  */
 export function useUnreadCount(enabled: boolean) {
-  const [data, setData] = useState<UnreadCountData>({ total: 0, breakdown: {} });
+  const [data, setData] = useState<UnreadCountData>({ total: 0, breakdown: {}, notifications: 0 });
 
   const refresh = useCallback(async () => {
     try {
       const res = await fetch('/api/inbox/unread-count');
       if (res.ok) {
         const json = await res.json();
-        setData({ total: json.total || 0, breakdown: json.breakdown || {} });
+        setData({ total: json.total || 0, breakdown: json.breakdown || {}, notifications: json.notifications || 0 });
       }
     } catch {
       // Silently fail — badge just won't show
@@ -37,7 +38,7 @@ export function useUnreadCount(enabled: boolean) {
         const res = await fetch('/api/inbox/unread-count');
         if (res.ok && !cancelled) {
           const json = await res.json();
-          setData({ total: json.total || 0, breakdown: json.breakdown || {} });
+          setData({ total: json.total || 0, breakdown: json.breakdown || {}, notifications: json.notifications || 0 });
         }
       } catch {
         // Silently fail — badge just won't show

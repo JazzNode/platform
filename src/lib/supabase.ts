@@ -837,15 +837,21 @@ export const getBadges = cache(
 
 // ----- Artist Gear fetcher -----
 
-export const getArtistGear = cache(async (artistId: string) => {
-  const sb = getSupabase();
-  const { data } = await sb
-    .from('artist_gear')
-    .select('*')
-    .eq('artist_id', artistId)
-    .order('display_order');
-  return (data || []) as { id: string; gear_name: string; gear_type: string; brand: string | null; model: string | null; photo_url: string | null; display_order: number }[];
-});
+export const getArtistGear = cache((artistId: string) =>
+  unstable_cache(
+    async () => {
+      const sb = getSupabase();
+      const { data } = await sb
+        .from('artist_gear')
+        .select('*')
+        .eq('artist_id', artistId)
+        .order('display_order');
+      return (data || []) as { id: string; gear_name: string; gear_type: string; brand: string | null; model: string | null; photo_url: string | null; display_order: number }[];
+    },
+    [`supabase-artist-gear-${artistId}`],
+    { revalidate: REVALIDATE.artists, tags: ['artists'] },
+  )(),
+);
 
 // ----- Utility functions (unchanged) -----
 
@@ -885,15 +891,21 @@ export function venueEventCount(
 }
 
 /** Get follower count for a venue or artist. */
-export async function getFollowerCount(targetType: 'artist' | 'venue', targetId: string): Promise<number> {
-  const sb = getSupabase();
-  const { count } = await sb
-    .from('follows')
-    .select('id', { count: 'exact', head: true })
-    .eq('target_type', targetType)
-    .eq('target_id', targetId);
-  return count ?? 0;
-}
+export const getFollowerCount = cache((targetType: 'artist' | 'venue', targetId: string) =>
+  unstable_cache(
+    async () => {
+      const sb = getSupabase();
+      const { count } = await sb
+        .from('follows')
+        .select('id', { count: 'exact', head: true })
+        .eq('target_type', targetType)
+        .eq('target_id', targetId);
+      return count ?? 0;
+    },
+    [`supabase-follower-count-${targetType}-${targetId}`],
+    { revalidate: 300, tags: [targetType === 'artist' ? 'artists' : 'venues'] },
+  )(),
+);
 
 // ----- Magazine Articles -----
 

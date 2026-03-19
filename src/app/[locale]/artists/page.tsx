@@ -1,6 +1,6 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
-import { getArtists, getCities, getVenues } from '@/lib/supabase';
+import { getArtists, getCities, getVenues, getBadges } from '@/lib/supabase';
 import { artistDisplayName, photoUrl, localized, normalizeInstrumentKey, cityName, displayName } from '@/lib/helpers';
 import ArtistsClient from '@/components/ArtistsClient';
 
@@ -32,9 +32,15 @@ export default async function ArtistsPage({ params, searchParams }: { params: Pr
   const tInst = await getTranslations('instruments');
   const tRegions = await getTranslations('regions');
 
-  const [artists, cities, venues] = await Promise.all([
-    getArtists(), getCities(), getVenues(),
+  const [artists, cities, venues, badges] = await Promise.all([
+    getArtists(), getCities(), getVenues(), getBadges(),
   ]);
+
+  // Build badge name map (badge_id → localized name)
+  const badgeNameMap: Record<string, string> = {};
+  for (const b of badges) {
+    badgeNameMap[b.id] = localized(b.fields as Record<string, unknown>, 'name', locale) || b.id;
+  }
 
   // Collect unique instruments with counts (from primary_instrument, lowercased)
   const instrumentCount = new Map<string, number>();
@@ -153,6 +159,7 @@ export default async function ArtistsPage({ params, searchParams }: { params: Pr
       venueOptions={venueOptions}
       regionLabels={regionLabels}
       worldMapLabel={tRegions('worldMap')}
+      badgeNameMap={badgeNameMap}
       initialFilters={initialFilters}
       labels={{
         artists: t('artists'),
