@@ -519,9 +519,11 @@ export default function FanInboxPage() {
   const startDM = useCallback(async (peerId: string, peerName: string, peerAvatar: string | null, resultType?: 'profile' | 'artist' | 'venue') => {
     if (!user) return;
     const supabase = createClient();
+    let success = false;
 
     // Helper: ensure conversation appears in the sidebar list
     const ensureInList = (id: string, type: UnifiedConversation['type'], extra: Partial<UnifiedConversation> = {}) => {
+      success = true;
       setSelectedConvo(id);
       setConversations((prev) => {
         if (prev.find((c) => c.id === id)) return prev;
@@ -535,77 +537,121 @@ export default function FanInboxPage() {
       });
     };
 
-    if (resultType === 'artist') {
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('type', 'artist_fan')
-        .eq('artist_id', peerId)
-        .eq('fan_user_id', user.id)
-        .maybeSingle();
-
-      if (existing) {
-        ensureInList(existing.id, 'artist_fan', { artist_id: peerId });
-        setFilter('artist');
-      } else {
-        const { data: newConvo } = await supabase
+    try {
+      if (resultType === 'artist') {
+        const { data: existing } = await supabase
           .from('conversations')
-          .insert({ type: 'artist_fan', artist_id: peerId, fan_user_id: user.id })
           .select('id')
-          .single();
-        if (newConvo) {
-          ensureInList(newConvo.id, 'artist_fan', { artist_id: peerId });
+          .eq('type', 'artist_fan')
+          .eq('artist_id', peerId)
+          .eq('fan_user_id', user.id)
+          .maybeSingle();
+
+        if (existing) {
+          ensureInList(existing.id, 'artist_fan', { artist_id: peerId });
           setFilter('artist');
+        } else {
+          const { data: newConvo, error } = await supabase
+            .from('conversations')
+            .insert({ type: 'artist_fan', artist_id: peerId, fan_user_id: user.id })
+            .select('id')
+            .single();
+          if (newConvo) {
+            ensureInList(newConvo.id, 'artist_fan', { artist_id: peerId });
+            setFilter('artist');
+          } else if (error) {
+            // Insert failed (e.g. unique constraint race) — retry finding it
+            const { data: retry } = await supabase
+              .from('conversations')
+              .select('id')
+              .eq('type', 'artist_fan')
+              .eq('artist_id', peerId)
+              .eq('fan_user_id', user.id)
+              .maybeSingle();
+            if (retry) {
+              ensureInList(retry.id, 'artist_fan', { artist_id: peerId });
+              setFilter('artist');
+            }
+          }
         }
-      }
-    } else if (resultType === 'venue') {
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('type', 'venue_fan')
-        .eq('venue_id', peerId)
-        .eq('fan_user_id', user.id)
-        .maybeSingle();
-
-      if (existing) {
-        ensureInList(existing.id, 'venue_fan', { venue_id: peerId });
-        setFilter('venue');
-      } else {
-        const { data: newConvo } = await supabase
+      } else if (resultType === 'venue') {
+        const { data: existing } = await supabase
           .from('conversations')
-          .insert({ type: 'venue_fan', venue_id: peerId, fan_user_id: user.id })
           .select('id')
-          .single();
-        if (newConvo) {
-          ensureInList(newConvo.id, 'venue_fan', { venue_id: peerId });
+          .eq('type', 'venue_fan')
+          .eq('venue_id', peerId)
+          .eq('fan_user_id', user.id)
+          .maybeSingle();
+
+        if (existing) {
+          ensureInList(existing.id, 'venue_fan', { venue_id: peerId });
           setFilter('venue');
+        } else {
+          const { data: newConvo, error } = await supabase
+            .from('conversations')
+            .insert({ type: 'venue_fan', venue_id: peerId, fan_user_id: user.id })
+            .select('id')
+            .single();
+          if (newConvo) {
+            ensureInList(newConvo.id, 'venue_fan', { venue_id: peerId });
+            setFilter('venue');
+          } else if (error) {
+            // Insert failed (e.g. unique constraint race) — retry finding it
+            const { data: retry } = await supabase
+              .from('conversations')
+              .select('id')
+              .eq('type', 'venue_fan')
+              .eq('venue_id', peerId)
+              .eq('fan_user_id', user.id)
+              .maybeSingle();
+            if (retry) {
+              ensureInList(retry.id, 'venue_fan', { venue_id: peerId });
+              setFilter('venue');
+            }
+          }
         }
-      }
-    } else {
-      const { data: existing } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('type', 'member_member')
-        .or(`and(fan_user_id.eq.${user.id},user_b_id.eq.${peerId}),and(fan_user_id.eq.${peerId},user_b_id.eq.${user.id})`)
-        .maybeSingle();
-
-      if (existing) {
-        ensureInList(existing.id, 'member_member');
       } else {
-        const { data: newConvo } = await supabase
+        const { data: existing } = await supabase
           .from('conversations')
-          .insert({ type: 'member_member', fan_user_id: user.id, user_b_id: peerId })
           .select('id')
-          .single();
-        if (newConvo) {
-          ensureInList(newConvo.id, 'member_member');
+          .eq('type', 'member_member')
+          .or(`and(fan_user_id.eq.${user.id},user_b_id.eq.${peerId}),and(fan_user_id.eq.${peerId},user_b_id.eq.${user.id})`)
+          .maybeSingle();
+
+        if (existing) {
+          ensureInList(existing.id, 'member_member');
+        } else {
+          const { data: newConvo, error } = await supabase
+            .from('conversations')
+            .insert({ type: 'member_member', fan_user_id: user.id, user_b_id: peerId })
+            .select('id')
+            .single();
+          if (newConvo) {
+            ensureInList(newConvo.id, 'member_member');
+          } else if (error) {
+            // Insert failed — retry finding it
+            const { data: retry } = await supabase
+              .from('conversations')
+              .select('id')
+              .eq('type', 'member_member')
+              .or(`and(fan_user_id.eq.${user.id},user_b_id.eq.${peerId}),and(fan_user_id.eq.${peerId},user_b_id.eq.${user.id})`)
+              .maybeSingle();
+            if (retry) {
+              ensureInList(retry.id, 'member_member');
+            }
+          }
         }
       }
+    } catch (err) {
+      console.error('[inbox] startDM failed:', err);
     }
 
-    setShowDmSearch(false);
-    setShowNewMenu(false);
-    setDmSearch('');
+    // Only close search UI if we successfully opened a conversation
+    if (success) {
+      setShowDmSearch(false);
+      setShowNewMenu(false);
+      setDmSearch('');
+    }
   }, [user]);
 
   // Fetch notifications
