@@ -26,39 +26,40 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
     }
 
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    // Find or create venue_fan conversation
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('type', 'venue_fan')
-      .eq('venue_id', venueId)
-      .eq('fan_user_id', user.id)
-      .maybeSingle();
+      // Find or create venue_fan conversation
+      const { data: existing } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('type', 'venue_fan')
+        .eq('venue_id', venueId)
+        .eq('fan_user_id', user.id)
+        .maybeSingle();
 
-    if (existing) {
-      router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
+      if (existing) {
+        router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
+        return;
+      }
+
+      // Create new conversation
+      const { data: newConvo } = await supabase
+        .from('conversations')
+        .insert({
+          type: 'venue_fan',
+          venue_id: venueId,
+          fan_user_id: user.id,
+        })
+        .select('id')
+        .single();
+
+      if (newConvo) {
+        router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
+      }
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Create new conversation
-    const { data: newConvo } = await supabase
-      .from('conversations')
-      .insert({
-        type: 'venue_fan',
-        venue_id: venueId,
-        fan_user_id: user.id,
-      })
-      .select('id')
-      .single();
-
-    if (newConvo) {
-      router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
-    }
-
-    setLoading(false);
   }, [claimed, user, venueId, locale, router, setShowAuthModal]);
 
   const icon = (

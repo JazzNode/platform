@@ -26,39 +26,40 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
     }
 
     setLoading(true);
-    const supabase = createClient();
+    try {
+      const supabase = createClient();
 
-    // Find or create artist_fan conversation
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('type', 'artist_fan')
-      .eq('artist_id', artistId)
-      .eq('fan_user_id', user.id)
-      .maybeSingle();
+      // Find or create artist_fan conversation
+      const { data: existing } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('type', 'artist_fan')
+        .eq('artist_id', artistId)
+        .eq('fan_user_id', user.id)
+        .maybeSingle();
 
-    if (existing) {
-      router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
+      if (existing) {
+        router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
+        return;
+      }
+
+      // Create new conversation
+      const { data: newConvo } = await supabase
+        .from('conversations')
+        .insert({
+          type: 'artist_fan',
+          artist_id: artistId,
+          fan_user_id: user.id,
+        })
+        .select('id')
+        .single();
+
+      if (newConvo) {
+        router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
+      }
+    } finally {
       setLoading(false);
-      return;
     }
-
-    // Create new conversation
-    const { data: newConvo } = await supabase
-      .from('conversations')
-      .insert({
-        type: 'artist_fan',
-        artist_id: artistId,
-        fan_user_id: user.id,
-      })
-      .select('id')
-      .single();
-
-    if (newConvo) {
-      router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
-    }
-
-    setLoading(false);
   }, [claimed, user, artistId, locale, router, setShowAuthModal]);
 
   const icon = (
