@@ -31,11 +31,18 @@ export default function VenueReviewsProvider({ venueId, children }: { venueId: s
   const { user } = useAuth();
   const [reviews, setReviews] = useState<VenueReview[]>([]);
   const [loading, setLoading] = useState(true);
+  const [prevVenueId, setPrevVenueId] = useState(venueId);
+
+  // Reset loading state when venueId changes (React-recommended pattern)
+  if (prevVenueId !== venueId) {
+    setPrevVenueId(venueId);
+    setLoading(true);
+    setReviews([]);
+  }
 
   // Fetch all reviews for this venue
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
 
     const supabase = createClient();
     supabase

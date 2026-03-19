@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from './AuthProvider';
 import { useVenueReviews } from './VenueReviewsProvider';
 import { useTranslations } from 'next-intl';
@@ -57,14 +57,6 @@ export default function VenueReviewForm({ mode, onFormOpen, onFormClose }: Venue
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-
-  useEffect(() => {
-    if (userReview && showForm) {
-      setRating(userReview.rating);
-      setText(userReview.text || '');
-      setIsAnonymous(userReview.is_anonymous);
-    }
-  }, [userReview, showForm]);
 
   const handleStarClick = (star: number) => {
     if (!user) {
