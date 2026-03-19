@@ -40,7 +40,7 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
 
       if (existing) {
         router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
-        return;
+        return; // keep loading=true until page navigates
       }
 
       // Create new conversation
@@ -56,8 +56,10 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
 
       if (newConvo) {
         router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
+        return; // keep loading=true until page navigates
       }
-    } finally {
+      setLoading(false);
+    } catch {
       setLoading(false);
     }
   }, [claimed, user, venueId, locale, router, setShowAuthModal]);
