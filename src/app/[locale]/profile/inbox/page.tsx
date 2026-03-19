@@ -99,7 +99,7 @@ export default function FanInboxPage() {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [fetching, setFetching] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // "+" menu state
   const [showNewMenu, setShowNewMenu] = useState(false);
@@ -383,7 +383,8 @@ export default function FanInboxPage() {
   }, [selectedConvo, user]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   // Send message
@@ -936,7 +937,7 @@ export default function FanInboxPage() {
                     </div>
 
                     {/* Messages */}
-                    <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                       {messages.map((msg) => {
                         const isMe = msg.sender_id === user.id;
 
@@ -972,7 +973,6 @@ export default function FanInboxPage() {
                           </div>
                         );
                       })}
-                      <div ref={messagesEndRef} />
                     </div>
 
                     {/* Message Input */}
