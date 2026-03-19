@@ -44,7 +44,7 @@ const LOCALE_LABELS: Record<string, string> = {
 // ---------- Component ----------
 
 export default function BadgesPage() {
-  const { token } = useAdmin();
+  const { token, getFreshToken, handleUnauthorized } = useAdmin();
   const t = useTranslations('adminHQ');
   const locale = useLocale();
 
@@ -115,13 +115,15 @@ export default function BadgesPage() {
   };
 
   const handleAutoTranslate = async () => {
-    if (!editBadge || !token) return;
+    if (!editBadge) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     setTranslating(true);
     try {
       const res = await fetch('/api/admin/badges/translate', {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${freshToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -147,12 +149,15 @@ export default function BadgesPage() {
       }
     } catch (err) {
       console.error('Translation failed:', err);
+      alert('Translation failed — please try again.');
     }
     setTranslating(false);
   };
 
   const handleSave = async () => {
-    if (!token || saving) return;
+    if (saving) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     setSaving(true);
 
     // Find changed badges by comparing with original
@@ -161,13 +166,14 @@ export default function BadgesPage() {
       return !orig || JSON.stringify(b) !== JSON.stringify(orig);
     });
 
+    const failed: string[] = [];
     try {
       for (const badge of changed) {
         const { badge_id, ...fields } = badge;
-        await fetch('/api/admin/badges', {
+        const res = await fetch('/api/admin/badges', {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${freshToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -188,12 +194,19 @@ export default function BadgesPage() {
             description_id: fields.description_id,
           }),
         });
+        if (res.status === 401) { handleUnauthorized(); setSaving(false); return; }
+        if (!res.ok) failed.push(badge_id);
       }
-      setOriginalBadges(badges);
-      setSaved(true);
-      setDirty(false);
+      if (failed.length > 0) {
+        alert(`Failed to save ${failed.length} badge(s): ${failed.join(', ')}`);
+      } else {
+        setOriginalBadges(badges);
+        setSaved(true);
+        setDirty(false);
+      }
     } catch (err) {
       console.error('Failed to save:', err);
+      alert('Network error — please try again.');
     }
     setSaving(false);
   };

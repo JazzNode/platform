@@ -79,6 +79,8 @@ export default function AdminNewEventsPage() {
 
   const toggleAudit = useCallback(async (eventId: string, newStatus: AuditStatus) => {
     const supabase = createClient();
+    // Capture previous status before optimistic update
+    const prevStatus = events.find((e) => e.event_id === eventId)?.audit_status ?? null;
     // Optimistic update
     setEvents((prev) =>
       prev.map((e) =>
@@ -91,14 +93,14 @@ export default function AdminNewEventsPage() {
       .eq('event_id', eventId);
     if (error) {
       console.error('Failed to update audit status:', error);
-      // Revert on failure
+      // Revert to captured previous status
       setEvents((prev) =>
         prev.map((e) =>
-          e.event_id === eventId ? { ...e, audit_status: e.audit_status } : e
+          e.event_id === eventId ? { ...e, audit_status: prevStatus } : e
         )
       );
     }
-  }, []);
+  }, [events]);
 
   // Group by created_at date
   const grouped = useMemo(() => {

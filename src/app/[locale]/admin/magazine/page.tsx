@@ -68,7 +68,7 @@ const STATUS_COLORS: Record<string, string> = {
 // ---------- Component ----------
 
 export default function MagazinePage() {
-  const { token } = useAdmin();
+  const { token, getFreshToken, handleUnauthorized } = useAdmin();
   const t = useTranslations('adminHQ');
   const tc = useTranslations('common');
   const locale = useLocale();
@@ -139,14 +139,17 @@ export default function MagazinePage() {
   // ---------- CRUD ----------
 
   const handleCreate = async () => {
-    if (!token) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     const slug = `draft-${Date.now()}`;
     try {
       const res = await fetch('/api/admin/magazine', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ slug, source_lang: 'zh' }),
       });
+      if (res.status === 401) { handleUnauthorized(); return; }
+      if (!res.ok) { alert(`Create failed: ${res.statusText}`); return; }
       const data = await res.json();
       if (data.article) {
         setArticles((prev) => [data.article, ...prev]);
@@ -154,11 +157,14 @@ export default function MagazinePage() {
       }
     } catch (err) {
       console.error('Failed to create:', err);
+      alert('Network error — please try again.');
     }
   };
 
   const handleSave = async () => {
-    if (!token || !editing || saving) return;
+    if (!editing || saving) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     setSaving(true);
     try {
       // Auto-generate slug from title if still a draft slug
@@ -170,9 +176,16 @@ export default function MagazinePage() {
 
       const res = await fetch('/api/admin/magazine', {
         method: 'PUT',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ ...editing, slug }),
       });
+      if (res.status === 401) { handleUnauthorized(); setSaving(false); return; }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: res.statusText }));
+        alert(`Save failed: ${errData.error || res.statusText}`);
+        setSaving(false);
+        return;
+      }
       const data = await res.json();
       if (data.article) {
         setArticles((prev) => prev.map((a) => (a.id === data.article.id ? data.article : a)));
@@ -180,29 +193,41 @@ export default function MagazinePage() {
       }
     } catch (err) {
       console.error('Failed to save:', err);
+      alert('Network error — please try again.');
     }
     setSaving(false);
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm(t('magDeleteConfirm'))) return;
+    if (!confirm(t('magDeleteConfirm'))) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     try {
-      await fetch('/api/admin/magazine', {
+      const res = await fetch('/api/admin/magazine', {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
       });
+      if (res.status === 401) { handleUnauthorized(); return; }
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: res.statusText }));
+        alert(`Delete failed: ${errData.error || res.statusText}`);
+        return;
+      }
       setArticles((prev) => prev.filter((a) => a.id !== id));
       if (editing?.id === id) setEditing(null);
     } catch (err) {
       console.error('Failed to delete:', err);
+      alert('Network error — please try again.');
     }
   };
 
   // ---------- Translation ----------
 
   const handleTranslate = async () => {
-    if (!token || !editing || translating) return;
+    if (!editing || translating) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     const sourceLang = editing.source_lang || 'zh';
     const title = (editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string;
     const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
@@ -216,7 +241,7 @@ export default function MagazinePage() {
     try {
       const res = await fetch('/api/admin/magazine/translate', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, excerpt: (editing as unknown as Record<string, unknown>)[`excerpt_${sourceLang}`], body, source_lang: sourceLang }),
       });
       const translations = await res.json();
@@ -234,7 +259,9 @@ export default function MagazinePage() {
   // ---------- Excerpt Generation ----------
 
   const handleGenerateExcerpt = async () => {
-    if (!token || !editing || generatingExcerpt) return;
+    if (!editing || generatingExcerpt) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     const sourceLang = editing.source_lang || 'zh';
     const title = (editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string;
     const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
@@ -248,7 +275,7 @@ export default function MagazinePage() {
     try {
       const res = await fetch('/api/admin/magazine/generate-excerpt', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, body, source_lang: sourceLang }),
       });
       const excerpts = await res.json();
@@ -264,7 +291,9 @@ export default function MagazinePage() {
   // ---------- Image Upload ----------
 
   const handleImageUpload = async (file: File, type: 'cover' | 'gallery') => {
-    if (!token || !editing) return;
+    if (!editing) return;
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
     const setter = type === 'cover' ? setUploadingCover : setUploadingGallery;
     setter(true);
 
@@ -276,9 +305,15 @@ export default function MagazinePage() {
 
       const res = await fetch('/api/admin/magazine/upload-image', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${freshToken}` },
         body: formData,
       });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({ error: res.statusText }));
+        alert(`Upload failed: ${errData.error || res.statusText}`);
+        setter(false);
+        return;
+      }
       const data = await res.json();
       if (data.url) {
         if (type === 'cover') {
@@ -289,6 +324,7 @@ export default function MagazinePage() {
       }
     } catch (err) {
       console.error('Upload failed:', err);
+      alert('Upload failed — please try again.');
     }
     setter(false);
   };

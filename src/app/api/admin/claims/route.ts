@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { createAdminClient } from '@/utils/supabase/admin';
@@ -102,16 +103,17 @@ export async function PATCH(request: NextRequest) {
       .eq(targetPK, claim.target_id)
       .single();
 
-    if (entity && (!entity.tier || entity.tier === 0)) {
-      await supabase
-        .from(targetTable)
-        .update({ tier: 1, verification_status: 'Claimed' })
-        .eq(targetPK, claim.target_id);
-    } else {
-      await supabase
-        .from(targetTable)
-        .update({ verification_status: 'Claimed' })
-        .eq(targetPK, claim.target_id);
+    const tierUpdate = entity && (!entity.tier || entity.tier === 0)
+      ? { tier: 1, verification_status: 'Claimed' }
+      : { verification_status: 'Claimed' };
+    const { error: tierError } = await supabase
+      .from(targetTable)
+      .update(tierUpdate)
+      .eq(targetPK, claim.target_id);
+
+    if (tierError) {
+      console.error(JSON.stringify({ action: 'approve_claim', step: 'tier_update', actor: adminUserId, target: claim.target_id, error: tierError.message }));
+      return NextResponse.json({ error: `Tier update failed: ${tierError.message}` }, { status: 500 });
     }
 
     // Upgrade user role to artist_manager / venue_manager if currently 'member'
@@ -124,12 +126,19 @@ export async function PATCH(request: NextRequest) {
         .single();
 
       if (profile?.role === 'member') {
-        await supabase
+        const { error: roleError } = await supabase
           .from('profiles')
           .update({ role: newRole, updated_at: now })
           .eq('id', claim.user_id);
+
+        if (roleError) {
+          console.error(JSON.stringify({ action: 'approve_claim', step: 'role_update', actor: adminUserId, target: claim.user_id, error: roleError.message }));
+        }
       }
     }
+
+    // Revalidate caches so public pages reflect tier/status changes
+    revalidateTag(claim.target_type === 'artist' ? 'artists' : 'venues', { expire: 0 });
 
     // Audit log
     writeAuditLog({
