@@ -63,7 +63,7 @@ export function TermsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () =
         <p>We reserve the right to modify these Terms at any time. Changes will be effective upon posting to this page. Your continued use of the Service after changes are posted constitutes acceptance of the updated Terms.</p>
       </S>
       <S title="12. Contact Us">
-        <p>If you have questions about these Terms, please <ContactHQLink>contact us</ContactHQLink>.</p>
+        <p>If you have questions about these Terms, please <ContactHQLink onNavigate={onClose}>contact us</ContactHQLink>.</p>
       </S>
     </LegalPageModal>
   );
@@ -114,7 +114,7 @@ export function PrivacyModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
           <li>Export your data in a portable format.</li>
           <li>Withdraw consent at any time (where processing is based on consent).</li>
         </ul>
-        <p>To exercise any of these rights, please <ContactHQLink>contact us</ContactHQLink>.</p>
+        <p>To exercise any of these rights, please <ContactHQLink onNavigate={onClose}>contact us</ContactHQLink>.</p>
       </S>
       <S title="7. Data Retention">
         <p>We retain your personal data for as long as your account is active or as needed to provide the Service. If you delete your account, we will remove your personal data within 30 days, except where retention is required by law.</p>
@@ -129,7 +129,7 @@ export function PrivacyModal({ isOpen, onClose }: { isOpen: boolean; onClose: ()
         <p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated &quot;Last updated&quot; date. Your continued use of the Service after changes are posted constitutes acceptance.</p>
       </S>
       <S title="11. Contact Us">
-        <p>If you have questions or concerns about this Privacy Policy, please <ContactHQLink>contact us</ContactHQLink>.</p>
+        <p>If you have questions or concerns about this Privacy Policy, please <ContactHQLink onNavigate={onClose}>contact us</ContactHQLink>.</p>
       </S>
     </LegalPageModal>
   );
@@ -172,14 +172,14 @@ export function RefundModal({ isOpen, onClose }: { isOpen: boolean; onClose: () 
         </ul>
       </S>
       <S title="5. How to Request a Refund">
-        <p>To request a refund, please <ContactHQLink>contact us</ContactHQLink> with your account email and a brief description of the reason. We aim to process all refund requests within 5 business days.</p>
+        <p>To request a refund, please <ContactHQLink onNavigate={onClose}>contact us</ContactHQLink> with your account email and a brief description of the reason. We aim to process all refund requests within 5 business days.</p>
         <p>Approved refunds will be credited to the original payment method.</p>
       </S>
       <S title="6. Changes to This Policy">
         <p>We may update this Refund &amp; Cancellation Policy from time to time. Changes will be posted on this page with an updated date. Existing subscriptions will be governed by the policy in effect at the time of purchase until the next renewal.</p>
       </S>
       <S title="7. Contact Us">
-        <p>If you have questions about refunds or cancellations, please <ContactHQLink>contact us</ContactHQLink>.</p>
+        <p>If you have questions about refunds or cancellations, please <ContactHQLink onNavigate={onClose}>contact us</ContactHQLink>.</p>
       </S>
     </LegalPageModal>
   );

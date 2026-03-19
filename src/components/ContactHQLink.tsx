@@ -9,19 +9,20 @@ import { useAuth } from '@/components/AuthProvider';
  * Inline link that opens the HQ inbox (logged-in) or auth modal (logged-out).
  * Drop-in replacement for <a href="mailto:…"> in legal pages.
  */
-export default function ContactHQLink({ children }: { children: React.ReactNode }) {
+export default function ContactHQLink({ children, onNavigate }: { children: React.ReactNode; onNavigate?: () => void }) {
   const locale = useLocale();
   const router = useRouter();
   const { user } = useAuth();
 
   const handleClick = useCallback(() => {
     if (user) {
+      onNavigate?.();
       router.push(`/${locale}/profile/inbox?contactHQ=1`);
     } else {
       // For guests, fall back to email since we can't show the modal from here
       window.location.href = 'mailto:hello@jazznode.com';
     }
-  }, [locale, router, user]);
+  }, [locale, router, user, onNavigate]);
 
   return (
     <button
