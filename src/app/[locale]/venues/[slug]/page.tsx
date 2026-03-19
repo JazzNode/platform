@@ -20,6 +20,7 @@ import type { BadgeProgress } from '@/lib/badges';
 import MessageVenueButton from '@/components/MessageVenueButton';
 import TierGate from '@/components/TierGate';
 import VenueReviewsSection from '@/components/VenueReviewsSection';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -256,7 +257,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
         <div className="flex-1 space-y-6">
           <div>
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold">{displayName(f)}</h1>
+            <h1 className="font-serif text-4xl sm:text-5xl font-bold">
+              {displayName(f)}{f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} />}
+            </h1>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
             <p className="text-xl text-[#8A8578]">{f.name_en}</p>
@@ -301,7 +304,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               )}
             </TierGate>
               <span className="text-[#8A8578]/30 select-none">|</span>
-              <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}>
+              <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}
+                fallback={<MessageVenueButton venueId={venue.id} claimed={false} />}>
                 <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
               </TierGate>
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />

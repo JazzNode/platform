@@ -91,11 +91,11 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
     <button
       onClick={handleClick}
       disabled={loading}
-      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[var(--color-gold)]/30 bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs font-semibold hover:bg-[var(--color-gold)]/20 transition-colors disabled:opacity-50"
+      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-400/20 transition-colors disabled:opacity-50"
       title={t('messageArtist')}
     >
       {loading ? (
-        <div className="w-3.5 h-3.5 border border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
+        <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
       ) : (
         icon
       )}

@@ -10,8 +10,8 @@ export default function BroadcastBubble({ body, createdAt, children }: Broadcast
   const t = useTranslations('artistStudio');
   return (
     <div className="max-w-[85%] sm:max-w-[70%]">
-      <div className="border-l-2 border-[var(--color-gold)] bg-[var(--color-gold)]/5 rounded-r-xl rounded-tl-xl px-4 py-3">
-        <p className="text-[10px] text-[var(--color-gold)]/70 font-semibold uppercase tracking-widest mb-1.5">
+      <div className="border-l-2 border-emerald-400 bg-emerald-400/5 rounded-r-xl rounded-tl-xl px-4 py-3">
+        <p className="text-[10px] text-emerald-400/70 font-semibold uppercase tracking-widest mb-1.5">
           {t('broadcastLabel')}
         </p>
         <p className="text-sm whitespace-pre-wrap break-words">{body}</p>

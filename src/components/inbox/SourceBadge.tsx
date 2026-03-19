@@ -4,7 +4,7 @@ type BadgeType = 'hq' | 'artist' | 'venue';
 
 const STYLES: Record<BadgeType, string> = {
   hq: 'bg-purple-400/10 text-purple-400 border-purple-400/20',
-  artist: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border-[var(--color-gold)]/20',
+  artist: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20',
   venue: 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20',
 };
 

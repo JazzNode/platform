@@ -25,6 +25,7 @@ import PageViewTracker from '@/components/PageViewTracker';
 import HireMeButton from '@/components/HireMeButton';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import TierGate from '@/components/TierGate';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -370,7 +371,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 ]}
                 className="font-serif text-4xl sm:text-5xl font-bold"
                 tag="h1"
-              />
+              />{f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} />}
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName
                   entityType="artist"
@@ -424,7 +425,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
                 )}
               </TierGate>
-              <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}>
+              <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}
+                fallback={<MessageArtistButton artistId={artist.id} claimed={false} />}>
                 <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
               </TierGate>
               <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />

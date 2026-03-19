@@ -69,9 +69,9 @@ function TranslateButton({ text, locale }: { text: string; locale: string }) {
   return (
     <div>
       <button onClick={handleTranslate} disabled={loading}
-        className="text-[var(--muted-foreground)]/50 hover:text-[var(--color-gold)] transition-colors disabled:opacity-30" title="Translate">
+        className="text-[var(--muted-foreground)]/50 hover:text-emerald-400 transition-colors disabled:opacity-30" title="Translate">
         {loading ? (
-          <div className="w-3.5 h-3.5 border border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin" />
+          <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
         ) : (
           <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" /><path d="M2 12h20" />
@@ -105,11 +105,37 @@ export default function FanInboxPage() {
   const [showNewMenu, setShowNewMenu] = useState(false);
   const [showDmSearch, setShowDmSearch] = useState(false);
   const [dmSearch, setDmSearch] = useState('');
-  const [dmSearchResults, setDmSearchResults] = useState<{ id: string; display_name: string | null; username: string | null; avatar_url: string | null }[]>([]);
+  const [dmSearchResults, setDmSearchResults] = useState<{ id: string; display_name: string | null; username: string | null; avatar_url: string | null; _type?: 'profile' | 'artist' | 'venue' }[]>([]);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
+
+  // Sync selectedConvo + filter from URL params (handles navigation from profile pages)
+  const urlConvo = searchParams.get('convo');
+  const urlTab = searchParams.get('tab');
+  useEffect(() => {
+    if (urlConvo && urlConvo !== selectedConvo) {
+      setSelectedConvo(urlConvo);
+    }
+    if (urlTab === 'dm') setFilter('dm');
+  }, [urlConvo, urlTab]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Auto-set filter when selectedConvo is resolved in conversations list
+  useEffect(() => {
+    if (!selectedConvo || conversations.length === 0) return;
+    const convo = conversations.find((c) => c.id === selectedConvo);
+    if (!convo) return;
+    // Auto-switch filter so the selected conversation is visible
+    if (filter !== 'all') {
+      const expectedFilter: FilterType =
+        convo.type === 'artist_fan' ? 'artist' :
+        convo.type === 'venue_fan' ? 'venue' :
+        convo.type === 'member_hq' ? 'hq' :
+        convo.type === 'member_member' ? 'dm' : 'all';
+      if (filter !== expectedFilter) setFilter('all');
+    }
+  }, [selectedConvo, conversations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch ALL conversations (unified)
   useEffect(() => {
@@ -369,64 +395,163 @@ export default function FanInboxPage() {
     return () => clearTimeout(timer);
   }, [user, fetching, shouldContactHQ, contactHQ, router, locale]);
 
-  // DM search users
+  // DM search users, artists, and venues
   useEffect(() => {
     if (!dmSearch.trim() || !user) return;
     const timer = setTimeout(async () => {
       const supabase = createClient();
-      const { data } = await supabase
+      const q = dmSearch.trim();
+
+      // Search profiles (users)
+      const { data: profiles } = await supabase
         .from('profiles')
         .select('id, display_name, username, avatar_url')
-        .or(`display_name.ilike.%${dmSearch}%,username.ilike.%${dmSearch}%`)
+        .or(`display_name.ilike.%${q}%,username.ilike.%${q}%`)
         .neq('id', user.id)
-        .limit(10);
-      setDmSearchResults(data || []);
+        .limit(5);
+
+      // Search claimed artists (tier >= 1)
+      const { data: artists } = await supabase
+        .from('artists')
+        .select('artist_id, display_name, name_local, name_en, photo_url, tier')
+        .or(`display_name.ilike.%${q}%,name_local.ilike.%${q}%,name_en.ilike.%${q}%`)
+        .gte('tier', 1)
+        .limit(5);
+
+      // Search claimed venues (tier >= 1)
+      const { data: venues } = await supabase
+        .from('venues')
+        .select('venue_id, display_name, name_local, name_en, photo_url, tier')
+        .or(`display_name.ilike.%${q}%,name_local.ilike.%${q}%,name_en.ilike.%${q}%`)
+        .gte('tier', 1)
+        .limit(5);
+
+      const results: typeof dmSearchResults = [
+        ...(profiles || []).map((p) => ({
+          id: p.id,
+          display_name: p.display_name,
+          username: p.username,
+          avatar_url: p.avatar_url,
+          _type: 'profile' as const,
+        })),
+        ...(artists || []).map((a) => ({
+          id: a.artist_id,
+          display_name: a.display_name || a.name_local || a.name_en,
+          username: null,
+          avatar_url: a.photo_url,
+          _type: 'artist' as const,
+        })),
+        ...(venues || []).map((v) => ({
+          id: v.venue_id,
+          display_name: v.display_name || v.name_local || v.name_en,
+          username: null,
+          avatar_url: v.photo_url,
+          _type: 'venue' as const,
+        })),
+      ];
+
+      setDmSearchResults(results);
     }, 300);
     return () => clearTimeout(timer);
   }, [dmSearch, user]);
 
-  // Start DM with a user
-  const startDM = useCallback(async (peerId: string, peerName: string, peerAvatar: string | null) => {
+  // Start conversation with a user/artist/venue from search
+  const startDM = useCallback(async (peerId: string, peerName: string, peerAvatar: string | null, resultType?: 'profile' | 'artist' | 'venue') => {
     if (!user) return;
     const supabase = createClient();
 
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('type', 'member_member')
-      .or(`and(fan_user_id.eq.${user.id},user_b_id.eq.${peerId}),and(fan_user_id.eq.${peerId},user_b_id.eq.${user.id})`)
-      .maybeSingle();
+    if (resultType === 'artist') {
+      // Find or create artist_fan conversation
+      const { data: existing } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('type', 'artist_fan')
+        .eq('artist_id', peerId)
+        .eq('fan_user_id', user.id)
+        .maybeSingle();
 
-    if (existing) {
-      setSelectedConvo(existing.id);
-      setShowDmSearch(false);
-      setShowNewMenu(false);
-      setDmSearch('');
-      return;
+      if (existing) {
+        setSelectedConvo(existing.id);
+        setFilter('artist');
+      } else {
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert({ type: 'artist_fan', artist_id: peerId, fan_user_id: user.id })
+          .select('id')
+          .single();
+        if (newConvo) {
+          setSelectedConvo(newConvo.id);
+          setFilter('artist');
+          setConversations((prev) => [{
+            id: newConvo.id, type: 'artist_fan', artist_id: peerId,
+            peer_name: peerName, peer_avatar: peerAvatar,
+            last_message: null, last_message_at: new Date().toISOString(),
+            unread_count: 0, source_badge: 'artist',
+          }, ...prev]);
+        }
+      }
+    } else if (resultType === 'venue') {
+      // Find or create venue_fan conversation
+      const { data: existing } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('type', 'venue_fan')
+        .eq('venue_id', peerId)
+        .eq('fan_user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        setSelectedConvo(existing.id);
+        setFilter('venue');
+      } else {
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert({ type: 'venue_fan', venue_id: peerId, fan_user_id: user.id })
+          .select('id')
+          .single();
+        if (newConvo) {
+          setSelectedConvo(newConvo.id);
+          setFilter('venue');
+          setConversations((prev) => [{
+            id: newConvo.id, type: 'venue_fan', venue_id: peerId,
+            peer_name: peerName, peer_avatar: peerAvatar,
+            last_message: null, last_message_at: new Date().toISOString(),
+            unread_count: 0, source_badge: 'venue',
+          }, ...prev]);
+        }
+      }
+    } else {
+      // member_member DM
+      const { data: existing } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('type', 'member_member')
+        .or(`and(fan_user_id.eq.${user.id},user_b_id.eq.${peerId}),and(fan_user_id.eq.${peerId},user_b_id.eq.${user.id})`)
+        .maybeSingle();
+
+      if (existing) {
+        setSelectedConvo(existing.id);
+      } else {
+        const { data: newConvo } = await supabase
+          .from('conversations')
+          .insert({ type: 'member_member', fan_user_id: user.id, user_b_id: peerId })
+          .select('id')
+          .single();
+        if (newConvo) {
+          setSelectedConvo(newConvo.id);
+          setConversations((prev) => [{
+            id: newConvo.id, type: 'member_member',
+            peer_name: peerName, peer_avatar: peerAvatar,
+            last_message: null, last_message_at: new Date().toISOString(),
+            unread_count: 0, source_badge: null,
+          }, ...prev]);
+        }
+      }
     }
 
-    const { data: newConvo } = await supabase
-      .from('conversations')
-      .insert({ type: 'member_member', fan_user_id: user.id, user_b_id: peerId })
-      .select('id')
-      .single();
-
-    if (newConvo) {
-      setSelectedConvo(newConvo.id);
-      setShowDmSearch(false);
-      setShowNewMenu(false);
-      setDmSearch('');
-      setConversations((prev) => [{
-        id: newConvo.id,
-        type: 'member_member',
-        peer_name: peerName,
-        peer_avatar: peerAvatar,
-        last_message: null,
-        last_message_at: new Date().toISOString(),
-        unread_count: 0,
-        source_badge: null,
-      }, ...prev]);
-    }
+    setShowDmSearch(false);
+    setShowNewMenu(false);
+    setDmSearch('');
   }, [user]);
 
   // Fetch notifications
@@ -455,7 +580,7 @@ export default function FanInboxPage() {
   if (loading || !user) {
     return (
       <div className="py-24 text-center">
-        <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+        <div className="w-6 h-6 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mx-auto" />
       </div>
     );
   }
@@ -497,7 +622,7 @@ export default function FanInboxPage() {
               >
                 {t(key === 'messages' ? 'inboxMessages' : 'inboxNotifications')}
                 {badge > 0 && (
-                  <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  <span className="ml-1.5 bg-emerald-400 text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                     {badge}
                   </span>
                 )}
@@ -523,7 +648,7 @@ export default function FanInboxPage() {
                 <div className="p-3 border-b border-[var(--border)] relative">
                   <button
                     onClick={() => { setShowNewMenu(!showNewMenu); setShowDmSearch(false); }}
-                    className="w-full text-center py-2 rounded-xl border border-dashed border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/50 hover:text-[var(--color-gold)] transition-colors"
+                    className="w-full text-center py-2 rounded-xl border border-dashed border-[var(--border)] text-xs text-[var(--muted-foreground)] hover:border-emerald-400/50 hover:text-emerald-400 transition-colors"
                   >
                     + {t('newConversation')}
                   </button>
@@ -559,10 +684,10 @@ export default function FanInboxPage() {
                     <div className="mt-2 space-y-2">
                       <input type="text" value={dmSearch} onChange={(e) => setDmSearch(e.target.value)}
                         placeholder={t('fanInboxSearchUsers')} autoFocus
-                        className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50"
+                        className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-emerald-400/50"
                       />
                       {dmSearch.trim() && dmSearchResults.map((u) => (
-                        <button key={u.id} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url)}
+                        <button key={`${u._type || 'profile'}-${u.id}`} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url, u._type)}
                           className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--muted)] transition-colors">
                           {u.avatar_url ? (
                             <img src={u.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
@@ -572,6 +697,12 @@ export default function FanInboxPage() {
                             </div>
                           )}
                           <span className="text-xs font-medium truncate">{u.display_name || u.username}</span>
+                          {u._type === 'artist' && (
+                            <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-400/15 text-emerald-400 shrink-0">{t('filterArtist')}</span>
+                          )}
+                          {u._type === 'venue' && (
+                            <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-400/15 text-emerald-400 shrink-0">{t('filterVenue')}</span>
+                          )}
                         </button>
                       ))}
                       <button onClick={() => { setShowDmSearch(false); setShowNewMenu(false); setDmSearch(''); }}
@@ -586,7 +717,7 @@ export default function FanInboxPage() {
                 <div className="flex-1 overflow-y-auto">
                   {fetching ? (
                     <div className="p-6 text-center">
-                      <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+                      <div className="w-5 h-5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mx-auto" />
                     </div>
                   ) : filteredConversations.length === 0 ? (
                     <div className="p-6 text-center">
@@ -622,7 +753,7 @@ export default function FanInboxPage() {
                               <p className="text-sm font-semibold truncate">{convo.peer_name}</p>
                               <SourceBadge type={convo.source_badge} />
                               {convo.unread_count > 0 && (
-                                <span className="ml-auto bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
+                                <span className="ml-auto bg-emerald-400 text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
                                   {convo.unread_count}
                                 </span>
                               )}
@@ -670,10 +801,10 @@ export default function FanInboxPage() {
                         return (
                           <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm ${
-                              isMe ? 'bg-[var(--color-gold)]/15 text-[var(--foreground)]' : 'bg-[var(--muted)] text-[var(--foreground)]'
+                              isMe ? 'bg-emerald-400/15 text-[var(--foreground)]' : 'bg-[var(--muted)] text-[var(--foreground)]'
                             }`}>
                               {!isMe && msg.sender_role === 'admin' && msg.sender_display && (
-                                <p className="text-[10px] text-[var(--color-gold)]/60 font-semibold mb-0.5">
+                                <p className="text-[10px] text-emerald-400/60 font-semibold mb-0.5">
                                   JazzNode HQ · {msg.sender_display}
                                 </p>
                               )}
@@ -681,7 +812,7 @@ export default function FanInboxPage() {
                                 <p className="whitespace-pre-wrap break-words flex-1">{msg.body}</p>
                                 <TranslateButton text={msg.body} locale={locale} />
                               </div>
-                              <p className={`text-[10px] mt-1 ${isMe ? 'text-[var(--color-gold)]/50' : 'text-[var(--muted-foreground)]/50'}`}>
+                              <p className={`text-[10px] mt-1 ${isMe ? 'text-emerald-400/50' : 'text-[var(--muted-foreground)]/50'}`}>
                                 {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </p>
                             </div>
@@ -697,10 +828,10 @@ export default function FanInboxPage() {
                         <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
                           onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
                           placeholder={t('typeMessage')}
-                          className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
+                          className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-emerald-400/50 transition-colors"
                         />
                         <button onClick={handleSend} disabled={!newMessage.trim() || sending}
-                          className="px-4 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30">
+                          className="px-4 py-2.5 rounded-xl bg-emerald-400 text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30">
                           {t('send')}
                         </button>
                       </div>
@@ -723,7 +854,7 @@ export default function FanInboxPage() {
           <div className="space-y-3">
             {notifsLoading ? (
               <div className="py-12 text-center">
-                <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+                <div className="w-6 h-6 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mx-auto" />
               </div>
             ) : notifications.length === 0 ? (
               <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 text-center">
@@ -733,10 +864,10 @@ export default function FanInboxPage() {
               <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl divide-y divide-[var(--border)]">
                 {notifications.map((notif) => (
                   <div key={notif.id}
-                    className={`px-5 py-4 transition-colors ${!notif.read_at ? 'bg-[var(--color-gold)]/[0.02] cursor-pointer' : ''}`}
+                    className={`px-5 py-4 transition-colors ${!notif.read_at ? 'bg-emerald-400/[0.02] cursor-pointer' : ''}`}
                     onClick={() => !notif.read_at && markNotifRead(notif.id)}>
                     <div className="flex items-start gap-3">
-                      {!notif.read_at && <span className="w-2 h-2 rounded-full bg-[var(--color-gold)] mt-1.5 shrink-0" />}
+                      {!notif.read_at && <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold">{notif.title}</p>
                         {notif.body && <p className="text-sm text-[var(--muted-foreground)] mt-0.5">{notif.body}</p>}

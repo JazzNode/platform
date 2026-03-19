@@ -27,7 +27,7 @@ export default function FilterChips({ active, onChange }: FilterChipsProps) {
             onClick={() => onChange(f)}
             className={`px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-colors ${
               active === f
-                ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
+                ? 'bg-emerald-400/15 text-emerald-400'
                 : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
             }`}
           >
