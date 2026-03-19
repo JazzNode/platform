@@ -1,21 +1,25 @@
 export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
-import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resolveLinks, buildMap, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
+import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resolveLinks, buildMap, buildVenueEventCounts, venueEventCount, getFeaturedMagazineArticles } from '@/lib/supabase';
 import { displayName, artistDisplayName, formatDate, formatTime, cityName, eventTitle } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import ManifestoReveal from '@/components/animations/ManifestoReveal';
 import HomeEventsSection from '@/components/HomeEventsSection';
 import RegionExploreRow from '@/components/RegionExploreRow';
+import MagazineCarousel from '@/components/MagazineCarousel';
+import FadeUp from '@/components/animations/FadeUp';
+import { localized } from '@/lib/helpers';
 
 export default async function HomePage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
   const tRegions = await getTranslations('regions');
 
-  const [venues, events, artists, cities, lineups, tags] = await Promise.all([
+  const [venues, events, artists, cities, lineups, tags, featuredArticles] = await Promise.all([
     getVenues(), getEvents(), getArtists(), getCities(), getLineups(), getTags().catch(() => []),
+    getFeaturedMagazineArticles().catch(() => []),
   ]);
   const cityMap = new Map(cities.map((c) => [c.id, c.fields]));
   const venuesWithEvents = venues.filter((v) => v.fields.event_list && v.fields.event_list.length > 0);
@@ -210,6 +214,35 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
           </div>
         </ManifestoReveal>
       </section>
+
+      {/* ─── Magazine Carousel (Featured Stories) ─── */}
+      {featuredArticles.length > 0 && (
+        <FadeUp>
+          <MagazineCarousel
+            articles={featuredArticles.map((a) => ({
+              id: a.id,
+              slug: a.slug,
+              title: localized(a as unknown as Record<string, unknown>, 'title', locale) || a.slug,
+              excerpt: localized(a as unknown as Record<string, unknown>, 'excerpt', locale) || '',
+              cover_image_url: a.cover_image_url || null,
+              category: a.category,
+              categoryLabel: t(({
+                'artist-feature': 'magazineCatArtist',
+                'venue-spotlight': 'magazineCatVenue',
+                'scene-report': 'magazineCatScene',
+                'culture': 'magazineCatCulture',
+              } as Record<string, string>)[a.category] || 'magazineCatCulture'),
+              author_name: a.author_name || null,
+              published_at: a.published_at || null,
+            }))}
+            locale={locale}
+            labels={{
+              magazine: t('magazineTitle'),
+              viewAll: t('viewAll'),
+            }}
+          />
+        </FadeUp>
+      )}
 
       {/* ─── Region Explore Row ─── */}
       <RegionExploreRow

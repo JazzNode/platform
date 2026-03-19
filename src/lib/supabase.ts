@@ -18,6 +18,7 @@ const REVALIDATE = {
   badges: 604800,    // 1 week
   tags: 604800,      // 1 week
   lineups: 3600,     // 1 hour
+  magazine: 3600,    // 1 hour
 } as const;
 
 // Server-side Supabase client (anon key, respects RLS public read policies)
@@ -893,6 +894,98 @@ export async function getFollowerCount(targetType: 'artist' | 'venue', targetId:
     .eq('target_id', targetId);
   return count ?? 0;
 }
+
+// ----- Magazine Articles -----
+
+export interface MagazineArticle {
+  id: string;
+  slug: string;
+  status: string;
+  category: string;
+  is_featured: boolean;
+  title_en?: string;
+  title_zh?: string;
+  title_ja?: string;
+  title_ko?: string;
+  title_th?: string;
+  title_id?: string;
+  excerpt_en?: string;
+  excerpt_zh?: string;
+  excerpt_ja?: string;
+  excerpt_ko?: string;
+  excerpt_th?: string;
+  excerpt_id?: string;
+  body_en?: string;
+  body_zh?: string;
+  body_ja?: string;
+  body_ko?: string;
+  body_th?: string;
+  body_id?: string;
+  cover_image_url?: string;
+  gallery_urls?: string[];
+  linked_artist_ids?: string[];
+  linked_venue_ids?: string[];
+  linked_city_ids?: string[];
+  author_name?: string;
+  published_at?: string;
+  created_at?: string;
+  updated_at?: string;
+  source_lang?: string;
+}
+
+/** Fetch published magazine articles, sorted by published_at desc. */
+export const getMagazineArticles = cache(
+  unstable_cache(
+    async () => {
+      const sb = getSupabase();
+      const { data, error } = await sb
+        .from('magazine_articles')
+        .select('*')
+        .eq('status', 'published')
+        .order('published_at', { ascending: false });
+
+      if (error) throw new Error(`Supabase magazine_articles: ${error.message}`);
+      return (data || []) as MagazineArticle[];
+    },
+    ['supabase-magazine'],
+    { revalidate: REVALIDATE.magazine, tags: ['magazine'] },
+  ),
+);
+
+/** Fetch a single published magazine article by slug. */
+export const getMagazineBySlug = cache(async (slug: string): Promise<MagazineArticle | null> => {
+  const sb = getSupabase();
+  const { data, error } = await sb
+    .from('magazine_articles')
+    .select('*')
+    .eq('slug', slug)
+    .eq('status', 'published')
+    .single();
+
+  if (error || !data) return null;
+  return data as MagazineArticle;
+});
+
+/** Fetch featured magazine articles for homepage carousel. */
+export const getFeaturedMagazineArticles = cache(
+  unstable_cache(
+    async () => {
+      const sb = getSupabase();
+      const { data, error } = await sb
+        .from('magazine_articles')
+        .select('id, slug, title_en, title_zh, title_ja, title_ko, title_th, title_id, excerpt_en, excerpt_zh, excerpt_ja, excerpt_ko, excerpt_th, excerpt_id, cover_image_url, category, author_name, published_at')
+        .eq('status', 'published')
+        .eq('is_featured', true)
+        .order('published_at', { ascending: false })
+        .limit(6);
+
+      if (error) return [];
+      return (data || []) as MagazineArticle[];
+    },
+    ['supabase-magazine-featured'],
+    { revalidate: REVALIDATE.magazine, tags: ['magazine'] },
+  ),
+);
 
 /** Country codes that have at least one city with an active venue (venue with events). */
 export const getActiveRegionCodes = cache(

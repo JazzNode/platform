@@ -1,0 +1,744 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { useAdmin } from '@/components/AdminProvider';
+import Image from 'next/image';
+
+// ---------- Types ----------
+
+interface Article {
+  id: string;
+  slug: string;
+  status: string;
+  category: string;
+  is_featured: boolean;
+  title_en: string | null;
+  title_zh: string | null;
+  title_ja: string | null;
+  title_ko: string | null;
+  title_th: string | null;
+  title_id: string | null;
+  excerpt_en: string | null;
+  excerpt_zh: string | null;
+  excerpt_ja: string | null;
+  excerpt_ko: string | null;
+  excerpt_th: string | null;
+  excerpt_id: string | null;
+  body_en: string | null;
+  body_zh: string | null;
+  body_ja: string | null;
+  body_ko: string | null;
+  body_th: string | null;
+  body_id: string | null;
+  cover_image_url: string | null;
+  gallery_urls: string[];
+  linked_artist_ids: string[];
+  linked_venue_ids: string[];
+  linked_city_ids: string[];
+  author_name: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  source_lang: string;
+}
+
+const CATEGORIES = [
+  { value: 'artist-feature', label: 'Artist Feature' },
+  { value: 'venue-spotlight', label: 'Venue Spotlight' },
+  { value: 'scene-report', label: 'Scene Report' },
+  { value: 'culture', label: 'Culture' },
+] as const;
+
+const LANG_OPTIONS = [
+  { value: 'zh', label: '中文' },
+  { value: 'en', label: 'English' },
+  { value: 'ja', label: '日本語' },
+  { value: 'ko', label: '한국어' },
+  { value: 'th', label: 'ไทย' },
+  { value: 'id', label: 'Indonesia' },
+] as const;
+
+const STATUS_COLORS: Record<string, string> = {
+  draft: 'bg-zinc-500/20 text-zinc-400',
+  published: 'bg-emerald-500/20 text-emerald-400',
+  archived: 'bg-orange-500/20 text-orange-400',
+};
+
+// ---------- Component ----------
+
+export default function MagazinePage() {
+  const { token } = useAdmin();
+  const t = useTranslations('adminHQ');
+  const locale = useLocale();
+
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Article | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [generatingExcerpt, setGeneratingExcerpt] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+
+  // Artist/Venue search for linking
+  const [artistSearch, setArtistSearch] = useState('');
+  const [venueSearch, setVenueSearch] = useState('');
+  const [searchResults, setSearchResults] = useState<{ artists: { id: string; name: string }[]; venues: { id: string; name: string }[] }>({ artists: [], venues: [] });
+
+  // ---------- Fetch ----------
+
+  const fetchArticles = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/admin/magazine', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.articles) setArticles(data.articles);
+    } catch (err) {
+      console.error('Failed to fetch articles:', err);
+    }
+    setLoading(false);
+  }, [token]);
+
+  useEffect(() => { fetchArticles(); }, [fetchArticles]);
+
+  // Fetch search data for artist/venue linking
+  useEffect(() => {
+    fetch('/api/search-data')
+      .then((r) => r.json())
+      .then((data) => {
+        setSearchResults({
+          artists: (data.artists || []).map((a: { id: string; name: string }) => ({ id: a.id, name: a.name })),
+          venues: (data.venues || []).map((v: { id: string; name: string }) => ({ id: v.id, name: v.name })),
+        });
+      })
+      .catch(() => {});
+  }, []);
+
+  // ---------- Helpers ----------
+
+  const getTitle = (a: Article) => {
+    const key = `title_${locale}` as keyof Article;
+    return (a[key] as string) || a.title_zh || a.title_en || a.slug;
+  };
+
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff-\s]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .slice(0, 80);
+  };
+
+  // ---------- CRUD ----------
+
+  const handleCreate = async () => {
+    if (!token) return;
+    const slug = `draft-${Date.now()}`;
+    try {
+      const res = await fetch('/api/admin/magazine', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, source_lang: 'zh' }),
+      });
+      const data = await res.json();
+      if (data.article) {
+        setArticles((prev) => [data.article, ...prev]);
+        setEditing(data.article);
+      }
+    } catch (err) {
+      console.error('Failed to create:', err);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!token || !editing || saving) return;
+    setSaving(true);
+    try {
+      // Auto-generate slug from title if still a draft slug
+      let slug = editing.slug;
+      if (slug.startsWith('draft-')) {
+        const title = editing.title_en || editing.title_zh || '';
+        if (title) slug = generateSlug(title) || slug;
+      }
+
+      const res = await fetch('/api/admin/magazine', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...editing, slug }),
+      });
+      const data = await res.json();
+      if (data.article) {
+        setArticles((prev) => prev.map((a) => (a.id === data.article.id ? data.article : a)));
+        setEditing(data.article);
+      }
+    } catch (err) {
+      console.error('Failed to save:', err);
+    }
+    setSaving(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!token || !confirm('Delete this article permanently?')) return;
+    try {
+      await fetch('/api/admin/magazine', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      setArticles((prev) => prev.filter((a) => a.id !== id));
+      if (editing?.id === id) setEditing(null);
+    } catch (err) {
+      console.error('Failed to delete:', err);
+    }
+  };
+
+  // ---------- Translation ----------
+
+  const handleTranslate = async () => {
+    if (!token || !editing || translating) return;
+    const sourceLang = editing.source_lang || 'zh';
+    const title = (editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string;
+    const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
+
+    if (!title?.trim() || !body?.trim()) {
+      alert(`Please fill in the title and body in the source language (${sourceLang}) first.`);
+      return;
+    }
+
+    setTranslating(true);
+    try {
+      const res = await fetch('/api/admin/magazine/translate', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, excerpt: (editing as unknown as Record<string, unknown>)[`excerpt_${sourceLang}`], body, source_lang: sourceLang }),
+      });
+      const translations = await res.json();
+      if (res.ok) {
+        setEditing((prev) => prev ? { ...prev, ...translations } : prev);
+      } else {
+        alert(`Translation failed: ${translations.error}`);
+      }
+    } catch (err) {
+      console.error('Translation failed:', err);
+    }
+    setTranslating(false);
+  };
+
+  // ---------- Excerpt Generation ----------
+
+  const handleGenerateExcerpt = async () => {
+    if (!token || !editing || generatingExcerpt) return;
+    const sourceLang = editing.source_lang || 'zh';
+    const title = (editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string;
+    const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
+
+    if (!body?.trim()) {
+      alert('Please write the article body first.');
+      return;
+    }
+
+    setGeneratingExcerpt(true);
+    try {
+      const res = await fetch('/api/admin/magazine/generate-excerpt', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, body, source_lang: sourceLang }),
+      });
+      const excerpts = await res.json();
+      if (res.ok) {
+        setEditing((prev) => prev ? { ...prev, ...excerpts } : prev);
+      }
+    } catch (err) {
+      console.error('Excerpt generation failed:', err);
+    }
+    setGeneratingExcerpt(false);
+  };
+
+  // ---------- Image Upload ----------
+
+  const handleImageUpload = async (file: File, type: 'cover' | 'gallery') => {
+    if (!token || !editing) return;
+    const setter = type === 'cover' ? setUploadingCover : setUploadingGallery;
+    setter(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('articleId', editing.id);
+      formData.append('type', type);
+
+      const res = await fetch('/api/admin/magazine/upload-image', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        if (type === 'cover') {
+          setEditing((prev) => prev ? { ...prev, cover_image_url: data.url } : prev);
+        } else {
+          setEditing((prev) => prev ? { ...prev, gallery_urls: [...(prev.gallery_urls || []), data.url] } : prev);
+        }
+      }
+    } catch (err) {
+      console.error('Upload failed:', err);
+    }
+    setter(false);
+  };
+
+  const removeGalleryImage = (url: string) => {
+    setEditing((prev) => prev ? { ...prev, gallery_urls: prev.gallery_urls.filter((u) => u !== url) } : prev);
+  };
+
+  // ---------- Linked entities ----------
+
+  const filteredArtists = artistSearch.length >= 2
+    ? searchResults.artists.filter((a) => a.name.toLowerCase().includes(artistSearch.toLowerCase())).slice(0, 8)
+    : [];
+
+  const filteredVenues = venueSearch.length >= 2
+    ? searchResults.venues.filter((v) => v.name.toLowerCase().includes(venueSearch.toLowerCase())).slice(0, 8)
+    : [];
+
+  const addLinkedArtist = (id: string) => {
+    setEditing((prev) => prev && !prev.linked_artist_ids.includes(id) ? { ...prev, linked_artist_ids: [...prev.linked_artist_ids, id] } : prev);
+    setArtistSearch('');
+  };
+
+  const removeLinkedArtist = (id: string) => {
+    setEditing((prev) => prev ? { ...prev, linked_artist_ids: prev.linked_artist_ids.filter((a) => a !== id) } : prev);
+  };
+
+  const addLinkedVenue = (id: string) => {
+    setEditing((prev) => prev && !prev.linked_venue_ids.includes(id) ? { ...prev, linked_venue_ids: [...prev.linked_venue_ids, id] } : prev);
+    setVenueSearch('');
+  };
+
+  const removeLinkedVenue = (id: string) => {
+    setEditing((prev) => prev ? { ...prev, linked_venue_ids: prev.linked_venue_ids.filter((v) => v !== id) } : prev);
+  };
+
+  // ---------- Render ----------
+
+  if (loading) {
+    return (
+      <div className="py-24 text-center">
+        <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  // ===== Article Editor Modal =====
+  if (editing) {
+    const sourceLang = editing.source_lang || 'zh';
+    return (
+      <div className="space-y-6 pb-16">
+        {/* Editor Header */}
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setEditing(null)}
+              className="p-2 rounded-lg text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-all"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="font-serif text-2xl font-bold">{getTitle(editing)}</h1>
+              <p className="text-xs text-[var(--muted-foreground)] font-mono mt-0.5">/{editing.slug}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleTranslate}
+              disabled={translating}
+              className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest transition-all ${
+                translating
+                  ? 'bg-[var(--muted)] text-[var(--muted-foreground)] cursor-wait'
+                  : 'bg-blue-500/15 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25'
+              }`}
+            >
+              {translating ? 'Translating...' : 'Translate All'}
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
+            >
+              {saving ? '...' : 'Save'}
+            </button>
+          </div>
+        </div>
+
+        {/* Settings Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {/* Status */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Status</label>
+            <select
+              value={editing.status}
+              onChange={(e) => setEditing({ ...editing, status: e.target.value })}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+            >
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Category</label>
+            <select
+              value={editing.category}
+              onChange={(e) => setEditing({ ...editing, category: e.target.value })}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+            >
+              {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+
+          {/* Source Language */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Source Lang</label>
+            <select
+              value={editing.source_lang}
+              onChange={(e) => setEditing({ ...editing, source_lang: e.target.value })}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+            >
+              {LANG_OPTIONS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
+            </select>
+          </div>
+
+          {/* Author + Featured */}
+          <div>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Author</label>
+            <input
+              type="text"
+              value={editing.author_name || ''}
+              onChange={(e) => setEditing({ ...editing, author_name: e.target.value })}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              placeholder="Author name"
+            />
+          </div>
+        </div>
+
+        {/* Featured toggle */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setEditing({ ...editing, is_featured: !editing.is_featured })}
+            className={`relative w-10 h-5 rounded-full transition-colors shrink-0 ${
+              editing.is_featured ? 'bg-[var(--color-gold)]' : 'bg-zinc-600'
+            }`}
+          >
+            <span
+              className="absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform"
+              style={{ left: editing.is_featured ? '22px' : '2px' }}
+            />
+          </button>
+          <span className="text-sm text-[var(--muted-foreground)]">Featured on homepage carousel</span>
+        </div>
+
+        {/* Cover Image */}
+        <div>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">
+            Cover Image
+            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">(main visual — subject should be centered)</span>
+          </label>
+          <div className="flex items-start gap-4">
+            {editing.cover_image_url ? (
+              <div className="relative w-48 aspect-video rounded-xl overflow-hidden bg-[var(--muted)]">
+                <Image src={editing.cover_image_url} alt="Cover" fill className="object-cover" sizes="192px" />
+                <button
+                  onClick={() => setEditing({ ...editing, cover_image_url: null })}
+                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center text-xs hover:bg-black/80"
+                >
+                  ×
+                </button>
+              </div>
+            ) : (
+              <label className={`flex items-center justify-center w-48 aspect-video rounded-xl border-2 border-dashed border-[var(--border)] cursor-pointer hover:border-[var(--color-gold)]/50 transition-colors ${uploadingCover ? 'opacity-50 pointer-events-none' : ''}`}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleImageUpload(f, 'cover');
+                  }}
+                />
+                <span className="text-xs text-[var(--muted-foreground)]">{uploadingCover ? 'Uploading...' : 'Upload Cover'}</span>
+              </label>
+            )}
+          </div>
+        </div>
+
+        {/* Gallery Images */}
+        <div>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">
+            Gallery Images
+            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">(min 2 recommended)</span>
+          </label>
+          <div className="flex flex-wrap gap-3">
+            {(editing.gallery_urls || []).map((url, i) => (
+              <div key={i} className="relative w-28 aspect-square rounded-xl overflow-hidden bg-[var(--muted)]">
+                <Image src={url} alt={`Gallery ${i + 1}`} fill className="object-cover" sizes="112px" />
+                <button
+                  onClick={() => removeGalleryImage(url)}
+                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center text-[10px] hover:bg-black/80"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+            <label className={`flex items-center justify-center w-28 aspect-square rounded-xl border-2 border-dashed border-[var(--border)] cursor-pointer hover:border-[var(--color-gold)]/50 transition-colors ${uploadingGallery ? 'opacity-50 pointer-events-none' : ''}`}>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleImageUpload(f, 'gallery');
+                }}
+              />
+              <span className="text-xs text-[var(--muted-foreground)]">{uploadingGallery ? '...' : '+ Add'}</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Linked Artists */}
+        <div>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Linked Artists</label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {editing.linked_artist_ids.map((id) => {
+              const artist = searchResults.artists.find((a) => a.id === id);
+              return (
+                <span key={id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[var(--color-gold)]/10 text-[var(--color-gold)] text-xs">
+                  {artist?.name || id.slice(0, 8)}
+                  <button onClick={() => removeLinkedArtist(id)} className="hover:text-white">×</button>
+                </span>
+              );
+            })}
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              value={artistSearch}
+              onChange={(e) => setArtistSearch(e.target.value)}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              placeholder="Search artists to link..."
+            />
+            {filteredArtists.length > 0 && (
+              <div className="absolute z-10 left-0 right-0 mt-1 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                {filteredArtists.map((a) => (
+                  <button key={a.id} onClick={() => addLinkedArtist(a.id)} className="w-full text-left px-3 py-2 text-sm hover:bg-[var(--muted)] transition-colors">
+                    {a.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Linked Venues */}
+        <div>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Linked Venues</label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {editing.linked_venue_ids.map((id) => {
+              const venue = searchResults.venues.find((v) => v.id === id);
+              return (
+                <span key={id} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 text-xs">
+                  {venue?.name || id.slice(0, 8)}
+                  <button onClick={() => removeLinkedVenue(id)} className="hover:text-white">×</button>
+                </span>
+              );
+            })}
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              value={venueSearch}
+              onChange={(e) => setVenueSearch(e.target.value)}
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              placeholder="Search venues to link..."
+            />
+            {filteredVenues.length > 0 && (
+              <div className="absolute z-10 left-0 right-0 mt-1 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-xl max-h-48 overflow-y-auto">
+                {filteredVenues.map((v) => (
+                  <button key={v.id} onClick={() => addLinkedVenue(v.id)} className="w-full text-left px-3 py-2 text-sm hover:bg-[var(--muted)] transition-colors">
+                    {v.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Title (source language) */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
+              Title <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()})</span>
+            </label>
+          </div>
+          <input
+            type="text"
+            value={((editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string) || ''}
+            onChange={(e) => setEditing({ ...editing, [`title_${sourceLang}`]: e.target.value })}
+            className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-base text-[var(--foreground)] font-serif focus:outline-none focus:border-[var(--color-gold)]/50"
+            placeholder="Article title..."
+          />
+        </div>
+
+        {/* Body (source language) */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
+              Body <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()}) — Markdown</span>
+            </label>
+          </div>
+          <textarea
+            value={((editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string) || ''}
+            onChange={(e) => setEditing({ ...editing, [`body_${sourceLang}`]: e.target.value })}
+            className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] font-mono leading-relaxed focus:outline-none focus:border-[var(--color-gold)]/50 min-h-[400px] resize-y"
+            placeholder="Write your article in Markdown..."
+          />
+        </div>
+
+        {/* Excerpt */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
+              Excerpt <span className="normal-case tracking-normal font-normal opacity-60">(auto-generated)</span>
+            </label>
+            <button
+              onClick={handleGenerateExcerpt}
+              disabled={generatingExcerpt}
+              className={`px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+                generatingExcerpt
+                  ? 'bg-[var(--muted)] text-[var(--muted-foreground)] cursor-wait'
+                  : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
+              }`}
+            >
+              {generatingExcerpt ? 'Generating...' : 'Generate Excerpts'}
+            </button>
+          </div>
+          <textarea
+            value={((editing as unknown as Record<string, unknown>)[`excerpt_${sourceLang}`] as string) || ''}
+            onChange={(e) => setEditing({ ...editing, [`excerpt_${sourceLang}`]: e.target.value })}
+            className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 min-h-[60px] resize-y"
+            placeholder="Brief excerpt for cards & SEO..."
+          />
+        </div>
+
+        {/* Translated Titles Preview */}
+        {LANG_OPTIONS.filter((l) => l.value !== sourceLang).some((l) => (editing as unknown as Record<string, unknown>)[`title_${l.value}`]) && (
+          <div>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Translated Titles</label>
+            <div className="space-y-1.5">
+              {LANG_OPTIONS.filter((l) => l.value !== sourceLang).map((l) => {
+                const val = (editing as unknown as Record<string, unknown>)[`title_${l.value}`] as string;
+                if (!val) return null;
+                return (
+                  <div key={l.value} className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-[var(--muted-foreground)] w-5 shrink-0">{l.value.toUpperCase()}</span>
+                    <span className="text-sm text-[var(--foreground)] truncate">{val}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Danger Zone */}
+        <div className="pt-6 border-t border-[var(--border)]">
+          <button
+            onClick={() => handleDelete(editing.id)}
+            className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-red-400 border border-red-500/30 hover:bg-red-500/10 transition-all"
+          >
+            Delete Article
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ===== Article List =====
+  return (
+    <div className="space-y-8 pb-16">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-serif text-3xl font-bold">{t('magazineTitle')}</h1>
+          <p className="text-sm text-[var(--muted-foreground)] mt-1">{t('magazineDesc')}</p>
+        </div>
+        <button
+          onClick={handleCreate}
+          className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
+        >
+          + New Article
+        </button>
+      </div>
+
+      {articles.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-[var(--muted-foreground)] text-sm mb-4">No articles yet. Start creating your first Magazine story.</p>
+          <button
+            onClick={handleCreate}
+            className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
+          >
+            Create First Article
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {articles.map((article) => (
+            <button
+              key={article.id}
+              onClick={() => setEditing(article)}
+              className="w-full flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all hover:bg-[var(--card)]/60 text-left"
+            >
+              {/* Cover thumbnail */}
+              <div className="w-16 h-10 rounded-lg overflow-hidden bg-[var(--muted)] shrink-0">
+                {article.cover_image_url ? (
+                  <Image src={article.cover_image_url} alt="" width={64} height={40} className="w-full h-full object-cover" sizes="64px" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-[var(--muted-foreground)]">No img</div>
+                )}
+              </div>
+
+              {/* Info */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium truncate">{getTitle(article)}</span>
+                  <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${STATUS_COLORS[article.status] || ''}`}>
+                    {article.status}
+                  </span>
+                  {article.is_featured && (
+                    <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                  {CATEGORIES.find((c) => c.value === article.category)?.label}
+                  {article.author_name ? ` · ${article.author_name}` : ''}
+                  {article.published_at ? ` · ${new Date(article.published_at).toLocaleDateString()}` : ''}
+                </p>
+              </div>
+
+              {/* Edit arrow */}
+              <svg className="w-4 h-4 text-[var(--muted-foreground)] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 18l6-6-6-6" />
+              </svg>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

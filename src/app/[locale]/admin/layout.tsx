@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { key: 'artistTiers', icon: 'music', path: '/artist-tiers' },
   { key: 'venueTiers', icon: 'house', path: '/venue-tiers' },
   { key: 'badges', icon: 'badge', path: '/badges' },
+  { key: 'magazine', icon: 'magazine', path: '/magazine' },
 ] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -77,6 +78,15 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" />
+        </svg>
+      );
+    case 'magazine':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          <path d="M8 7h8" />
+          <path d="M8 11h6" />
         </svg>
       );
     default:
