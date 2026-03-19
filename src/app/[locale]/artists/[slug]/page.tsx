@@ -359,19 +359,22 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
 
           <div className="flex-1 space-y-5">
             <div>
-              <EditableName
-                entityType="artist"
-                entityId={artist.id}
-                field={artistDisplayNameField(f, locale)}
-                value={artistDisplayName(f, locale)}
-                fieldOptions={[
-                  { field: 'name_local', label: 'name_local', value: f.name_local || '' },
-                  { field: 'name_en', label: 'name_en', value: f.name_en || '' },
-                  { field: 'display_name', label: 'display_name', value: f.display_name || '' },
-                ]}
-                className="font-serif text-4xl sm:text-5xl font-bold"
-                tag="h1"
-              />{f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} />}
+              <div className="inline-flex items-start gap-1">
+                <EditableName
+                  entityType="artist"
+                  entityId={artist.id}
+                  field={artistDisplayNameField(f, locale)}
+                  value={artistDisplayName(f, locale)}
+                  fieldOptions={[
+                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                  ]}
+                  className="font-serif text-4xl sm:text-5xl font-bold"
+                  tag="h1"
+                />
+                {f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className="!top-0 !ml-0 mt-1 sm:mt-1.5" />}
+              </div>
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName
                   entityType="artist"

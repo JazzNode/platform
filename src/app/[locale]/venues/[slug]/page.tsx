@@ -257,9 +257,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
         <div className="flex-1 space-y-6">
           <div>
-            <h1 className="font-serif text-4xl sm:text-5xl font-bold">
-              {displayName(f)}{f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} />}
-            </h1>
+            <div className="inline-flex items-start gap-1">
+              <h1 className="font-serif text-4xl sm:text-5xl font-bold">
+                {displayName(f)}
+              </h1>
+              {f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className="!top-0 !ml-0 mt-1 sm:mt-1.5" />}
+            </div>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
             <p className="text-xl text-[#8A8578]">{f.name_en}</p>
