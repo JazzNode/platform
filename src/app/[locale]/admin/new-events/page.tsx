@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client';
@@ -15,7 +15,10 @@ interface NewEvent {
   venue_id: string | null;
   venue_name: string | null;
   venue_city: string | null;
+  audit_status: string | null;
 }
+
+type AuditStatus = 'need_fix' | 'checked' | null;
 
 export default function AdminNewEventsPage() {
   const t = useTranslations('adminHQ');
@@ -42,6 +45,7 @@ export default function AdminNewEventsPage() {
           start_at,
           timezone,
           created_at,
+          audit_status,
           venue_id,
           venues!events_venue_id_fkey ( display_name, name_local, name_en, city_id, cities!venues_city_id_fkey ( name_en, name_local ) )
         `)
@@ -62,6 +66,7 @@ export default function AdminNewEventsPage() {
             venue_id: row.venue_id as string | null,
             venue_name: (venue?.display_name || venue?.name_local || venue?.name_en || null) as string | null,
             venue_city: (city?.name_local || city?.name_en || null) as string | null,
+            audit_status: (row.audit_status as string | null) || null,
           };
         });
         setEvents(mapped);
@@ -71,6 +76,29 @@ export default function AdminNewEventsPage() {
     })();
     return () => { cancelled = true; };
   }, [days]);
+
+  const toggleAudit = useCallback(async (eventId: string, newStatus: AuditStatus) => {
+    const supabase = createClient();
+    // Optimistic update
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.event_id === eventId ? { ...e, audit_status: newStatus } : e
+      )
+    );
+    const { error } = await supabase
+      .from('events')
+      .update({ audit_status: newStatus })
+      .eq('event_id', eventId);
+    if (error) {
+      console.error('Failed to update audit status:', error);
+      // Revert on failure
+      setEvents((prev) =>
+        prev.map((e) =>
+          e.event_id === eventId ? { ...e, audit_status: e.audit_status } : e
+        )
+      );
+    }
+  }, []);
 
   // Group by created_at date
   const grouped = useMemo(() => {
@@ -167,41 +195,76 @@ export default function AdminNewEventsPage() {
             {dateEvents.map((event) => {
               const tz = event.timezone || 'Asia/Taipei';
               return (
-                <Link
+                <div
                   key={event.event_id}
-                  href={`/${locale}/events/${event.event_id}`}
-                  target="_blank"
-                  className="flex items-start gap-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--color-gold)]/30 transition-colors group"
+                  className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border)] bg-[var(--card)] hover:border-[var(--color-gold)]/30 transition-colors group"
                 >
-                  {/* Time column */}
-                  <div className="shrink-0 w-20 text-right">
-                    <p className="text-xs text-[var(--color-gold)] font-medium">
-                      {formatEventDate(event.start_at, tz)}
-                    </p>
-                    <p className="text-[10px] text-[var(--muted-foreground)]">
-                      {formatEventTime(event.start_at, tz)}
-                    </p>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-serif font-bold text-sm group-hover:text-[var(--color-gold)] transition-colors truncate">
-                      {eventTitle(event)}
-                    </p>
-                    {event.venue_name && (
-                      <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
-                        {event.venue_city ? `${event.venue_city} · ` : ''}{event.venue_name}
+                  {/* Clickable event info area */}
+                  <Link
+                    href={`/${locale}/events/${event.event_id}`}
+                    target="_blank"
+                    className="flex items-start gap-4 flex-1 min-w-0"
+                  >
+                    {/* Time column */}
+                    <div className="shrink-0 w-20 text-right">
+                      <p className="text-xs text-[var(--color-gold)] font-medium">
+                        {formatEventDate(event.start_at, tz)}
                       </p>
-                    )}
-                  </div>
+                      <p className="text-[10px] text-[var(--muted-foreground)]">
+                        {formatEventTime(event.start_at, tz)}
+                      </p>
+                    </div>
 
-                  {/* Created time */}
-                  <div className="shrink-0 text-right">
-                    <p className="text-[10px] text-[var(--muted-foreground)]">
-                      {new Date(event.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                    </p>
+                    {/* Content */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-serif font-bold text-sm group-hover:text-[var(--color-gold)] transition-colors truncate">
+                        {eventTitle(event)}
+                      </p>
+                      {event.venue_name && (
+                        <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate">
+                          {event.venue_city ? `${event.venue_city} · ` : ''}{event.venue_name}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Created time */}
+                    <div className="shrink-0 text-right">
+                      <p className="text-[10px] text-[var(--muted-foreground)]">
+                        {new Date(event.created_at).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                      </p>
+                    </div>
+                  </Link>
+
+                  {/* Audit buttons */}
+                  <div className="shrink-0 flex items-center gap-1.5">
+                    <button
+                      onClick={() =>
+                        toggleAudit(event.event_id, event.audit_status === 'need_fix' ? null : 'need_fix')
+                      }
+                      title="Need Fix"
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-all border ${
+                        event.audit_status === 'need_fix'
+                          ? 'bg-red-500/15 text-red-400 border-red-500/30'
+                          : 'text-[var(--muted-foreground)] border-[var(--border)] hover:text-red-400 hover:border-red-500/30'
+                      }`}
+                    >
+                      need fix
+                    </button>
+                    <button
+                      onClick={() =>
+                        toggleAudit(event.event_id, event.audit_status === 'checked' ? null : 'checked')
+                      }
+                      title="Checked"
+                      className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-all border ${
+                        event.audit_status === 'checked'
+                          ? 'bg-green-500/15 text-green-400 border-green-500/30'
+                          : 'text-[var(--muted-foreground)] border-[var(--border)] hover:text-green-400 hover:border-green-500/30'
+                      }`}
+                    >
+                      checked
+                    </button>
                   </div>
-                </Link>
+                </div>
               );
             })}
           </div>
