@@ -288,11 +288,73 @@ export default function FanInboxPage() {
         })
       );
 
+      // If selectedConvo is set but not in the fetched list, fetch it directly
+      if (!cancelled && selectedConvo && !enriched.find((c) => c.id === selectedConvo)) {
+        const { data: missedConvo } = await supabase
+          .from('conversations')
+          .select('id, type, artist_id, venue_id, fan_user_id, user_b_id, last_message_at')
+          .eq('id', selectedConvo)
+          .maybeSingle();
+
+        if (missedConvo) {
+          let peer_name = '';
+          let peer_avatar: string | null = null;
+          let source_badge: 'hq' | 'artist' | 'venue' | null = null;
+
+          if (missedConvo.type === 'artist_fan' && missedConvo.artist_id) {
+            const { data: artist } = await supabase
+              .from('artists')
+              .select('display_name, name_local, name_en, photo_url')
+              .eq('artist_id', missedConvo.artist_id)
+              .maybeSingle();
+            peer_name = artist?.display_name || artist?.name_local || artist?.name_en || missedConvo.artist_id;
+            peer_avatar = artist?.photo_url || null;
+            source_badge = 'artist';
+          } else if (missedConvo.type === 'venue_fan' && missedConvo.venue_id) {
+            const { data: venue } = await supabase
+              .from('venues')
+              .select('display_name, name_local, name_en, photo_url')
+              .eq('venue_id', missedConvo.venue_id)
+              .maybeSingle();
+            peer_name = venue?.display_name || venue?.name_local || venue?.name_en || missedConvo.venue_id;
+            peer_avatar = venue?.photo_url || null;
+            source_badge = 'venue';
+          } else if (missedConvo.type === 'member_hq') {
+            peer_name = 'JazzNode HQ';
+            source_badge = 'hq';
+          } else if (missedConvo.type === 'member_member') {
+            const peerId = missedConvo.fan_user_id === user.id ? missedConvo.user_b_id : missedConvo.fan_user_id;
+            if (peerId) {
+              const { data: peer } = await supabase
+                .from('profiles')
+                .select('display_name, username, avatar_url')
+                .eq('id', peerId)
+                .maybeSingle();
+              peer_name = peer?.display_name || peer?.username || 'Unknown';
+              peer_avatar = peer?.avatar_url || null;
+            }
+          }
+
+          enriched.unshift({
+            id: missedConvo.id,
+            type: missedConvo.type,
+            artist_id: missedConvo.artist_id,
+            venue_id: missedConvo.venue_id,
+            peer_name,
+            peer_avatar,
+            last_message: null,
+            last_message_at: missedConvo.last_message_at || new Date().toISOString(),
+            unread_count: 0,
+            source_badge,
+          });
+        }
+      }
+
       if (!cancelled) { setConversations(enriched); setFetching(false); }
     })();
 
     return () => { cancelled = true; };
-  }, [user]);
+  }, [user, selectedConvo]);
 
   // Fetch messages for selected conversation
   useEffect(() => {
@@ -475,8 +537,22 @@ export default function FanInboxPage() {
     if (!user) return;
     const supabase = createClient();
 
+    // Helper: ensure conversation appears in the sidebar list
+    const ensureInList = (id: string, type: UnifiedConversation['type'], extra: Partial<UnifiedConversation> = {}) => {
+      setSelectedConvo(id);
+      setConversations((prev) => {
+        if (prev.find((c) => c.id === id)) return prev;
+        return [{
+          id, type,
+          peer_name: peerName, peer_avatar: peerAvatar,
+          last_message: null, last_message_at: new Date().toISOString(),
+          unread_count: 0, source_badge: type === 'artist_fan' ? 'artist' : type === 'venue_fan' ? 'venue' : type === 'member_hq' ? 'hq' : null,
+          ...extra,
+        }, ...prev];
+      });
+    };
+
     if (resultType === 'artist') {
-      // Find or create artist_fan conversation
       const { data: existing } = await supabase
         .from('conversations')
         .select('id')
@@ -486,7 +562,7 @@ export default function FanInboxPage() {
         .maybeSingle();
 
       if (existing) {
-        setSelectedConvo(existing.id);
+        ensureInList(existing.id, 'artist_fan', { artist_id: peerId });
         setFilter('artist');
       } else {
         const { data: newConvo } = await supabase
@@ -495,18 +571,11 @@ export default function FanInboxPage() {
           .select('id')
           .single();
         if (newConvo) {
-          setSelectedConvo(newConvo.id);
+          ensureInList(newConvo.id, 'artist_fan', { artist_id: peerId });
           setFilter('artist');
-          setConversations((prev) => [{
-            id: newConvo.id, type: 'artist_fan', artist_id: peerId,
-            peer_name: peerName, peer_avatar: peerAvatar,
-            last_message: null, last_message_at: new Date().toISOString(),
-            unread_count: 0, source_badge: 'artist',
-          }, ...prev]);
         }
       }
     } else if (resultType === 'venue') {
-      // Find or create venue_fan conversation
       const { data: existing } = await supabase
         .from('conversations')
         .select('id')
@@ -516,7 +585,7 @@ export default function FanInboxPage() {
         .maybeSingle();
 
       if (existing) {
-        setSelectedConvo(existing.id);
+        ensureInList(existing.id, 'venue_fan', { venue_id: peerId });
         setFilter('venue');
       } else {
         const { data: newConvo } = await supabase
@@ -525,18 +594,11 @@ export default function FanInboxPage() {
           .select('id')
           .single();
         if (newConvo) {
-          setSelectedConvo(newConvo.id);
+          ensureInList(newConvo.id, 'venue_fan', { venue_id: peerId });
           setFilter('venue');
-          setConversations((prev) => [{
-            id: newConvo.id, type: 'venue_fan', venue_id: peerId,
-            peer_name: peerName, peer_avatar: peerAvatar,
-            last_message: null, last_message_at: new Date().toISOString(),
-            unread_count: 0, source_badge: 'venue',
-          }, ...prev]);
         }
       }
     } else {
-      // member_member DM
       const { data: existing } = await supabase
         .from('conversations')
         .select('id')
@@ -545,7 +607,7 @@ export default function FanInboxPage() {
         .maybeSingle();
 
       if (existing) {
-        setSelectedConvo(existing.id);
+        ensureInList(existing.id, 'member_member');
       } else {
         const { data: newConvo } = await supabase
           .from('conversations')
@@ -553,13 +615,7 @@ export default function FanInboxPage() {
           .select('id')
           .single();
         if (newConvo) {
-          setSelectedConvo(newConvo.id);
-          setConversations((prev) => [{
-            id: newConvo.id, type: 'member_member',
-            peer_name: peerName, peer_avatar: peerAvatar,
-            last_message: null, last_message_at: new Date().toISOString(),
-            unread_count: 0, source_badge: null,
-          }, ...prev]);
+          ensureInList(newConvo.id, 'member_member');
         }
       }
     }
