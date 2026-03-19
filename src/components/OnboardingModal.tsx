@@ -118,7 +118,7 @@ export default function OnboardingModal() {
               <select
                 value={region}
                 onChange={(e) => setRegion(e.target.value)}
-                className="w-full h-10 rounded-lg border border-[var(--border)] bg-transparent px-3 text-sm outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-colors text-[var(--foreground)]"
+                className="w-full h-10 rounded-lg border border-[var(--border)] bg-transparent px-3 text-sm outline-none focus:border-[var(--color-gold)] focus:ring-1 focus:ring-[var(--color-gold)]/50 transition-colors text-[var(--foreground)] [&>option]:bg-[var(--background)] [&>option]:text-[var(--foreground)]"
               >
                 <option value="">{t('regionPlaceholder')}</option>
                 {REGIONS_ACTIVE.map((r) => (
