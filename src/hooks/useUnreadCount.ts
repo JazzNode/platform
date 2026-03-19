@@ -1,0 +1,41 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+
+interface UnreadCountData {
+  total: number;
+  breakdown: Record<string, number>;
+}
+
+/**
+ * Hook to fetch the total unread inbox count for the authenticated user.
+ * Polls every 60 seconds. Returns { total, breakdown, refresh }.
+ *
+ * breakdown keys: "profile", "artist:<id>", "venue:<id>", "hq"
+ */
+export function useUnreadCount(enabled: boolean) {
+  const [data, setData] = useState<UnreadCountData>({ total: 0, breakdown: {} });
+
+  const refresh = useCallback(async () => {
+    try {
+      const res = await fetch('/api/inbox/unread-count');
+      if (res.ok) {
+        const json = await res.json();
+        setData({ total: json.total || 0, breakdown: json.breakdown || {} });
+      }
+    } catch {
+      // Silently fail — badge just won't show
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!enabled) return;
+
+    refresh();
+
+    const interval = setInterval(refresh, 60_000);
+    return () => clearInterval(interval);
+  }, [enabled, refresh]);
+
+  return { ...data, refresh };
+}

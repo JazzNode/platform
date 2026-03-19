@@ -11,6 +11,7 @@ import { useRegion } from './RegionProvider';
 
 import { createClient } from '@/utils/supabase/client';
 import { ACTIVE_COUNTRY_CODES } from '@/lib/regions';
+import { useUnreadCount } from '@/hooks/useUnreadCount';
 
 const localeFullNames: Record<string, string> = { en: 'English', zh: '中文', ja: '日本語', ko: '한국어', th: 'ไทย', id: 'Indonesia' };
 const localeList = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
@@ -159,6 +160,9 @@ export default function Header() {
   const [claimedArtists, setClaimedArtists] = useState<{ id: string; name: string }[]>([]);
   const [claimedVenues, setClaimedVenues] = useState<{ id: string; name: string }[]>([]);
 
+  // Inbox unread count badge
+  const { total: unreadTotal, breakdown: unreadBreakdown } = useUnreadCount(!!user);
+
   useEffect(() => {
     if (!profile) return;
     const supabase = createClient();
@@ -211,7 +215,12 @@ export default function Header() {
             <circle cx="12" cy="8" r="4" />
             <path d="M20 21a8 8 0 0 0-16 0" />
           </svg>
-          {tAuth('profile')}
+          <span className="flex-1">{tAuth('profile')}</span>
+          {(unreadBreakdown.profile || 0) > 0 && (
+            <span className="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-[5px] rounded-full flex items-center justify-center leading-none">
+              {unreadBreakdown.profile! > 99 ? '99+' : unreadBreakdown.profile}
+            </span>
+          )}
         </button>
         {hasClaimed && (
           <div className="border-t border-[var(--border)] py-1">
@@ -226,7 +235,12 @@ export default function Header() {
                   <circle cx="6" cy="18" r="3" />
                   <circle cx="18" cy="16" r="3" />
                 </svg>
-                <span className="truncate">{a.name}</span>
+                <span className="truncate flex-1">{a.name}</span>
+                {(unreadBreakdown[`artist:${a.id}`] || 0) > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-[5px] rounded-full flex items-center justify-center leading-none shrink-0">
+                    {unreadBreakdown[`artist:${a.id}`] > 99 ? '99+' : unreadBreakdown[`artist:${a.id}`]}
+                  </span>
+                )}
               </button>
             ))}
             {effectiveClaimedVenues.map((v) => (
@@ -239,7 +253,12 @@ export default function Header() {
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
                   <polyline points="9 22 9 12 15 12 15 22" />
                 </svg>
-                <span className="truncate">{v.name}</span>
+                <span className="truncate flex-1">{v.name}</span>
+                {(unreadBreakdown[`venue:${v.id}`] || 0) > 0 && (
+                  <span className="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-[5px] rounded-full flex items-center justify-center leading-none shrink-0">
+                    {unreadBreakdown[`venue:${v.id}`] > 99 ? '99+' : unreadBreakdown[`venue:${v.id}`]}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -255,7 +274,12 @@ export default function Header() {
                 <path d="M2 17l10 5 10-5" />
                 <path d="M2 12l10 5 10-5" />
               </svg>
-              <span>JazzNode HQ</span>
+              <span className="flex-1">JazzNode HQ</span>
+              {(unreadBreakdown.hq || 0) > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] px-[5px] rounded-full flex items-center justify-center leading-none shrink-0">
+                  {unreadBreakdown.hq! > 99 ? '99+' : unreadBreakdown.hq}
+                </span>
+              )}
             </button>
           </div>
         )}
@@ -301,13 +325,20 @@ export default function Header() {
       <div ref={mobile ? undefined : userMenuRefDesktop} className="relative">
         <button
           onClick={() => setUserMenuOpen(!userMenuOpen)}
-          className="w-7 h-7 rounded-full overflow-hidden bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
+          className="relative w-7 h-7 rounded-full overflow-visible bg-[var(--color-gold)] text-[#0A0A0A] text-xs font-bold flex items-center justify-center transition-opacity hover:opacity-90"
           aria-label="User menu"
         >
-          {profile?.avatar_url ? (
-            <Image src={profile.avatar_url} alt="" width={28} height={28} className="w-full h-full object-cover" sizes="28px" />
-          ) : (
-            userInitial
+          <span className="w-7 h-7 rounded-full overflow-hidden flex items-center justify-center">
+            {profile?.avatar_url ? (
+              <Image src={profile.avatar_url} alt="" width={28} height={28} className="w-full h-full object-cover" sizes="28px" />
+            ) : (
+              userInitial
+            )}
+          </span>
+          {unreadTotal > 0 && (
+            <span className="absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-[5px] rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center leading-none shadow-sm border-2 border-[var(--background)]">
+              {unreadTotal > 99 ? '99+' : unreadTotal}
+            </span>
           )}
         </button>
         {userMenuOpen && !mobile && (
