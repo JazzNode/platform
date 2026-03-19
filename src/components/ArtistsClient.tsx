@@ -9,6 +9,7 @@ import FollowButton from '@/components/FollowButton';
 import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from '@/components/RegionProvider';
 import { normalizeInstrumentKey } from '@/lib/helpers';
+import { BADGE_ICONS } from '@/components/BadgeCard';
 
 interface SerializedArtist {
   id: string;
@@ -22,6 +23,8 @@ interface SerializedArtist {
   photoUrl: string | null;
   cityList: string[];          // city record IDs
   venueList: string[];         // venue record IDs
+  tier: number;                // 0 = unclaimed, 1+ = claimed
+  badgeList: string[];         // earned badge IDs
 }
 
 interface CityOption {
@@ -55,6 +58,7 @@ interface Props {
     musicians: string;
     groups: string;
     bigBands: string;
+    claimed: string;
     noArtists: string;
     artistFootprint: string;
     allVenues: string;
@@ -172,6 +176,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         if (!a.type || a.type === 'person' || a.type === 'big band') return false;
       } else if (selectedType === 'bigBands') {
         if (a.type !== 'big band') return false;
+      } else if (selectedType === 'claimed') {
+        if (a.tier < 1) return false;
       }
       // Instrument filter
       if (selectedInstruments.size > 0) {
@@ -214,10 +220,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             { key: 'musicians', label: labels.musicians },
             { key: 'groups', label: labels.groups },
             { key: 'bigBands', label: labels.bigBands },
+            { key: 'claimed', label: labels.claimed },
           ] as const).map(({ key, label }) => (
             <button
               key={key}
-              onClick={() => { setSelectedType(key); if (key !== 'musicians' && key !== 'all') setSelectedInstruments(new Set()); }}
+              onClick={() => { setSelectedType(key); if (key !== 'musicians' && key !== 'all' && key !== 'claimed') setSelectedInstruments(new Set()); }}
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
@@ -420,6 +427,22 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 </div>
               </div>
               {artist.bio && <p className="text-xs text-[#8A8578] line-clamp-2 leading-relaxed">{artist.bio}</p>}
+              {artist.badgeList.length > 0 && (
+                <div className="flex items-center gap-1 mt-2 flex-wrap">
+                  {artist.badgeList.slice(0, 5).map((badgeId) => (
+                    <span
+                      key={badgeId}
+                      className="inline-flex items-center justify-center w-6 h-6 rounded-md bg-gold/10 text-gold/80 shrink-0"
+                      title={badgeId.replace(/^art_/, '').replace(/_/g, ' ')}
+                    >
+                      <span className="[&_svg]:!w-3.5 [&_svg]:!h-3.5">{BADGE_ICONS[badgeId] || BADGE_ICONS.art_in_the_house}</span>
+                    </span>
+                  ))}
+                  {artist.badgeList.length > 5 && (
+                    <span className="text-[10px] text-gold/60 ml-0.5">+{artist.badgeList.length - 5}</span>
+                  )}
+                </div>
+              )}
               <div className="flex gap-2 mt-3 flex-wrap">
                 {artist.countryCode && <span className="text-[10px] uppercase tracking-widest text-[#8A8578]">🌍 {artist.countryCode}</span>}
                 {artist.eventCount > 0 && <span className="text-[10px] uppercase tracking-widest text-[#8A8578]">{artist.eventCount} events</span>}

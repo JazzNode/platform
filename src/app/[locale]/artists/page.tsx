@@ -132,6 +132,8 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       photoUrl: photoUrl(f.photo_url) || null,
       cityList: f.city_list || [],
       venueList: f.venue_list || [],
+      tier: f.tier || 0,
+      badgeList: f.badge_list || [],
     };
   });
 
@@ -152,6 +154,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
         musicians: t('musicians'),
         groups: t('groups'),
         bigBands: t('bigBands'),
+        claimed: t('claimed'),
         noArtists: t('noArtists'),
         artistFootprint: t('artistFootprint'),
         allVenues: t('allVenues'),
