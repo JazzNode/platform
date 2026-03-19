@@ -236,6 +236,19 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                 </Link>
               );
             })}
+            {profile?.username && (
+              <Link
+                href={`/${locale}/user/${profile.username}`}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-all"
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                <span>{t('viewPublicProfile')}</span>
+              </Link>
+            )}
           </div>
         </div>
 
