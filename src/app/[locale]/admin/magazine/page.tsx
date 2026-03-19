@@ -43,11 +43,11 @@ interface Article {
   source_lang: string;
 }
 
-const CATEGORIES = [
-  { value: 'artist-feature', label: 'Artist Feature' },
-  { value: 'venue-spotlight', label: 'Venue Spotlight' },
-  { value: 'scene-report', label: 'Scene Report' },
-  { value: 'culture', label: 'Culture' },
+const CATEGORY_KEYS = [
+  { value: 'artist-feature', key: 'magazineCatArtist' },
+  { value: 'venue-spotlight', key: 'magazineCatVenue' },
+  { value: 'scene-report', key: 'magazineCatScene' },
+  { value: 'culture', key: 'magazineCatCulture' },
 ] as const;
 
 const LANG_OPTIONS = [
@@ -70,6 +70,7 @@ const STATUS_COLORS: Record<string, string> = {
 export default function MagazinePage() {
   const { token } = useAdmin();
   const t = useTranslations('adminHQ');
+  const tc = useTranslations('common');
   const locale = useLocale();
 
   const [articles, setArticles] = useState<Article[]>([]);
@@ -182,7 +183,7 @@ export default function MagazinePage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!token || !confirm('Delete this article permanently?')) return;
+    if (!token || !confirm(t('magDeleteConfirm'))) return;
     try {
       await fetch('/api/admin/magazine', {
         method: 'DELETE',
@@ -205,7 +206,7 @@ export default function MagazinePage() {
     const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
 
     if (!title?.trim() || !body?.trim()) {
-      alert(`Please fill in the title and body in the source language (${sourceLang}) first.`);
+      alert(t('magAlertFillSource'));
       return;
     }
 
@@ -220,7 +221,7 @@ export default function MagazinePage() {
       if (res.ok) {
         setEditing((prev) => prev ? { ...prev, ...translations } : prev);
       } else {
-        alert(`Translation failed: ${translations.error}`);
+        alert(`${t('magTranslateFailed')}: ${translations.error}`);
       }
     } catch (err) {
       console.error('Translation failed:', err);
@@ -237,7 +238,7 @@ export default function MagazinePage() {
     const body = (editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string;
 
     if (!body?.trim()) {
-      alert('Please write the article body first.');
+      alert(t('magAlertWriteBody'));
       return;
     }
 
@@ -363,14 +364,14 @@ export default function MagazinePage() {
                   : 'bg-blue-500/15 text-blue-400 border border-blue-500/30 hover:bg-blue-500/25'
               }`}
             >
-              {translating ? 'Translating...' : 'Translate All'}
+              {translating ? t('magTranslating') : t('magTranslateAll')}
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
               className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
             >
-              {saving ? '...' : 'Save'}
+              {saving ? '...' : t('magSave')}
             </button>
           </div>
         </div>
@@ -379,33 +380,33 @@ export default function MagazinePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {/* Status */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Status</label>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">{t('magStatus')}</label>
             <select
               value={editing.status}
               onChange={(e) => setEditing({ ...editing, status: e.target.value })}
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
             >
-              <option value="draft">Draft</option>
-              <option value="published">Published</option>
-              <option value="archived">Archived</option>
+              <option value="draft">{t('magDraft')}</option>
+              <option value="published">{t('magPublished')}</option>
+              <option value="archived">{t('magArchived')}</option>
             </select>
           </div>
 
           {/* Category */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Category</label>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">{t('magCategory')}</label>
             <select
               value={editing.category}
               onChange={(e) => setEditing({ ...editing, category: e.target.value })}
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
             >
-              {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+              {CATEGORY_KEYS.map((c) => <option key={c.value} value={c.value}>{tc(c.key)}</option>)}
             </select>
           </div>
 
           {/* Source Language */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Source Lang</label>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">{t('magSourceLang')}</label>
             <select
               value={editing.source_lang}
               onChange={(e) => setEditing({ ...editing, source_lang: e.target.value })}
@@ -417,13 +418,13 @@ export default function MagazinePage() {
 
           {/* Author + Featured */}
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">Author</label>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-1.5">{t('magAuthor')}</label>
             <input
               type="text"
               value={editing.author_name || ''}
               onChange={(e) => setEditing({ ...editing, author_name: e.target.value })}
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
-              placeholder="Author name"
+              placeholder={t('magAuthorPlaceholder')}
             />
           </div>
         </div>
@@ -441,14 +442,14 @@ export default function MagazinePage() {
               style={{ left: editing.is_featured ? '22px' : '2px' }}
             />
           </button>
-          <span className="text-sm text-[var(--muted-foreground)]">Featured on homepage carousel</span>
+          <span className="text-sm text-[var(--muted-foreground)]">{t('magFeaturedToggle')}</span>
         </div>
 
         {/* Cover Image */}
         <div>
           <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">
-            Cover Image
-            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">(main visual — subject should be centered)</span>
+            {t('magCoverImage')}
+            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">({t('magCoverHint')})</span>
           </label>
           <div className="flex items-start gap-4">
             {editing.cover_image_url ? (
@@ -472,7 +473,7 @@ export default function MagazinePage() {
                     if (f) handleImageUpload(f, 'cover');
                   }}
                 />
-                <span className="text-xs text-[var(--muted-foreground)]">{uploadingCover ? 'Uploading...' : 'Upload Cover'}</span>
+                <span className="text-xs text-[var(--muted-foreground)]">{uploadingCover ? t('magUploading') : t('magUploadCover')}</span>
               </label>
             )}
           </div>
@@ -481,8 +482,8 @@ export default function MagazinePage() {
         {/* Gallery Images */}
         <div>
           <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">
-            Gallery Images
-            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">(min 2 recommended)</span>
+            {t('magGallery')}
+            <span className="normal-case tracking-normal font-normal ml-2 opacity-60">({t('magGalleryHint')})</span>
           </label>
           <div className="flex flex-wrap gap-3">
             {(editing.gallery_urls || []).map((url, i) => (
@@ -506,14 +507,14 @@ export default function MagazinePage() {
                   if (f) handleImageUpload(f, 'gallery');
                 }}
               />
-              <span className="text-xs text-[var(--muted-foreground)]">{uploadingGallery ? '...' : '+ Add'}</span>
+              <span className="text-xs text-[var(--muted-foreground)]">{uploadingGallery ? '...' : t('magGalleryAdd')}</span>
             </label>
           </div>
         </div>
 
         {/* Linked Artists */}
         <div>
-          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Linked Artists</label>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">{t('magLinkedArtists')}</label>
           <div className="flex flex-wrap gap-2 mb-2">
             {editing.linked_artist_ids.map((id) => {
               const artist = searchResults.artists.find((a) => a.id === id);
@@ -531,7 +532,7 @@ export default function MagazinePage() {
               value={artistSearch}
               onChange={(e) => setArtistSearch(e.target.value)}
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
-              placeholder="Search artists to link..."
+              placeholder={t('magSearchArtists')}
             />
             {filteredArtists.length > 0 && (
               <div className="absolute z-10 left-0 right-0 mt-1 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-xl max-h-48 overflow-y-auto">
@@ -547,7 +548,7 @@ export default function MagazinePage() {
 
         {/* Linked Venues */}
         <div>
-          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Linked Venues</label>
+          <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">{t('magLinkedVenues')}</label>
           <div className="flex flex-wrap gap-2 mb-2">
             {editing.linked_venue_ids.map((id) => {
               const venue = searchResults.venues.find((v) => v.id === id);
@@ -565,7 +566,7 @@ export default function MagazinePage() {
               value={venueSearch}
               onChange={(e) => setVenueSearch(e.target.value)}
               className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
-              placeholder="Search venues to link..."
+              placeholder={t('magSearchVenues')}
             />
             {filteredVenues.length > 0 && (
               <div className="absolute z-10 left-0 right-0 mt-1 bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-xl max-h-48 overflow-y-auto">
@@ -583,7 +584,7 @@ export default function MagazinePage() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
-              Title <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()})</span>
+              {t('magTitle')} <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()})</span>
             </label>
           </div>
           <input
@@ -591,7 +592,7 @@ export default function MagazinePage() {
             value={((editing as unknown as Record<string, unknown>)[`title_${sourceLang}`] as string) || ''}
             onChange={(e) => setEditing({ ...editing, [`title_${sourceLang}`]: e.target.value })}
             className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2.5 text-base text-[var(--foreground)] font-serif focus:outline-none focus:border-[var(--color-gold)]/50"
-            placeholder="Article title..."
+            placeholder={t('magTitlePlaceholder')}
           />
         </div>
 
@@ -599,14 +600,14 @@ export default function MagazinePage() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
-              Body <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()}) — Markdown</span>
+              {t('magBody')} <span className="text-[var(--color-gold)]">({sourceLang.toUpperCase()}) — Markdown</span>
             </label>
           </div>
           <textarea
             value={((editing as unknown as Record<string, unknown>)[`body_${sourceLang}`] as string) || ''}
             onChange={(e) => setEditing({ ...editing, [`body_${sourceLang}`]: e.target.value })}
             className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-4 py-3 text-sm text-[var(--foreground)] font-mono leading-relaxed focus:outline-none focus:border-[var(--color-gold)]/50 min-h-[400px] resize-y"
-            placeholder="Write your article in Markdown..."
+            placeholder={t('magBodyPlaceholder')}
           />
         </div>
 
@@ -614,7 +615,7 @@ export default function MagazinePage() {
         <div>
           <div className="flex items-center justify-between mb-2">
             <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold">
-              Excerpt <span className="normal-case tracking-normal font-normal opacity-60">(auto-generated)</span>
+              {t('magExcerpt')} <span className="normal-case tracking-normal font-normal opacity-60">({t('magExcerptAuto')})</span>
             </label>
             <button
               onClick={handleGenerateExcerpt}
@@ -625,21 +626,21 @@ export default function MagazinePage() {
                   : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25'
               }`}
             >
-              {generatingExcerpt ? 'Generating...' : 'Generate Excerpts'}
+              {generatingExcerpt ? t('magGenerating') : t('magGenerateExcerpt')}
             </button>
           </div>
           <textarea
             value={((editing as unknown as Record<string, unknown>)[`excerpt_${sourceLang}`] as string) || ''}
             onChange={(e) => setEditing({ ...editing, [`excerpt_${sourceLang}`]: e.target.value })}
             className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 min-h-[60px] resize-y"
-            placeholder="Brief excerpt for cards & SEO..."
+            placeholder={t('magExcerptPlaceholder')}
           />
         </div>
 
         {/* Translated Titles Preview */}
         {LANG_OPTIONS.filter((l) => l.value !== sourceLang).some((l) => (editing as unknown as Record<string, unknown>)[`title_${l.value}`]) && (
           <div>
-            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">Translated Titles</label>
+            <label className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] font-semibold block mb-2">{t('magTranslatedTitles')}</label>
             <div className="space-y-1.5">
               {LANG_OPTIONS.filter((l) => l.value !== sourceLang).map((l) => {
                 const val = (editing as unknown as Record<string, unknown>)[`title_${l.value}`] as string;
@@ -661,7 +662,7 @@ export default function MagazinePage() {
             onClick={() => handleDelete(editing.id)}
             className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-red-400 border border-red-500/30 hover:bg-red-500/10 transition-all"
           >
-            Delete Article
+            {t('magDelete')}
           </button>
         </div>
       </div>
@@ -680,18 +681,18 @@ export default function MagazinePage() {
           onClick={handleCreate}
           className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
         >
-          + New Article
+          {t('magNewArticle')}
         </button>
       </div>
 
       {articles.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-[var(--muted-foreground)] text-sm mb-4">No articles yet. Start creating your first Magazine story.</p>
+          <p className="text-[var(--muted-foreground)] text-sm mb-4">{t('magNoArticles')}</p>
           <button
             onClick={handleCreate}
             className="px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest bg-[var(--color-gold)] text-[#0A0A0A] hover:opacity-90 transition-all"
           >
-            Create First Article
+            {t('magCreateFirst')}
           </button>
         </div>
       ) : (
@@ -707,7 +708,7 @@ export default function MagazinePage() {
                 {article.cover_image_url ? (
                   <Image src={article.cover_image_url} alt="" width={64} height={40} className="w-full h-full object-cover" sizes="64px" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] text-[var(--muted-foreground)]">No img</div>
+                  <div className="w-full h-full flex items-center justify-center text-[10px] text-[var(--muted-foreground)]">{t('magNoImg')}</div>
                 )}
               </div>
 
@@ -716,16 +717,16 @@ export default function MagazinePage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium truncate">{getTitle(article)}</span>
                   <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${STATUS_COLORS[article.status] || ''}`}>
-                    {article.status}
+                    {article.status === 'draft' ? t('magDraft') : article.status === 'published' ? t('magPublished') : t('magArchived')}
                   </span>
                   {article.is_featured && (
                     <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-[var(--color-gold)]/20 text-[var(--color-gold)]">
-                      Featured
+                      {t('magFeatured')}
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
-                  {CATEGORIES.find((c) => c.value === article.category)?.label}
+                  {(() => { const cat = CATEGORY_KEYS.find((c) => c.value === article.category); return cat ? tc(cat.key) : article.category; })()}
                   {article.author_name ? ` · ${article.author_name}` : ''}
                   {article.published_at ? ` · ${new Date(article.published_at).toLocaleDateString()}` : ''}
                 </p>
