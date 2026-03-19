@@ -468,7 +468,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 )}
                 <div>
                   <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
-                    {artist.displayName}{artist.tier >= 1 && <VerifiedBadge size="sm" />}
+                    {artist.displayName}{artist.tier >= 1 && <VerifiedBadge size="sm" className={/[a-z]$/.test(artist.displayName) ? '' : '!-top-0.5'} />}
                   </h3>
                   {artist.type && artist.type !== 'person' ? (
                     <p className="text-xs uppercase tracking-widest text-gold capitalize">{artist.type}</p>

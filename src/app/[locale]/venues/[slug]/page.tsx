@@ -261,7 +261,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               <h1 className="font-serif text-4xl sm:text-5xl font-bold">
                 {displayName(f)}
               </h1>
-              {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(displayName(f)) ? 'mt-1 sm:mt-1.5' : 'mt-0.5 sm:mt-0.5'}`} />}
+              {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(displayName(f)) ? 'mt-1 sm:mt-1.5' : 'mt-0'}`} />}
             </div>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (

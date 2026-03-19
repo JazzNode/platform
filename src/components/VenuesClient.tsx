@@ -271,7 +271,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   </span>
                 )}
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
-                  {venue.displayName}{venue.tier >= 1 && <VerifiedBadge size="sm" />}
+                  {venue.displayName}{venue.tier >= 1 && <VerifiedBadge size="sm" className={/[a-z]$/.test(venue.displayName) ? '' : '!-top-0.5'} />}
                 </h3>
                 <div className="flex items-center gap-1.5 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
                   {venue.cityLabel && <><span>{venue.cityLabel}</span><span className="text-[#8A8578]/30">·</span></>}
