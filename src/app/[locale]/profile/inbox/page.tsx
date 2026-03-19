@@ -741,7 +741,7 @@ export default function FanInboxPage() {
               <button
                 key={key}
                 onClick={() => { setTab(key); setSelectedConvo(null); }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
                   tab === key
                     ? 'bg-[var(--card)] text-[var(--foreground)]'
                     : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
@@ -749,7 +749,7 @@ export default function FanInboxPage() {
               >
                 {t(key === 'messages' ? 'inboxMessages' : 'inboxNotifications')}
                 {badge > 0 && (
-                  <span className="ml-1.5 bg-emerald-400 text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                  <span className="bg-emerald-400 text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
                     {badge}
                   </span>
                 )}
