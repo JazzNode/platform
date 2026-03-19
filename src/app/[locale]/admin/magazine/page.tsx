@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import Image from 'next/image';
@@ -89,21 +89,23 @@ export default function MagazinePage() {
 
   // ---------- Fetch ----------
 
-  const fetchArticles = useCallback(async () => {
+  useEffect(() => {
     if (!token) return;
-    try {
-      const res = await fetch('/api/admin/magazine', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      if (data.articles) setArticles(data.articles);
-    } catch (err) {
-      console.error('Failed to fetch articles:', err);
-    }
-    setLoading(false);
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/admin/magazine', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        if (!cancelled && data.articles) setArticles(data.articles);
+      } catch (err) {
+        console.error('Failed to fetch articles:', err);
+      }
+      if (!cancelled) setLoading(false);
+    })();
+    return () => { cancelled = true; };
   }, [token]);
-
-  useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   // Fetch search data for artist/venue linking
   useEffect(() => {

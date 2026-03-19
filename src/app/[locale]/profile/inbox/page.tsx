@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
@@ -116,9 +116,9 @@ export default function FanInboxPage() {
   const urlTab = searchParams.get('tab');
   useEffect(() => {
     if (urlConvo && urlConvo !== selectedConvo) {
-      setSelectedConvo(urlConvo);
+      startTransition(() => setSelectedConvo(urlConvo));
     }
-    if (urlTab === 'dm') setFilter('dm');
+    if (urlTab === 'dm') startTransition(() => setFilter('dm'));
   }, [urlConvo, urlTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-set filter when selectedConvo is resolved in conversations list
@@ -132,7 +132,7 @@ export default function FanInboxPage() {
       convo.type === 'venue_fan' ? 'venue' :
       convo.type === 'member_hq' ? 'hq' :
       convo.type === 'member_member' ? 'dm' : 'all';
-    if (filter !== 'all' && filter !== expectedFilter) setFilter(expectedFilter);
+    if (filter !== 'all' && filter !== expectedFilter) startTransition(() => setFilter(expectedFilter));
   }, [selectedConvo, conversations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch ALL conversations (unified)

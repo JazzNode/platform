@@ -31,10 +31,21 @@ export function useUnreadCount(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    refresh();
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/inbox/unread-count');
+        if (res.ok && !cancelled) {
+          const json = await res.json();
+          setData({ total: json.total || 0, breakdown: json.breakdown || {} });
+        }
+      } catch {
+        // Silently fail — badge just won't show
+      }
+    })();
 
     const interval = setInterval(refresh, 60_000);
-    return () => clearInterval(interval);
+    return () => { cancelled = true; clearInterval(interval); };
   }, [enabled, refresh]);
 
   return { ...data, refresh };
