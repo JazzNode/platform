@@ -117,6 +117,7 @@ export default function Footer() {
     { key: 'venues', href: `/${locale}/venues` },
     { key: 'events', href: `/${locale}/events` },
     { key: 'artists', href: `/${locale}/artists` },
+    { key: 'magazine', href: `/${locale}/magazine` },
   ] as const;
 
   return (

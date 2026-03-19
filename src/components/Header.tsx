@@ -378,9 +378,6 @@ export default function Header() {
             <Link href={`/${locale}/artists`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
               {t('artists')}
             </Link>
-            <Link href={`/${locale}/magazine`} className="text-sm uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors duration-300 link-lift">
-              {t('magazine')}
-            </Link>
 
             {/* Search + User + Language group */}
             <div className="flex items-center gap-3 ml-auto border-l border-[var(--border)] pl-6">
