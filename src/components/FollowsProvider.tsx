@@ -12,6 +12,8 @@ interface FollowsContextType {
   loading: boolean;
   /** Increments when the jazz cat easter egg should fire */
   catEggTrigger: number;
+  /** Whether the user has any follows at all */
+  hasAnyFollows: boolean;
 }
 
 const FollowsContext = createContext<FollowsContextType | null>(null);
@@ -107,8 +109,10 @@ export default function FollowsProvider({ children }: { children: React.ReactNod
     [user, keys],
   );
 
+  const hasAnyFollows = keys.size > 0;
+
   return (
-    <FollowsContext.Provider value={{ isFollowing, toggleFollow, loading, catEggTrigger }}>
+    <FollowsContext.Provider value={{ isFollowing, toggleFollow, loading, catEggTrigger, hasAnyFollows }}>
       {children}
     </FollowsContext.Provider>
   );

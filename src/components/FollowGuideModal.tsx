@@ -24,32 +24,66 @@ interface RecommendItem {
   subtitle: string;
 }
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 export default function FollowGuideModal() {
   const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
   const t = useTranslations('followGuide');
   const locale = useLocale();
-  const { profile } = useAuth();
-  const { isFollowing, toggleFollow } = useFollows();
+  const { user, profile } = useAuth();
+  const { isFollowing, toggleFollow, hasAnyFollows, loading: followsLoading } = useFollows();
 
   const [show, setShow] = useState(false);
   const [items, setItems] = useState<RecommendItem[]>([]);
   const [followedIds, setFollowedIds] = useState<Set<string>>(new Set());
-  const hasShown = useRef(false);
+  const hasShownThisSession = useRef(false);
 
-  // Show modal: fan user with no follows
+  // Show modal: fan user — first time immediately, second time only after 24h if no follows
   useEffect(() => {
-    if (
-      profile &&
-      profile.user_type === 'fan' &&
-      !hasShown.current
-    ) {
+    if (!profile || profile.user_type !== 'fan' || !user || followsLoading || hasShownThisSession.current) return;
+
+    const storageKey = `followGuide:${user.id}`;
+    let state: { shownCount: number; firstShownAt: string | null };
+    try {
+      const stored = localStorage.getItem(storageKey);
+      state = stored ? JSON.parse(stored) : { shownCount: 0, firstShownAt: null };
+    } catch {
+      state = { shownCount: 0, firstShownAt: null };
+    }
+
+    // Already shown twice (max) → done
+    if (state.shownCount >= 2) return;
+
+    // First time → show after short delay
+    if (state.shownCount === 0) {
       const timer = setTimeout(() => {
-        hasShown.current = true;
+        hasShownThisSession.current = true;
+        localStorage.setItem(storageKey, JSON.stringify({
+          shownCount: 1,
+          firstShownAt: new Date().toISOString(),
+        }));
         setShow(true);
       }, 600);
       return () => clearTimeout(timer);
     }
-  }, [profile]);
+
+    // Second time → only if user still has no follows AND 24h have passed
+    if (state.shownCount === 1) {
+      if (hasAnyFollows) return;
+      const firstShown = new Date(state.firstShownAt!).getTime();
+      if (Date.now() - firstShown < ONE_DAY_MS) return;
+
+      const timer = setTimeout(() => {
+        hasShownThisSession.current = true;
+        localStorage.setItem(storageKey, JSON.stringify({
+          ...state,
+          shownCount: 2,
+        }));
+        setShow(true);
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [profile, user, followsLoading, hasAnyFollows]);
 
   // Derive loading state
   const loadingData = show && items.length === 0;
