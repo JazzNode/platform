@@ -373,7 +373,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   className="font-serif text-4xl sm:text-5xl font-bold"
                   tag="h1"
                 />
-                {f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className="!top-0 !ml-0 mt-1 sm:mt-1.5" />}
+                {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(artistDisplayName(f, locale)) ? 'mt-1 sm:mt-1.5' : 'mt-0.5 sm:mt-0.5'}`} />}
               </div>
               {f.name_en && f.name_local && f.name_en !== f.name_local && (
                 <EditableName

@@ -261,7 +261,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               <h1 className="font-serif text-4xl sm:text-5xl font-bold">
                 {displayName(f)}
               </h1>
-              {f.tier && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className="!top-0 !ml-0 mt-1 sm:mt-1.5" />}
+              {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(displayName(f)) ? 'mt-1 sm:mt-1.5' : 'mt-0.5 sm:mt-0.5'}`} />}
             </div>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
@@ -282,7 +282,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 {jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency}
               </span>
             )}
-            {f.capacity && (
+            {f.capacity != null && f.capacity > 0 && (
               <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 {f.capacity} {t('capacitySeats')}
@@ -494,7 +494,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     </div>
                   </div>
                 )}
-                {f.capacity && (
+                {f.capacity != null && f.capacity > 0 && (
                   <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
                     <div className="text-3xl font-bold text-gold">{f.capacity}</div>
                     <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('capacitySeats')}</div>
