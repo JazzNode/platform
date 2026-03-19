@@ -383,7 +383,7 @@ export default function OwnerMembersPage() {
                               value={member.role}
                               onChange={(e) => handleSetRole(member.id, e.target.value)}
                               disabled={updatingId === member.id}
-                              className="bg-[var(--background)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors disabled:opacity-50 cursor-pointer"
+                              className="bg-[var(--background)] border border-[var(--border)] rounded-lg px-2 py-1.5 text-xs text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors disabled:opacity-50 cursor-pointer [&>option]:bg-[var(--background)] [&>option]:text-[var(--foreground)]"
                             >
                               {SETTABLE_ROLES.map((r) => (
                                 <option key={r} value={r}>

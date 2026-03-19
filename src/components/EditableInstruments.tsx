@@ -131,7 +131,7 @@ export default function EditableInstruments({
                 setDraftList((prev) => [e.target.value, ...prev]);
               }
             }}
-            className="w-full bg-[#0A0A0A] text-sm text-[#F0EDE6] border border-[#8A8578]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-2"
+            className="w-full bg-[#0A0A0A] text-sm text-[#F0EDE6] border border-[#8A8578]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-2 [&>option]:bg-[#0A0A0A] [&>option]:text-[#F0EDE6]"
             disabled={saving}
           >
             <option value="">(none)</option>

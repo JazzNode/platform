@@ -142,7 +142,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
               <select
                 value={form.gear_type}
                 onChange={(e) => setForm({ ...form, gear_type: e.target.value })}
-                className="px-4 py-2 rounded-xl bg-[var(--muted)] border border-[var(--border)] text-sm focus:outline-none"
+                className="px-4 py-2 rounded-xl bg-[var(--muted)] border border-[var(--border)] text-sm text-[var(--foreground)] focus:outline-none [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
               >
                 {GEAR_TYPES.map((gt) => (
                   <option key={gt} value={gt}>{gt.charAt(0).toUpperCase() + gt.slice(1)}</option>

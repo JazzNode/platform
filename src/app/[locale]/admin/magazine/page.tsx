@@ -384,7 +384,7 @@ export default function MagazinePage() {
             <select
               value={editing.status}
               onChange={(e) => setEditing({ ...editing, status: e.target.value })}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
             >
               <option value="draft">{t('magDraft')}</option>
               <option value="published">{t('magPublished')}</option>
@@ -398,7 +398,7 @@ export default function MagazinePage() {
             <select
               value={editing.category}
               onChange={(e) => setEditing({ ...editing, category: e.target.value })}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
             >
               {CATEGORY_KEYS.map((c) => <option key={c.value} value={c.value}>{tc(c.key)}</option>)}
             </select>
@@ -410,7 +410,7 @@ export default function MagazinePage() {
             <select
               value={editing.source_lang}
               onChange={(e) => setEditing({ ...editing, source_lang: e.target.value })}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
             >
               {LANG_OPTIONS.map((l) => <option key={l.value} value={l.value}>{l.label}</option>)}
             </select>
@@ -423,7 +423,7 @@ export default function MagazinePage() {
               type="text"
               value={editing.author_name || ''}
               onChange={(e) => setEditing({ ...editing, author_name: e.target.value })}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
               placeholder={t('magAuthorPlaceholder')}
             />
           </div>
@@ -531,7 +531,7 @@ export default function MagazinePage() {
               type="text"
               value={artistSearch}
               onChange={(e) => setArtistSearch(e.target.value)}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
               placeholder={t('magSearchArtists')}
             />
             {filteredArtists.length > 0 && (
@@ -565,7 +565,7 @@ export default function MagazinePage() {
               type="text"
               value={venueSearch}
               onChange={(e) => setVenueSearch(e.target.value)}
-              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50"
+              className="w-full bg-[var(--muted)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--foreground)] focus:outline-none focus:border-[var(--color-gold)]/50 [&>option]:bg-[var(--muted)] [&>option]:text-[var(--foreground)]"
               placeholder={t('magSearchVenues')}
             />
             {filteredVenues.length > 0 && (
