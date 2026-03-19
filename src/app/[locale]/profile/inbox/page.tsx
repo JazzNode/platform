@@ -841,7 +841,7 @@ export default function FanInboxPage() {
                 </div>
 
                 {/* Conversation List */}
-                <div className="flex-1 overflow-y-auto">
+                <div className="flex-1 overflow-y-auto no-scrollbar">
                   {fetching ? (
                     <div className="p-6 text-center">
                       <div className="w-5 h-5 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mx-auto" />
@@ -937,7 +937,7 @@ export default function FanInboxPage() {
                     </div>
 
                     {/* Messages */}
-                    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
+                    <div ref={messagesContainerRef} className="flex-1 overflow-y-auto no-scrollbar p-4 space-y-3">
                       {messages.map((msg) => {
                         const isMe = msg.sender_id === user.id;
 
