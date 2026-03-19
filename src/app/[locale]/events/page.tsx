@@ -25,9 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function EventsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ view?: string; venue?: string; category?: string; city?: string }> }) {
+export default async function EventsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ view?: string; venue?: string; category?: string; city?: string; region?: string }> }) {
   const { locale } = await params;
-  const { view, venue, category, city } = await searchParams;
+  const { view, venue, category, city, region } = await searchParams;
   const t = await getTranslations('common');
   const tRegions = await getTranslations('regions');
   const showPast = view === 'past';
@@ -128,7 +128,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     .sort((a, b) => a.label.localeCompare(b.label));
 
   // Build initial filters from URL search params
-  const initialFilters = (venue || category || city) ? { venue, category, city } : undefined;
+  const initialFilters = (venue || category || city || region) ? { venue, category, city, region } : undefined;
 
   return (
     <EventsClient

@@ -25,8 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function VenuesPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function VenuesPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ region?: string; city?: string }> }) {
   const { locale } = await params;
+  const { region, city } = await searchParams;
   const t = await getTranslations('common');
   const tRegions = await getTranslations('regions');
 
@@ -74,6 +75,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
       hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
       jamBadgeLabel: t('jamThisWeek'),
+      tier: f.tier || 0,
     };
   });
 
@@ -96,6 +98,9 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
     try { regionLabels[code] = tRegions(code as 'TW' | 'JP' | 'HK'); } catch { regionLabels[code] = code; }
   }
 
+  // Build initial filters from URL search params
+  const initialFilters = (region || city) ? { region, city } : undefined;
+
   return (
     <VenuesClient
       venues={serializedVenues}
@@ -103,6 +108,7 @@ export default async function VenuesPage({ params }: { params: Promise<{ locale:
       locale={locale}
       regionLabels={regionLabels}
       worldMapLabel={tRegions('worldMap')}
+      initialFilters={initialFilters}
       labels={{
         venues: t('venues'),
         allCities: t('allCities'),

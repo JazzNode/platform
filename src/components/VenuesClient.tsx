@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useFilterParams } from '@/hooks/useFilterParams';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -8,6 +9,7 @@ import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
 import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from '@/components/RegionProvider';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface SerializedVenue {
   id: string;
@@ -21,6 +23,7 @@ interface SerializedVenue {
   description: string | null;
   hasUpcomingJam?: boolean;
   jamBadgeLabel?: string;
+  tier: number;
 }
 
 interface CityOption {
@@ -30,12 +33,18 @@ interface CityOption {
   countryCode: string;
 }
 
+interface InitialFilters {
+  region?: string;   // country code
+  city?: string;     // city record ID
+}
+
 interface Props {
   venues: SerializedVenue[];
   cities: CityOption[];
   locale: string;
   regionLabels: Record<string, string>;
   worldMapLabel: string;
+  initialFilters?: InitialFilters;
   labels: {
     venues: string;
     allCities: string;
@@ -47,12 +56,20 @@ interface Props {
 // extends the touch target to 44px minimum (Apple/Google HIG recommendation).
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, labels }: Props) {
+export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
-  const [hasInteracted, setHasInteracted] = useState(false);
-  const [userRegion, setUserRegion] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [hasInteracted, setHasInteracted] = useState(!!initialFilters);
+  const [userRegion, setUserRegion] = useState<string | null>(() => {
+    if (initialFilters?.city) {
+      const c = cities.find((x) => x.recordId === initialFilters.city);
+      return c?.countryCode || null;
+    }
+    return initialFilters?.region || null;
+  });
+  const [selectedCity, setSelectedCity] = useState<string | null>(
+    initialFilters?.city || null
+  );
 
   // Group cities by country code
   const regionGroups = useMemo(() => {
@@ -69,8 +86,15 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   // Stable region order
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
-  // Derive effective region: prefer user selection, fall back to global
-  const activeRegion = hasInteracted
+  // Sync filter state back to URL for back-button restoration
+  const filterParams = useMemo(() => ({
+    region: userRegion,
+    city: selectedCity,
+  }), [userRegion, selectedCity]);
+  useFilterParams(filterParams);
+
+  // Derive effective region: prefer user/initial selection, fall back to global
+  const activeRegion = (hasInteracted || initialFilters)
     ? userRegion
     : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 
@@ -247,7 +271,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   </span>
                 )}
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
-                  {venue.displayName}
+                  {venue.displayName}{venue.tier >= 1 && <VerifiedBadge size="sm" />}
                 </h3>
                 <div className="flex items-center gap-1.5 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
                   {venue.cityLabel && <><span>{venue.cityLabel}</span><span className="text-[#8A8578]/30">·</span></>}

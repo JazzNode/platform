@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useFilterParams } from '@/hooks/useFilterParams';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -42,6 +43,7 @@ interface InitialFilters {
   venue?: string;     // venue record ID
   category?: string;  // 'jam' | 'vocal' | 'matinee'
   city?: string;      // city record ID
+  region?: string;    // country code
 }
 
 interface Props {
@@ -92,6 +94,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       const c = cities.find((x) => x.recordId === initialFilters.city);
       return c?.countryCode || null;
     }
+    if (initialFilters?.region) return initialFilters.region;
     return null;
   });
 
@@ -112,6 +115,15 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
     initialFilters?.venue ? new Set([initialFilters.venue]) : new Set()
   );
 
+  // Sync filter state back to URL for back-button restoration
+  const filterParams = useMemo(() => ({
+    region: userRegion,
+    venue: selectedVenues.size === 1 ? [...selectedVenues][0] : null,
+    category: selectedCategory !== 'all' ? selectedCategory : null,
+    city: selectedCity,
+  }), [userRegion, selectedVenues, selectedCategory, selectedCity]);
+  useFilterParams(filterParams);
+
   // Group cities by country code
   const regionGroups = useMemo(() => {
     const map: Record<string, CityOption[]> = {};
@@ -128,7 +140,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
   const regionOrder = useMemo(() => Object.keys(regionGroups).sort(), [regionGroups]);
 
   // Derive effective region: prefer user/initial selection, fall back to global
-  const activeRegion = (hasInteracted || initialFilters?.venue || initialFilters?.city)
+  const activeRegion = (hasInteracted || initialFilters?.venue || initialFilters?.city || initialFilters?.region)
     ? userRegion
     : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 

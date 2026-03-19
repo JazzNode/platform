@@ -25,8 +25,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
-export default async function ArtistsPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ArtistsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ instrument?: string; type?: string; region?: string; city?: string; venue?: string }> }) {
   const { locale } = await params;
+  const { instrument, type, region, city, venue } = await searchParams;
   const t = await getTranslations('common');
   const tInst = await getTranslations('instruments');
   const tRegions = await getTranslations('regions');
@@ -137,6 +138,11 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
     };
   });
 
+  // Build initial filters from URL search params
+  const initialFilters = (instrument || type || region || city || venue)
+    ? { instrument, type, region, city, venue }
+    : undefined;
+
   return (
     <ArtistsClient
       artists={serialized}
@@ -147,6 +153,7 @@ export default async function ArtistsPage({ params }: { params: Promise<{ locale
       venueOptions={venueOptions}
       regionLabels={regionLabels}
       worldMapLabel={tRegions('worldMap')}
+      initialFilters={initialFilters}
       labels={{
         artists: t('artists'),
         allInstruments: t('allInstruments'),

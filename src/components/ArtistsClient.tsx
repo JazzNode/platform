@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { useFilterParams } from '@/hooks/useFilterParams';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -10,6 +11,7 @@ import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from '@/components/RegionProvider';
 import { normalizeInstrumentKey } from '@/lib/helpers';
 import { BADGE_ICONS } from '@/components/BadgeCard';
+import VerifiedBadge from '@/components/VerifiedBadge';
 
 interface SerializedArtist {
   id: string;
@@ -42,6 +44,14 @@ interface VenueOption {
   cityLabel: string;
 }
 
+interface InitialFilters {
+  instrument?: string;  // comma-separated instrument keys
+  type?: string;        // 'musicians' | 'groups' | 'bigBands' | 'claimed'
+  region?: string;      // country code
+  city?: string;        // city record ID
+  venue?: string;       // comma-separated venue record IDs
+}
+
 interface Props {
   artists: SerializedArtist[];
   instruments: string[];       // sorted unique instrument list
@@ -51,6 +61,7 @@ interface Props {
   locale: string;
   regionLabels: Record<string, string>;  // e.g. { TW: '台灣', JP: '日本' }
   worldMapLabel: string;                  // e.g. '世界版圖'
+  initialFilters?: InitialFilters;
   labels: {
     artists: string;
     allInstruments: string;
@@ -68,18 +79,58 @@ interface Props {
 // Shared pill base: invisible ::after extends touch target to 44px minimum
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, labels }: Props) {
+export default function ArtistsClient({ artists, instruments, instrumentNames = {}, cityOptions, venueOptions, locale, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(!!initialFilters);
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); return instrumentNames[k] || k; };
-  const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(new Set());
-  const [selectedType, setSelectedType] = useState<string>('all');
+  const [selectedInstruments, setSelectedInstruments] = useState<Set<string>>(
+    () => initialFilters?.instrument ? new Set(initialFilters.instrument.split(',').filter(Boolean)) : new Set()
+  );
+  const [selectedType, setSelectedType] = useState<string>(
+    initialFilters?.type && ['musicians', 'groups', 'bigBands', 'claimed'].includes(initialFilters.type)
+      ? initialFilters.type : 'all'
+  );
 
   // ── Region hierarchy state (matching EventsClient) ──
-  const [userRegion, setUserRegion] = useState<string | null>(null);
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
-  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(new Set());
+  const [userRegion, setUserRegion] = useState<string | null>(() => {
+    if (initialFilters?.venue) {
+      const vid = initialFilters.venue.split(',')[0];
+      const v = venueOptions.find((x) => x.recordId === vid);
+      if (v?.cityRecordIds?.[0]) {
+        const c = cityOptions.find((x) => x.recordId === v.cityRecordIds[0]);
+        return c?.countryCode || null;
+      }
+    }
+    if (initialFilters?.city) {
+      const c = cityOptions.find((x) => x.recordId === initialFilters.city);
+      return c?.countryCode || null;
+    }
+    if (initialFilters?.region) return initialFilters.region;
+    return null;
+  });
+  const [selectedCity, setSelectedCity] = useState<string | null>(() => {
+    if (initialFilters?.venue) {
+      const vid = initialFilters.venue.split(',')[0];
+      const v = venueOptions.find((x) => x.recordId === vid);
+      return v?.cityRecordIds?.[0] || null;
+    }
+    if (initialFilters?.city) return initialFilters.city;
+    return null;
+  });
+  const [selectedVenues, setSelectedVenues] = useState<Set<string>>(
+    () => initialFilters?.venue ? new Set(initialFilters.venue.split(',').filter(Boolean)) : new Set()
+  );
+
+  // Sync filter state back to URL for back-button restoration
+  const filterParams = useMemo(() => ({
+    instrument: selectedInstruments.size > 0 ? [...selectedInstruments].sort().join(',') : null,
+    type: selectedType !== 'all' ? selectedType : null,
+    region: userRegion,
+    city: selectedCity,
+    venue: selectedVenues.size > 0 ? [...selectedVenues].sort().join(',') : null,
+  }), [selectedInstruments, selectedType, userRegion, selectedCity, selectedVenues]);
+  useFilterParams(filterParams);
 
   // Group cities by country code
   const regionGroups = useMemo(() => {
@@ -93,8 +144,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
     return map;
   }, [cityOptions]);
 
-  // Derive effective region: prefer user selection, fall back to global
-  const activeRegion = hasInteracted
+  // Derive effective region: prefer user/initial selection, fall back to global
+  const activeRegion = (hasInteracted || initialFilters)
     ? userRegion
     : (globalRegion && regionGroups[globalRegion] ? globalRegion : null);
 
@@ -417,7 +468,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 )}
                 <div>
                   <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
-                    {artist.displayName}
+                    {artist.displayName}{artist.tier >= 1 && <VerifiedBadge size="sm" />}
                   </h3>
                   {artist.type && artist.type !== 'person' ? (
                     <p className="text-xs uppercase tracking-widest text-gold capitalize">{artist.type}</p>
