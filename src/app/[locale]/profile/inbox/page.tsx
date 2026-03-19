@@ -94,7 +94,7 @@ export default function FanInboxPage() {
   const [tab, setTab] = useState<Tab>('messages');
   const [filter, setFilter] = useState<FilterType>('all');
   const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
-  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => searchParams.get('convo'));
+  const [selectedConvo, setSelectedConvoRaw] = useState<string | null>(() => searchParams.get('convo'));
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -110,6 +110,12 @@ export default function FanInboxPage() {
   // Delete conversation state
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+
+  // Wrap setSelectedConvo to also reset delete confirmation
+  const setSelectedConvo = useCallback((val: string | null | ((prev: string | null) => string | null)) => {
+    setSelectedConvoRaw(val);
+    setConfirmDelete(false);
+  }, []);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -410,8 +416,6 @@ export default function FanInboxPage() {
     setSending(false);
   }, [newMessage, selectedConvo, user, sending]);
 
-  // Reset delete confirmation when switching conversations
-  useEffect(() => { setConfirmDelete(false); }, [selectedConvo]);
 
   // Delete entire conversation
   const handleDeleteConversation = useCallback(async () => {
