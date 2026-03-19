@@ -36,7 +36,6 @@ export default function DMButton({ targetUserId, className }: DMButtonProps) {
       .maybeSingle();
 
     if (existing) {
-      sessionStorage.setItem('inbox_open_convo', existing.id);
       router.push(`/${locale}/profile/inbox?tab=dm&convo=${existing.id}`);
       return;
     }
@@ -49,7 +48,6 @@ export default function DMButton({ targetUserId, className }: DMButtonProps) {
       .single();
 
     if (newConvo) {
-      sessionStorage.setItem('inbox_open_convo', newConvo.id);
       router.push(`/${locale}/profile/inbox?tab=dm&convo=${newConvo.id}`);
     }
   }, [user, targetUserId, locale, router, setShowAuthModal]);

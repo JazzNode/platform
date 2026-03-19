@@ -94,14 +94,7 @@ export default function FanInboxPage() {
   const [tab, setTab] = useState<Tab>('messages');
   const [filter, setFilter] = useState<FilterType>('all');
   const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
-  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => {
-    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('inbox_open_convo') : null;
-    if (stored) {
-      sessionStorage.removeItem('inbox_open_convo');
-      return stored;
-    }
-    return searchParams.get('convo');
-  });
+  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => searchParams.get('convo'));
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -118,18 +111,10 @@ export default function FanInboxPage() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
 
-  // Sync selectedConvo from sessionStorage (set by message buttons) or URL params
+  // Sync selectedConvo & filter from URL params (handles navigation from message buttons)
   const urlConvo = searchParams.get('convo');
   const urlTab = searchParams.get('tab');
   useEffect(() => {
-    // sessionStorage is the primary source (set before navigation by message buttons)
-    const stored = sessionStorage.getItem('inbox_open_convo');
-    if (stored) {
-      sessionStorage.removeItem('inbox_open_convo');
-      if (stored !== selectedConvo) setSelectedConvo(stored);
-      return;
-    }
-    // Fallback to URL params
     if (urlConvo && urlConvo !== selectedConvo) {
       setSelectedConvo(urlConvo);
     }
@@ -137,19 +122,17 @@ export default function FanInboxPage() {
   }, [urlConvo, urlTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-set filter when selectedConvo is resolved in conversations list
+  // so the selected conversation is always visible in the sidebar
   useEffect(() => {
     if (!selectedConvo || conversations.length === 0) return;
     const convo = conversations.find((c) => c.id === selectedConvo);
     if (!convo) return;
-    // Auto-switch filter so the selected conversation is visible
-    if (filter !== 'all') {
-      const expectedFilter: FilterType =
-        convo.type === 'artist_fan' ? 'artist' :
-        convo.type === 'venue_fan' ? 'venue' :
-        convo.type === 'member_hq' ? 'hq' :
-        convo.type === 'member_member' ? 'dm' : 'all';
-      if (filter !== expectedFilter) setFilter('all');
-    }
+    const expectedFilter: FilterType =
+      convo.type === 'artist_fan' ? 'artist' :
+      convo.type === 'venue_fan' ? 'venue' :
+      convo.type === 'member_hq' ? 'hq' :
+      convo.type === 'member_member' ? 'dm' : 'all';
+    if (filter !== 'all' && filter !== expectedFilter) setFilter(expectedFilter);
   }, [selectedConvo, conversations]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch ALL conversations (unified)

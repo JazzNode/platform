@@ -38,7 +38,6 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
       .maybeSingle();
 
     if (existing) {
-      sessionStorage.setItem('inbox_open_convo', existing.id);
       router.push(`/${locale}/profile/inbox?convo=${existing.id}`);
       setLoading(false);
       return;
@@ -56,7 +55,6 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
       .single();
 
     if (newConvo) {
-      sessionStorage.setItem('inbox_open_convo', newConvo.id);
       router.push(`/${locale}/profile/inbox?convo=${newConvo.id}`);
     }
 
