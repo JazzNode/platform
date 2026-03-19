@@ -63,6 +63,7 @@ export async function getUserBadgeProgress(
     { data: profile },
     { data: conversations },
     { data: messageCheck },
+    { count: reviewCount },
   ] = await Promise.all([
     sb.from('badges').select('*').eq('target_type', 'user'),
     sb.from('user_badges').select('*').eq('user_id', userId),
@@ -71,6 +72,7 @@ export async function getUserBadgeProgress(
     sb.from('profiles').select('display_name, bio, avatar_url, website, created_at').eq('id', userId).single(),
     sb.from('conversations').select('id').or(`fan_user_id.eq.${userId},user_b_id.eq.${userId}`),
     sb.from('messages').select('id').eq('sender_id', userId).limit(1),
+    sb.from('venue_reviews').select('id', { count: 'exact', head: true }).eq('user_id', userId),
   ]);
 
   if (!allBadges) return [];
@@ -169,6 +171,7 @@ export async function getUserBadgeProgress(
       totalFollows, artistFollows, venueFollows,
       distinctCities, lateEventCount,
       profileComplete, hasMessage, conversationCount,
+      reviewCount: reviewCount ?? 0,
     }, badge.criteria_target);
 
     const isEarned = earnedMap.has(bid) || (progress ? progress.current >= progress.target : checkBinaryBadge(bid, { profileComplete, isEarlyAdopter }));
@@ -251,6 +254,7 @@ interface UserStats {
   profileComplete: boolean;
   hasMessage: boolean;
   conversationCount: number;
+  reviewCount: number;
 }
 
 function computeProgress(
@@ -275,6 +279,10 @@ function computeProgress(
       return { current: stats.hasMessage ? 1 : 0, target: criteriaTarget || 1 };
     case 'usr_social_butterfly':
       return { current: stats.conversationCount, target: criteriaTarget || 3 };
+    case 'usr_first_review':
+      return { current: Math.min(stats.reviewCount, 1), target: criteriaTarget || 1 };
+    case 'usr_scene_critic':
+      return { current: stats.reviewCount, target: criteriaTarget || 5 };
     default:
       return null;
   }

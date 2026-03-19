@@ -846,5 +846,26 @@
     "ctaTitle": "Ready to Level Up?",
     "ctaDesc": "Claim your artist or venue page for free, and upgrade anytime to unlock the full suite of tools.",
     "ctaButton": "Explore Artists"
+  },
+  "reviews": {
+    "sectionTitle": "Community Reviews",
+    "writeReview": "Write a Review",
+    "editReview": "Edit Your Review",
+    "ratingLabel": "Your Rating",
+    "textPlaceholder": "Share your experience (optional, max 200 chars)",
+    "anonymousLabel": "Post Anonymously",
+    "anonymousUser": "Anonymous",
+    "submitReview": "Submit",
+    "updateReview": "Update",
+    "deleteReview": "Delete Review",
+    "deleteConfirm": "Are you sure?",
+    "confirmYes": "Yes",
+    "cancel": "Cancel",
+    "averageRating": "Average Rating",
+    "reviewCount": "{count} reviews",
+    "noReviews": "No reviews yet. Be the first!",
+    "charsRemaining": "{count} chars remaining",
+    "loginToReview": "Log in to leave a review",
+    "you": "You"
   }
 }

@@ -839,5 +839,26 @@
     "ctaTitle": "레벨 업할 준비 되셨나요?",
     "ctaDesc": "아티스트 또는 베뉴 페이지를 무료로 클레임하고, 언제든 업그레이드하여 모든 도구를 잠금 해제하세요.",
     "ctaButton": "아티스트 둘러보기"
+  },
+  "reviews": {
+    "sectionTitle": "커뮤니티 리뷰",
+    "writeReview": "리뷰 작성",
+    "editReview": "리뷰 수정",
+    "ratingLabel": "평점",
+    "textPlaceholder": "경험을 공유하세요 (선택사항, 최대 200자)",
+    "anonymousLabel": "익명으로 게시",
+    "anonymousUser": "익명",
+    "submitReview": "제출",
+    "updateReview": "수정",
+    "deleteReview": "리뷰 삭제",
+    "deleteConfirm": "정말 삭제하시겠습니까?",
+    "confirmYes": "예",
+    "cancel": "취소",
+    "averageRating": "평균 평점",
+    "reviewCount": "리뷰 {count}개",
+    "noReviews": "아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!",
+    "charsRemaining": "{count}자 남음",
+    "loginToReview": "로그인 후 리뷰를 남기세요",
+    "you": "나"
   }
 }

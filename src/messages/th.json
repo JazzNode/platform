@@ -839,5 +839,26 @@
     "ctaTitle": "พร้อมอัปเลเวลหรือยัง?",
     "ctaDesc": "เคลมหน้าศิลปินหรือสถานที่ของคุณฟรี และอัปเกรดเมื่อไหร่ก็ได้เพื่อปลดล็อกเครื่องมือทั้งหมด",
     "ctaButton": "สำรวจศิลปิน"
+  },
+  "reviews": {
+    "sectionTitle": "รีวิวจากชุมชน",
+    "writeReview": "เขียนรีวิว",
+    "editReview": "แก้ไขรีวิว",
+    "ratingLabel": "คะแนนของคุณ",
+    "textPlaceholder": "แชร์ประสบการณ์ของคุณ (ไม่บังคับ, สูงสุด 200 ตัวอักษร)",
+    "anonymousLabel": "โพสต์แบบไม่ระบุชื่อ",
+    "anonymousUser": "ไม่ระบุชื่อ",
+    "submitReview": "ส่ง",
+    "updateReview": "อัปเดต",
+    "deleteReview": "ลบรีวิว",
+    "deleteConfirm": "คุณแน่ใจหรือไม่?",
+    "confirmYes": "ใช่",
+    "cancel": "ยกเลิก",
+    "averageRating": "คะแนนเฉลี่ย",
+    "reviewCount": "{count} รีวิว",
+    "noReviews": "ยังไม่มีรีวิว เป็นคนแรกเลย!",
+    "charsRemaining": "เหลือ {count} ตัวอักษร",
+    "loginToReview": "เข้าสู่ระบบเพื่อเขียนรีวิว",
+    "you": "คุณ"
   }
 }

@@ -839,5 +839,26 @@
     "ctaTitle": "Siap Naik Level?",
     "ctaDesc": "Klaim halaman artis atau tempat Anda secara gratis, dan upgrade kapan saja untuk membuka semua fitur.",
     "ctaButton": "Jelajahi Artis"
+  },
+  "reviews": {
+    "sectionTitle": "Ulasan Komunitas",
+    "writeReview": "Tulis Ulasan",
+    "editReview": "Edit Ulasan Anda",
+    "ratingLabel": "Penilaian Anda",
+    "textPlaceholder": "Bagikan pengalaman Anda (opsional, maks 200 karakter)",
+    "anonymousLabel": "Posting Anonim",
+    "anonymousUser": "Anonim",
+    "submitReview": "Kirim",
+    "updateReview": "Perbarui",
+    "deleteReview": "Hapus Ulasan",
+    "deleteConfirm": "Anda yakin?",
+    "confirmYes": "Ya",
+    "cancel": "Batal",
+    "averageRating": "Rating Rata-rata",
+    "reviewCount": "{count} ulasan",
+    "noReviews": "Belum ada ulasan. Jadilah yang pertama!",
+    "charsRemaining": "{count} karakter tersisa",
+    "loginToReview": "Masuk untuk menulis ulasan",
+    "you": "Anda"
   }
 }

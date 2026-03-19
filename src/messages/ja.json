@@ -839,5 +839,26 @@
     "ctaTitle": "レベルアップしませんか？",
     "ctaDesc": "アーティストや会場ページを無料でクレームし、いつでもアップグレードしてすべてのツールを解放できます。",
     "ctaButton": "アーティストを探す"
+  },
+  "reviews": {
+    "sectionTitle": "コミュニティレビュー",
+    "writeReview": "レビューを書く",
+    "editReview": "レビューを編集",
+    "ratingLabel": "あなたの評価",
+    "textPlaceholder": "体験をシェア（任意、最大200文字）",
+    "anonymousLabel": "匿名で投稿",
+    "anonymousUser": "匿名",
+    "submitReview": "送信",
+    "updateReview": "更新",
+    "deleteReview": "レビューを削除",
+    "deleteConfirm": "本当に削除しますか？",
+    "confirmYes": "はい",
+    "cancel": "キャンセル",
+    "averageRating": "平均評価",
+    "reviewCount": "{count}件のレビュー",
+    "noReviews": "まだレビューがありません。最初のレビューを書きましょう！",
+    "charsRemaining": "残り{count}文字",
+    "loginToReview": "ログインしてレビューを書く",
+    "you": "あなた"
   }
 }

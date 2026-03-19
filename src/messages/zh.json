@@ -846,5 +846,26 @@
     "ctaTitle": "準備好升級了嗎？",
     "ctaDesc": "免費認領你的藝人或場地頁面，隨時升級解鎖完整工具套件。",
     "ctaButton": "探索藝人"
+  },
+  "reviews": {
+    "sectionTitle": "社群評價",
+    "writeReview": "撰寫評價",
+    "editReview": "編輯你的評價",
+    "ratingLabel": "你的評分",
+    "textPlaceholder": "分享你的體驗（選填，最多 200 字）",
+    "anonymousLabel": "匿名發表",
+    "anonymousUser": "匿名樂迷",
+    "submitReview": "送出",
+    "updateReview": "更新",
+    "deleteReview": "刪除評價",
+    "deleteConfirm": "確定要刪除嗎？",
+    "confirmYes": "確定",
+    "cancel": "取消",
+    "averageRating": "平均評分",
+    "reviewCount": "{count} 則評價",
+    "noReviews": "還沒有評價，成為第一個吧！",
+    "charsRemaining": "剩餘 {count} 字",
+    "loginToReview": "登入後即可評價",
+    "you": "你"
   }
 }

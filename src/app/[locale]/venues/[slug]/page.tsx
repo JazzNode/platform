@@ -19,6 +19,7 @@ import BadgeCategorySection from '@/components/BadgeCategorySection';
 import type { BadgeProgress } from '@/lib/badges';
 import MessageVenueButton from '@/components/MessageVenueButton';
 import TierGate from '@/components/TierGate';
+import VenueReviewsSection from '@/components/VenueReviewsSection';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -497,6 +498,11 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           </FadeUp>
         );
       })()}
+
+      {/* Community Reviews */}
+      <FadeUp>
+        <VenueReviewsSection venueId={venue.id} />
+      </FadeUp>
 
 {/* Most Frequent Performers */}
       {topPerformers.length > 0 && (
