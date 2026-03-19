@@ -760,6 +760,8 @@
     "fanInboxHQPlaceholder": "Type your message to JazzNode HQ...",
     "fanInboxNewDM": "New Message",
     "fanInboxSearchUsers": "Search users...",
+    "deleteConversation": "Delete Conversation",
+    "deleteConversationConfirm": "Delete this conversation?",
     "fanInboxNoDM": "No direct messages yet.",
     "fanInboxNoNotifications": "No notifications yet.",
     "inboxMessages": "Messages",

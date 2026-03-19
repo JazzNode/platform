@@ -755,6 +755,8 @@
     "fanInboxHQPlaceholder": "JazzNode HQ へのメッセージを入力...",
     "fanInboxNewDM": "新しいメッセージ",
     "fanInboxSearchUsers": "ユーザーを検索...",
+    "deleteConversation": "会話を削除",
+    "deleteConversationConfirm": "この会話を削除しますか？",
     "fanInboxNoDM": "ダイレクトメッセージはまだありません。",
     "fanInboxNoNotifications": "通知はまだありません。",
     "inboxMessages": "メッセージ",

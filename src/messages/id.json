@@ -755,6 +755,8 @@
     "fanInboxHQPlaceholder": "Ketik pesan ke JazzNode HQ...",
     "fanInboxNewDM": "Pesan Baru",
     "fanInboxSearchUsers": "Cari pengguna...",
+    "deleteConversation": "Hapus Percakapan",
+    "deleteConversationConfirm": "Hapus percakapan ini?",
     "fanInboxNoDM": "Belum ada pesan langsung.",
     "fanInboxNoNotifications": "Belum ada notifikasi.",
     "inboxMessages": "Pesan",

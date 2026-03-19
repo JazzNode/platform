@@ -760,6 +760,8 @@
     "fanInboxHQPlaceholder": "輸入訊息給 JazzNode HQ...",
     "fanInboxNewDM": "新訊息",
     "fanInboxSearchUsers": "搜尋用戶...",
+    "deleteConversation": "刪除對話",
+    "deleteConversationConfirm": "確定要刪除此對話？",
     "fanInboxNoDM": "目前沒有私訊。",
     "fanInboxNoNotifications": "目前沒有通知。",
     "inboxMessages": "訊息",

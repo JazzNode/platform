@@ -755,6 +755,8 @@
     "fanInboxHQPlaceholder": "พิมพ์ข้อความถึง JazzNode HQ...",
     "fanInboxNewDM": "ข้อความใหม่",
     "fanInboxSearchUsers": "ค้นหาผู้ใช้...",
+    "deleteConversation": "ลบการสนทนา",
+    "deleteConversationConfirm": "ลบการสนทนานี้?",
     "fanInboxNoDM": "ยังไม่มีข้อความส่วนตัว",
     "fanInboxNoNotifications": "ยังไม่มีการแจ้งเตือน",
     "inboxMessages": "ข้อความ",
