@@ -178,7 +178,7 @@
     "checkEmailMessage": "我們已將確認連結寄到您的信箱，\n請點擊連結啟用帳號。",
     "close": "關閉",
     "invalidCredentials": "電子信箱或密碼不正確。",
-    "emailInUse": "此信箱已被註冊。",
+    "emailInUse": "此信箱已被註冊。若您曾使用 Google 登入，可以<setPassword>設定密碼</setPassword>來啟用信箱密碼登入。",
     "weakPassword": "密碼需至少 6 個字元。",
     "rateLimited": "嘗試次數過多，請等待 60 秒後再試。",
     "genericError": "發生錯誤，請稍後再試。",

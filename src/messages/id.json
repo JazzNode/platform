@@ -174,7 +174,7 @@
     "checkEmailMessage": "Kami telah mengirimkan tautan konfirmasi ke email Anda.\nSilakan klik tautan untuk mengaktifkan akun.",
     "close": "Tutup",
     "invalidCredentials": "Email atau kata sandi salah.",
-    "emailInUse": "Email ini sudah terdaftar.",
+    "emailInUse": "Email ini sudah terdaftar. Jika Anda masuk dengan Google, Anda dapat <setPassword>mengatur kata sandi</setPassword> untuk mengaktifkan login email.",
     "weakPassword": "Kata sandi harus minimal 6 karakter.",
     "rateLimited": "Terlalu banyak percobaan. Silakan tunggu 60 detik sebelum mencoba lagi.",
     "genericError": "Terjadi kesalahan. Silakan coba lagi.",

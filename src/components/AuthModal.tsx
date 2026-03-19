@@ -20,6 +20,7 @@ export default function AuthModal() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [emailInUseError, setEmailInUseError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [confirmationSent, setConfirmationSent] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
@@ -28,6 +29,7 @@ export default function AuthModal() {
     setEmail('');
     setPassword('');
     setError('');
+    setEmailInUseError(false);
     setLoading(false);
     setConfirmationSent(false);
     setResetEmailSent(false);
@@ -60,6 +62,7 @@ export default function AuthModal() {
   const switchTab = (newTab: Tab) => {
     setTab(newTab);
     setError('');
+    setEmailInUseError(false);
     setConfirmationSent(false);
     setResetEmailSent(false);
   };
@@ -82,8 +85,10 @@ export default function AuthModal() {
       const { error, needsConfirmation } = await signUp(email, password);
       setLoading(false);
       if (error) {
-        if (error === 'emailInUse') setError(t('emailInUse'));
-        else if (error === 'rateLimited') setError(t('rateLimited'));
+        if (error === 'emailInUse') {
+          setEmailInUseError(true);
+          setError('emailInUse');
+        } else if (error === 'rateLimited') setError(t('rateLimited'));
         else if (error.toLowerCase().includes('password')) setError(t('weakPassword'));
         else setError(t('genericError'));
       } else if (needsConfirmation) {
@@ -254,7 +259,23 @@ export default function AuthModal() {
                     />
                   </div>
 
-                  {error && <p className="text-xs text-red-400">{error}</p>}
+                  {error && (
+                    <p className="text-xs text-red-400">
+                      {emailInUseError
+                        ? t.rich('emailInUse', {
+                            setPassword: (chunks) => (
+                              <button
+                                type="button"
+                                onClick={() => switchTab('forgotPassword')}
+                                className="underline text-[var(--color-gold)] hover:text-[var(--color-gold-bright)] transition-colors"
+                              >
+                                {chunks}
+                              </button>
+                            ),
+                          })
+                        : error}
+                    </p>
+                  )}
 
                   <button
                     type="submit"
