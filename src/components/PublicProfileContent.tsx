@@ -73,27 +73,24 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
           </div>
 
           <div className="flex-1 space-y-5">
-            {/* Name + Action Buttons */}
+            {/* Name */}
             <div>
-              <div className="flex items-start justify-between gap-4">
-                <h1 className="font-serif text-4xl sm:text-5xl font-bold">
-                  {profile.display_name || `@${username}`}
-                </h1>
-                <div className="flex items-center gap-2 shrink-0">
-                  <DMButton targetUserId={profile.id} />
-                  <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
-                </div>
-              </div>
+              <h1 className="font-serif text-4xl sm:text-5xl font-bold">
+                {profile.display_name || `@${username}`}
+              </h1>
               {profile.display_name && profile.username && (
                 <p className="mt-1 text-xl text-[#8A8578]">@{profile.username}</p>
               )}
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2">
+            {/* Tags + Action Buttons */}
+            <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
                 {t('memberSince', { date: memberSince })}
               </span>
+              <span className="text-[#8A8578]/30 select-none">|</span>
+              <DMButton targetUserId={profile.id} />
+              <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
             </div>
 
             {/* Bio */}
