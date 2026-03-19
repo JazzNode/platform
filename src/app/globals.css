@@ -156,6 +156,15 @@
   background-size: 256px 256px;
 }
 
+/* ─── Hide scrollbar (cross-browser, used on horizontal nav tabs) ─── */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE, Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Opera */
+}
+
 /* ─── Utility classes ─── */
 .font-serif {
   font-family: 'Space Grotesk', 'ET Ping Ting', var(--font-inter), 'Inter', sans-serif;
