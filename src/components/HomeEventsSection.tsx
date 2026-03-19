@@ -4,6 +4,9 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import BookmarkButton from '@/components/BookmarkButton';
+import FollowButton from '@/components/FollowButton';
+import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from './RegionProvider';
 
 interface HomeEvent {
@@ -48,9 +51,25 @@ interface Props {
 }
 
 function EventCard({ event, locale, index }: { event: HomeEvent; locale: string; index: number }) {
+  const { isFollowing } = useFollows();
+  const bookmarked = isFollowing('event', event.id);
+
   return (
     <FadeUpItem delay={(index % 3) * 60} className={index >= 6 ? 'hidden sm:block' : undefined}>
-      <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
+      <Link
+        href={`/${locale}/events/${event.id}`}
+        className="block relative p-6 rounded-2xl card-hover group h-full"
+        style={{
+          backgroundColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
+          borderWidth: 1,
+          borderStyle: 'solid',
+          borderColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
+          transition: 'background-color 0.6s ease, border-color 0.6s ease',
+        }}
+      >
+        <div className="absolute top-3 right-3 z-10">
+          <BookmarkButton itemId={event.id} />
+        </div>
         {event.venue_name && (
           <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">
             {event.city_name ? `${event.city_name} · ` : ''}{event.venue_name}
@@ -83,6 +102,7 @@ export default function HomeEventsSection({
   locale, events, jams, venues, labels,
 }: Props) {
   const { region } = useRegion();
+  const { isFollowing } = useFollows();
 
   // Fall back to world map (null) when the selected region has no content
   // on this page — mirrors the visual logic in RegionExploreRow
@@ -172,19 +192,36 @@ export default function HomeEventsSection({
           </FadeUp>
           <FadeUp stagger={0.15}>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredVenues.slice(0, 6).map((venue) => (
-                <Link key={venue.id} href={`/${locale}/venues/${venue.id}`} className="fade-up-item block bg-[var(--card)] p-6 card-hover group border border-[var(--border)]">
-                  <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
-                    {venue.name}
-                  </h3>
-                  <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
-                    {venue.city_name} · {venue.event_count} events
-                  </p>
-                  {venue.jazz_frequency && (
-                    <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.jazz_frequency] || venue.jazz_frequency}</p>
-                  )}
-                </Link>
-              ))}
+              {filteredVenues.slice(0, 6).map((venue) => {
+                const followed = isFollowing('venue', venue.id);
+                return (
+                  <Link
+                    key={venue.id}
+                    href={`/${locale}/venues/${venue.id}`}
+                    className="fade-up-item block relative p-6 rounded-2xl card-hover group"
+                    style={{
+                      backgroundColor: followed ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
+                      borderWidth: 1,
+                      borderStyle: 'solid',
+                      borderColor: followed ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
+                      transition: 'background-color 0.6s ease, border-color 0.6s ease',
+                    }}
+                  >
+                    <div className="absolute top-3 right-3 z-10">
+                      <FollowButton itemType="venue" itemId={venue.id} />
+                    </div>
+                    <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
+                      {venue.name}
+                    </h3>
+                    <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
+                      {venue.city_name} · {venue.event_count} events
+                    </p>
+                    {venue.jazz_frequency && (
+                      <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.jazz_frequency] || venue.jazz_frequency}</p>
+                    )}
+                  </Link>
+                );
+              })}
             </div>
           </FadeUp>
         </section>
