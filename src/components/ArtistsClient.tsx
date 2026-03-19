@@ -20,8 +20,8 @@ interface SerializedArtist {
   eventCount: number;
   bio: string | null;
   photoUrl: string | null;
-  cityList: string[];          // Airtable record IDs
-  venueList: string[];         // Airtable record IDs
+  cityList: string[];          // city record IDs
+  venueList: string[];         // venue record IDs
 }
 
 interface CityOption {

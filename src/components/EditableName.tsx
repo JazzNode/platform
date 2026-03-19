@@ -15,7 +15,7 @@ interface FieldOption {
 interface EditableNameProps {
   entityType: 'artist' | 'event' | 'venue';
   entityId: string;
-  /** The Airtable field to update (used when fieldOptions is not provided) */
+  /** The database field to update (used when fieldOptions is not provided) */
   field: FieldName;
   value: string;
   /** When provided, clicking edit shows a field picker first */

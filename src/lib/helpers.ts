@@ -2,13 +2,13 @@
  * Shared helpers for JazzNode web.
  */
 
-/** Generate a URL-safe slug from a name, with Airtable record ID suffix for uniqueness. */
+/** Generate a URL-safe slug from a name, with record ID suffix for uniqueness. */
 export function makeSlug(name: string | undefined, id: string): string {
   const base = (name || 'untitled')
     .toLowerCase()
     .replace(/[^a-z0-9\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0E00-\u0E7F]+/g, '-')
     .replace(/^-|-$/g, '');
-  // Use last 6 chars of Airtable record ID for uniqueness
+  // Use last 6 chars of record ID for uniqueness
   const suffix = id.slice(-6);
   return `${base}-${suffix}`;
 }

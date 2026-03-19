@@ -1,11 +1,9 @@
 /**
- * Content data layer — reads from Supabase (Phase 2 migration).
+ * Content data layer — reads from Supabase.
  *
- * Maintains the same export interface as the original Airtable version:
- *   - All fetchers return { id: string; fields: T }[]
- *   - FK fields are wrapped in arrays for backward compatibility
- *   - Derived fields (event_list, badge_list, etc.) are computed from joins
- *   - resolveLinks() and buildMap() work unchanged
+ * All fetchers return { id: string; fields: T }[].
+ * FK fields are wrapped in arrays for backward compatibility.
+ * Derived fields (event_list, badge_list, etc.) are computed from joins.
  */
 
 import { cache } from 'react';
@@ -254,8 +252,8 @@ export interface Lineup {
   instrument_list?: string[];
   role?: string;
   order?: number;
-  artist_name?: string[];     // no longer available (was Airtable lookup)
-  event_title?: string[];     // no longer available (was Airtable lookup)
+  artist_name?: string[];     // deprecated, not populated
+  event_title?: string[];     // deprecated, not populated
 }
 
 export interface Tag {
@@ -465,7 +463,7 @@ function wrapFK(val: string | null | undefined): string[] | undefined {
   return val ? [val] : undefined;
 }
 
-/** Strip null/undefined values so downstream code can treat missing fields as absent (Airtable convention). */
+/** Strip null/undefined values so downstream code can treat missing fields as absent. */
 function stripNulls(obj: Record<string, unknown>): Record<string, unknown> {
   const clean: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(obj)) {
