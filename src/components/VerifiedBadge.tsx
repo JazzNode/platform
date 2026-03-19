@@ -14,7 +14,7 @@ export default function VerifiedBadge({ size = 'md', label = 'Claimed', classNam
 
   return (
     <span
-      className={`inline-flex items-center shrink-0 relative align-top -top-0.5 ml-[2px] ${className}`}
+      className={`inline-flex items-center shrink-0 relative align-top -top-px ml-px ${className}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
