@@ -151,7 +151,7 @@ export default function Footer() {
           {/* Bottom row */}
           <div className="mt-10 flex flex-col items-center gap-4 text-xs text-[var(--muted-foreground,#8A8578)]">
             <span>© {new Date().getFullYear()} JazzNode</span>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center flex-wrap justify-center gap-x-6 gap-y-2">
               <Link
                 href={`/${locale}/releases`}
                 className="hover:text-gold transition-colors duration-300"
@@ -159,6 +159,24 @@ export default function Footer() {
                 Releases
               </Link>
               <SoundWave />
+              <Link
+                href={`/${locale}/legal/terms`}
+                className="hover:text-gold transition-colors duration-300"
+              >
+                {t('terms')}
+              </Link>
+              <Link
+                href={`/${locale}/legal/privacy`}
+                className="hover:text-gold transition-colors duration-300"
+              >
+                {t('privacy')}
+              </Link>
+              <Link
+                href={`/${locale}/legal/refund`}
+                className="hover:text-gold transition-colors duration-300"
+              >
+                {t('refund')}
+              </Link>
               <button
                 onClick={() => setLegalOpen(true)}
                 className="cursor-pointer hover:text-gold transition-colors duration-300"
