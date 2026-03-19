@@ -860,6 +860,7 @@
     "cancel": "취소",
     "averageRating": "평균 평점",
     "reviewCount": "리뷰 {count}개",
+    "emptyCta": "이곳에 가본 적 있나요? 리뷰를 남겨주세요!",
     "noReviews": "아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!",
     "charsRemaining": "{count}자 남음",
     "loginToReview": "로그인 후 리뷰를 남기세요",

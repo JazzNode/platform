@@ -860,6 +860,7 @@
     "cancel": "Batal",
     "averageRating": "Rating Rata-rata",
     "reviewCount": "{count} ulasan",
+    "emptyCta": "Pernah ke sini? Tulis ulasan!",
     "noReviews": "Belum ada ulasan. Jadilah yang pertama!",
     "charsRemaining": "{count} karakter tersisa",
     "loginToReview": "Masuk untuk menulis ulasan",

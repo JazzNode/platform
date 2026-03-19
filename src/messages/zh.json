@@ -867,6 +867,7 @@
     "cancel": "取消",
     "averageRating": "平均評分",
     "reviewCount": "{count} 則評價",
+    "emptyCta": "你去過這裡嗎？留下評價吧！",
     "noReviews": "還沒有評價，成為第一個吧！",
     "charsRemaining": "剩餘 {count} 字",
     "loginToReview": "登入後即可評價",

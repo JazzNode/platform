@@ -65,25 +65,10 @@ export default function VenueReviewList() {
     );
   }
 
+  if (reviewCount === 0) return null;
+
   return (
-    <div className="space-y-6 mt-6">
-      {/* Summary bar */}
-      {reviewCount > 0 && (
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" className="text-gold">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-            <span className="text-lg font-bold text-gold tabular-nums">{averageRating}</span>
-          </div>
-          <span className="text-sm text-[#8A8578]">{t('reviewCount', { count: reviewCount })}</span>
-        </div>
-      )}
-
-      {reviewCount === 0 && (
-        <p className="text-sm text-[#6A6560] py-4">{t('noReviews')}</p>
-      )}
-
+    <div className="space-y-4 mt-6">
       {/* Review cards */}
       {reviews.map((review) => {
         const isOwn = user?.id === review.user_id;

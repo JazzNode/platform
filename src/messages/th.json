@@ -860,6 +860,7 @@
     "cancel": "ยกเลิก",
     "averageRating": "คะแนนเฉลี่ย",
     "reviewCount": "{count} รีวิว",
+    "emptyCta": "เคยมาที่นี่ไหม? เขียนรีวิวเลย!",
     "noReviews": "ยังไม่มีรีวิว เป็นคนแรกเลย!",
     "charsRemaining": "เหลือ {count} ตัวอักษร",
     "loginToReview": "เข้าสู่ระบบเพื่อเขียนรีวิว",

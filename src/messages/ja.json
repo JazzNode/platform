@@ -860,6 +860,7 @@
     "cancel": "キャンセル",
     "averageRating": "平均評価",
     "reviewCount": "{count}件のレビュー",
+    "emptyCta": "ここに行ったことがありますか？レビューを書きましょう！",
     "noReviews": "まだレビューがありません。最初のレビューを書きましょう！",
     "charsRemaining": "残り{count}文字",
     "loginToReview": "ログインしてレビューを書く",

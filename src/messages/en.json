@@ -867,6 +867,7 @@
     "cancel": "Cancel",
     "averageRating": "Average Rating",
     "reviewCount": "{count} reviews",
+    "emptyCta": "Been here? Leave a review!",
     "noReviews": "No reviews yet. Be the first!",
     "charsRemaining": "{count} chars remaining",
     "loginToReview": "Log in to leave a review",
