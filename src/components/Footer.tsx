@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useTheme } from '@/components/ThemeProvider';
 import { themes, themeOrder, type Theme } from '@/lib/themes';
 import LegalModal from '@/components/LegalModal';
+import { TermsModal, PrivacyModal, RefundModal } from '@/components/LegalModals';
 import { useAdmin } from '@/components/AdminProvider';
 
 function SoundWave() {
@@ -81,6 +82,9 @@ export default function Footer() {
   const locale = useLocale();
   const t = useTranslations('common');
   const [legalOpen, setLegalOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [refundOpen, setRefundOpen] = useState(false);
   const { toggleAdmin } = useAdmin();
   const tapCountRef = useRef(0);
   const tapTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -161,30 +165,24 @@ export default function Footer() {
               </Link>
             </div>
             <div className="flex items-center flex-wrap justify-center gap-x-5 gap-y-1">
-              <Link
-                href={`/${locale}/legal/terms`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gold transition-colors duration-300"
+              <button
+                onClick={() => setTermsOpen(true)}
+                className="cursor-pointer hover:text-gold transition-colors duration-300"
               >
                 {t('terms')}
-              </Link>
-              <Link
-                href={`/${locale}/legal/privacy`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gold transition-colors duration-300"
+              </button>
+              <button
+                onClick={() => setPrivacyOpen(true)}
+                className="cursor-pointer hover:text-gold transition-colors duration-300"
               >
                 {t('privacy')}
-              </Link>
-              <Link
-                href={`/${locale}/legal/refund`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-gold transition-colors duration-300"
+              </button>
+              <button
+                onClick={() => setRefundOpen(true)}
+                className="cursor-pointer hover:text-gold transition-colors duration-300"
               >
                 {t('refund')}
-              </Link>
+              </button>
               <button
                 onClick={() => setLegalOpen(true)}
                 className="cursor-pointer hover:text-gold transition-colors duration-300"
@@ -197,6 +195,9 @@ export default function Footer() {
       </div>
 
       <LegalModal isOpen={legalOpen} onClose={() => setLegalOpen(false)} />
+      <TermsModal isOpen={termsOpen} onClose={() => setTermsOpen(false)} />
+      <PrivacyModal isOpen={privacyOpen} onClose={() => setPrivacyOpen(false)} />
+      <RefundModal isOpen={refundOpen} onClose={() => setRefundOpen(false)} />
     </footer>
   );
 }
