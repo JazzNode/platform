@@ -94,7 +94,14 @@ export default function FanInboxPage() {
   const [tab, setTab] = useState<Tab>('messages');
   const [filter, setFilter] = useState<FilterType>('all');
   const [conversations, setConversations] = useState<UnifiedConversation[]>([]);
-  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => searchParams.get('convo'));
+  const [selectedConvo, setSelectedConvo] = useState<string | null>(() => {
+    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('inbox_open_convo') : null;
+    if (stored) {
+      sessionStorage.removeItem('inbox_open_convo');
+      return stored;
+    }
+    return searchParams.get('convo');
+  });
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
@@ -111,10 +118,18 @@ export default function FanInboxPage() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
 
-  // Sync selectedConvo + filter from URL params (handles navigation from profile pages)
+  // Sync selectedConvo from sessionStorage (set by message buttons) or URL params
   const urlConvo = searchParams.get('convo');
   const urlTab = searchParams.get('tab');
   useEffect(() => {
+    // sessionStorage is the primary source (set before navigation by message buttons)
+    const stored = sessionStorage.getItem('inbox_open_convo');
+    if (stored) {
+      sessionStorage.removeItem('inbox_open_convo');
+      if (stored !== selectedConvo) setSelectedConvo(stored);
+      return;
+    }
+    // Fallback to URL params
     if (urlConvo && urlConvo !== selectedConvo) {
       setSelectedConvo(urlConvo);
     }
