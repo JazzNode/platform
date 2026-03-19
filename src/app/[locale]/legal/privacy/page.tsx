@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import ContactHQLink from '@/components/ContactHQLink';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy | JazzNode',
@@ -77,7 +78,7 @@ export default function PrivacyPage() {
               <li>Export your data in a portable format.</li>
               <li>Withdraw consent at any time (where processing is based on consent).</li>
             </ul>
-            <p>To exercise any of these rights, please contact us at <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>.</p>
+            <p>To exercise any of these rights, please <ContactHQLink>contact us</ContactHQLink>.</p>
           </Section>
 
           <Section title="7. Data Retention">
@@ -97,7 +98,7 @@ export default function PrivacyPage() {
           </Section>
 
           <Section title="11. Contact Us">
-            <p>If you have questions or concerns about this Privacy Policy, please contact us at <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>.</p>
+            <p>If you have questions or concerns about this Privacy Policy, please <ContactHQLink>contact us</ContactHQLink>.</p>
           </Section>
 
         </section>

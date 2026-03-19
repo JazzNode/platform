@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import ContactHQLink from '@/components/ContactHQLink';
 
 export const metadata: Metadata = {
   title: 'Refund & Cancellation Policy | JazzNode',
@@ -68,7 +69,7 @@ export default function RefundPage() {
           </Section>
 
           <Section title="5. How to Request a Refund">
-            <p>To request a refund, please contact us at <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a> with your account email and a brief description of the reason. We aim to process all refund requests within 5 business days.</p>
+            <p>To request a refund, please <ContactHQLink>contact us</ContactHQLink> with your account email and a brief description of the reason. We aim to process all refund requests within 5 business days.</p>
             <p>Approved refunds will be credited to the original payment method.</p>
           </Section>
 
@@ -77,7 +78,7 @@ export default function RefundPage() {
           </Section>
 
           <Section title="7. Contact Us">
-            <p>If you have questions about refunds or cancellations, please reach out to <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>.</p>
+            <p>If you have questions about refunds or cancellations, please <ContactHQLink>contact us</ContactHQLink>.</p>
           </Section>
 
         </section>

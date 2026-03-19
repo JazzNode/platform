@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
+import ContactHQLink from '@/components/ContactHQLink';
 
 export const metadata: Metadata = {
   title: 'Terms of Service | JazzNode',
@@ -89,7 +90,7 @@ export default function TermsPage() {
           </Section>
 
           <Section title="12. Contact Us">
-            <p>If you have questions about these Terms, please contact us at <a href="mailto:hello@jazznode.com" className="text-gold hover:text-[var(--color-gold-bright)] transition-colors underline underline-offset-2">hello@jazznode.com</a>.</p>
+            <p>If you have questions about these Terms, please <ContactHQLink>contact us</ContactHQLink>.</p>
           </Section>
 
         </section>

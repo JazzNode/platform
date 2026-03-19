@@ -149,30 +149,38 @@ export default function Footer() {
           </div>
 
           {/* Bottom row */}
-          <div className="mt-10 flex flex-col items-center gap-4 text-xs text-[var(--muted-foreground,#8A8578)]">
-            <span>© {new Date().getFullYear()} JazzNode</span>
-            <div className="flex items-center flex-wrap justify-center gap-x-6 gap-y-2">
+          <div className="mt-10 flex flex-col items-center gap-3 text-xs text-[var(--muted-foreground,#8A8578)]">
+            <div className="flex items-center gap-4">
+              <span>© {new Date().getFullYear()} JazzNode</span>
+              <SoundWave />
               <Link
                 href={`/${locale}/releases`}
                 className="hover:text-gold transition-colors duration-300"
               >
                 Releases
               </Link>
-              <SoundWave />
+            </div>
+            <div className="flex items-center flex-wrap justify-center gap-x-5 gap-y-1">
               <Link
                 href={`/${locale}/legal/terms`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-gold transition-colors duration-300"
               >
                 {t('terms')}
               </Link>
               <Link
                 href={`/${locale}/legal/privacy`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-gold transition-colors duration-300"
               >
                 {t('privacy')}
               </Link>
               <Link
                 href={`/${locale}/legal/refund`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hover:text-gold transition-colors duration-300"
               >
                 {t('refund')}
