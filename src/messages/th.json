@@ -142,7 +142,13 @@
     "searchQuickJam": "แจมเซสชัน",
     "searchQuickTonight": "โชว์คืนนี้",
     "searchQuickCities": "สำรวจเมือง",
-    "searchQuickOr": "หรือเลือกตามเมือง"
+    "searchQuickOr": "หรือเลือกตามเมือง",
+    "newEvents": "เพิ่มใหม่",
+    "newEventsCount": "รายการที่เพิ่มใหม่",
+    "noNewEvents": "ไม่มีกิจกรรมที่เพิ่มใหม่",
+    "newEventsPageDescription": "เรียกดูกิจกรรมแจ๊สที่เพิ่มเข้ามาล่าสุด",
+    "today": "วันนี้",
+    "yesterday": "เมื่อวาน"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",
@@ -437,6 +443,7 @@
     "recentActivity": "กิจกรรมล่าสุด",
     "viewAll": "ดูทั้งหมด",
     "noClaims": "ไม่มีคำขอล่าสุด",
+    "newEvents": "กิจกรรมใหม่",
     "artistTiers": "ระดับศิลปิน",
     "venueTiers": "ระดับสถานที่",
     "badges": "จัดการตราสัญลักษณ์",

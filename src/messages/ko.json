@@ -142,7 +142,13 @@
     "searchQuickJam": "잼 세션",
     "searchQuickTonight": "오늘 밤 공연",
     "searchQuickCities": "도시 탐색",
-    "searchQuickOr": "또는 도시별로 찾기"
+    "searchQuickOr": "또는 도시별로 찾기",
+    "newEvents": "최근 추가",
+    "newEventsCount": "건 추가됨",
+    "noNewEvents": "최근 추가된 이벤트가 없습니다.",
+    "newEventsPageDescription": "최근 추가된 재즈 이벤트를 확인하세요.",
+    "today": "오늘",
+    "yesterday": "어제"
   },
   "auth": {
     "signIn": "로그인",
@@ -437,6 +443,7 @@
     "recentActivity": "최근 활동",
     "viewAll": "전체 보기",
     "noClaims": "최근 소유권 요청이 없습니다.",
+    "newEvents": "최근 추가",
     "artistTiers": "아티스트 등급",
     "venueTiers": "공연장 등급",
     "badges": "배지 관리",

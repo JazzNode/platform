@@ -146,7 +146,13 @@
     "searchQuickJam": "Jam Session",
     "searchQuickTonight": "今晚有演出",
     "searchQuickCities": "探索城市",
-    "searchQuickOr": "或按城市瀏覽"
+    "searchQuickOr": "或按城市瀏覽",
+    "newEvents": "新增活動",
+    "newEventsCount": "筆新增",
+    "noNewEvents": "近期沒有新增活動。",
+    "newEventsPageDescription": "瀏覽近期爬蟲新增的爵士演出場次。",
+    "today": "今天",
+    "yesterday": "昨天"
   },
   "auth": {
     "signIn": "登入",
@@ -442,6 +448,7 @@
     "recentActivity": "近期操作",
     "viewAll": "查看全部",
     "noClaims": "目前沒有近期認領。",
+    "newEvents": "新增活動",
     "artistTiers": "藝人等級",
     "venueTiers": "場地等級",
     "badges": "徽章管理",

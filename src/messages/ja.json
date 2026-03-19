@@ -142,7 +142,13 @@
     "searchQuickJam": "ジャムセッション",
     "searchQuickTonight": "今夜のライブ",
     "searchQuickCities": "都市を探す",
-    "searchQuickOr": "または都市から探す"
+    "searchQuickOr": "または都市から探す",
+    "newEvents": "新着イベント",
+    "newEventsCount": "件の新着",
+    "noNewEvents": "最近追加されたイベントはありません。",
+    "newEventsPageDescription": "最近追加されたジャズイベントを閲覧。",
+    "today": "今日",
+    "yesterday": "昨日"
   },
   "auth": {
     "signIn": "ログイン",
@@ -437,6 +443,7 @@
     "recentActivity": "最近の操作",
     "viewAll": "すべて表示",
     "noClaims": "最近の申請はありません。",
+    "newEvents": "新着イベント",
     "artistTiers": "アーティスト階層",
     "venueTiers": "会場階層",
     "badges": "バッジ管理",

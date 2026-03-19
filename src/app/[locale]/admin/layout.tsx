@@ -9,6 +9,7 @@ import { useAdmin } from '@/components/AdminProvider';
 
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
+  { key: 'newEvents', icon: 'sparkle', path: '/new-events' },
   { key: 'inbox', icon: 'bell', path: '/inbox' },
   { key: 'members', icon: 'users', path: '/members' },
   { key: 'claims', icon: 'shield', path: '/claims' },
@@ -70,6 +71,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <path d="M12 15l-3.5 2 .9-3.9L6 10.1l4-.3L12 6l2 3.8 4 .3-3.4 3 .9 3.9z" />
           <path d="M8 21l1-6" />
           <path d="M16 21l-1-6" />
+        </svg>
+      );
+    case 'sparkle':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" />
         </svg>
       );
     default:

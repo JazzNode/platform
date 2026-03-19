@@ -208,6 +208,7 @@ export interface Event {
   payment_method?: string[];
   popularity?: string;
   promoter_list?: string[];   // derived: from event_promoters junction
+  created_at?: string;        // when the event record was created in Supabase
 }
 
 export interface BadgeDef {
@@ -405,6 +406,7 @@ interface EventRow {
   fetched_at: string | null;
   raw_payload_hash: string | null;
   raw_payload_url: string | null;
+  created_at: string | null;
 }
 
 interface LineupRow {

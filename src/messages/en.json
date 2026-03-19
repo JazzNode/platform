@@ -146,7 +146,13 @@
     "searchQuickJam": "Jam Session",
     "searchQuickTonight": "Tonight's Shows",
     "searchQuickCities": "Explore Cities",
-    "searchQuickOr": "or browse by city"
+    "searchQuickOr": "or browse by city",
+    "newEvents": "Recently Added",
+    "newEventsCount": "newly added",
+    "noNewEvents": "No recently added events.",
+    "newEventsPageDescription": "Browse recently added jazz events from scraper updates.",
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
   "auth": {
     "signIn": "Sign In",
@@ -442,6 +448,7 @@
     "recentActivity": "Recent Activity",
     "viewAll": "View All",
     "noClaims": "No recent claims.",
+    "newEvents": "New Events",
     "artistTiers": "Artist Tiers",
     "venueTiers": "Venue Tiers",
     "badges": "Badges",

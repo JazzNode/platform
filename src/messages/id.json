@@ -142,7 +142,13 @@
     "searchQuickJam": "Jam Session",
     "searchQuickTonight": "Pertunjukan Malam Ini",
     "searchQuickCities": "Jelajahi Kota",
-    "searchQuickOr": "atau telusuri berdasarkan kota"
+    "searchQuickOr": "atau telusuri berdasarkan kota",
+    "newEvents": "Baru Ditambahkan",
+    "newEventsCount": "baru ditambahkan",
+    "noNewEvents": "Tidak ada acara yang baru ditambahkan.",
+    "newEventsPageDescription": "Jelajahi acara jazz yang baru ditambahkan.",
+    "today": "Hari ini",
+    "yesterday": "Kemarin"
   },
   "auth": {
     "signIn": "Masuk",
@@ -437,6 +443,7 @@
     "recentActivity": "Aktivitas Terbaru",
     "viewAll": "Lihat Semua",
     "noClaims": "Tidak ada klaim terbaru.",
+    "newEvents": "Acara Baru",
     "artistTiers": "Tingkat Artis",
     "venueTiers": "Tingkat Tempat",
     "badges": "Manajemen Lencana",
