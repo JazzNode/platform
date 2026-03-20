@@ -22,8 +22,8 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     notFound();
   }
 
-  // Profile is set to private
-  if (!profile.is_public) {
+  // Profile is set to private (explicit false check — undefined means column not yet added, treat as public)
+  if (profile.is_public === false) {
     return (
       <div className="py-24 text-center space-y-4">
         <div className="text-5xl">🔒</div>
