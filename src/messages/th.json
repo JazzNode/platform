@@ -257,6 +257,7 @@
     "cropConfirm": "ยืนยัน",
     "cropCancel": "ยกเลิก",
     "viewPublicProfile": "ดูโปรไฟล์สาธารณะ",
+    "setUsernameFirst": "กรุณาตั้งชื่อผู้ใช้ก่อน",
     "memberSince": "สมาชิกตั้งแต่ {date}",
     "notFound": "ไม่พบผู้ใช้",
     "follows": "กำลังติดตาม",

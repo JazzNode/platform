@@ -262,6 +262,7 @@
     "cropConfirm": "Confirm",
     "cropCancel": "Cancel",
     "viewPublicProfile": "View public profile",
+    "setUsernameFirst": "Please set a username first",
     "memberSince": "Member since {date}",
     "notFound": "User not found.",
     "follows": "Following",

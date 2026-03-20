@@ -262,6 +262,7 @@
     "cropConfirm": "確認",
     "cropCancel": "取消",
     "viewPublicProfile": "查看公開頁面",
+    "setUsernameFirst": "請先設定帳號名稱",
     "memberSince": "加入於 {date}",
     "notFound": "找不到此用戶。",
     "follows": "追蹤",

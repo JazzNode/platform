@@ -187,8 +187,8 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
           </nav>
 
           {/* View public profile link */}
-          {profile?.username && (
-            <div className="mt-6 pt-6 border-t border-[var(--border)]">
+          <div className="mt-6 pt-6 border-t border-[var(--border)]">
+            {profile?.username ? (
               <Link
                 href={`/${locale}/user/${profile.username}`}
                 className="flex items-center gap-2 text-xs text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors"
@@ -200,8 +200,20 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                 </svg>
                 <span>{t('viewPublicProfile')}</span>
               </Link>
-            </div>
-          )}
+            ) : (
+              <div className="space-y-1">
+                <span className="flex items-center gap-2 text-xs text-[var(--muted-foreground)]/50 cursor-not-allowed">
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                  <span>{t('viewPublicProfile')}</span>
+                </span>
+                <p className="text-[10px] text-[var(--color-gold)]/70 pl-6">{t('setUsernameFirst')}</p>
+              </div>
+            )}
+          </div>
         </aside>
 
         {/* Mobile Top Bar */}
@@ -236,7 +248,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                 </Link>
               );
             })}
-            {profile?.username && (
+            {profile?.username ? (
               <Link
                 href={`/${locale}/user/${profile.username}`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-all"
@@ -248,6 +260,18 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
                 </svg>
                 <span>{t('viewPublicProfile')}</span>
               </Link>
+            ) : (
+              <span
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs whitespace-nowrap text-[var(--muted-foreground)]/50 cursor-not-allowed"
+                title={t('setUsernameFirst')}
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                  <polyline points="15 3 21 3 21 9" />
+                  <line x1="10" y1="14" x2="21" y2="3" />
+                </svg>
+                <span>{t('viewPublicProfile')}</span>
+              </span>
             )}
           </div>
         </div>

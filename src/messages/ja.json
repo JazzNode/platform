@@ -257,6 +257,7 @@
     "cropConfirm": "確定",
     "cropCancel": "キャンセル",
     "viewPublicProfile": "公開プロフィールを見る",
+    "setUsernameFirst": "先にユーザー名を設定してください",
     "memberSince": "{date}から参加",
     "notFound": "ユーザーが見つかりません。",
     "follows": "フォロー中",
