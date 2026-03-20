@@ -76,26 +76,22 @@ export default function VenueOverviewPage({ params }: { params: Promise<{ slug: 
       </FadeUp>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <FadeUp>
-          <div className="bg-gradient-to-br from-[var(--color-gold)]/8 to-[var(--color-gold)]/3 border border-[var(--color-gold)]/20 rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('totalPageViews')}</p>
-            <p className="text-3xl font-bold text-[var(--color-gold)]">{stats.pageViews.toLocaleString()}</p>
+      <FadeUp>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div className="bg-gradient-to-br from-[var(--color-gold)]/8 to-[var(--color-gold)]/3 border border-[var(--color-gold)]/20 rounded-2xl p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">{t('totalPageViews')}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[var(--color-gold)]">{stats.pageViews.toLocaleString()}</p>
           </div>
-        </FadeUp>
-        <FadeUp>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('followerCount')}</p>
-            <p className="text-3xl font-bold">{stats.followers.toLocaleString()}</p>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">{t('followerCount')}</p>
+            <p className="text-2xl sm:text-3xl font-bold">{stats.followers.toLocaleString()}</p>
           </div>
-        </FadeUp>
-        <FadeUp>
-          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5">
-            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{t('eventsThisMonth')}</p>
-            <p className="text-3xl font-bold">{stats.eventsThisMonth.toLocaleString()}</p>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 sm:p-5">
+            <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">{t('eventsThisMonth')}</p>
+            <p className="text-2xl sm:text-3xl font-bold">{stats.eventsThisMonth.toLocaleString()}</p>
           </div>
-        </FadeUp>
-      </div>
+        </div>
+      </FadeUp>
 
       {/* Badge Overview */}
       <FadeUp>
