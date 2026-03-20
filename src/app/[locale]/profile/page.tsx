@@ -63,7 +63,7 @@ function MyReviews() {
       </h2>
 
       {reviews.length === 0 ? (
-        <p className="text-[var(--muted-foreground)] text-sm">{t('noMyReviews')}</p>
+        <p className="text-[#8A8578] text-sm">{t('noMyReviews')}</p>
       ) : (
         <div className="space-y-3">
           {reviews.map((review) => {
@@ -83,16 +83,16 @@ function MyReviews() {
                       {t('viewVenue')} →
                     </span>
                     {review.is_anonymous && (
-                      <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md bg-[var(--border)]/50 text-[var(--muted-foreground)]">
+                      <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md bg-[var(--border)]/50 text-[#8A8578]">
                         {t('anonymous')}
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-[var(--muted-foreground)]">{dateStr}</span>
+                  <span className="text-xs text-[#8A8578]">{dateStr}</span>
                 </div>
                 <div className="flex items-center gap-1 mb-1.5">
                   {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-[var(--color-gold)]' : 'text-[var(--muted-foreground)]/30'}>
+                    <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-[var(--color-gold)]' : 'text-[#8A8578]/30'}>
                       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                     </svg>
                   ))}
