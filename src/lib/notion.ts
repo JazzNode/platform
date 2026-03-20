@@ -6,7 +6,8 @@ import type {
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
-const RELEASES_PAGE_ID = '323212724506809eab38c09ae5bb0a29';
+const RELEASES_PAGE_ID = '3292127245068066b40de1323b88dce1';
+const RELEASES_INTERNAL_PAGE_ID = '329212724506808b96fbf5915f6134ca';
 
 /* ─── Rich text → plain string ─── */
 export function richTextToPlain(rt: RichTextItemResponse[]): string {
@@ -32,14 +33,14 @@ export function richTextToHtml(rt: RichTextItemResponse[]): string {
     .join('');
 }
 
-/* ─── Fetch all blocks from the Releases page ─── */
-export async function fetchReleasesBlocks(): Promise<BlockObjectResponse[]> {
+/* ─── Fetch all blocks from a Notion page ─── */
+async function fetchPageBlocks(pageId: string): Promise<BlockObjectResponse[]> {
   const blocks: BlockObjectResponse[] = [];
   let cursor: string | undefined;
 
   do {
     const res = await notion.blocks.children.list({
-      block_id: RELEASES_PAGE_ID,
+      block_id: pageId,
       start_cursor: cursor,
       page_size: 100,
     });
@@ -70,4 +71,45 @@ export async function fetchReleasesBlocks(): Promise<BlockObjectResponse[]> {
   }
 
   return blocks;
+}
+
+export type NotionBlockWithChildren = BlockObjectResponse & { children?: BlockObjectResponse[] };
+
+export interface VersionGroup {
+  version: string;
+  blocks: NotionBlockWithChildren[];
+}
+
+/* ─── Group blocks by version (h2 headings = version boundaries) ─── */
+export function groupBlocksByVersion(blocks: NotionBlockWithChildren[]): VersionGroup[] {
+  const groups: VersionGroup[] = [];
+  let current: VersionGroup | null = null;
+
+  for (const block of blocks) {
+    if (block.type === 'heading_2') {
+      const text = richTextToPlain(block.heading_2.rich_text);
+      current = { version: text, blocks: [] };
+      groups.push(current);
+    } else if (current) {
+      current.blocks.push(block);
+    } else {
+      // Blocks before any version heading go into an "Ungrouped" section
+      if (!groups.length || groups[0].version !== '') {
+        groups.unshift({ version: '', blocks: [] });
+      }
+      groups[0].blocks.push(block);
+    }
+  }
+
+  return groups;
+}
+
+/* ─── Public releases (footer link) ─── */
+export async function fetchReleasesBlocks(): Promise<BlockObjectResponse[]> {
+  return fetchPageBlocks(RELEASES_PAGE_ID);
+}
+
+/* ─── Internal releases (admin dashboard) ─── */
+export async function fetchInternalReleasesBlocks(): Promise<BlockObjectResponse[]> {
+  return fetchPageBlocks(RELEASES_INTERNAL_PAGE_ID);
 }
