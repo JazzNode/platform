@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
 interface UnreadCountData {
@@ -20,8 +20,6 @@ interface UnreadCountData {
  */
 export function useUnreadCount(enabled: boolean) {
   const [data, setData] = useState<UnreadCountData>({ total: 0, breakdown: {}, notifications: 0 });
-  const latestData = useRef(data);
-  latestData.current = data;
 
   const refresh = useCallback(async () => {
     try {
@@ -38,8 +36,8 @@ export function useUnreadCount(enabled: boolean) {
   useEffect(() => {
     if (!enabled) return;
 
-    // Initial fetch
-    refresh();
+    // Initial fetch (scheduled to avoid synchronous setState in effect body)
+    const timer = setTimeout(refresh, 0);
 
     // Polling fallback for message counts (longer interval since notifications are realtime)
     const interval = setInterval(refresh, 120_000);
@@ -63,6 +61,7 @@ export function useUnreadCount(enabled: boolean) {
       .subscribe();
 
     return () => {
+      clearTimeout(timer);
       clearInterval(interval);
       supabase.removeChannel(channel);
     };
