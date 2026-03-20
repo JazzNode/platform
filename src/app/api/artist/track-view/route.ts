@@ -12,6 +12,8 @@ export async function POST(req: NextRequest) {
 
     const userAgent = req.headers.get('user-agent') || null;
     const referrer = req.headers.get('referer') || null;
+    const city = req.headers.get('x-vercel-ip-city') || null;
+    const countryCode = req.headers.get('x-vercel-ip-country') || null;
 
     // Client-side (PageViewTracker) already deduplicates with a 60s localStorage window.
     // Server-side ILIKE dedup on user_agent caused full table scans → removed.
@@ -19,6 +21,8 @@ export async function POST(req: NextRequest) {
       artist_id: artistId,
       referrer,
       user_agent: userAgent?.slice(0, 500),
+      city: city ? decodeURIComponent(city) : null,
+      country_code: countryCode,
     });
 
     return NextResponse.json({ tracked: true });
