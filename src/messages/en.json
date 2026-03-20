@@ -728,6 +728,7 @@
     "anonymous": "Anonymous",
     "typeMessage": "Type a message...",
     "send": "Send",
+    "sendFailed": "Failed to send message. Please try again.",
     "broadcastsTitle": "Broadcasts",
     "newBroadcast": "New Broadcast",
     "broadcastTitlePlaceholder": "Subject line...",

@@ -302,19 +302,27 @@ export default function AdminInboxPage() {
   const handleSend = useCallback(async () => {
     if (!newMessage.trim() || !selectedConvo || !token || sending) return;
     setSending(true);
+    const body = newMessage.trim();
     try {
       const res = await fetch('/api/admin/conversations', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: selectedConvo, body: newMessage.trim() }),
+        body: JSON.stringify({ conversationId: selectedConvo, body }),
       });
       const data = await res.json();
       if (data.message) {
         setMessages((prev) => [...prev, { ...data.message, sender_display: 'You' }]);
         setNewMessage('');
+      } else {
+        console.error('Send message failed:', data);
+        alert('Failed to send message');
       }
-    } catch {}
-    setSending(false);
+    } catch (err) {
+      console.error('Send message error:', err);
+      alert('Failed to send message');
+    } finally {
+      setSending(false);
+    }
   }, [newMessage, selectedConvo, token, sending]);
 
   const selectedConversation = conversations.find((c) => c.id === selectedConvo);

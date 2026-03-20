@@ -723,6 +723,7 @@
     "anonymous": "ไม่ระบุชื่อ",
     "typeMessage": "พิมพ์ข้อความ...",
     "send": "ส่ง",
+    "sendFailed": "ส่งข้อความไม่สำเร็จ กรุณาลองอีกครั้ง",
     "broadcastsTitle": "ประกาศ",
     "newBroadcast": "ประกาศใหม่",
     "broadcastTitlePlaceholder": "หัวข้อ...",

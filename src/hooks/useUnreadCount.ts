@@ -60,10 +60,15 @@ export function useUnreadCount(enabled: boolean) {
       )
       .subscribe();
 
+    // Listen for custom event dispatched when inbox marks messages as read
+    const onInboxRead = () => refresh();
+    window.addEventListener('inbox:read', onInboxRead);
+
     return () => {
       clearTimeout(timer);
       clearInterval(interval);
       supabase.removeChannel(channel);
+      window.removeEventListener('inbox:read', onInboxRead);
     };
   }, [enabled, refresh]);
 

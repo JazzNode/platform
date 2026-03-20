@@ -723,6 +723,7 @@
     "anonymous": "Anonim",
     "typeMessage": "Ketik pesan...",
     "send": "Kirim",
+    "sendFailed": "Gagal mengirim pesan. Silakan coba lagi.",
     "broadcastsTitle": "Siaran",
     "newBroadcast": "Siaran Baru",
     "broadcastTitlePlaceholder": "Judul...",

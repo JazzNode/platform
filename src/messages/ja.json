@@ -723,6 +723,7 @@
     "anonymous": "匿名",
     "typeMessage": "メッセージを入力...",
     "send": "送信",
+    "sendFailed": "メッセージの送信に失敗しました。もう一度お試しください。",
     "broadcastsTitle": "ブロードキャスト",
     "newBroadcast": "新規ブロードキャスト",
     "broadcastTitlePlaceholder": "件名...",

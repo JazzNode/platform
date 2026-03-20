@@ -387,6 +387,8 @@ export default function FanInboxPage() {
         setConversations((prev) =>
           prev.map((c) => (c.id === selectedConvo ? { ...c, unread_count: 0 } : c))
         );
+        // Notify header badge to refresh unread count
+        window.dispatchEvent(new Event('inbox:read'));
       });
   }, [selectedConvo, user]);
 
@@ -403,17 +405,28 @@ export default function FanInboxPage() {
     const body = newMessage.trim();
     setNewMessage('');
 
-    const { data: msg } = await supabase
-      .from('messages')
-      .insert({ conversation_id: selectedConvo, sender_id: user.id, body })
-      .select('id, conversation_id, sender_id, sender_role, broadcast_id, body, read_at, created_at')
-      .single();
+    try {
+      const { data: msg, error } = await supabase
+        .from('messages')
+        .insert({ conversation_id: selectedConvo, sender_id: user.id, body })
+        .select('id, conversation_id, sender_id, sender_role, broadcast_id, body, read_at, created_at')
+        .single();
 
-    if (msg) {
-      setMessages((prev) => [...prev, msg]);
-      await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', selectedConvo);
+      if (error) {
+        console.error('Send message failed:', error);
+        setNewMessage(body);
+        alert(t('sendFailed') ?? 'Failed to send message');
+      } else if (msg) {
+        setMessages((prev) => [...prev, msg]);
+        await supabase.from('conversations').update({ last_message_at: new Date().toISOString() }).eq('id', selectedConvo);
+      }
+    } catch (err) {
+      console.error('Send message error:', err);
+      setNewMessage(body);
+      alert(t('sendFailed') ?? 'Failed to send message');
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   }, [newMessage, selectedConvo, user, sending]);
 
 

@@ -728,6 +728,7 @@
     "anonymous": "匿名用戶",
     "typeMessage": "輸入訊息...",
     "send": "傳送",
+    "sendFailed": "訊息傳送失敗，請再試一次。",
     "broadcastsTitle": "廣播",
     "newBroadcast": "新增廣播",
     "broadcastTitlePlaceholder": "標題...",

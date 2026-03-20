@@ -148,6 +148,8 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
             c.id === selectedConvo ? { ...c, unread_count: 0 } : c
           )
         );
+        // Notify header badge to refresh unread count
+        window.dispatchEvent(new Event('inbox:read'));
       });
   }, [selectedConvo, user]);
 
@@ -164,35 +166,45 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
     const body = newMessage.trim();
     setNewMessage('');
 
-    const { data: msg } = await supabase
-      .from('messages')
-      .insert({
-        conversation_id: selectedConvo,
-        sender_id: user.id,
-        body,
-      })
-      .select()
-      .single();
+    try {
+      const { data: msg, error } = await supabase
+        .from('messages')
+        .insert({
+          conversation_id: selectedConvo,
+          sender_id: user.id,
+          body,
+        })
+        .select()
+        .single();
 
-    if (msg) {
-      setMessages((prev) => [...prev, msg]);
+      if (error) {
+        console.error('Send message failed:', error);
+        setNewMessage(body);
+        alert(t('sendFailed') ?? 'Failed to send message');
+      } else if (msg) {
+        setMessages((prev) => [...prev, msg]);
 
-      // Update conversation's last_message_at
-      await supabase
-        .from('conversations')
-        .update({ last_message_at: new Date().toISOString() })
-        .eq('id', selectedConvo);
+        // Update conversation's last_message_at
+        await supabase
+          .from('conversations')
+          .update({ last_message_at: new Date().toISOString() })
+          .eq('id', selectedConvo);
 
-      setConversations((prev) =>
-        prev.map((c) =>
-          c.id === selectedConvo
-            ? { ...c, last_message_at: new Date().toISOString(), last_message: body }
-            : c
-        )
-      );
+        setConversations((prev) =>
+          prev.map((c) =>
+            c.id === selectedConvo
+              ? { ...c, last_message_at: new Date().toISOString(), last_message: body }
+              : c
+          )
+        );
+      }
+    } catch (err) {
+      console.error('Send message error:', err);
+      setNewMessage(body);
+      alert(t('sendFailed') ?? 'Failed to send message');
+    } finally {
+      setSending(false);
     }
-
-    setSending(false);
   }, [newMessage, selectedConvo, user, sending]);
 
   // Archive conversation
