@@ -9,6 +9,7 @@ import { useAdmin } from '@/components/AdminProvider';
 
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
+  { key: 'analytics', icon: 'trend', path: '/analytics' },
   { key: 'newEvents', icon: 'sparkle', path: '/new-events' },
   { key: 'inbox', icon: 'bell', path: '/inbox' },
   { key: 'members', icon: 'users', path: '/members' },
@@ -26,6 +27,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 20V10M12 20V4M6 20v-6" />
+        </svg>
+      );
+    case 'trend':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
         </svg>
       );
     case 'shield':
