@@ -285,7 +285,18 @@
     "ownerConfirmDelete": "정말 삭제하시겠습니까?",
     "ownerDeleteConfirm": "확인",
     "ownerDeleteCancel": "취소",
-    "ownerMemberDeleted": "계정이 삭제되었습니다!"
+    "ownerMemberDeleted": "계정이 삭제되었습니다!",
+    "publicProfile": "공개 프로필",
+    "publicProfileHint": "비활성화하면 다른 사용자가 프로필 페이지를 볼 수 없습니다.",
+    "privateProfile": "비공개 프로필",
+    "privateProfileHint": "이 사용자는 프로필을 비공개로 설정했습니다.",
+    "reviews": "리뷰",
+    "noReviews": "아직 리뷰가 없습니다.",
+    "unknownVenue": "공연장",
+    "myReviews": "내 리뷰",
+    "noMyReviews": "아직 작성한 리뷰가 없습니다.",
+    "viewVenue": "공연장 보기",
+    "anonymous": "익명"
   },
   "regions": {
     "worldMap": "세계 지도",

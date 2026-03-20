@@ -285,7 +285,18 @@
     "ownerConfirmDelete": "แน่ใจหรือไม่?",
     "ownerDeleteConfirm": "ยืนยัน",
     "ownerDeleteCancel": "ยกเลิก",
-    "ownerMemberDeleted": "ลบบัญชีแล้ว!"
+    "ownerMemberDeleted": "ลบบัญชีแล้ว!",
+    "publicProfile": "โปรไฟล์สาธารณะ",
+    "publicProfileHint": "เมื่อปิด ผู้ใช้คนอื่นจะไม่สามารถดูหน้าโปรไฟล์ของคุณได้",
+    "privateProfile": "โปรไฟล์ส่วนตัว",
+    "privateProfileHint": "ผู้ใช้นี้เลือกที่จะไม่เปิดเผยโปรไฟล์",
+    "reviews": "รีวิว",
+    "noReviews": "ยังไม่มีรีวิว",
+    "unknownVenue": "สถานที่",
+    "myReviews": "รีวิวของฉัน",
+    "noMyReviews": "คุณยังไม่ได้เขียนรีวิว",
+    "viewVenue": "ดูสถานที่",
+    "anonymous": "ไม่ระบุชื่อ"
   },
   "regions": {
     "worldMap": "แผนที่โลก",

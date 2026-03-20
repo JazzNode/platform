@@ -4,11 +4,110 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import AvatarCropModal from '@/components/AvatarCropModal';
 import FadeUp from '@/components/animations/FadeUp';
 import BadgeShowcase from '@/components/BadgeShowcase';
+
+interface MyReview {
+  id: string;
+  venue_id: string;
+  venue_name: string | null;
+  rating: number;
+  text: string | null;
+  is_anonymous: boolean;
+  created_at: string;
+}
+
+function MyReviews() {
+  const t = useTranslations('profile');
+  const locale = useLocale();
+  const { user } = useAuth();
+  const [reviews, setReviews] = useState<MyReview[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) return;
+    const supabase = createClient();
+    supabase
+      .from('venue_reviews')
+      .select('id, venue_id, rating, text, is_anonymous, created_at')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .then(async ({ data }) => {
+        if (!data || data.length === 0) { setReviews([]); setLoading(false); return; }
+        // Fetch venue names from Airtable venues cache via existing helper isn't available client-side,
+        // so we just display the venue_id as link. Venue pages will show the name.
+        setReviews(data.map((r) => ({ ...r, venue_name: null })));
+        setLoading(false);
+      });
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="py-8 text-center">
+        <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h2 className="font-serif text-xl font-bold flex items-center gap-3">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        {t('myReviews')}
+      </h2>
+
+      {reviews.length === 0 ? (
+        <p className="text-[#8A8578] text-sm">{t('noMyReviews')}</p>
+      ) : (
+        <div className="space-y-3">
+          {reviews.map((review) => {
+            const dateStr = new Date(review.created_at).toLocaleDateString(
+              locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US',
+              { year: 'numeric', month: 'short', day: 'numeric' },
+            );
+            return (
+              <Link
+                key={review.id}
+                href={`/${locale}/venues/${review.venue_id}`}
+                className="block bg-[var(--background)] p-4 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/30 transition-colors group"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium group-hover:text-[var(--color-gold)] transition-colors">
+                      {t('viewVenue')} →
+                    </span>
+                    {review.is_anonymous && (
+                      <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md bg-[var(--border)]/50 text-[#8A8578]">
+                        {t('anonymous')}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-xs text-[#8A8578]">{dateStr}</span>
+                </div>
+                <div className="flex items-center gap-1 mb-1.5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-[var(--color-gold)]' : 'text-[#8A8578]/30'}>
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                  ))}
+                </div>
+                {review.text && (
+                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{review.text}</p>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
@@ -26,6 +125,7 @@ export default function ProfilePage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isPublic, setIsPublic] = useState(true);
   const [cropModalOpen, setCropModalOpen] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,6 +137,7 @@ export default function ProfilePage() {
       setUsername(profile.username || '');
       setBio(profile.bio || '');
       setWebsite(profile.website || '');
+      setIsPublic(profile.is_public ?? true);
     }
   }, [profile]);
 
@@ -66,6 +167,7 @@ export default function ProfilePage() {
         username: username || null,
         bio: bio || null,
         website: website || null,
+        is_public: isPublic,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
@@ -81,7 +183,7 @@ export default function ProfilePage() {
     }
 
     setSaving(false);
-  }, [user, displayName, username, bio, website, refreshProfile, t]);
+  }, [user, displayName, username, bio, website, isPublic, refreshProfile, t]);
 
   const handleAvatarClick = useCallback(() => {
     if (!uploading) fileInputRef.current?.click();
@@ -283,6 +385,23 @@ export default function ProfilePage() {
             </div>
           </div>
 
+          {/* Profile Visibility */}
+          <div className="flex items-center justify-between py-4 border-t border-[var(--border)]">
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t('publicProfile')}</p>
+              <p className="text-xs text-[var(--muted-foreground)]/60 mt-0.5">{t('publicProfileHint')}</p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isPublic}
+              onClick={() => setIsPublic(!isPublic)}
+              className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-gold)]/50 ${isPublic ? 'bg-[var(--color-gold)]' : 'bg-[var(--border)]'}`}
+            >
+              <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ${isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           {/* Save button */}
           <div className="flex items-center gap-4">
             <button
@@ -308,6 +427,13 @@ export default function ProfilePage() {
               </a>
             )}
           </div>
+        </div>
+      </FadeUp>
+
+      {/* My Reviews */}
+      <FadeUp>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8">
+          <MyReviews />
         </div>
       </FadeUp>
 

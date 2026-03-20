@@ -16,6 +16,7 @@ export interface UserProfile {
   social_links: Record<string, string>;
   claimed_artist_ids: string[];
   claimed_venue_ids: string[];
+  is_public: boolean;
   region: string | null;
   user_type: 'fan' | 'industry' | null;
   created_at: string;

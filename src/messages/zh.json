@@ -290,7 +290,18 @@
     "ownerConfirmDelete": "確定要刪除此帳號？",
     "ownerDeleteConfirm": "確認刪除",
     "ownerDeleteCancel": "取消",
-    "ownerMemberDeleted": "帳號已刪除！"
+    "ownerMemberDeleted": "帳號已刪除！",
+    "publicProfile": "公開個人檔案",
+    "publicProfileHint": "關閉後，其他用戶將無法看到你的個人頁面。",
+    "privateProfile": "非公開檔案",
+    "privateProfileHint": "此用戶已選擇不公開個人檔案。",
+    "reviews": "留言紀錄",
+    "noReviews": "尚無留言紀錄。",
+    "unknownVenue": "場地",
+    "myReviews": "我的留言",
+    "noMyReviews": "你還沒有留過任何評論。",
+    "viewVenue": "查看場地",
+    "anonymous": "匿名"
   },
   "regions": {
     "worldMap": "世界版圖",

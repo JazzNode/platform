@@ -290,7 +290,18 @@
     "ownerConfirmDelete": "Are you sure?",
     "ownerDeleteConfirm": "Confirm",
     "ownerDeleteCancel": "Cancel",
-    "ownerMemberDeleted": "Account deleted!"
+    "ownerMemberDeleted": "Account deleted!",
+    "publicProfile": "Public Profile",
+    "publicProfileHint": "When turned off, your profile page will be hidden from other users.",
+    "privateProfile": "Private Profile",
+    "privateProfileHint": "This user has chosen to keep their profile private.",
+    "reviews": "Reviews",
+    "noReviews": "No reviews yet.",
+    "unknownVenue": "Venue",
+    "myReviews": "My Reviews",
+    "noMyReviews": "You haven't left any reviews yet.",
+    "viewVenue": "View venue",
+    "anonymous": "Anonymous"
   },
   "regions": {
     "worldMap": "World Map",

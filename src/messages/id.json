@@ -285,7 +285,18 @@
     "ownerConfirmDelete": "Yakin ingin menghapus?",
     "ownerDeleteConfirm": "Konfirmasi",
     "ownerDeleteCancel": "Batal",
-    "ownerMemberDeleted": "Akun telah dihapus!"
+    "ownerMemberDeleted": "Akun telah dihapus!",
+    "publicProfile": "Profil Publik",
+    "publicProfileHint": "Jika dinonaktifkan, halaman profil Anda tidak akan terlihat oleh pengguna lain.",
+    "privateProfile": "Profil Privat",
+    "privateProfileHint": "Pengguna ini memilih untuk menjadikan profilnya privat.",
+    "reviews": "Ulasan",
+    "noReviews": "Belum ada ulasan.",
+    "unknownVenue": "Tempat",
+    "myReviews": "Ulasan Saya",
+    "noMyReviews": "Anda belum menulis ulasan.",
+    "viewVenue": "Lihat tempat",
+    "anonymous": "Anonim"
   },
   "regions": {
     "worldMap": "Peta Dunia",

@@ -10,6 +10,7 @@ export interface Profile {
   website: string | null;
   role: 'member' | 'artist_manager' | 'venue_manager' | 'admin';
   social_links: Record<string, string>;
+  is_public: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -38,6 +39,7 @@ export async function getSearchableProfiles(): Promise<SearchableProfile[]> {
   const { data } = await supabase
     .from('profiles')
     .select('id, username, display_name, avatar_url, bio')
+    .eq('is_public', true)
     .or('display_name.not.is.null,username.not.is.null');
   return (data || []) as SearchableProfile[];
 }
@@ -51,6 +53,32 @@ export async function getProfileById(id: string): Promise<Profile | null> {
     .single();
   if (error || !data) return null;
   return data as Profile;
+}
+
+export interface UserReview {
+  id: string;
+  venue_id: string;
+  rating: number;
+  text: string | null;
+  is_anonymous: boolean;
+  created_at: string;
+}
+
+/** Fetch all reviews by a user. For public profiles, pass publicOnly=true to exclude anonymous reviews. */
+export async function getUserReviews(userId: string, publicOnly = false): Promise<UserReview[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from('venue_reviews')
+    .select('id, venue_id, rating, text, is_anonymous, created_at')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (publicOnly) {
+    query = query.eq('is_anonymous', false);
+  }
+
+  const { data } = await query;
+  return (data || []) as UserReview[];
 }
 
 export async function getProfileByUsername(username: string): Promise<Profile | null> {

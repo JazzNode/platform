@@ -22,6 +22,17 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  // Profile is set to private
+  if (!profile.is_public) {
+    return (
+      <div className="py-24 text-center space-y-4">
+        <div className="text-5xl">🔒</div>
+        <h1 className="font-serif text-2xl font-bold">{t('privateProfile')}</h1>
+        <p className="text-[#8A8578] text-sm">{t('privateProfileHint')}</p>
+      </div>
+    );
+  }
+
   return (
     <PublicProfileContent
       profile={profile}

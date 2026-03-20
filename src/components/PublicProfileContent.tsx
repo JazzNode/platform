@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { getPublicFollows } from '@/lib/profile';
+import { getPublicFollows, getUserReviews } from '@/lib/profile';
 import type { Profile } from '@/lib/profile';
 import { getArtists, getVenues, getEvents, getCities, resolveLinks, buildMap } from '@/lib/supabase';
 import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normalizeInstrumentKey } from '@/lib/helpers';
@@ -25,12 +25,13 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
     { year: 'numeric', month: 'long' },
   );
 
-  const [follows, artists, venues, events, cities] = await Promise.all([
+  const [follows, artists, venues, events, cities, reviews] = await Promise.all([
     getPublicFollows(profile.id),
     getArtists(),
     getVenues(),
     getEvents(),
     getCities(),
+    getUserReviews(profile.id, true),
   ]);
 
   const venueMap = buildMap(venues);
@@ -223,6 +224,56 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                     <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
                       {eventTitle(f, locale)}
                     </h3>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      </FadeUp>
+
+      {/* Reviews */}
+      <FadeUp>
+        <section className="border-t border-[var(--border)] pt-12">
+          <h2 className="font-serif text-2xl font-bold mb-8 flex items-center gap-3">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            {t('reviews')}
+          </h2>
+
+          {reviews.length === 0 ? (
+            <p className="text-[#8A8578] text-sm">{t('noReviews')}</p>
+          ) : (
+            <div className="space-y-4">
+              {reviews.map((review) => {
+                const venue = venueMap.get(review.venue_id);
+                const dateStr = new Date(review.created_at).toLocaleDateString(
+                  locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US',
+                  { year: 'numeric', month: 'short', day: 'numeric' },
+                );
+                return (
+                  <Link
+                    key={review.id}
+                    href={`/${locale}/venues/${review.venue_id}`}
+                    className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium group-hover:text-gold transition-colors">
+                        {venue ? displayName(venue.fields) : t('unknownVenue')}
+                      </span>
+                      <span className="text-xs text-[#8A8578]">{dateStr}</span>
+                    </div>
+                    <div className="flex items-center gap-1 mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-gold' : 'text-[#8A8578]/30'}>
+                          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                      ))}
+                    </div>
+                    {review.text && (
+                      <p className="text-sm text-[#C4BFB3] leading-relaxed">{review.text}</p>
+                    )}
                   </Link>
                 );
               })}
