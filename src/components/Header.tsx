@@ -314,9 +314,9 @@ export default function Header() {
           <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
-          {unreadTotal > 0 && (
+          {(unreadBreakdown.profile || 0) > 0 && (
             <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-[4px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none border-[1.5px] border-[var(--background)]">
-              {unreadTotal > 99 ? '99+' : unreadTotal}
+              {unreadBreakdown.profile! > 99 ? '99+' : unreadBreakdown.profile}
             </span>
           )}
         </Link>
@@ -375,7 +375,17 @@ export default function Header() {
               userInitial
             )}
           </span>
-          {/* Badge moved to dedicated inbox icons */}
+          {/* Management badge: artist + venue + hq unread */}
+          {(() => {
+            const mgmt = Object.entries(unreadBreakdown)
+              .filter(([k]) => k !== 'profile')
+              .reduce((sum, [, v]) => sum + v, 0);
+            return mgmt > 0 ? (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-[16px] px-[4px] rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center leading-none border-[1.5px] border-[var(--background)]">
+                {mgmt > 99 ? '99+' : mgmt}
+              </span>
+            ) : null;
+          })()}
         </button>
         {userMenuOpen && !mobile && (
           <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
