@@ -253,7 +253,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
 
   /* Shared pill style helpers */
   const pillActive = 'bg-gold/10 border-gold/60 text-gold';
-  const pillInactive = 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]';
+  const pillInactive = 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]';
 
   return (
     <div className="space-y-12">

@@ -104,7 +104,7 @@ export default function ClaimModal({ targetType, targetId, targetName, onClose }
                 value={evidenceText}
                 onChange={(e) => setEvidenceText(e.target.value)}
                 placeholder={t('claimEvidencePlaceholder')}
-                className="w-full h-32 px-4 py-3 bg-[var(--card)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-gold/50 resize-none transition-colors"
+                className="w-full h-32 px-4 py-3 bg-[var(--card)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-gold/50 resize-none transition-colors"
                 required
               />
             </div>

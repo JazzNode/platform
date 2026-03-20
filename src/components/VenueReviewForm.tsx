@@ -29,7 +29,7 @@ function StarInput({ value, onChange, size = 32 }: { value: number; onChange: (v
             fill={(hover || value) >= star ? 'currentColor' : 'none'}
             stroke="currentColor"
             strokeWidth="1.5"
-            className={`transition-colors duration-150 ${(hover || value) >= star ? 'text-gold drop-shadow-[0_0_6px_rgba(200,168,78,0.4)]' : 'text-[#6A6560] hover:text-[var(--muted-foreground)]'}`}
+            className={`transition-colors duration-150 ${(hover || value) >= star ? 'text-gold drop-shadow-[0_0_6px_rgba(var(--theme-glow-rgb),0.4)]' : 'text-[var(--muted-foreground)] hover:text-[var(--muted-foreground)]'}`}
           >
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
@@ -165,9 +165,9 @@ export default function VenueReviewForm({ mode, onFormOpen, onFormClose }: Venue
           rows={3}
           maxLength={MAX_CHARS}
           placeholder={t('textPlaceholder')}
-          className="w-full rounded-xl bg-[var(--background)] border border-[var(--border)] p-4 text-sm resize-none focus:outline-none focus:border-gold/50 transition-colors placeholder:text-[#6A6560]"
+          className="w-full rounded-xl bg-[var(--background)] border border-[var(--border)] p-4 text-sm resize-none focus:outline-none focus:border-gold/50 transition-colors placeholder:text-[var(--muted-foreground)]"
         />
-        <div className="text-xs text-[#6A6560] text-right mt-1">
+        <div className="text-xs text-[var(--muted-foreground)] text-right mt-1">
           {t('charsRemaining', { count: MAX_CHARS - text.length })}
         </div>
       </div>

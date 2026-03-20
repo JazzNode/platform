@@ -212,7 +212,7 @@ export default function AdminClaimsPage() {
                 >
                   {claim.target_id}
                 </Link>
-                <span className="text-[#6A6560] ml-2">({claim.target_type})</span>
+                <span className="text-[var(--muted-foreground)] ml-2">({claim.target_type})</span>
               </div>
 
               {/* Evidence */}
@@ -224,7 +224,7 @@ export default function AdminClaimsPage() {
               )}
 
               {/* Timestamps */}
-              <div className="text-xs text-[#6A6560]">
+              <div className="text-xs text-[var(--muted-foreground)]">
                 {t('submittedAt')}: {new Date(claim.submitted_at).toLocaleString()}
                 {claim.reviewed_at && (
                   <span className="ml-4">{t('reviewedAt')}: {new Date(claim.reviewed_at).toLocaleString()}</span>
@@ -247,7 +247,7 @@ export default function AdminClaimsPage() {
                         value={revokeReason}
                         onChange={(e) => setRevokeReason(e.target.value)}
                         placeholder={t('revokeReasonPlaceholder')}
-                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-orange-400/50 resize-none"
+                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-orange-400/50 resize-none"
                       />
                       <div className="flex gap-2">
                         <button
@@ -286,7 +286,7 @@ export default function AdminClaimsPage() {
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder={t('rejectionReasonPlaceholder')}
-                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-red-400/50 resize-none"
+                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-red-400/50 resize-none"
                       />
                       <div className="flex gap-2">
                         <button

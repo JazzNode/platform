@@ -295,7 +295,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               </span>
             )}
             {f.is_gold_partner && (
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-600 to-yellow-500 text-[#0A0A0A] font-bold">
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
                 ★ {t('goldPartner')}
               </span>
             )}

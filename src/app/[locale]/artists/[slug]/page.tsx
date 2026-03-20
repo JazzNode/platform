@@ -668,7 +668,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       {eventTitle(event.fields, locale)}
                     </h3>
                     {sidemen.length > 0 && (
-                      <p className="text-xs text-[#6A6560] mt-2">
+                      <p className="text-xs text-[var(--muted-foreground)] mt-2">
                         w/ {sidemen.join(', ')}
                       </p>
                     )}

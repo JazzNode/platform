@@ -80,7 +80,7 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
           {event.title}
         </h3>
         {event.sidemen.length > 0 && (
-          <p className="text-xs text-[#6A6560] mt-2">w/ {event.sidemen.join(', ')}</p>
+          <p className="text-xs text-[var(--muted-foreground)] mt-2">w/ {event.sidemen.join(', ')}</p>
         )}
         {event.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mt-3">
@@ -212,7 +212,7 @@ export default function HomeEventsSection({
                       {venue.city_name} · {venue.event_count} events
                     </p>
                     {venue.jazz_frequency && (
-                      <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.jazz_frequency] || venue.jazz_frequency}</p>
+                      <p className="mt-1 text-xs text-[var(--muted-foreground)]">{jazzFreqLabel[venue.jazz_frequency] || venue.jazz_frequency}</p>
                     )}
                   </Link>
                   </FadeUpItem>

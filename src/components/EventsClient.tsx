@@ -358,7 +358,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedVenues.size === 0
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
               }`}
             >
               {labels.allVenues}
@@ -370,7 +370,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                   selectedVenues.has(venue.recordId)
                     ? 'bg-gold/10 border-gold/60 text-gold'
-                    : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                    : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
                 }`}
               >
                 {venue.label}
@@ -395,7 +395,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedCategory === key
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
               }`}
             >
               {label}
@@ -446,7 +446,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                       {event.title}
                     </h3>
                     {event.sidemen.length > 0 && (
-                      <p className="text-xs text-[#6A6560] mt-2">
+                      <p className="text-xs text-[var(--muted-foreground)] mt-2">
                         w/ {event.sidemen.join(', ')}
                       </p>
                     )}

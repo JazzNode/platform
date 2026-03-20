@@ -40,10 +40,10 @@ export default function RecordNav({ prevHref, prevTitle, nextHref, nextTitle, pr
           className="flex-1 group relative block bg-[var(--card)] p-4 sm:p-5 rounded-2xl border border-[var(--border)] card-hover text-left overflow-hidden"
         >
           <div className="flex items-center gap-2">
-            <span className="text-xs uppercase tracking-widest text-[#6A6560] group-hover:text-[var(--muted-foreground)] transition-colors">
+            <span className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--muted-foreground)] transition-colors">
               {prevLabel}
             </span>
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[#6A6560]/60 bg-[#6A6560]/8 rounded border border-[#6A6560]/10 leading-none">
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[var(--muted-foreground)]/60 bg-[var(--muted-foreground)]/8 rounded border border-[var(--muted-foreground)]/10 leading-none">
               ←
             </kbd>
           </div>
@@ -60,10 +60,10 @@ export default function RecordNav({ prevHref, prevTitle, nextHref, nextTitle, pr
           className="flex-1 group relative block bg-[var(--card)] p-4 sm:p-5 rounded-2xl border border-[var(--border)] card-hover text-right overflow-hidden"
         >
           <div className="flex items-center justify-end gap-2">
-            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[#6A6560]/60 bg-[#6A6560]/8 rounded border border-[#6A6560]/10 leading-none">
+            <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono text-[var(--muted-foreground)]/60 bg-[var(--muted-foreground)]/8 rounded border border-[var(--muted-foreground)]/10 leading-none">
               →
             </kbd>
-            <span className="text-xs uppercase tracking-widest text-[#6A6560] group-hover:text-[var(--muted-foreground)] transition-colors">
+            <span className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] group-hover:text-[var(--muted-foreground)] transition-colors">
               {nextLabel}
             </span>
           </div>
