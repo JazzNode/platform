@@ -705,11 +705,12 @@ export default function FanInboxPage() {
     if (!user) return;
     const supabase = createClient();
 
-    // Initial fetch
+    // Initial fetch (personal only — exclude artist/venue scoped notifications)
     supabase
       .from('notifications')
       .select('id, title, body, type, read_at, created_at')
       .eq('user_id', user.id)
+      .or('reference_type.is.null,reference_type.not.in.(artist,venue)')
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data }) => {
@@ -717,7 +718,8 @@ export default function FanInboxPage() {
         setNotifsLoading(false);
       });
 
-    // Realtime: listen for new notifications for this user
+    // Realtime: listen for new personal notifications (exclude artist/venue scoped)
+    const ENTITY_TYPES = ['artist', 'venue'];
     const channel = supabase
       .channel('user-notifications')
       .on(
@@ -729,8 +731,9 @@ export default function FanInboxPage() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          const n = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string };
-          setNotifications((prev) => [n, ...prev]);
+          const n = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string; reference_type?: string | null };
+          if (n.reference_type && ENTITY_TYPES.includes(n.reference_type)) return;
+          setNotifications((prev) => [{ id: n.id, title: n.title, body: n.body, type: n.type, read_at: n.read_at, created_at: n.created_at }, ...prev]);
         },
       )
       .on(
@@ -742,8 +745,9 @@ export default function FanInboxPage() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          const updated = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string };
-          setNotifications((prev) => prev.map((n) => n.id === updated.id ? updated : n));
+          const updated = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string; reference_type?: string | null };
+          if (updated.reference_type && ENTITY_TYPES.includes(updated.reference_type)) return;
+          setNotifications((prev) => prev.map((n) => n.id === updated.id ? { id: updated.id, title: updated.title, body: updated.body, type: updated.type, read_at: updated.read_at, created_at: updated.created_at } : n));
         },
       )
       .subscribe();

@@ -803,6 +803,8 @@
     "fanInboxNoNotifications": "No notifications yet.",
     "inboxMessages": "Messages",
     "inboxNotifications": "Notifications",
+    "markAllRead": "Mark All Read",
+    "noNotifications": "No notifications yet.",
     "filterAll": "All",
     "filterHQ": "JazzNode HQ",
     "filterArtist": "Artists",

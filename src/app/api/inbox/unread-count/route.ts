@@ -54,10 +54,10 @@ export async function GET() {
     breakdown.profile = 0;
   }
 
-  // 2. Artist inboxes: conversations of type artist_fan for each claimed artist
-  //    (as the artist manager, messages from fans)
+  // 2. Artist inboxes: messages + notifications for each claimed artist
   const claimedArtists = profile.claimed_artist_ids || [];
   for (const artistId of claimedArtists) {
+    let msgCount = 0;
     const { data: artistConvos } = await supabase
       .from('conversations')
       .select('id')
@@ -72,15 +72,25 @@ export async function GET() {
         .in('conversation_id', convoIds)
         .neq('sender_id', user.id)
         .is('read_at', null);
-      breakdown[`artist:${artistId}`] = count || 0;
-    } else {
-      breakdown[`artist:${artistId}`] = 0;
+      msgCount = count || 0;
     }
+
+    // Artist notifications
+    const { count: artistNotifCount } = await supabase
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('reference_type', 'artist')
+      .eq('reference_id', artistId)
+      .is('read_at', null);
+
+    breakdown[`artist:${artistId}`] = msgCount + (artistNotifCount || 0);
   }
 
-  // 3. Venue inboxes: conversations of type venue_fan for each claimed venue
+  // 3. Venue inboxes: messages + notifications for each claimed venue
   const claimedVenues = profile.claimed_venue_ids || [];
   for (const venueId of claimedVenues) {
+    let msgCount = 0;
     const { data: venueConvos } = await supabase
       .from('conversations')
       .select('id')
@@ -95,10 +105,19 @@ export async function GET() {
         .in('conversation_id', convoIds)
         .neq('sender_id', user.id)
         .is('read_at', null);
-      breakdown[`venue:${venueId}`] = count || 0;
-    } else {
-      breakdown[`venue:${venueId}`] = 0;
+      msgCount = count || 0;
     }
+
+    // Venue notifications
+    const { count: venueNotifCount } = await supabase
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('reference_type', 'venue')
+      .eq('reference_id', venueId)
+      .is('read_at', null);
+
+    breakdown[`venue:${venueId}`] = msgCount + (venueNotifCount || 0);
   }
 
   // 4. HQ inbox: member_hq conversations (admin/owner only)
@@ -124,12 +143,13 @@ export async function GET() {
 
   const total = Object.values(breakdown).reduce((sum, n) => sum + n, 0);
 
-  // 5. Unread notifications count
+  // 5. Unread notifications count (personal only — exclude artist/venue scoped notifications)
   const { count: notifCount } = await supabase
     .from('notifications')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', user.id)
-    .is('read_at', null);
+    .is('read_at', null)
+    .or('reference_type.is.null,reference_type.not.in.(artist,venue)');
 
   return NextResponse.json({ total, breakdown, notifications: notifCount || 0 });
 }
