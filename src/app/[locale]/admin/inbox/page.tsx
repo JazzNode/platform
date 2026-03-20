@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
+import { createClient } from '@/utils/supabase/client';
 
 type Tab = 'notifications' | 'messages';
 
@@ -131,7 +132,7 @@ export default function AdminInboxPage() {
   const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch notifications
+  // Fetch notifications + Realtime subscription
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
@@ -148,7 +149,30 @@ export default function AdminInboxPage() {
       } catch {}
       if (!cancelled) setLoadingNotifs(false);
     })();
-    return () => { cancelled = true; };
+
+    // Realtime: listen for new admin notifications
+    const supabase = createClient();
+    const channel = supabase
+      .channel('admin-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+        },
+        (payload) => {
+          const n = payload.new as Notification;
+          setNotifications((prev) => [n, ...prev]);
+          if (!n.read_at) setUnreadCount((prev) => prev + 1);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
   }, [token]);
 
   // Fetch HQ conversations

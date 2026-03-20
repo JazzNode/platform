@@ -687,10 +687,12 @@ export default function FanInboxPage() {
     }
   }, [user]);
 
-  // Fetch notifications
+  // Fetch notifications + Realtime subscription
   useEffect(() => {
     if (!user) return;
     const supabase = createClient();
+
+    // Initial fetch
     supabase
       .from('notifications')
       .select('id, title, body, type, read_at, created_at')
@@ -701,6 +703,41 @@ export default function FanInboxPage() {
         setNotifications(data || []);
         setNotifsLoading(false);
       });
+
+    // Realtime: listen for new notifications for this user
+    const channel = supabase
+      .channel('user-notifications')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const n = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string };
+          setNotifications((prev) => [n, ...prev]);
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updated = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string };
+          setNotifications((prev) => prev.map((n) => n.id === updated.id ? updated : n));
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const markNotifRead = useCallback(async (id: string) => {
