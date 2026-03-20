@@ -73,7 +73,7 @@ export default function ClaimModal({ targetType, targetId, targetName, onClose }
           <h2 className="font-serif text-xl font-bold">{t('claimPage')}</h2>
           <button
             onClick={onClose}
-            className="text-[#8A8578] hover:text-[var(--foreground)] transition-colors p-1"
+            className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors p-1"
             aria-label="Close"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -87,16 +87,16 @@ export default function ClaimModal({ targetType, targetId, targetName, onClose }
           <div className="p-6 text-center space-y-3">
             <div className="text-3xl">&#10003;</div>
             <p className="text-gold font-medium">{t('claimSuccess')}</p>
-            <p className="text-sm text-[#8A8578]">{t('claimSuccessDetail')}</p>
+            <p className="text-sm text-[var(--muted-foreground)]">{t('claimSuccessDetail')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <p className="text-sm text-[#8A8578]">
+            <p className="text-sm text-[var(--muted-foreground)]">
               {t('claimDescription', { name: targetName })}
             </p>
 
             <div>
-              <label className="block text-xs uppercase tracking-widest text-[#8A8578] mb-2">
+              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
                 {t('claimEvidence')}
               </label>
               <textarea
@@ -116,7 +116,7 @@ export default function ClaimModal({ targetType, targetId, targetName, onClose }
             <button
               type="submit"
               disabled={submitting || !evidenceText.trim()}
-              className="w-full py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gold text-[#0A0A0A] hover:bg-[#E8C868]"
+              className="w-full py-3 rounded-xl text-sm font-bold uppercase tracking-widest transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed bg-gold text-[#0A0A0A] hover:bg-gold-bright"
             >
               {submitting ? t('claimSubmitting') : t('claimSubmit')}
             </button>

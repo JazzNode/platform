@@ -26,12 +26,12 @@ export default function UnclaimedNotice({ targetType, targetId, targetName }: Un
 
   return (
     <>
-      <p className="text-[11px] text-[#8A8578]/60">
+      <p className="text-[11px] text-[var(--muted-foreground)]/60">
         {t.rich('unclaimedArtistNotice', {
           claimLink: (chunks) => (
             <button
               onClick={handleClick}
-              className="underline underline-offset-2 decoration-[#8A8578]/40 hover:text-[#8A8578] transition-colors"
+              className="underline underline-offset-2 decoration-[var(--muted-foreground)]/40 hover:text-[var(--muted-foreground)] transition-colors"
             >
               {chunks}
             </button>

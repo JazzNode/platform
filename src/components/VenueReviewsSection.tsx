@@ -26,7 +26,7 @@ function VenueReviewsInner() {
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
               <span className="text-lg font-bold text-gold tabular-nums">{averageRating}</span>
-              <span className="text-sm text-[#8A8578] ml-1">{t('reviewCount', { count: reviewCount })}</span>
+              <span className="text-sm text-[var(--muted-foreground)] ml-1">{t('reviewCount', { count: reviewCount })}</span>
             </div>
             <VenueReviewForm mode="button" onFormOpen={() => setFormOpen(true)} onFormClose={() => setFormOpen(false)} />
           </div>
