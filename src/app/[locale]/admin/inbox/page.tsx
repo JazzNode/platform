@@ -150,7 +150,8 @@ export default function AdminInboxPage() {
       if (!cancelled) setLoadingNotifs(false);
     })();
 
-    // Realtime: listen for new admin notifications
+    // Realtime: listen for new HQ admin notifications only
+    const HQ_TYPES = ['new_member', 'system'];
     const supabase = createClient();
     const channel = supabase
       .channel('admin-notifications')
@@ -163,6 +164,7 @@ export default function AdminInboxPage() {
         },
         (payload) => {
           const n = payload.new as Notification;
+          if (!HQ_TYPES.includes(n.type)) return;
           setNotifications((prev) => [n, ...prev]);
           if (!n.read_at) setUnreadCount((prev) => prev + 1);
         },

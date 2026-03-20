@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyAdminToken } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
+// Notification types that belong to HQ admin (not personal user notifications)
+const HQ_NOTIFICATION_TYPES = ['new_member', 'system'];
+
 /**
- * GET /api/admin/notifications — Fetch admin notifications
+ * GET /api/admin/notifications — Fetch HQ admin notifications only
  */
 export async function GET(request: NextRequest) {
   const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
@@ -20,7 +23,8 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from('notifications')
     .select('*', { count: 'exact' })
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .in('type', HQ_NOTIFICATION_TYPES);
 
   if (type && type !== 'all') {
     query = query.eq('type', type);
@@ -31,11 +35,12 @@ export async function GET(request: NextRequest) {
   const { data, count, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Count unread
+  // Count unread (HQ types only)
   const { count: unreadCount } = await supabase
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
+    .in('type', HQ_NOTIFICATION_TYPES)
     .is('read_at', null);
 
   return NextResponse.json({
