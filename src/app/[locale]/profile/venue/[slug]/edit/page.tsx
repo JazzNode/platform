@@ -120,7 +120,7 @@ export default function VenueEditPage({ params }: { params: Promise<{ slug: stri
   if (!venue) {
     return (
       <div className="py-24 text-center">
-        <p className="text-[var(--muted-foreground)]">Venue not found.</p>
+        <p className="text-[#8A8578]">Venue not found.</p>
       </div>
     );
   }

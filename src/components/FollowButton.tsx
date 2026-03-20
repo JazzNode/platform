@@ -92,7 +92,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
-          : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'
+          : 'border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30'
       }`}
       style={animating ? { animation: 'fav-btn-pop 0.4s ease-out' } : undefined}
     >
@@ -124,7 +124,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
       </span>
       <span className="uppercase tracking-widest text-xs relative">{active ? t('following') : t('follow')}</span>
       {followerCount != null && followerCount > 0 && (
-        <span className="text-[10px] text-[var(--muted-foreground)] tabular-nums">{followerCount}</span>
+        <span className="text-[10px] text-[#8A8578] tabular-nums">{followerCount}</span>
       )}
     </button>
   );

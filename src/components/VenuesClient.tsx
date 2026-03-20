@@ -145,7 +145,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
       <FadeUp>
         <div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold">{labels.venues}</h1>
-          <p className="text-[var(--muted-foreground)] mt-2 text-sm uppercase tracking-widest">
+          <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
             {filteredVenues.length} venues
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
             className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
-                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
             {worldMapLabel}
@@ -192,7 +192,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
-                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
                   }`}
                 >
                   {regionLabels[code] || code}
@@ -213,7 +213,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                         className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
-                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[var(--muted-foreground)]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[var(--muted-foreground)]'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
                         }`}
                       >
                         {city.label}
@@ -231,7 +231,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
       <div key={filterKey}>
         {filteredVenues.length === 0 && (
           <FadeUp>
-            <p className="text-[var(--muted-foreground)]">{labels.noVenues}</p>
+            <p className="text-[#8A8578]">{labels.noVenues}</p>
           </FadeUp>
         )}
 
@@ -276,13 +276,13 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                 <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                   {venue.displayName}{venue.tier >= 1 && <VerifiedBadge size="sm" className={/[a-z]$/.test(venue.displayName) ? '' : '!top-0'} />}
                 </h3>
-                <div className="flex items-center gap-1.5 mt-2 text-xs uppercase tracking-widest text-[var(--muted-foreground)]">
-                  {venue.cityLabel && <><span>{venue.cityLabel}</span><span className="text-[var(--muted-foreground)]/30">·</span></>}
+                <div className="flex items-center gap-1.5 mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
+                  {venue.cityLabel && <><span>{venue.cityLabel}</span><span className="text-[#8A8578]/30">·</span></>}
                   <span>{venue.eventCount} events</span>
-                  {venue.jazzFrequencyLabel && <><span className="text-[var(--muted-foreground)]/30">·</span><span>{venue.jazzFrequencyLabel}</span></>}
+                  {venue.jazzFrequencyLabel && <><span className="text-[#8A8578]/30">·</span><span>{venue.jazzFrequencyLabel}</span></>}
                 </div>
                 {venue.description && (
-                  <p className="text-xs text-[var(--muted-foreground)] mt-3 line-clamp-2 leading-relaxed">
+                  <p className="text-xs text-[#8A8578] mt-3 line-clamp-2 leading-relaxed">
                     {venue.description}
                   </p>
                 )}

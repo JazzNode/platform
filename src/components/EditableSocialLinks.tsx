@@ -141,13 +141,13 @@ export default function EditableSocialLinks({
         <p className="text-[10px] uppercase tracking-widest text-[var(--color-gold)]/70">Social Links</p>
         {SOCIAL_CONFIGS.map(({ key, label, placeholder }) => (
           <div key={key} className="flex items-center gap-3">
-            <label className="text-xs text-[var(--muted-foreground)] w-20 shrink-0 font-mono">{label}</label>
+            <label className="text-xs text-[#8A8578] w-20 shrink-0 font-mono">{label}</label>
             <input
               type="text"
               value={draft[key] || ''}
               onChange={(e) => setDraft((prev) => ({ ...prev, [key]: e.target.value }))}
               placeholder={placeholder}
-              className="flex-1 bg-transparent text-sm text-[var(--foreground)] border-b border-[var(--muted-foreground)]/30 focus:border-[var(--color-gold)] outline-none py-1 placeholder:text-[var(--muted-foreground)]/40"
+              className="flex-1 bg-transparent text-sm text-[#F0EDE6] border-b border-[#8A8578]/30 focus:border-[var(--color-gold)] outline-none py-1 placeholder:text-[#8A8578]/40"
               disabled={saving}
             />
           </div>
@@ -164,7 +164,7 @@ export default function EditableSocialLinks({
           <button
             onClick={() => { setEditing(false); setDraft(withDefaults(fields)); setError(null); }}
             disabled={saving}
-            className="text-xs px-3 py-1.5 rounded-lg border border-[var(--muted-foreground)]/30 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]/30"
+            className="text-xs px-3 py-1.5 rounded-lg border border-[#8A8578]/30 text-[#8A8578] hover:text-[#F0EDE6] hover:border-[#F0EDE6]/30"
           >
             取消
           </button>

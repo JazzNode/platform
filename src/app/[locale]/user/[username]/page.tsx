@@ -28,7 +28,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <div className="py-24 text-center space-y-4">
         <div className="text-5xl">🔒</div>
         <h1 className="font-serif text-2xl font-bold">{t('privateProfile')}</h1>
-        <p className="text-[var(--muted-foreground)] text-sm">{t('privateProfileHint')}</p>
+        <p className="text-[#8A8578] text-sm">{t('privateProfileHint')}</p>
       </div>
     );
   }

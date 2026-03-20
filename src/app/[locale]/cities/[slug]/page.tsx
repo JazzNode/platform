@@ -138,7 +138,7 @@ export default async function CityDetailPage({ params }: { params: Promise<{ loc
       <div className="space-y-12">
         <FadeUp>
           <div>
-            <nav className="text-xs text-[var(--muted-foreground)] uppercase tracking-widest mb-4">
+            <nav className="text-xs text-[#8A8578] uppercase tracking-widest mb-4">
               <Link href={`/${locale}/cities`} className="hover:text-gold transition-colors duration-300">
                 {t('cities')}
               </Link>
@@ -147,7 +147,7 @@ export default async function CityDetailPage({ params }: { params: Promise<{ loc
             </nav>
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">{name}</h1>
             {city.fields.country_code && (
-              <p className="text-[var(--muted-foreground)] mt-2 text-sm uppercase tracking-widest">
+              <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
                 {city.fields.country_code}
               </p>
             )}
@@ -205,11 +205,11 @@ export default async function CityDetailPage({ params }: { params: Promise<{ loc
                         <p className="font-serif font-bold truncate group-hover:text-gold transition-colors duration-300">
                           {venueName}
                         </p>
-                        <p className="text-xs text-[var(--muted-foreground)]">{eventCount} events</p>
+                        <p className="text-xs text-[#8A8578]">{eventCount} events</p>
                       </div>
                     </div>
                     {v.fields.address_local && (
-                      <p className="text-xs text-[var(--muted-foreground)] truncate">{v.fields.address_local}</p>
+                      <p className="text-xs text-[#8A8578] truncate">{v.fields.address_local}</p>
                     )}
                   </Link>
                 );
@@ -277,7 +277,7 @@ export default async function CityDetailPage({ params }: { params: Promise<{ loc
                           {aName}
                         </p>
                         {a.fields.primary_instrument && (
-                          <p className="text-[10px] text-[var(--muted-foreground)] uppercase tracking-wider truncate">
+                          <p className="text-[10px] text-[#8A8578] uppercase tracking-wider truncate">
                             {a.fields.primary_instrument}
                           </p>
                         )}

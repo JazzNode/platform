@@ -260,7 +260,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       <FadeUp>
         <div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold">{labels.artists}</h1>
-          <p className="text-[var(--muted-foreground)] mt-2 text-sm uppercase tracking-widest">
+          <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
             {filteredArtists.length} artists
           </p>
         </div>
@@ -284,7 +284,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
               className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedType === key
                   ? 'bg-gold/20 border-gold text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
               }`}
             >
               {label}
@@ -339,7 +339,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         <FadeUpItem delay={380}>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
           {/* Section label */}
-          <span className="text-[10px] uppercase tracking-[0.15em] text-[var(--muted-foreground)] font-medium mr-1 shrink-0">
+          <span className="text-[10px] uppercase tracking-[0.15em] text-[#8A8578] font-medium mr-1 shrink-0">
             {labels.artistFootprint}
           </span>
 
@@ -349,7 +349,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
-                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
             {worldMapLabel}
@@ -378,7 +378,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                   className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
-                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
                   }`}
                 >
                   {regionLabels[code] || code}
@@ -399,7 +399,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                         className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
-                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[var(--muted-foreground)]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[var(--muted-foreground)]'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
                         }`}
                       >
                         {city.label}
@@ -443,7 +443,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
       </div>
 
       {filteredArtists.length === 0 && (
-        <p className="text-[var(--muted-foreground)]">{labels.noArtists}</p>
+        <p className="text-[#8A8578]">{labels.noArtists}</p>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -482,7 +482,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                   ) : null}
                 </div>
               </div>
-              {artist.bio && <p className="text-xs text-[var(--muted-foreground)] line-clamp-2 leading-relaxed">{artist.bio}</p>}
+              {artist.bio && <p className="text-xs text-[#8A8578] line-clamp-2 leading-relaxed">{artist.bio}</p>}
               {artist.badgeList.length > 0 && (
                 <div className="flex items-center gap-1 mt-2 flex-wrap">
                   {artist.badgeList.slice(0, 5).map((badgeId) => (
@@ -502,8 +502,8 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 </div>
               )}
               <div className="flex gap-2 mt-3 flex-wrap">
-                {artist.countryCode && <span className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">🌍 {artist.countryCode}</span>}
-                {artist.eventCount > 0 && <span className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">{artist.eventCount} events</span>}
+                {artist.countryCode && <span className="text-[10px] uppercase tracking-widest text-[#8A8578]">🌍 {artist.countryCode}</span>}
+                {artist.eventCount > 0 && <span className="text-[10px] uppercase tracking-widest text-[#8A8578]">{artist.eventCount} events</span>}
               </div>
             </Link>
             </FadeUpItem>

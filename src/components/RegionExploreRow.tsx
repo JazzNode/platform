@@ -12,7 +12,7 @@ interface Props {
 
 const pillBase = 'px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light cursor-pointer';
 const pillActive = 'bg-gold/20 border-gold text-gold';
-const pillInactive = 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]';
+const pillInactive = 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]';
 
 export default function RegionExploreRow({ regionCodes, regionLabels, worldMapLabel }: Props) {
   const { region, setRegion } = useRegion();
