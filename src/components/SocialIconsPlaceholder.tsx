@@ -9,7 +9,7 @@ interface SocialIconsPlaceholderProps {
 
 function GhostIcon({ children }: { children: React.ReactNode }) {
   return (
-    <span className="text-[#8A8578]/25 cursor-pointer">
+    <span className="text-[var(--muted-foreground)]/25 cursor-pointer">
       {children}
     </span>
   );

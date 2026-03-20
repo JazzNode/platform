@@ -221,7 +221,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <Link href={`/${locale}/venues`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/venues`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
@@ -251,7 +251,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           </div>
         ) : (
           <div className="w-full lg:w-[400px] h-[260px] shrink-0 rounded-2xl bg-[var(--card)] flex items-center justify-center border border-[var(--border)]">
-            <svg className="w-16 h-16 text-[#8A8578]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            <svg className="w-16 h-16 text-[var(--muted-foreground)]/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
           </div>
         )}
 
@@ -265,31 +265,31 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             </div>
           </div>
           {f.name_en && f.name_local && f.name_en !== f.name_local && (
-            <p className="text-xl text-[#8A8578]">{f.name_en}</p>
+            <p className="text-xl text-[var(--muted-foreground)]">{f.name_en}</p>
           )}
 
           {/* Tags + Action Buttons */}
           <div className="flex flex-wrap items-center gap-2">
             {f.city_id?.[0] && cityMap.get(f.city_id[0]) && (
-              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                 <svg className="w-3 h-3" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C4.7 0 2 2.7 2 6c0 4.5 6 10 6 10s6-5.5 6-10c0-3.3-2.7-6-6-6zm0 8.5c-1.4 0-2.5-1.1-2.5-2.5S6.6 3.5 8 3.5s2.5 1.1 2.5 2.5S9.4 8.5 8 8.5z"/></svg>
                 {cityName(cityMap.get(f.city_id[0])!, locale)}
               </span>
             )}
             {f.jazz_frequency && f.jazz_frequency !== 'none' && (
-              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                 {jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency}
               </span>
             )}
             {f.capacity != null && f.capacity > 0 && (
-              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                 {f.capacity} {t('capacitySeats')}
               </span>
             )}
             {f.currency && (
-              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+              <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2"/><path d="M12 6v12M9 9.5c0-1 .9-1.5 3-1.5s3 .5 3 1.5-1 1.5-3 2-3 1-3 2 .9 1.5 3 1.5 3-.5 3-1.5"/></svg>
                 {f.currency}
               </span>
@@ -306,7 +306,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 </span>
               )}
             </TierGate>
-              <span className="text-[#8A8578]/30 select-none">|</span>
+              <span className="text-[var(--muted-foreground)]/30 select-none">|</span>
               <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}
                 fallback={<MessageVenueButton venueId={venue.id} claimed={false} />}>
                 <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
@@ -317,7 +317,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
           {/* Unclaimed notice */}
           {(!f.tier || f.tier === 0) && f.verification_status !== 'Verified' && (
-            <p className="text-xs text-[#8A8578] italic">
+            <p className="text-xs text-[var(--muted-foreground)] italic">
               {t('unclaimedVenueNotice')}
             </p>
           )}
@@ -326,7 +326,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           )}
 
           {/* Vibe Check / Practical Info */}
-          <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[#8A8578]">
+          <div className="flex flex-wrap gap-2 text-xs uppercase tracking-widest text-[var(--muted-foreground)]">
             {f.payment_method?.map((pm) => (
               <span key={pm} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border)]">
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
@@ -392,7 +392,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           {/* Business Hours */}
           {f.business_hour && (
             <div className="text-sm text-[#C4BFB3]">
-              <span className="flex items-center gap-2 text-[#8A8578] mb-1">
+              <span className="flex items-center gap-2 text-[var(--muted-foreground)] mb-1">
                 <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10 10-4.49 10-10S17.51 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>
                 {t('businessHours')}
               </span>
@@ -418,7 +418,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               <div className="mb-6 space-y-1">
                 {f.address_local && <p className="text-sm text-[#C4BFB3]">{f.address_local}</p>}
                 {f.address_en && f.address_en !== f.address_local && (
-                  <p className="text-xs text-[#8A8578]">{f.address_en}</p>
+                  <p className="text-xs text-[var(--muted-foreground)]">{f.address_en}</p>
                 )}
               </div>
             )}
@@ -445,14 +445,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                   <a
                     href={f.place_id ? `https://www.google.com/maps/place/?q=place_id:${f.place_id}` : `https://www.google.com/maps/search/?api=1&query=${f.lat},${f.lng}`}
                     target="_blank" rel="noreferrer"
-                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
+                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-colors"
                   >
                     {t('openInGoogleMaps')}
                   </a>
                   <a
                     href={`https://maps.apple.com/?ll=${f.lat},${f.lng}&q=${encodeURIComponent(f.name_local || f.name_en || 'Venue')}`}
                     target="_blank" rel="noreferrer"
-                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30 transition-colors"
+                    className="text-xs px-4 py-2 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-colors"
                   >
                     {t('openInAppleMaps')}
                   </a>
@@ -478,18 +478,18 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
                   <div className="text-3xl font-bold text-gold">{venueEvents.length}</div>
-                  <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('totalGigs')}</div>
+                  <div className="text-xs text-[var(--muted-foreground)] mt-1 uppercase tracking-widest">{t('totalGigs')}</div>
                 </div>
                 {uniqueArtistCount > 0 && (
                   <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
                     <div className="text-3xl font-bold text-gold">{uniqueArtistCount}</div>
-                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('artists')}</div>
+                    <div className="text-xs text-[var(--muted-foreground)] mt-1 uppercase tracking-widest">{t('artists')}</div>
                   </div>
                 )}
                 {yearsActive && yearsActive > 0 && (
                   <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
                     <div className="text-3xl font-bold text-gold">{yearsActive}</div>
-                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">
+                    <div className="text-xs text-[var(--muted-foreground)] mt-1 uppercase tracking-widest">
                       {locale === 'zh' ? '年' : locale === 'ja' ? '年' : locale === 'ko' ? '년' : 'years'}
                     </div>
                   </div>
@@ -497,7 +497,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 {f.capacity != null && f.capacity > 0 && (
                   <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 text-center">
                     <div className="text-3xl font-bold text-gold">{f.capacity}</div>
-                    <div className="text-xs text-[#8A8578] mt-1 uppercase tracking-widest">{t('capacitySeats')}</div>
+                    <div className="text-xs text-[var(--muted-foreground)] mt-1 uppercase tracking-widest">{t('capacitySeats')}</div>
                   </div>
                 )}
               </div>
@@ -526,7 +526,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                   <div>
                     <span className="text-sm font-medium group-hover:text-gold transition-colors">{artistDisplayName(a.fields, locale)}</span>
                     {a.fields.primary_instrument && (
-                      <span className="text-xs text-[#8A8578] ml-2">{instLabel(a.fields.primary_instrument)}</span>
+                      <span className="text-xs text-[var(--muted-foreground)] ml-2">{instLabel(a.fields.primary_instrument)}</span>
                     )}
                   </div>
                 </Link>
@@ -557,7 +557,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                       <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                         {eventTitle(event.fields, locale)}
                       </h3>
-                      {artist && <p className="text-xs text-[#8A8578] mt-1">Host: {artistDisplayName(artist.fields, locale)}</p>}
+                      {artist && <p className="text-xs text-[var(--muted-foreground)] mt-1">Host: {artistDisplayName(artist.fields, locale)}</p>}
                     </Link>
                   );
                 })}
@@ -593,12 +593,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                     <span className="pulse-dot" />
                     {t('upcomingGigs')}
                   </h2>
-                  <Link href={`/${locale}/events?venue=${venue.id}`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                  <Link href={`/${locale}/events?venue=${venue.id}`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
                     {t('viewAll')} →
                   </Link>
                 </div>
                 {upcomingEvents.length === 0 ? (
-                  <p className="text-[#8A8578]">{t('noEvents')}</p>
+                  <p className="text-[var(--muted-foreground)]">{t('noEvents')}</p>
                 ) : (
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {upcomingEvents.slice(0, 6).map((event) => {
@@ -617,7 +617,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                           <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                             {eventTitle(event.fields, locale)}
                           </h3>
-                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
+                          {artist && <p className="text-xs text-[var(--muted-foreground)] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
                         </Link>
                       );
                     })}
@@ -632,7 +632,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                 <section className="border-t border-[var(--border)] pt-12">
                   <div className="flex items-end justify-between mb-8 border-b border-[var(--border)] pb-6">
                     <h2 className="font-serif text-2xl font-bold">{t('weeklyJam')}</h2>
-                    <Link href={`/${locale}/events?venue=${venue.id}&category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+                    <Link href={`/${locale}/events?venue=${venue.id}&category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
                       {t('viewAll')} →
                     </Link>
                   </div>
@@ -648,7 +648,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                           <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300">
                             {eventTitle(event.fields, locale)}
                           </h3>
-                          {artist && <p className="text-xs text-[#8A8578] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
+                          {artist && <p className="text-xs text-[var(--muted-foreground)] mt-1">♪ {artistDisplayName(artist.fields, locale)}</p>}
                         </Link>
                       );
                     })}
@@ -676,13 +676,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
                             href={`/${locale}/events/${event.id}`}
                             className="block p-4 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/20 transition-colors group"
                           >
-                            <div className="text-xs text-[#8A8578] mb-1">
+                            <div className="text-xs text-[var(--muted-foreground)] mb-1">
                               {formatDate(event.fields.start_at, locale, tz)}
                             </div>
                             <h3 className="text-sm font-medium group-hover:text-gold transition-colors duration-300 line-clamp-1">
                               {eventTitle(event.fields, locale)}
                             </h3>
-                            {artist && <p className="text-xs text-[#8A8578]/60 mt-0.5">♪ {artistDisplayName(artist.fields, locale)}</p>}
+                            {artist && <p className="text-xs text-[var(--muted-foreground)]/60 mt-0.5">♪ {artistDisplayName(artist.fields, locale)}</p>}
                           </Link>
                         );
                       })}

@@ -341,7 +341,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
@@ -386,7 +386,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                     { field: 'name_en', label: 'name_en', value: f.name_en || '' },
                     { field: 'display_name', label: 'display_name', value: f.display_name || '' },
                   ]}
-                  className="mt-1 text-xl text-[#8A8578]"
+                  className="mt-1 text-xl text-[var(--muted-foreground)]"
                   tag="p"
                 />
               )}
@@ -401,12 +401,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 primaryInstrumentLabel={f.primary_instrument ? instLabel(f.primary_instrument) : undefined}
               />
               {f.type && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                   {f.type === 'person' ? t('musicians') : f.type === 'big band' ? t('bigBands') : t('groups')}
                 </span>
               )}
               {f.country_code && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                   {f.country_code}
                 </span>
               )}
@@ -422,7 +422,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   </span>
                 )}
               </TierGate>
-              <span className="text-[#8A8578]/30 select-none">|</span>
+              <span className="text-[var(--muted-foreground)]/30 select-none">|</span>
               <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
                 {f.available_for_hire && (
                   <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
@@ -458,7 +458,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               content={bioFull}
               shortContent={bioShort}
               contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
-              shortContentClassName="text-[#F0EDE6] font-medium text-lg leading-relaxed"
+              shortContentClassName="text-[var(--foreground)] font-medium text-lg leading-relaxed"
               wrapperClassName="border-t border-[var(--border)] pt-5"
             />
             {!bioFull && desc && (
@@ -564,7 +564,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                             <p className="font-serif text-lg font-bold text-[var(--foreground)] group-hover:text-[#FF0000] transition-colors duration-300">
                               {artistDisplayName(f, locale)}
                             </p>
-                            <p className="text-sm text-[#8A8578] mt-1">YouTube</p>
+                            <p className="text-sm text-[var(--muted-foreground)] mt-1">YouTube</p>
                           </div>
                           <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#FF0000]/70 group-hover:text-[#FF0000] transition-colors">
                             {t('visitChannel')} ↗
@@ -610,7 +610,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       {artistDisplayName(member.fields, locale)}
                     </span>
                     {member.instruments.length > 0 && (
-                      <span className="text-xs text-[#8A8578]">
+                      <span className="text-xs text-[var(--muted-foreground)]">
                         {member.instruments.map((i) => instLabel(i)).join(', ')}
                       </span>
                     )}
@@ -621,7 +621,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                     </span>
                   )}
                   {member.fields.primary_instrument && member.instruments.length === 0 && (
-                    <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[#8A8578] shrink-0">
+                    <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] shrink-0">
                       {instLabel(member.fields.primary_instrument)}
                     </span>
                   )}
@@ -659,7 +659,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   <FadeUpItem key={event.id} delay={(i % 3) * 60}>
                   <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
                     {venue && (
-                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{displayName(venue.fields)}</p>
                     )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
@@ -685,7 +685,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       </div>
                     )}
                     {event.fields.source_url && (
-                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gold group-hover:text-[#E8C868] transition-colors">
+                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gold group-hover:text-gold-bright transition-colors">
                         {t('getTickets')} ↗
                       </span>
                     )}
@@ -703,7 +703,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         <FadeUp>
           <section className={upcomingEvents.length === 0 ? 'border-t border-[var(--border)] pt-12' : ''}>
             {upcomingEvents.length === 0 && (
-              <p className="text-[#8A8578] text-sm mb-6">{t('noEvents')}</p>
+              <p className="text-[var(--muted-foreground)] text-sm mb-6">{t('noEvents')}</p>
             )}
             <CollapsibleSection
               title={t('pastHighlights')}
@@ -720,13 +720,13 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       href={`/${locale}/events/${event.id}`}
                       className="block p-4 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/20 transition-colors group"
                     >
-                      <div className="text-xs text-[#8A8578] mb-1">
+                      <div className="text-xs text-[var(--muted-foreground)] mb-1">
                         {formatDate(event.fields.start_at, locale, tz)}
                       </div>
                       <h3 className="text-sm font-medium group-hover:text-gold transition-colors duration-300 line-clamp-1">
                         {eventTitle(event.fields, locale)}
                       </h3>
-                      {venue && <p className="text-xs text-[#8A8578]/60 mt-0.5">{displayName(venue.fields)}</p>}
+                      {venue && <p className="text-xs text-[var(--muted-foreground)]/60 mt-0.5">{displayName(venue.fields)}</p>}
                     </Link>
                   );
                 })}
@@ -748,7 +748,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 <div className="space-y-4">
                   {leaderProjects.length > 0 && (
                     <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asLeader')}</h3>
+                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asLeader')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {leaderProjects.map((p) => (
                           <Link
@@ -764,7 +764,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   )}
                   {sidemanProjects.length > 0 && (
                     <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asSideman')}</h3>
+                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asSideman')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {sidemanProjects.map((p) => (
                           <Link
@@ -780,7 +780,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   )}
                   {featuredGuestProjects.length > 0 && (
                     <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asFeaturedGuest')}</h3>
+                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asFeaturedGuest')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {featuredGuestProjects.map((p) => (
                           <Link
@@ -796,7 +796,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   )}
                   {bandMemberProjects.length > 0 && (
                     <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-3">{t('asBandMember')}</h3>
+                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asBandMember')}</h3>
                       <div className="flex flex-wrap gap-2">
                         {bandMemberProjects.map((p) => (
                           <Link
@@ -816,7 +816,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               {/* Frequent Collaborators */}
               {topCollaborators.length > 0 && (
                 <div>
-                  <h3 className="text-xs uppercase tracking-widest text-[#8A8578] mb-4">{t('frequentCollaborators')}</h3>
+                  <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-4">{t('frequentCollaborators')}</h3>
                   <div className="space-y-2">
                     {topCollaborators.map((collab) => (
                       <Link
@@ -842,12 +842,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                           <span className="text-sm font-medium group-hover:text-gold transition-colors truncate block">
                             {artistDisplayName(collab.fields, locale)}
                           </span>
-                          <span className="text-xs text-[#8A8578]">
+                          <span className="text-xs text-[var(--muted-foreground)]">
                             {collab.count} {t('gigsCount')}
                           </span>
                         </div>
                         {collab.fields.primary_instrument && (
-                          <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[#8A8578] shrink-0">
+                          <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] shrink-0">
                             {instLabel(collab.fields.primary_instrument)}
                           </span>
                         )}
@@ -886,7 +886,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                     >
                       <span>{displayName(v.fields)}</span>
                       {v.gigCount > 0 && (
-                        <span className="text-xs text-[#8A8578]">x{v.gigCount}</span>
+                        <span className="text-xs text-[var(--muted-foreground)]">x{v.gigCount}</span>
                       )}
                     </Link>
                   ))}
@@ -899,7 +899,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   {artistCities.map((c) => (
                     <span
                       key={c.id}
-                      className="text-xs px-3 py-1.5 rounded-xl bg-[var(--card)] text-[#8A8578] border border-[var(--border)]"
+                      className="text-xs px-3 py-1.5 rounded-xl bg-[var(--card)] text-[var(--muted-foreground)] border border-[var(--border)]"
                     >
                       {cityName(c.fields, locale)}
                     </span>

@@ -6,12 +6,14 @@ import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-const GOLD = '#C8A84E';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('venueDashboard');
   const { previewVenueTier } = useAdmin();
+  const { theme } = useTheme();
+
+  const GOLD = theme.accent;
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -108,8 +110,9 @@ export default function VenueAnalyticsPage({ params }: { params: Promise<{ slug:
                 <XAxis dataKey="date" tick={{ fontSize: 10, fill: '#999' }} tickFormatter={(v) => v.slice(5)} />
                 <YAxis tick={{ fontSize: 10, fill: '#999' }} width={30} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: '#1A1A1A', border: '1px solid #333', borderRadius: 12, fontSize: 12 }}
-                  labelStyle={{ color: '#999' }}
+                  contentStyle={{ backgroundColor: 'var(--card, #111111)', border: '1px solid var(--border, #333)', borderRadius: 12, fontSize: 12, color: 'var(--foreground, #F0EDE6)' }}
+                  labelStyle={{ color: 'var(--muted-foreground, #8A8578)' }}
+                  cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                 />
                 <Bar dataKey="count" fill={GOLD} radius={[4, 4, 0, 0]} />
               </BarChart>

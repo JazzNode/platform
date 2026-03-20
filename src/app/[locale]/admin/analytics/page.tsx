@@ -9,12 +9,11 @@ import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
 } from 'recharts';
+import { useTheme } from '@/components/ThemeProvider';
 
-const GOLD = '#C8A84E';
-const GOLD_DIM = '#C8A84E40';
-const ACCENT_2 = '#7C9885';
-const ACCENT_2_DIM = '#7C988540';
-const ACCENT_3 = '#8B7355';
+// Fallback hex values — overridden by theme at runtime
+const FALLBACK_ACCENT_2 = '#7C9885';
+const FALLBACK_ACCENT_3 = '#8B7355';
 
 type Range = '7d' | '28d' | '90d' | '365d';
 
@@ -42,13 +41,16 @@ interface AnalyticsData {
 }
 
 // --- Shared chart config ---
-const chartTooltipStyle = {
-  backgroundColor: '#1A1A1A',
-  border: '1px solid #333',
+const chartTooltipStyle: React.CSSProperties = {
+  backgroundColor: 'var(--card, #111111)',
+  border: '1px solid var(--border, #333)',
   borderRadius: 12,
   fontSize: 12,
   padding: '8px 12px',
+  color: 'var(--foreground, #F0EDE6)',
 };
+const chartTooltipLabelStyle: React.CSSProperties = { color: 'var(--muted-foreground, #8A8578)' };
+const chartCursorStyle = { fill: 'rgba(255,255,255,0.04)' };
 const axisTickStyle = { fontSize: 10, fill: '#666' };
 
 function formatDate(dateStr: string, range: Range) {
@@ -92,7 +94,7 @@ function KpiCard({ label, value, change, icon }: {
         <span className="text-[var(--muted-foreground)]">{icon}</span>
         <span className="text-xs text-[var(--muted-foreground)] uppercase tracking-widest">{label}</span>
       </div>
-      <p className="text-2xl font-bold font-serif text-[var(--foreground)]">{value.toLocaleString()}</p>
+      <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">{value.toLocaleString()}</p>
       <div className="flex items-center gap-1.5 mt-2">
         {!isNeutral && (
           <svg className={`w-3.5 h-3.5 ${isPositive ? 'text-emerald-400' : 'text-red-400'}`} viewBox="0 0 16 16" fill="currentColor">
@@ -152,9 +154,17 @@ export default function AdminAnalyticsPage() {
   const t = useTranslations('adminHQ');
   const locale = useLocale();
   const { token } = useAdmin();
+  const { theme } = useTheme();
   const [range, setRange] = useState<Range>('28d');
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Derive chart colors from active theme
+  const GOLD = theme.accent;
+  const GOLD_DIM = theme.accent + '40';
+  const ACCENT_2 = theme.accent2 || FALLBACK_ACCENT_2;
+  const ACCENT_2_DIM = ACCENT_2 + '40';
+  const ACCENT_3 = theme.accentDim || FALLBACK_ACCENT_3;
 
   useEffect(() => {
     if (!token) return;
@@ -327,7 +337,7 @@ export default function AdminAnalyticsPage() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
               <XAxis dataKey="date" tick={axisTickStyle} tickFormatter={(v) => formatDate(v, range)} interval="preserveStartEnd" />
               <YAxis tick={axisTickStyle} width={36} />
-              <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: '#999' }} labelFormatter={(v) => formatDate(v as string, range)} />
+              <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartTooltipLabelStyle} cursor={chartCursorStyle} labelFormatter={(v) => formatDate(v as string, range)} />
               <Area type="monotone" dataKey="artistViews" name={t('artistViews')} stroke={GOLD} fill="url(#gradGold)" strokeWidth={2} dot={false} />
               <Area type="monotone" dataKey="venueViews" name={t('venueViews')} stroke={ACCENT_2} fill="url(#gradGreen)" strokeWidth={2} dot={false} />
             </AreaChart>
@@ -362,7 +372,7 @@ export default function AdminAnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="date" tick={axisTickStyle} tickFormatter={(v) => formatDate(v, range)} interval="preserveStartEnd" />
                 <YAxis tick={axisTickStyle} width={30} allowDecimals={false} />
-                <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: '#999' }} labelFormatter={(v) => formatDate(v as string, range)} />
+                <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartTooltipLabelStyle} cursor={chartCursorStyle} labelFormatter={(v) => formatDate(v as string, range)} />
                 <Area type="monotone" dataKey="count" name={t('kpiUsers')} stroke={GOLD} fill="url(#gradUser)" strokeWidth={2} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
@@ -384,7 +394,7 @@ export default function AdminAnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="date" tick={axisTickStyle} tickFormatter={(v) => formatDate(v, range)} interval="preserveStartEnd" />
                 <YAxis tick={axisTickStyle} width={30} allowDecimals={false} />
-                <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: '#999' }} labelFormatter={(v) => formatDate(v as string, range)} />
+                <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartTooltipLabelStyle} cursor={chartCursorStyle} labelFormatter={(v) => formatDate(v as string, range)} />
                 <Area type="monotone" dataKey="count" name={t('kpiFollows')} stroke={ACCENT_2} fill="url(#gradFollow)" strokeWidth={2} dot={false} />
               </AreaChart>
             </ResponsiveContainer>
@@ -471,7 +481,7 @@ export default function AdminAnalyticsPage() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="date" tick={axisTickStyle} tickFormatter={(v) => formatDate(v, range)} interval="preserveStartEnd" />
                 <YAxis tick={axisTickStyle} width={30} allowDecimals={false} />
-                <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: '#999' }} labelFormatter={(v) => formatDate(v as string, range)} />
+                <Tooltip contentStyle={chartTooltipStyle} labelStyle={chartTooltipLabelStyle} cursor={chartCursorStyle} labelFormatter={(v) => formatDate(v as string, range)} />
                 <Bar dataKey="submitted" name={t('claimsSubmitted')} fill={GOLD_DIM} stroke={GOLD} strokeWidth={1} radius={[3, 3, 0, 0]} />
                 <Bar dataKey="approved" name={t('claimsApproved')} fill={ACCENT_2_DIM} stroke={ACCENT_2} strokeWidth={1} radius={[3, 3, 0, 0]} />
               </BarChart>

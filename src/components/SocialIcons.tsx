@@ -15,7 +15,7 @@ function IconLink({ href, title, children }: { href: string; title: string; chil
       target="_blank"
       rel="noopener noreferrer"
       title={title}
-      className="text-[#8A8578] hover:text-[var(--color-gold)] transition-colors duration-300"
+      className="text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors duration-300"
     >
       {children}
     </a>

@@ -80,16 +80,16 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                 {profile.display_name || `@${username}`}
               </h1>
               {profile.display_name && profile.username && (
-                <p className="mt-1 text-xl text-[#8A8578]">@{profile.username}</p>
+                <p className="mt-1 text-xl text-[var(--muted-foreground)]">@{profile.username}</p>
               )}
             </div>
 
             {/* Tags + Action Buttons */}
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[#8A8578]">
+              <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
                 {t('memberSince', { date: memberSince })}
               </span>
-              <span className="text-[#8A8578]/30 select-none">|</span>
+              <span className="text-[var(--muted-foreground)]/30 select-none">|</span>
               <DMButton targetUserId={profile.id} />
               <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
             </div>
@@ -125,7 +125,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
           </h2>
 
           {!hasFollows ? (
-            <p className="text-[#8A8578] text-sm">{t('noFollows')}</p>
+            <p className="text-[var(--muted-foreground)] text-sm">{t('noFollows')}</p>
           ) : (
             <div className="space-y-6">
               {followedArtists.length > 0 && (
@@ -174,7 +174,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                         <div>
                           <span className="text-sm font-medium group-hover:text-gold transition-colors">{displayName(venue.fields)}</span>
                           {city && (
-                            <span className="text-[10px] uppercase tracking-widest text-[#8A8578] ml-2">📍 {cityName(city.fields, locale)}</span>
+                            <span className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] ml-2">📍 {cityName(city.fields, locale)}</span>
                           )}
                         </div>
                       </Link>
@@ -198,7 +198,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
           </h2>
 
           {!hasBookmarks ? (
-            <p className="text-[#8A8578] text-sm">{t('noBookmarks')}</p>
+            <p className="text-[var(--muted-foreground)] text-sm">{t('noBookmarks')}</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {bookmarkedEvents.map((event) => {
@@ -216,7 +216,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                     className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group"
                   >
                     {venue && (
-                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">{displayName(venue.fields)}</p>
+                      <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{displayName(venue.fields)}</p>
                     )}
                     <div className="text-xs uppercase tracking-widest text-gold mb-2">
                       {dateStr} · {timeStr}
@@ -243,7 +243,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
           </h2>
 
           {reviews.length === 0 ? (
-            <p className="text-[#8A8578] text-sm">{t('noReviews')}</p>
+            <p className="text-[var(--muted-foreground)] text-sm">{t('noReviews')}</p>
           ) : (
             <div className="space-y-4">
               {reviews.map((review) => {
@@ -262,11 +262,11 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                       <span className="text-sm font-medium group-hover:text-gold transition-colors">
                         {venue ? displayName(venue.fields) : t('unknownVenue')}
                       </span>
-                      <span className="text-xs text-[#8A8578]">{dateStr}</span>
+                      <span className="text-xs text-[var(--muted-foreground)]">{dateStr}</span>
                     </div>
                     <div className="flex items-center gap-1 mb-2">
                       {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-gold' : 'text-[#8A8578]/30'}>
+                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-gold' : 'text-[var(--muted-foreground)]/30'}>
                           <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                         </svg>
                       ))}

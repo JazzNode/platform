@@ -63,7 +63,7 @@ export default function EventCarousel({
                 transitionDelay: phase === 'visible' ? `${i * 200}ms` : `${i * 80}ms`,
               }}
             >
-              <p className="text-[11px] text-[#8A8578] mb-0.5">
+              <p className="text-[11px] text-[var(--muted-foreground)] mb-0.5">
                 {event.date}
               </p>
               <p className="text-sm text-[var(--foreground)] truncate group-hover/event:text-gold transition-colors duration-300">

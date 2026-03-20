@@ -158,12 +158,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       {/* ─── Hero + Stats ─── */}
       <section className="pt-24 pb-16">
         <HeroReveal>
-          <h1 className="hero-title text-6xl sm:text-8xl lg:text-[10rem] text-[#F0EDE6]">
+          <h1 className="hero-title text-6xl sm:text-8xl lg:text-[10rem] text-[var(--foreground)]">
             <span className="hero-line block">Jazz.</span>
             <span className="hero-line block text-gold">Live.</span>
             <span className="hero-line block">Connected.</span>
           </h1>
-          <p className="hero-tagline mt-8 max-w-lg text-lg text-[#8A8578] leading-relaxed">
+          <p className="hero-tagline mt-8 max-w-lg text-lg text-[var(--muted-foreground)] leading-relaxed">
             {t('tagline')}
           </p>
 

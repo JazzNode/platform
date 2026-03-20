@@ -71,7 +71,7 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
           <BookmarkButton itemId={event.id} />
         </div>
         {event.venue_name && (
-          <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">
+          <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">
             {event.city_name ? `${event.city_name} · ` : ''}{event.venue_name}
           </p>
         )}
@@ -144,13 +144,13 @@ export default function HomeEventsSection({
         <FadeUp>
           <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
             <h2 className="font-serif text-4xl sm:text-5xl font-bold">{labels.upcomingEvents}</h2>
-            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+            <Link href={`/${locale}/events`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
               {labels.viewAll} →
             </Link>
           </div>
         </FadeUp>
         {filteredEvents.length === 0 ? (
-          <p className="text-[#8A8578]">{labels.noEvents}</p>
+          <p className="text-[var(--muted-foreground)]">{labels.noEvents}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredEvents.slice(0, 9).map((event, i) => (
@@ -166,7 +166,7 @@ export default function HomeEventsSection({
           <FadeUp>
             <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
               <h2 className="font-serif text-4xl sm:text-5xl font-bold">{labels.weeklyJam}</h2>
-              <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+              <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
                 {labels.viewAll} →
               </Link>
             </div>
@@ -185,7 +185,7 @@ export default function HomeEventsSection({
           <FadeUp>
             <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
               <h2 className="font-serif text-4xl sm:text-5xl font-bold">{labels.featuredVenues}</h2>
-              <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift">
+              <Link href={`/${locale}/venues`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
                 {labels.viewAll} →
               </Link>
             </div>
@@ -213,7 +213,7 @@ export default function HomeEventsSection({
                     <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">
                       {venue.name}
                     </h3>
-                    <p className="mt-2 text-xs uppercase tracking-widest text-[#8A8578]">
+                    <p className="mt-2 text-xs uppercase tracking-widest text-[var(--muted-foreground)]">
                       {venue.city_name} · {venue.event_count} events
                     </p>
                     {venue.jazz_frequency && (
