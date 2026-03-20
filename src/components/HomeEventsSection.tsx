@@ -58,13 +58,11 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
     <FadeUpItem delay={(index % 3) * 60} className={index >= 6 ? 'hidden sm:block' : undefined}>
       <Link
         href={`/${locale}/events/${event.id}`}
-        className="block relative p-6 rounded-2xl card-hover group h-full"
+        className="block relative p-6 rounded-2xl border card-hover group h-full"
         style={{
           backgroundColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
-          borderWidth: 1,
-          borderStyle: 'solid',
           borderColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
-          transition: 'background-color 0.6s ease, border-color 0.6s ease',
+          transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
         }}
       >
         <div className="absolute top-3 right-3 z-10">
@@ -190,21 +188,18 @@ export default function HomeEventsSection({
               </Link>
             </div>
           </FadeUp>
-          <FadeUp stagger={0.15}>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredVenues.slice(0, 6).map((venue) => {
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredVenues.slice(0, 6).map((venue, i) => {
                 const followed = isFollowing('venue', venue.id);
                 return (
+                  <FadeUpItem key={venue.id} delay={(i % 3) * 60}>
                   <Link
-                    key={venue.id}
                     href={`/${locale}/venues/${venue.id}`}
-                    className="fade-up-item block relative p-6 rounded-2xl card-hover group"
+                    className="block relative p-6 rounded-2xl border card-hover group h-full"
                     style={{
                       backgroundColor: followed ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
-                      borderWidth: 1,
-                      borderStyle: 'solid',
                       borderColor: followed ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
-                      transition: 'background-color 0.6s ease, border-color 0.6s ease',
+                      transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
                     }}
                   >
                     <div className="absolute top-3 right-3 z-10">
@@ -220,10 +215,10 @@ export default function HomeEventsSection({
                       <p className="mt-1 text-xs text-[#6A6560]">{jazzFreqLabel[venue.jazz_frequency] || venue.jazz_frequency}</p>
                     )}
                   </Link>
+                  </FadeUpItem>
                 );
               })}
             </div>
-          </FadeUp>
         </section>
       )}
     </div>
