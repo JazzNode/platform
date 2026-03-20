@@ -770,7 +770,7 @@ export default function FanInboxPage() {
         <FadeUp>
           {/* Filter Chips */}
           <div className="mb-3">
-            <FilterChips active={filter} onChange={setFilter} />
+            <FilterChips active={filter} onChange={(f) => { setFilter(f); setSelectedConvo(null); }} />
           </div>
 
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden" style={{ height: 'calc(100vh - 320px)', minHeight: '400px' }}>
