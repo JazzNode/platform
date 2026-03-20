@@ -96,9 +96,21 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       }
     });
 
+    // Proactively refresh session when the tab becomes visible again.
+    // On Windows, browsers aggressively suspend background tabs, which stops
+    // the Supabase auto-refresh timer. When the user returns, the access token
+    // may already be expired. Calling getSession() triggers a refresh if needed.
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        supabase.auth.getSession();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
       cancelled = true;
       subscription.unsubscribe();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [fetchProfile]);
 
