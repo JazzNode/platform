@@ -12,8 +12,13 @@ export async function POST(req: NextRequest) {
 
     const userAgent = req.headers.get('user-agent') || null;
     const referrer = req.headers.get('referer') || null;
-    const city = req.headers.get('x-vercel-ip-city') || null;
-    const countryCode = req.headers.get('x-vercel-ip-country') || null;
+    const rawCity = req.headers.get('x-vercel-ip-city');
+    const rawCountry = req.headers.get('x-vercel-ip-country');
+
+    // GeoIP: Vercel headers may be absent in local dev or non-Vercel environments.
+    // Only write valid values — never empty strings (prefer null for missing data).
+    const city = rawCity ? decodeURIComponent(rawCity) : null;
+    const countryCode = rawCountry && rawCountry.length === 2 ? rawCountry : null;
 
     // Client-side (PageViewTracker) already deduplicates with a 60s localStorage window.
     // Server-side ILIKE dedup on user_agent caused full table scans → removed.
@@ -21,7 +26,7 @@ export async function POST(req: NextRequest) {
       artist_id: artistId,
       referrer,
       user_agent: userAgent?.slice(0, 500),
-      city: city ? decodeURIComponent(city) : null,
+      city,
       country_code: countryCode,
     });
 

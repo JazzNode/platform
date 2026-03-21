@@ -10,8 +10,9 @@ export async function GET(request: NextRequest) {
   const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
   if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  const ALLOWED_RANGES: Record<string, number> = { '7d': 7, '28d': 28, '90d': 90, '365d': 365 };
   const range = request.nextUrl.searchParams.get('range') || '28d';
-  const days = range === '365d' ? 365 : range === '90d' ? 90 : range === '7d' ? 7 : 28;
+  const days = ALLOWED_RANGES[range] ?? 28;
 
   const now = new Date();
   const currentStart = new Date(now.getTime() - days * 86400000);
@@ -257,12 +258,12 @@ export async function GET(request: NextRequest) {
   // --- Top Cities ---
   const cityCountMap: Record<string, number> = {};
   for (const v of aViewsCurr) {
-    const city = v.city || 'Unknown';
-    cityCountMap[city] = (cityCountMap[city] || 0) + 1;
+    if (!v.city) continue; // Skip views without GeoIP data
+    cityCountMap[v.city] = (cityCountMap[v.city] || 0) + 1;
   }
   for (const v of vViewsCurr) {
-    const city = v.city || 'Unknown';
-    cityCountMap[city] = (cityCountMap[city] || 0) + 1;
+    if (!v.city) continue;
+    cityCountMap[v.city] = (cityCountMap[v.city] || 0) + 1;
   }
   const topCities = Object.entries(cityCountMap)
     .sort(([, a], [, b]) => b - a)
