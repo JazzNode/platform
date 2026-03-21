@@ -141,9 +141,13 @@ export default function PWAInstallBanner() {
 
         <div className="flex items-center gap-3">
           {/* App icon */}
-          <div className="w-12 h-12 rounded-xl bg-[#0A0A0A] border border-[var(--border)] flex items-center justify-center shrink-0">
-            <span className="text-gold font-bold text-sm tracking-wide">JN</span>
-          </div>
+          <img
+            src="/icons/icon-192.png"
+            alt="JazzNode"
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-xl shrink-0"
+          />
 
           <div className="flex-1 min-w-0">
             <p className="font-serif font-bold text-sm text-[var(--foreground)]">
