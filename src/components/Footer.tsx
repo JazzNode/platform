@@ -41,7 +41,7 @@ function ThemePicker() {
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-4 max-w-xs mx-auto pb-4">
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-3 sm:gap-x-5 sm:gap-y-4 max-w-xs mx-auto pb-4">
       {themeOrder.map((id) => {
         const t = themes[id];
         const active = themeId === id;
@@ -53,7 +53,7 @@ function ThemePicker() {
           >
             {/* Color dot */}
             <span
-              className={`w-6 h-6 rounded-full transition-all duration-300 ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full transition-all duration-300 ${
                 active ? 'scale-110' : 'hover:scale-110'
               }`}
               style={{
