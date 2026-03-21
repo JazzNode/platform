@@ -1,46 +1,28 @@
-# web
+# platform
 
-> The Jazz Scene, Connected. — The IMDb of Jazz.
-
-JazzNode 公開網站 — 瀏覽場地、藝人、活動。
+JazzNode 管理後台 — 分析儀表板、內容審核、Claims 工作流、使用者管理。
 
 ## Tech Stack
 
 - **Next.js 16** (App Router, SSG + ISR)
 - **React 19** + **TypeScript**
-- **Tailwind CSS v4** + **shadcn/ui** + **Radix UI**
-- **Supabase** (SSOT，搭配 SSR adapter)
-- **next-intl** (EN / 繁中 / 日本語)
-- **Recharts** (資料視覺化)
-- **Fuse.js** (模糊搜尋)
+- **Tailwind CSS v4** + **shadcn/ui**
+- **Supabase** (Auth + Realtime + 資料存取)
+- **Recharts** (分析圖表)
+- **Notion Client** (報告/文件同步)
+- **AWS S3** (海報圖片封存)
+- **@react-pdf/renderer** (PDF 產生)
 - **Sharp** (圖片處理)
-- **Vercel** (部署)
+- **next-intl** (8 種語言支援)
 
-## Architecture
+## 功能
 
-```
-Supabase (SSOT)
-    ↓ build-time fetch
-Next.js SSG + ISR (revalidate: 1h)
-    ↓
-Vercel CDN → Users
-```
-
-- **Zero runtime API calls** — 所有資料在建置時取得
-- **ISR** — 每小時自動重新驗證頁面
-- **Schema Check** — `prebuild` hook 自動執行 schema alignment 檢查
-- **Three languages** — URL-based: `/en/`, `/zh/`, `/ja/`
-
-## Routes
-
-| Route | Description |
-|---|---|
-| `/[locale]` | 首頁 — 即將到來的活動 + 推薦場地 |
-| `/[locale]/venues` | 場地列表（依城市分組） |
-| `/[locale]/venues/[id]` | 場地詳情 + 活動列表 |
-| `/[locale]/artists` | 藝人列表（依樂器分組） |
-| `/[locale]/artists/[id]` | 藝人簡介 + 演出紀錄 |
-| `/[locale]/events` | 活動行事曆（依月份分組） |
+- **分析儀表板** — 即時指標、活動統計、場地/藝人活躍度
+- **內容管理** — 活動審核、Release 分組管理
+- **8 種城市主題配色** — 主題選擇器（mobile/desktop 優化）
+- **Claims 工作流** — 場地/藝人認領審核
+- **使用者管理** — Supabase Auth 整合
+- **多語言** — 支援 8 種語言
 
 ## Getting Started
 
@@ -49,19 +31,18 @@ npm install
 
 # 環境變數
 cp .env.local.example .env.local
-# 填入 Supabase URL、Supabase Anon Key 等
+# 填入 Supabase URL、Service Role Key、Notion Token 等
 
 npm run dev     # 開發
-npm run build   # 建置（含 schema 檢查）
+npm run build   # 建置
 ```
 
 ## Structure
 
 ```
 src/
-├── app/           — 路由目錄（venues, artists, events, cities 等）
-├── components/    — 75+ 可重用 UI 元件
-├── lib/           — 服務模組（Supabase client、filters、helpers）
-├── i18n/          — 語言設定
-└── messages/      — 翻譯內容（EN / 繁中 / 日本語）
+├── app/           — Admin 路由
+├── components/    — 75+ 元件（analytics、moderation 等）
+├── lib/           — 服務模組（Supabase、Notion、S3 等）
+└── messages/      — i18n 翻譯（8 種語言）
 ```
