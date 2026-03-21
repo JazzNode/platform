@@ -66,7 +66,7 @@ export default function EventCarousel({
               <p className="text-[11px] text-[var(--muted-foreground)] mb-0.5">
                 {event.date}
               </p>
-              <p className="text-sm text-[var(--foreground)] truncate group-hover/event:text-gold transition-colors duration-300">
+              <p className="text-sm text-[var(--foreground)] sm:truncate leading-snug group-hover/event:text-gold transition-colors duration-300">
                 {event.title}
               </p>
             </div>

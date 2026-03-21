@@ -135,43 +135,41 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
         </FadeUpItem>
       )}
 
-      <div key={filterKey} className="grid gap-6 sm:grid-cols-2">
+      <div key={filterKey} className="grid gap-4 sm:gap-6 sm:grid-cols-2">
           {filteredCities.map((city, i) => (
             <FadeUpItem key={city.id} delay={(i % 2) * 60}>
             <div
-              className="relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-6 sm:p-8 overflow-hidden group card-hover"
+              className="relative bg-[var(--card)] rounded-2xl border border-[var(--border)] p-4 sm:p-8 overflow-hidden group card-hover"
             >
-              {/* Venue photo strip */}
-              {city.venuePhotos.length > 0 && (
-                <div className="flex items-center -space-x-3 mb-5">
-                  {city.venuePhotos.map((photo, i) => (
-                    <Image
-                      key={i}
-                      src={photo.url}
-                      alt={photo.name}
-                      width={40} height={40}
-                      className="w-10 h-10 rounded-full object-cover border-2 border-[var(--card)]"
-                      style={{ zIndex: city.venuePhotos.length - i }}
-                      sizes="40px"
-                    />
-                  ))}
-                  {city.venues.length > city.venuePhotos.length && (
-                    <span className="text-xs text-[var(--muted-foreground)] ml-4">
-                      +{city.venues.length - city.venuePhotos.length}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {/* City name */}
-              <div className="mb-5">
+              {/* City name + venue photos inline */}
+              <div className="flex items-center justify-between mb-4">
                 <h2 className="font-serif text-2xl sm:text-3xl font-bold">
                   {city.name}
                 </h2>
+                {city.venuePhotos.length > 0 && (
+                  <div className="flex items-center -space-x-2 shrink-0">
+                    {city.venuePhotos.map((photo, i) => (
+                      <Image
+                        key={i}
+                        src={photo.url}
+                        alt={photo.name}
+                        width={32} height={32}
+                        className="w-8 h-8 rounded-full object-cover border-2 border-[var(--card)]"
+                        style={{ zIndex: city.venuePhotos.length - i }}
+                        sizes="32px"
+                      />
+                    ))}
+                    {city.venues.length > city.venuePhotos.length && (
+                      <span className="text-[10px] text-[var(--muted-foreground)] ml-2">
+                        +{city.venues.length - city.venuePhotos.length}
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Stats row */}
-              <div className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-[var(--muted-foreground)] mb-6">
+              {/* Stats row — compact on mobile */}
+              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-[var(--muted-foreground)] mb-4">
                 <span>
                   <CountUp end={city.venueCount} trigger="visible" className="font-bold text-gold" /> {labels.venuesInCity}
                 </span>
@@ -183,22 +181,22 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
                 </span>
               </div>
 
-              {/* Venue chips */}
-              <div className="flex flex-wrap gap-2 mb-6">
+              {/* Venue chips — wrap on all sizes */}
+              <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4">
                 {city.venues.map((v) => (
                   <Link
                     key={v.id}
                     href={`/${locale}/venues/${v.id}`}
-                    className="text-xs px-3 py-1.5 rounded-full border border-[var(--border)] text-gold hover:bg-gold/10 transition-colors duration-300"
+                    className="text-[11px] sm:text-xs px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full border border-[var(--border)] text-gold hover:bg-gold/10 transition-colors duration-300"
                   >
                     {v.displayName}
                   </Link>
                 ))}
               </div>
 
-              {/* Top artist pills */}
+              {/* Top artist pills — wrap on all sizes */}
               {city.topArtists.length > 0 && (
-                <div className="mb-5">
+                <div className="mb-4">
                   <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
                     {labels.topPerformers}
                   </p>
@@ -207,7 +205,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
                       <Link
                         key={a.id}
                         href={`/${locale}/artists/${a.id}`}
-                        className="text-xs px-2.5 py-1 rounded-full bg-[var(--secondary)] text-[var(--foreground)] hover:text-gold hover:bg-gold/10 transition-colors duration-300"
+                        className="text-[11px] sm:text-xs px-2 sm:px-2.5 py-1 rounded-full bg-[var(--secondary)] text-[var(--foreground)] hover:text-gold hover:bg-gold/10 transition-colors duration-300"
                       >
                         {a.displayName}
                       </Link>
