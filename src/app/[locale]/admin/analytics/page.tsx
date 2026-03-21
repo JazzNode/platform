@@ -169,7 +169,7 @@ export default function AdminAnalyticsPage() {
   useEffect(() => {
     if (!token) return;
     let cancelled = false;
-    setLoading(true);
+    setLoading(true); // eslint-disable-line react-hooks/set-state-in-effect -- intentional loading state before async fetch
     (async () => {
       try {
         const res = await fetch(`/api/admin/analytics?range=${range}`, {
