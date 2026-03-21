@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache';
 import {
   fetchInternalReleasesBlocks,
   groupBlocksByVersion,
@@ -8,23 +9,30 @@ import {
 import ReleasedClient from './ReleasedClient';
 
 export const revalidate = 300;
+export const maxDuration = 60;
+
+const getCachedReleaseData = unstable_cache(
+  async () => {
+    const blocks = await fetchInternalReleasesBlocks();
+    const groups = groupBlocksByVersion(blocks);
+    return groups.map((g) => ({
+      version: g.version,
+      html: g.blocks.map((block) => renderBlockToHtml(block)).filter(Boolean),
+    }));
+  },
+  ['internal-releases'],
+  { revalidate: 300 },
+);
 
 export default async function ReleasedPage() {
-  let groups: { version: string; blocks: NotionBlockWithChildren[] }[] = [];
+  let serializedGroups: { version: string; html: string[] }[] = [];
   let error = false;
 
   try {
-    const blocks = await fetchInternalReleasesBlocks();
-    groups = groupBlocksByVersion(blocks);
+    serializedGroups = await getCachedReleaseData();
   } catch {
     error = true;
   }
-
-  // Serialize blocks to a simpler format for the client component
-  const serializedGroups = groups.map((g) => ({
-    version: g.version,
-    html: g.blocks.map((block) => renderBlockToHtml(block)).filter(Boolean),
-  }));
 
   return <ReleasedClient groups={serializedGroups} error={error} />;
 }

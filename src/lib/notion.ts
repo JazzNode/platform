@@ -50,23 +50,32 @@ async function fetchPageBlocks(pageId: string): Promise<BlockObjectResponse[]> {
     cursor = res.has_more ? res.next_cursor ?? undefined : undefined;
   } while (cursor);
 
-  // Fetch children for toggle blocks
-  for (const block of blocks) {
-    if (block.has_children && block.type === 'toggle') {
-      const children: BlockObjectResponse[] = [];
-      let childCursor: string | undefined;
-      do {
-        const res = await notion.blocks.children.list({
-          block_id: block.id,
-          start_cursor: childCursor,
-          page_size: 100,
-        });
-        for (const b of res.results) {
-          if ('type' in b) children.push(b as BlockObjectResponse);
-        }
-        childCursor = res.has_more ? res.next_cursor ?? undefined : undefined;
-      } while (childCursor);
-      (block as BlockObjectResponse & { children: BlockObjectResponse[] }).children = children;
+  // Fetch children for toggle blocks concurrently
+  const toggleBlocks = blocks.filter((b) => b.has_children && b.type === 'toggle');
+  if (toggleBlocks.length > 0) {
+    const childrenResults = await Promise.all(
+      toggleBlocks.map(async (block) => {
+        const children: BlockObjectResponse[] = [];
+        let childCursor: string | undefined;
+        do {
+          const res = await notion.blocks.children.list({
+            block_id: block.id,
+            start_cursor: childCursor,
+            page_size: 100,
+          });
+          for (const b of res.results) {
+            if ('type' in b) children.push(b as BlockObjectResponse);
+          }
+          childCursor = res.has_more ? res.next_cursor ?? undefined : undefined;
+        } while (childCursor);
+        return { blockId: block.id, children };
+      }),
+    );
+    for (const { blockId, children } of childrenResults) {
+      const block = blocks.find((b) => b.id === blockId);
+      if (block) {
+        (block as BlockObjectResponse & { children: BlockObjectResponse[] }).children = children;
+      }
     }
   }
 
