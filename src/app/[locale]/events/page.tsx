@@ -1,7 +1,7 @@
-export const revalidate = 3600;
+export const revalidate = 300;
 import { getTranslations } from 'next-intl/server';
 import { getEvents, getVenues, getArtists, getLineups, getCities, getTags, resolveLinks, buildMap } from '@/lib/supabase';
-import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, localized, cityName, eventTitle, relativeEventDate, isEventTonight } from '@/lib/helpers';
 import EventsClient from '@/components/EventsClient';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -127,12 +127,54 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
+  // Serialize today's events (with relative time) for the "Today" section
+  const todayEventIds = new Set<string>();
+  const todaySerialized = !showPast ? upcoming
+    .filter((e) => e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei'))
+    .map((event) => {
+      todayEventIds.add(event.id);
+      const tz = event.fields.timezone || 'Asia/Taipei';
+      const venue = resolveLinks(event.fields.venue_id, venueMap)[0];
+      const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+      const eventLineups = (lineupsByEvent.get(event.id) || [])
+        .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+      const lineupArtists = eventLineups
+        .filter((l) => l.fields.role !== 'ensemble')
+        .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+        .filter(Boolean);
+      const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+        .map((tag) => tag.fields.name)
+        .filter(Boolean) as string[];
+      const rel = relativeEventDate(event.fields.start_at, locale, tz);
+      return {
+        id: event.id,
+        title: eventTitle(event.fields, locale),
+        start_at: event.fields.start_at || null,
+        end_at: event.fields.end_at || null,
+        timezone: tz,
+        venue_id: venue?.id || null,
+        venue_name: venue ? displayName(venue.fields) : '',
+        venue_address: venue?.fields.address_local || venue?.fields.address_en || '',
+        city_record_id: venue?.fields.city_id?.[0] || null,
+        city_name: venue?.fields.city_id?.[0] ? cityName(cities.find((c) => c.id === venue.fields.city_id?.[0])?.fields || {}, locale) : '',
+        country_code: cities.find((c) => c.id === venue?.fields.city_id?.[0])?.fields.country_code || '',
+        relative_label: rel.label,
+        time_display: rel.time,
+        sidemen: lineupArtists.map((a) => artistDisplayName(a.fields, locale)),
+        tags: eventTags,
+      };
+    }) : [];
+
+  // Remove today's events from main list to avoid duplication
+  const mainEvents = showPast ? serializedEvents : serializedEvents.filter((e) => !todayEventIds.has(e.id));
+
   // Build initial filters from URL search params
   const initialFilters = (venue || category || city || region) ? { venue, category, city, region } : undefined;
 
   return (
     <EventsClient
-      events={serializedEvents}
+      events={mainEvents}
+      todayEvents={todaySerialized}
       cities={cityOptions}
       venues={venueOptions}
       locale={locale}
@@ -141,6 +183,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
       worldMapLabel={tRegions('worldMap')}
       initialFilters={initialFilters}
       labels={{
+        todayEvents: t('tonightEvents'),
         allCities: t('allCities'),
         allVenues: t('allVenues'),
         allCategories: t('allCategories'),

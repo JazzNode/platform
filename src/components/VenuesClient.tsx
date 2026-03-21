@@ -7,6 +7,7 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import FollowButton from '@/components/FollowButton';
+import ShareButton from '@/components/ShareButton';
 import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from '@/components/RegionProvider';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -249,7 +250,13 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
                 }}
               >
-                <div className="absolute top-3 right-3 z-10">
+                <div className="absolute top-3 right-3 z-10 flex items-center gap-0" onClick={(e) => e.preventDefault()}>
+                  <ShareButton
+                    title={venue.displayName}
+                    url={`/${locale}/venues/${venue.id}`}
+                    variant="icon"
+                    glass
+                  />
                   <FollowButton itemType="venue" itemId={venue.id} glass />
                 </div>
                 {venue.photoUrl && (

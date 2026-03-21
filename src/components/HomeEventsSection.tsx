@@ -5,6 +5,8 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
+import AddToCalendar from '@/components/AddToCalendar';
+import ShareButton from '@/components/ShareButton';
 import FollowButton from '@/components/FollowButton';
 import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from './RegionProvider';
@@ -13,10 +15,13 @@ interface HomeEvent {
   id: string;
   title: string;
   start_at: string | null;
+  end_at?: string | null;
+  timezone: string;
   venue_name: string;
+  venue_address?: string;
   city_name: string;
   country_code: string;
-  date_display: string;
+  relative_label: string;
   time_display: string;
   sidemen: string[];
   tags: string[];
@@ -65,7 +70,21 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
           transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
         }}
       >
-        <div className="absolute top-3 right-3 z-10">
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-0" onClick={(e) => e.preventDefault()}>
+          <AddToCalendar
+            title={event.title}
+            startAt={event.start_at || ''}
+            endAt={event.end_at}
+            timezone={event.timezone}
+            venueName={event.venue_name}
+            address={event.venue_address}
+            variant="icon"
+          />
+          <ShareButton
+            title={event.title}
+            url={`/${locale}/events/${event.id}`}
+            variant="icon"
+          />
           <BookmarkButton itemId={event.id} />
         </div>
         {event.venue_name && (
@@ -74,7 +93,7 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
           </p>
         )}
         <div className="text-xs uppercase tracking-widest text-gold mb-2">
-          {event.tags.includes('matinee') && '☀️ '}{event.date_display} · {event.time_display}
+          {event.tags.includes('matinee') && '☀️ '}{event.relative_label} · {event.time_display}
         </div>
         <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
           {event.title}
@@ -163,7 +182,7 @@ export default function HomeEventsSection({
         <section>
           <FadeUp>
             <div className="flex items-end justify-between mb-12 border-b border-[var(--border)] pb-6">
-              <h2 className="font-serif text-4xl sm:text-5xl font-bold">{labels.weeklyJam}</h2>
+              <h2 className="font-serif text-4xl sm:text-5xl font-bold whitespace-pre-line sm:whitespace-normal">{labels.weeklyJam}</h2>
               <Link href={`/${locale}/events?category=jam`} className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift">
                 {labels.viewAll} →
               </Link>
@@ -202,7 +221,12 @@ export default function HomeEventsSection({
                       transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
                     }}
                   >
-                    <div className="absolute top-3 right-3 z-10">
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-0" onClick={(e) => e.preventDefault()}>
+                      <ShareButton
+                        title={venue.name}
+                        url={`/${locale}/venues/${venue.id}`}
+                        variant="icon"
+                      />
                       <FollowButton itemType="venue" itemId={venue.id} />
                     </div>
                     <h3 className="font-serif text-xl font-bold group-hover:text-gold transition-colors duration-300">

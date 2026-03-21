@@ -1,10 +1,10 @@
-export const revalidate = 3600;
+export const revalidate = 300;
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
 import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/supabase';
-import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey } from '@/lib/helpers';
+import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey, relativeEventDate, isEventLive } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
@@ -12,6 +12,9 @@ import FavoriteHighlight from '@/components/FavoriteHighlight';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import EventPosterUpload from '@/components/EventPosterUpload';
+import AddToCalendar from '@/components/AddToCalendar';
+import ShareButton from '@/components/ShareButton';
+import { createClient as createServerSupabase } from '@/utils/supabase/server';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
@@ -71,6 +74,18 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const venueMap = buildMap(venues);
   const artistMap = buildMap(artists);
   const venue = resolveLinks(f.venue_id, venueMap)[0];
+
+  // Fetch bookmark (want-to-go) count
+  let bookmarkCount = 0;
+  try {
+    const supabase = await createServerSupabase();
+    const { count } = await supabase
+      .from('follows')
+      .select('*', { count: 'exact', head: true })
+      .eq('target_type', 'event')
+      .eq('target_id', event.id);
+    bookmarkCount = count ?? 0;
+  } catch { /* ignore — count is non-critical */ }
 
   // Compute prev/next events — same venue only, chronological
   const venueEventIds = new Set(venue?.fields.event_list || []);
@@ -199,6 +214,14 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
         {/* Info */}
         <div className="flex-1 space-y-6">
+          {/* LIVE badge */}
+          {isEventLive(f.start_at, f.end_at) && (
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-bold uppercase tracking-widest animate-pulse">
+              <span className="w-2 h-2 rounded-full bg-red-400" />
+              {t('happeningNow')}
+            </div>
+          )}
+
           {/* Title */}
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
@@ -229,7 +252,14 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 />
               )}
             </div>
-            <BookmarkButton itemId={event.id} variant="full" />
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <BookmarkButton itemId={event.id} variant="full" />
+              {bookmarkCount > 0 && (
+                <span className="text-[10px] text-[var(--muted-foreground)]">
+                  {bookmarkCount} {t('wantToGo')}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Primary artist */}
@@ -282,6 +312,44 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventAddress')}</span>
                 <span className="text-[#C4BFB3]">{venue.fields.address_local || venue.fields.address_en}</span>
               </div>
+            )}
+          </div>
+
+          {/* Action buttons row: Add to Calendar + Share + Directions */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-6">
+            {f.start_at && (
+              <AddToCalendar
+                title={eventTitle(f, locale)}
+                startAt={f.start_at}
+                endAt={f.end_at}
+                timezone={tz}
+                venueName={venue ? displayName(venue.fields) : undefined}
+                address={venue?.fields.address_local || venue?.fields.address_en || undefined}
+                description={descShort || desc || undefined}
+                sourceUrl={f.source_url}
+                variant="full"
+                label={t('addToCalendar')}
+              />
+            )}
+            <ShareButton
+              title={eventTitle(f, locale)}
+              url={`/${locale}/events/${slug}`}
+              variant="full"
+              label={t('share')}
+            />
+            {venue?.fields.lat && venue?.fields.lng && (
+              <a
+                href={`https://www.google.com/maps/dir/?api=1&destination=${venue.fields.lat},${venue.fields.lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+                <span>{t('getDirections')}</span>
+              </a>
             )}
           </div>
 

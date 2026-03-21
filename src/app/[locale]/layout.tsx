@@ -22,6 +22,7 @@ import ClaimGuideModal from '@/components/ClaimGuideModal';
 import FollowGuideModal from '@/components/FollowGuideModal';
 import ComingSoonToast from '@/components/ComingSoonToast';
 import CatEasterEgg from '@/components/CatEasterEgg';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
 import IntroOverlay from '@/components/animations/IntroOverlay';
@@ -48,6 +49,11 @@ export const metadata: Metadata = {
       th: '/th',
       id: '/id',
     },
+  },
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/icons/icon-192.png',
+    apple: '/icons/apple-touch-icon.png',
   },
   other: {
     'mobile-web-app-capable': 'yes',
@@ -103,6 +109,7 @@ export default async function LocaleLayout({
                   <FollowGuideModal />
                   <ComingSoonToast />
                   <CatEasterEgg />
+                  <ServiceWorkerRegister />
               </TierConfigProvider>
               </AdminProvider>
               </ClaimsProvider>

@@ -261,6 +261,86 @@ export function parseYouTubeVideoId(url: string): string | null {
   }
 }
 
+/**
+ * Smart relative date display for events.
+ * "Tonight 8:00" / "Tomorrow 9:00" / "Sat 8:00" / full date for > 7 days.
+ * Returns both the relative label and the time separately for flexible rendering.
+ */
+export function relativeEventDate(
+  iso: string | undefined,
+  locale: string = 'en',
+  timezone: string = 'Asia/Taipei',
+): { label: string; time: string; isTonight: boolean; isTomorrow: boolean; isThisWeek: boolean } {
+  if (!iso) return { label: '', time: '', isTonight: false, isTomorrow: false, isThisWeek: false };
+
+  const eventDate = new Date(iso);
+  const now = new Date();
+
+  // Get dates in the event's timezone for comparison
+  const eventDay = new Date(eventDate.toLocaleString('en-US', { timeZone: timezone }));
+  const today = new Date(now.toLocaleString('en-US', { timeZone: timezone }));
+
+  const eventDayStart = new Date(eventDay.getFullYear(), eventDay.getMonth(), eventDay.getDate());
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffDays = Math.round((eventDayStart.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24));
+
+  const time = formatTime(iso, timezone);
+
+  const labels: Record<string, { today: string; tonight: string; tomorrow: string }> = {
+    en: { today: 'Today', tonight: 'Tonight', tomorrow: 'Tomorrow' },
+    zh: { today: '今天', tonight: '今晚', tomorrow: '明天' },
+    ja: { today: '今日', tonight: '今夜', tomorrow: '明日' },
+    ko: { today: '오늘', tonight: '오늘 밤', tomorrow: '내일' },
+    th: { today: 'วันนี้', tonight: 'คืนนี้', tomorrow: 'พรุ่งนี้' },
+    id: { today: 'Hari ini', tonight: 'Malam ini', tomorrow: 'Besok' },
+  };
+  const l = labels[locale] || labels.en;
+
+  if (diffDays === 0) {
+    // Determine if event is in the evening (18:00+) or daytime
+    const eventHour = eventDay.getHours();
+    const todayLabel = eventHour >= 18 ? l.tonight : l.today;
+    return { label: todayLabel, time, isTonight: true, isTomorrow: false, isThisWeek: true };
+  }
+  if (diffDays === 1) {
+    return { label: l.tomorrow, time, isTonight: false, isTomorrow: true, isThisWeek: true };
+  }
+  if (diffDays >= 2 && diffDays <= 6) {
+    // Show weekday name
+    const localeMap: Record<string, string> = { zh: 'zh-TW', ja: 'ja-JP', ko: 'ko-KR', th: 'th-TH', id: 'id-ID' };
+    const weekday = eventDate.toLocaleDateString(localeMap[locale] || 'en-US', {
+      weekday: 'short',
+      timeZone: timezone,
+    });
+    return { label: weekday, time, isTonight: false, isTomorrow: false, isThisWeek: true };
+  }
+
+  // More than a week away — use full date
+  return { label: formatDate(iso, locale, timezone), time, isTonight: false, isTomorrow: false, isThisWeek: false };
+}
+
+/**
+ * Check if an event is currently live (started but not ended).
+ * Default event duration is 2.5 hours if end_at is not provided.
+ */
+export function isEventLive(startAt: string | undefined, endAt?: string | null): boolean {
+  if (!startAt) return false;
+  const now = Date.now();
+  const start = new Date(startAt).getTime();
+  const end = endAt ? new Date(endAt).getTime() : start + 2.5 * 60 * 60 * 1000;
+  return now >= start && now <= end;
+}
+
+/** Check if an event is happening today (considering timezone). */
+export function isEventTonight(startAt: string | undefined, timezone: string = 'Asia/Taipei'): boolean {
+  if (!startAt) return false;
+  const now = new Date();
+  const eventDate = new Date(startAt);
+  const todayStr = now.toLocaleDateString('en-CA', { timeZone: timezone }); // YYYY-MM-DD
+  const eventStr = eventDate.toLocaleDateString('en-CA', { timeZone: timezone });
+  return todayStr === eventStr;
+}
+
 /** Supported locales. */
 export const locales = ['en', 'zh', 'ja', 'ko', 'th', 'id'] as const;
 export type Locale = (typeof locales)[number];

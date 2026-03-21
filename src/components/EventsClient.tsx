@@ -6,6 +6,8 @@ import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import BookmarkButton from '@/components/BookmarkButton';
+import AddToCalendar from '@/components/AddToCalendar';
+import ShareButton from '@/components/ShareButton';
 import { useFollows } from '@/components/FollowsProvider';
 import { useRegion } from '@/components/RegionProvider';
 
@@ -46,8 +48,27 @@ interface InitialFilters {
   region?: string;    // country code
 }
 
+interface TodayEvent {
+  id: string;
+  title: string;
+  start_at: string | null;
+  end_at?: string | null;
+  timezone: string;
+  venue_id: string | null;
+  venue_name: string;
+  venue_address?: string;
+  city_record_id: string | null;
+  city_name: string;
+  country_code: string;
+  relative_label: string;
+  time_display: string;
+  sidemen: string[];
+  tags: string[];
+}
+
 interface Props {
   events: SerializedEvent[];
+  todayEvents?: TodayEvent[];
   cities: CityOption[];
   venues: VenueOption[];
   locale: string;
@@ -56,6 +77,7 @@ interface Props {
   worldMapLabel: string;                  // e.g. '世界版圖'
   initialFilters?: InitialFilters;
   labels: {
+    todayEvents?: string;
     allCities: string;
     allVenues: string;
     allCategories: string;
@@ -76,7 +98,7 @@ interface Props {
 // extends the touch target to 44px minimum (Apple/Google HIG recommendation).
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
-export default function EventsClient({ events, cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
+export default function EventsClient({ events, todayEvents = [], cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
   const { isFollowing } = useFollows();
   const { region: globalRegion } = useRegion();
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -405,6 +427,86 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
         </FadeUpItem>
       </div>
 
+      {/* ─── Today's Shows ─── */}
+      {todayEvents.length > 0 && !showPast && (
+        <section>
+          <FadeUp>
+            <div className="mb-8 border-b border-[var(--border)] pb-4">
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold whitespace-pre-line sm:whitespace-normal">{labels.todayEvents}</h2>
+            </div>
+          </FadeUp>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {todayEvents.map((event, i) => {
+              const bookmarked = isFollowing('event', event.id);
+              return (
+                <FadeUpItem key={event.id} delay={(i % 3) * 60}>
+                  <Link
+                    href={`/${locale}/events/${event.id}`}
+                    className="block p-6 rounded-2xl border card-hover group h-full relative"
+                    style={{
+                      backgroundColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.14)' : 'var(--card)',
+                      borderColor: bookmarked ? 'rgba(var(--theme-glow-rgb), 0.22)' : 'var(--border)',
+                      transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
+                    }}
+                  >
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-0" onClick={(e) => e.preventDefault()}>
+                      <AddToCalendar
+                        title={event.title}
+                        startAt={event.start_at || ''}
+                        endAt={event.end_at}
+                        timezone={event.timezone}
+                        venueName={event.venue_name}
+                        address={event.venue_address}
+                        variant="icon"
+                      />
+                      <ShareButton
+                        title={event.title}
+                        url={`/${locale}/events/${event.id}`}
+                        variant="icon"
+                      />
+                      <BookmarkButton itemId={event.id} />
+                    </div>
+                    {event.venue_name && (
+                      <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">
+                        {event.city_name ? `${event.city_name} · ` : ''}{event.venue_name}
+                      </p>
+                    )}
+                    <div className="text-xs uppercase tracking-widest text-gold mb-2">
+                      {event.tags.includes('matinee') && '☀️ '}{event.relative_label} · {event.time_display}
+                    </div>
+                    <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                      {event.title}
+                    </h3>
+                    {event.sidemen.length > 0 && (
+                      <p className="text-xs text-[var(--muted-foreground)] mt-2">
+                        w/ {event.sidemen.join(', ')}
+                      </p>
+                    )}
+                    {event.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {event.tags.map((tag) => {
+                          const tagLabel = tag === 'matinee' ? labels.matinee
+                            : tag === 'vocal' || tag === 'vocals' ? labels.tagVocals
+                            : tag;
+                          return (
+                            <span
+                              key={tag}
+                              className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
+                            >
+                              {tagLabel}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </Link>
+                </FadeUpItem>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <div key={filterKey}>
         {filteredEvents.length === 0 && (
           <FadeUp>
@@ -412,10 +514,28 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
           </FadeUp>
         )}
 
-        {[...byMonth.entries()].map(([month, monthEvents]) => (
+        {[...byMonth.entries()].map(([month, monthEvents]) => {
+          // Format month as localized "2026 三月份" style
+          const [year, m] = month.split('-');
+          const monthDate = new Date(parseInt(year), parseInt(m) - 1, 1);
+          const zhMonthNames = ['一月份', '二月份', '三月份', '四月份', '五月份', '六月份', '七月份', '八月份', '九月份', '十月份', '十一月份', '十二月份'];
+          let displayMonth: string;
+          if (locale === 'zh') {
+            displayMonth = `${year}年${zhMonthNames[parseInt(m) - 1]}`;
+          } else {
+            const localeMap: Record<string, string> = { en: 'en-US', ja: 'ja-JP', ko: 'ko-KR', th: 'th-TH', id: 'id-ID' };
+            displayMonth = monthDate.toLocaleDateString(localeMap[locale] || 'en-US', { year: 'numeric', month: 'long' });
+          }
+          const monthCount = monthEvents.length;
+          return (
           <section key={month} className="mt-16 first:mt-0">
             <FadeUp>
-              <h2 className="font-serif text-2xl font-bold mb-6 text-gold">{month}</h2>
+              <div className="flex items-baseline gap-4 pb-4 mb-6 border-b border-[var(--border)]">
+                <h2 className="font-serif text-2xl font-bold text-[var(--foreground)]">{displayMonth}</h2>
+                <p className="text-sm text-gold uppercase tracking-widest">
+                  {monthCount}<span className="ml-1.5">{monthCount === 1 ? 'SHOW' : 'SHOWS'}</span>
+                </p>
+              </div>
             </FadeUp>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {monthEvents.map((event, i) => {
@@ -431,7 +551,19 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                       transition: 'background-color 0.6s ease, border-color 0.6s ease, box-shadow 0.4s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.4s cubic-bezier(0.25,0.46,0.45,0.94)',
                     }}
                   >
-                    <div className="absolute top-3 right-3 z-10">
+                    <div className="absolute top-3 right-3 z-10 flex items-center gap-0" onClick={(e) => e.preventDefault()}>
+                      <AddToCalendar
+                        title={event.title}
+                        startAt={event.start_at || ''}
+                        timezone={event.timezone}
+                        venueName={event.venue_name}
+                        variant="icon"
+                      />
+                      <ShareButton
+                        title={event.title}
+                        url={`/${locale}/events/${event.id}`}
+                        variant="icon"
+                      />
                       <BookmarkButton itemId={event.id} />
                     </div>
                     {event.venue_name && (
@@ -473,7 +605,8 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 })}
               </div>
           </section>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

@@ -1,12 +1,13 @@
-export const revalidate = 3600;
+export const revalidate = 300;
 import { getTranslations } from 'next-intl/server';
 import Link from 'next/link';
 import { getVenues, getEvents, getArtists, getCities, getLineups, getTags, resolveLinks, buildMap, buildVenueEventCounts, venueEventCount, getFeaturedMagazineArticles } from '@/lib/supabase';
-import { displayName, artistDisplayName, formatDate, formatTime, cityName, eventTitle } from '@/lib/helpers';
+import { displayName, artistDisplayName, formatDate, formatTime, cityName, eventTitle, relativeEventDate, isEventLive, isEventTonight } from '@/lib/helpers';
 import HeroReveal from '@/components/animations/HeroReveal';
 import CountUp from '@/components/animations/CountUp';
 import ManifestoReveal from '@/components/animations/ManifestoReveal';
 import HomeEventsSection from '@/components/HomeEventsSection';
+import TonightSection from '@/components/TonightSection';
 import RegionExploreRow from '@/components/RegionExploreRow';
 import MagazineCarousel from '@/components/MagazineCarousel';
 import FadeUp from '@/components/animations/FadeUp';
@@ -78,15 +79,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
       .map((tag) => tag.fields.name)
       .filter(Boolean) as string[];
 
+    const rel = relativeEventDate(event.fields.start_at, locale, tz);
     return {
       id: event.id,
       title: eventTitle(event.fields, locale),
       start_at: event.fields.start_at || null,
+      end_at: event.fields.end_at || null,
+      timezone: tz,
       venue_name: venue ? displayName(venue.fields) : '',
+      venue_address: venue?.fields.address_local || venue?.fields.address_en || '',
       city_name: city ? cityName(city, locale) : '',
       country_code: city?.country_code || '',
-      date_display: formatDate(event.fields.start_at, locale, tz),
-      time_display: formatTime(event.fields.start_at, tz),
+      relative_label: rel.label,
+      time_display: rel.time,
       sidemen,
       tags: eventTags,
     };
@@ -109,15 +114,19 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     const eventTags = resolveLinks(event.fields.tag_list, tagMap)
       .map((tag) => tag.fields.name)
       .filter(Boolean) as string[];
+    const relJam = relativeEventDate(event.fields.start_at, locale, tz);
     return {
       id: event.id,
       title: eventTitle(event.fields, locale),
       start_at: event.fields.start_at || null,
+      end_at: event.fields.end_at || null,
+      timezone: tz,
       venue_name: venue ? displayName(venue.fields) : '',
+      venue_address: venue?.fields.address_local || venue?.fields.address_en || '',
       city_name: city ? cityName(city, locale) : '',
       country_code: city?.country_code || '',
-      date_display: formatDate(event.fields.start_at, locale, tz),
-      time_display: formatTime(event.fields.start_at, tz),
+      relative_label: relJam.label,
+      time_display: relJam.time,
       sidemen,
       tags: eventTags,
     };
@@ -141,11 +150,68 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     };
   });
 
+  // ─── Tonight & This Week events for TonightSection ───
+  const oneDayLater = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).toISOString();
+  const serializeTonightEvent = (event: typeof events[number]) => {
+    const tz = event.fields.timezone || 'Asia/Taipei';
+    const venue = resolveLinks(event.fields.venue_id, venueMap)[0];
+    const city = venue?.fields.city_id?.[0] ? cityMap.get(venue.fields.city_id[0]) : null;
+    const primaryArtist = resolveLinks(event.fields.primary_artist, artistMap)[0];
+    const eventLineups = (lineupsByEvent.get(event.id) || [])
+      .sort((a, b) => (a.fields.order || 99) - (b.fields.order || 99));
+    const sidemen = eventLineups
+      .filter((l) => l.fields.role !== 'ensemble')
+      .map((l) => resolveLinks(l.fields.artist_id, artistMap)[0])
+      .filter(Boolean)
+      .filter((a) => a.id !== primaryArtist?.id)
+      .map((a) => artistDisplayName(a.fields, locale));
+    const eventTags = resolveLinks(event.fields.tag_list, tagMap)
+      .map((tag) => tag.fields.name)
+      .filter(Boolean) as string[];
+    const rel = relativeEventDate(event.fields.start_at, locale, tz);
+    return {
+      id: event.id,
+      title: eventTitle(event.fields, locale),
+      start_at: event.fields.start_at || null,
+      end_at: event.fields.end_at || null,
+      timezone: tz,
+      venue_name: venue ? displayName(venue.fields) : '',
+      venue_address: venue?.fields.address_local || venue?.fields.address_en || '',
+      city_name: city ? cityName(city, locale) : '',
+      country_code: city?.country_code || '',
+      relative_label: rel.label,
+      time_display: rel.time,
+      sidemen,
+      tags: eventTags,
+      source_url: event.fields.source_url || null,
+      is_live: isEventLive(event.fields.start_at, event.fields.end_at),
+    };
+  };
+
+  // Tonight: events starting today (all types including jams)
+  const tonightAll = events
+    .filter((e) => e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei'))
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+  const tonightEvents = tonightAll.map(serializeTonightEvent);
+
+  // This week (fallback): next 7 days excluding today
+  const thisWeekAll = events
+    .filter((e) => {
+      if (!e.fields.start_at || e.fields.start_at < oneDayLater || e.fields.start_at > sevenDaysLater) return false;
+      return true;
+    })
+    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+  const thisWeekEvents = thisWeekAll.slice(0, 12).map(serializeTonightEvent);
+
+  // Count tonight events for MobileTabBar badge (passed via data attribute)
+  const tonightCount = tonightAll.length;
+
   // Collect region codes that have actual content (for RegionExploreRow + fallback)
   const allCountryCodes = [
     ...homeEvents.map((e) => e.country_code),
     ...homeJams.map((e) => e.country_code),
     ...homeVenues.map((v) => v.country_code),
+    ...tonightEvents.map((e) => e.country_code),
   ].filter(Boolean);
   const regionCodesInUse = [...new Set(allCountryCodes)];
   const regionLabelsMap: Record<string, string> = {};
@@ -154,15 +220,15 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   }
 
   return (
-    <div className="space-y-24">
-      {/* ─── Hero + Stats ─── */}
-      <section className="pt-24 pb-16">
+    <div className="space-y-24" data-tonight-count={tonightCount}>
+      {/* ─── 1. Hero + Stats ─── */}
+      <section>
         <HeroReveal>
-          <h1 className="hero-title text-6xl sm:text-8xl lg:text-[10rem] text-[var(--foreground)]">
+          <h2 className="hero-title text-5xl sm:text-7xl lg:text-[8rem] text-[var(--foreground)]">
             <span className="hero-line block">Jazz.</span>
             <span className="hero-line block text-gold">Live.</span>
             <span className="hero-line block">Connected.</span>
-          </h1>
+          </h2>
           <p className="hero-tagline mt-8 max-w-lg text-lg text-[var(--muted-foreground)] leading-relaxed">
             {t('tagline')}
           </p>
@@ -189,33 +255,48 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </HeroReveal>
       </section>
 
-      {/* ─── Brand Manifesto ─── */}
-      <section className="manifesto-section relative">
-        <ManifestoReveal>
-          <div className="relative pl-8 sm:pl-12 max-w-2xl">
-            <div className="manifesto-accent absolute left-0 top-0 bottom-0 w-px bg-gold" />
-            <div className="space-y-5 sm:space-y-6">
-              <p className="manifesto-line font-serif text-lg sm:text-xl leading-relaxed text-[var(--foreground)]">
-                {t('manifestoL1')}
-              </p>
-              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
-                {t('manifestoL2')}
-              </p>
-              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
-                {t('manifestoL3')}
-              </p>
-              <p className="manifesto-line font-serif text-base sm:text-lg leading-relaxed text-[var(--foreground)]">
-                {t('manifestoL4')}
-              </p>
-            </div>
-            <p className="manifesto-attr mt-10 text-xs uppercase tracking-[0.3em] text-gold">
-              ── JazzNode
-            </p>
-          </div>
-        </ManifestoReveal>
-      </section>
+      {/* ─── 2. Region Explore Row (World Map) ─── */}
+      <RegionExploreRow
+        regionCodes={regionCodesInUse}
+        regionLabels={regionLabelsMap}
+        worldMapLabel={tRegions('worldMap')}
+      />
 
-      {/* ─── Magazine Carousel (Featured Stories) ─── */}
+      {/* ─── 3. 🔥 Today's Jazz ─── */}
+      <TonightSection
+        locale={locale}
+        tonightEvents={tonightEvents}
+        thisWeekEvents={thisWeekEvents}
+        labels={{
+          tonightEvents: t('tonightEvents'),
+          tonightEmpty: t('tonightEmpty'),
+          thisWeek: t('thisWeek'),
+          viewAll: t('viewAll'),
+          live: t('live'),
+          addToCalendar: t('addToCalendar'),
+          share: t('share'),
+        }}
+      />
+
+      {/* ─── 4-6. Jams → Events → Venues ─── */}
+      <HomeEventsSection
+        locale={locale}
+        events={homeEvents}
+        jams={homeJams}
+        venues={homeVenues}
+        labels={{
+          upcomingEvents: t('upcomingEvents'),
+          weeklyJam: t('weeklyJam'),
+          featuredVenues: t('featuredVenues'),
+          viewAll: t('viewAll'),
+          noEvents: t('noEvents'),
+          jazzNightly: t('jazzNightly'),
+          jazzWeekends: t('jazzWeekends'),
+          jazzOccasional: t('jazzOccasional'),
+        }}
+      />
+
+      {/* ─── 7. Magazine Carousel ─── */}
       {featuredArticles.length > 0 && (
         <FadeUp>
           <MagazineCarousel
@@ -244,30 +325,31 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         </FadeUp>
       )}
 
-      {/* ─── Region Explore Row ─── */}
-      <RegionExploreRow
-        regionCodes={regionCodesInUse}
-        regionLabels={regionLabelsMap}
-        worldMapLabel={tRegions('worldMap')}
-      />
-
-      {/* ─── Filterable Content (Events + Jams + Venues) ─── */}
-      <HomeEventsSection
-        locale={locale}
-        events={homeEvents}
-        jams={homeJams}
-        venues={homeVenues}
-        labels={{
-          upcomingEvents: t('upcomingEvents'),
-          weeklyJam: t('weeklyJam'),
-          featuredVenues: t('featuredVenues'),
-          viewAll: t('viewAll'),
-          noEvents: t('noEvents'),
-          jazzNightly: t('jazzNightly'),
-          jazzWeekends: t('jazzWeekends'),
-          jazzOccasional: t('jazzOccasional'),
-        }}
-      />
+      {/* ─── Brand Manifesto (bottom — returning visitors scroll past) ─── */}
+      <section className="manifesto-section relative">
+        <ManifestoReveal>
+          <div className="relative pl-8 sm:pl-12 max-w-2xl">
+            <div className="manifesto-accent absolute left-0 top-0 bottom-0 w-px bg-gold" />
+            <div className="space-y-5 sm:space-y-6">
+              <p className="manifesto-line font-serif text-lg sm:text-xl leading-relaxed text-[var(--foreground)]">
+                {t('manifestoL1')}
+              </p>
+              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
+                {t('manifestoL2')}
+              </p>
+              <p className="manifesto-line text-sm sm:text-base leading-relaxed text-[var(--muted-foreground)]">
+                {t('manifestoL3')}
+              </p>
+              <p className="manifesto-line font-serif text-base sm:text-lg leading-relaxed text-[var(--foreground)]">
+                {t('manifestoL4')}
+              </p>
+            </div>
+            <p className="manifesto-attr mt-10 text-xs uppercase tracking-[0.3em] text-gold">
+              ── JazzNode
+            </p>
+          </div>
+        </ManifestoReveal>
+      </section>
     </div>
   );
 }
