@@ -404,6 +404,7 @@ export default function Header() {
             ? 'bg-[var(--background)]/80 backdrop-blur-xl border-b border-[rgba(var(--theme-glow-rgb),0.12)] shadow-[0_1px_20px_rgba(0,0,0,0.3)]'
             : 'bg-[var(--background)]/40 backdrop-blur-md border-b border-transparent'
         }`}
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
       >
         <div className="mx-auto flex h-14 sm:h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
           <Link href={`/${locale}`} className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-[var(--color-gold)] group-hover:text-[var(--color-gold-bright)] transition-colors link-lift">
