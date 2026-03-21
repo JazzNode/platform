@@ -76,7 +76,6 @@ export default function RegionProvider({ children, availableRegions }: RegionPro
 
     // eslint-disable-next-line react-hooks/set-state-in-effect -- hydration-safe init from browser APIs (localStorage/cookies)
     setRegionState(resolved);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
   }, [profile, available]);
 

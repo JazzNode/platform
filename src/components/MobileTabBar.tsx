@@ -81,6 +81,7 @@ export default function MobileTabBar() {
     const el = document.querySelector('[data-tonight-count]');
     if (el) {
       const count = parseInt(el.getAttribute('data-tonight-count') || '0', 10);
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reading from external DOM attribute
       setTonightCount(count);
     }
   }, [pathname]);

@@ -29,6 +29,7 @@ export default function PushNotificationToggle({ label }: { label?: string }) {
 
   useEffect(() => {
     if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- syncing from browser Notification API
       setPermission('unsupported');
       return;
     }
