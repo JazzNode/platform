@@ -126,7 +126,7 @@ export default function AdminClaimsPage() {
     <div className="max-w-3xl mx-auto space-y-8">
       <div>
         <h1 className="font-serif text-3xl font-bold">{t('adminTitle')}</h1>
-        <p className="text-sm text-[#8A8578] mt-1">{t('adminDescription')}</p>
+        <p className="text-sm text-[var(--muted-foreground)] mt-1">{t('adminDescription')}</p>
       </div>
 
       {/* Tabs */}
@@ -138,7 +138,7 @@ export default function AdminClaimsPage() {
             className={`px-4 py-2 text-sm font-medium tracking-wide transition-colors relative ${
               tab === f
                 ? 'text-gold'
-                : 'text-[#8A8578] hover:text-[var(--foreground)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
             }`}
           >
             {f === 'pending' ? t('statusPending') : f === 'approved' ? t('statusApproved') : f === 'rejected' ? t('statusRejected') : f === 'withdrawn' ? t('statusWithdrawn') : f === 'revoked' ? t('statusRevoked') : t('statusAll')}
@@ -156,9 +156,9 @@ export default function AdminClaimsPage() {
 
       {/* Claims list */}
       {loading ? (
-        <div className="text-center py-12 text-[#8A8578]">Loading...</div>
+        <div className="text-center py-12 text-[var(--muted-foreground)]">Loading...</div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-12 text-[#8A8578]">{t('noClaims')}</div>
+        <div className="text-center py-12 text-[var(--muted-foreground)]">{t('noClaims')}</div>
       ) : (
         <div className="space-y-4">
           {filtered.map((claim) => (
@@ -177,7 +177,7 @@ export default function AdminClaimsPage() {
                       className="w-10 h-10 rounded-full object-cover border border-[var(--border)]"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-full bg-[var(--background)] border border-[var(--border)] flex items-center justify-center text-sm text-[#8A8578]">
+                    <div className="w-10 h-10 rounded-full bg-[var(--background)] border border-[var(--border)] flex items-center justify-center text-sm text-[var(--muted-foreground)]">
                       ?
                     </div>
                   )}
@@ -186,7 +186,7 @@ export default function AdminClaimsPage() {
                       {claim.user_profile?.display_name || claim.user_profile?.username || 'Unknown'}
                     </p>
                     {claim.user_profile?.username && (
-                      <p className="text-xs text-[#8A8578]">@{claim.user_profile.username}</p>
+                      <p className="text-xs text-[var(--muted-foreground)]">@{claim.user_profile.username}</p>
                     )}
                   </div>
                 </div>
@@ -205,26 +205,26 @@ export default function AdminClaimsPage() {
 
               {/* Target */}
               <div className="text-sm">
-                <span className="text-[#8A8578]">{t('claimTarget')}: </span>
+                <span className="text-[var(--muted-foreground)]">{t('claimTarget')}: </span>
                 <Link
                   href={`/${claim.target_type === 'artist' ? 'artists' : 'venues'}/${claim.target_id}`}
                   className="text-gold hover:underline"
                 >
                   {claim.target_id}
                 </Link>
-                <span className="text-[#6A6560] ml-2">({claim.target_type})</span>
+                <span className="text-[var(--muted-foreground)] ml-2">({claim.target_type})</span>
               </div>
 
               {/* Evidence */}
               {claim.evidence_text && (
                 <div className="text-sm bg-[var(--background)] rounded-xl p-4 border border-[var(--border)]">
-                  <p className="text-xs uppercase tracking-widest text-[#8A8578] mb-2">{t('claimEvidence')}</p>
+                  <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">{t('claimEvidence')}</p>
                   <p className="text-[#C4BFB3] whitespace-pre-line">{claim.evidence_text}</p>
                 </div>
               )}
 
               {/* Timestamps */}
-              <div className="text-xs text-[#6A6560]">
+              <div className="text-xs text-[var(--muted-foreground)]">
                 {t('submittedAt')}: {new Date(claim.submitted_at).toLocaleString()}
                 {claim.reviewed_at && (
                   <span className="ml-4">{t('reviewedAt')}: {new Date(claim.reviewed_at).toLocaleString()}</span>
@@ -247,7 +247,7 @@ export default function AdminClaimsPage() {
                         value={revokeReason}
                         onChange={(e) => setRevokeReason(e.target.value)}
                         placeholder={t('revokeReasonPlaceholder')}
-                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-orange-400/50 resize-none"
+                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-orange-400/50 resize-none"
                       />
                       <div className="flex gap-2">
                         <button
@@ -259,7 +259,7 @@ export default function AdminClaimsPage() {
                         </button>
                         <button
                           onClick={() => { setRevokingId(null); setRevokeReason(''); }}
-                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8A8578] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
                         >
                           {t('cancelAction')}
                         </button>
@@ -286,7 +286,7 @@ export default function AdminClaimsPage() {
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder={t('rejectionReasonPlaceholder')}
-                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[#6A6560] focus:outline-none focus:border-red-400/50 resize-none"
+                        className="w-full h-20 px-3 py-2 bg-[var(--background)] border border-[var(--border)] rounded-xl text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)] focus:outline-none focus:border-red-400/50 resize-none"
                       />
                       <div className="flex gap-2">
                         <button
@@ -298,7 +298,7 @@ export default function AdminClaimsPage() {
                         </button>
                         <button
                           onClick={() => { setRejectingId(null); setRejectReason(''); }}
-                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8A8578] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
+                          className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
                         >
                           {t('cancelAction')}
                         </button>
@@ -309,7 +309,7 @@ export default function AdminClaimsPage() {
                       <button
                         onClick={() => handleAction(claim.claim_id, 'approve')}
                         disabled={actionLoading === claim.claim_id}
-                        className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-gold text-[#0A0A0A] hover:bg-[#E8C868] transition-colors disabled:opacity-40"
+                        className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest bg-gold text-[#0A0A0A] hover:bg-gold-bright transition-colors disabled:opacity-40"
                       >
                         {actionLoading === claim.claim_id ? '...' : t('approve')}
                       </button>

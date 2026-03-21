@@ -18,7 +18,7 @@ function StarDisplay({ rating }: { rating: number }) {
           fill={rating >= star ? 'currentColor' : 'none'}
           stroke="currentColor"
           strokeWidth="1.5"
-          className={rating >= star ? 'text-gold' : 'text-[#6A6560]/40'}
+          className={rating >= star ? 'text-gold' : 'text-[var(--muted-foreground)]/40'}
         >
           <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
         </svg>
@@ -48,7 +48,7 @@ function RelativeTime({ dateStr, locale }: { dateStr: string; locale: string }) 
     label = locale === 'zh' ? `${months} 個月前` : locale === 'ja' ? `${months}ヶ月前` : `${months}mo ago`;
   }
 
-  return <span className="text-xs text-[#6A6560]">{label}</span>;
+  return <span className="text-xs text-[var(--muted-foreground)]">{label}</span>;
 }
 
 export default function VenueReviewList() {
@@ -59,7 +59,7 @@ export default function VenueReviewList() {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 py-8 text-sm text-[#6A6560]">
+      <div className="flex items-center gap-2 py-8 text-sm text-[var(--muted-foreground)]">
         <div className="w-4 h-4 border-2 border-gold/30 border-t-gold rounded-full animate-spin" />
       </div>
     );
@@ -87,7 +87,7 @@ export default function VenueReviewList() {
             <div className="flex items-center gap-2.5">
               {review.is_anonymous || !review.profile?.avatar_url ? (
                 <div className="w-7 h-7 rounded-full bg-[var(--border)] flex items-center justify-center shrink-0">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[#6A6560]">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-[var(--muted-foreground)]">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                     <circle cx="12" cy="7" r="4" />
                   </svg>

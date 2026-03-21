@@ -22,15 +22,15 @@ export default function CollapsibleSection({ title, count, countLabel, children,
         className="flex items-center gap-3 w-full text-left group py-2"
       >
         <span
-          className="text-[#8A8578] transition-transform duration-300 text-sm"
+          className="text-[var(--muted-foreground)] transition-transform duration-300 text-sm"
           style={{ transform: open ? 'rotate(90deg)' : 'rotate(0deg)' }}
         >
           ▸
         </span>
-        <span className="text-[#8A8578] group-hover:text-[var(--color-gold)] transition-colors text-sm font-medium">
+        <span className="text-[var(--muted-foreground)] group-hover:text-[var(--color-gold)] transition-colors text-sm font-medium">
           {title}
         </span>
-        <span className="text-xs text-[#8A8578]/60">
+        <span className="text-xs text-[var(--muted-foreground)]/60">
           ({count} {countLabel})
         </span>
       </button>

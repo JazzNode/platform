@@ -13,7 +13,7 @@ const tabs = [
 ] as const;
 
 function TabIcon({ tab, active }: { tab: string; active: boolean }) {
-  const stroke = active ? 'var(--color-gold)' : 'var(--muted-foreground, #6A6560)';
+  const stroke = active ? 'var(--color-gold)' : 'var(--muted-foreground)';
   const props = { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke, strokeWidth: 1.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
   switch (tab) {
@@ -126,7 +126,7 @@ export default function MobileTabBar() {
                 <TabIcon tab={key} active={active} />
                 <span
                   className={`text-[10px] tracking-wider transition-colors duration-300 ${
-                    active ? 'text-gold font-medium' : 'text-[var(--muted-foreground,#6A6560)]'
+                    active ? 'text-gold font-medium' : 'text-[var(--muted-foreground)]'
                   }`}
                 >
                   {t(key)}

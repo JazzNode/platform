@@ -197,7 +197,7 @@ export default function EditableName({
           ref={menuRef}
           className="absolute top-full left-0 mt-2 z-50 bg-[#1A1A1A] border border-[var(--color-gold)]/30 rounded-xl shadow-lg shadow-black/40 overflow-hidden min-w-[220px]"
         >
-          <p className="text-[10px] uppercase tracking-widest text-[#8A8578] px-3 pt-3 pb-1">選擇要編輯的欄位</p>
+          <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] px-3 pt-3 pb-1">選擇要編輯的欄位</p>
           {fieldOptions.map((option) => (
             <button
               key={option.field}
@@ -206,11 +206,11 @@ export default function EditableName({
             >
               <div>
                 <span className="text-sm font-mono text-[var(--color-gold)]">{option.label}</span>
-                <p className="text-xs text-[#8A8578] mt-0.5 truncate max-w-[200px]">
+                <p className="text-xs text-[var(--muted-foreground)] mt-0.5 truncate max-w-[200px]">
                   {option.value || '(empty)'}
                 </p>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8A8578] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)] shrink-0">
                 <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                 <path d="m15 5 4 4" />
               </svg>

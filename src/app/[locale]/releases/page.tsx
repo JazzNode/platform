@@ -1,6 +1,12 @@
 import type { Metadata } from 'next';
 import type { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
-import { fetchReleasesBlocks, richTextToHtml, richTextToPlain } from '@/lib/notion';
+import {
+  fetchReleasesBlocks,
+  groupBlocksByVersion,
+  richTextToHtml,
+  richTextToPlain,
+  type NotionBlockWithChildren,
+} from '@/lib/notion';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 
@@ -14,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /* ─── Notion block → React ─── */
-function NotionBlock({ block }: { block: BlockObjectResponse & { children?: BlockObjectResponse[] } }) {
+function NotionBlock({ block }: { block: NotionBlockWithChildren }) {
   switch (block.type) {
     case 'heading_1':
       return (
@@ -155,12 +161,61 @@ function NotionBlock({ block }: { block: BlockObjectResponse & { children?: Bloc
   }
 }
 
+/* ─── Version group section ─── */
+function VersionSection({
+  version,
+  blocks,
+  defaultOpen,
+}: {
+  version: string;
+  blocks: NotionBlockWithChildren[];
+  defaultOpen?: boolean;
+}) {
+  if (!version) {
+    return (
+      <div className="notion-content mb-8">
+        {blocks.map((block) => (
+          <NotionBlock key={block.id} block={block} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <details open={defaultOpen} className="group mb-6">
+      <summary className="cursor-pointer select-none flex items-center gap-3 py-3">
+        <span className="text-3xl sm:text-4xl font-bold text-[var(--foreground)]">{version}</span>
+        <span className="text-xs text-[var(--muted-foreground)] opacity-60">
+          ({blocks.length} items)
+        </span>
+        <svg
+          className="w-5 h-5 text-[var(--muted-foreground)] transition-transform group-open:rotate-90 ml-auto"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="9 18 15 12 9 6" />
+        </svg>
+      </summary>
+      <div className="notion-content pt-2 pb-4 border-l-2 border-[var(--border)] ml-2 pl-6">
+        {blocks.map((block) => (
+          <NotionBlock key={block.id} block={block} />
+        ))}
+      </div>
+    </details>
+  );
+}
+
 export default async function ReleasesPage() {
-  let blocks: (BlockObjectResponse & { children?: BlockObjectResponse[] })[] = [];
+  let groups: { version: string; blocks: NotionBlockWithChildren[] }[] = [];
   let error = false;
 
   try {
-    blocks = await fetchReleasesBlocks();
+    const blocks = await fetchReleasesBlocks();
+    groups = groupBlocksByVersion(blocks);
   } catch {
     error = true;
   }
@@ -184,14 +239,19 @@ export default async function ReleasesPage() {
             <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center">
               <p className="text-zinc-400">Unable to load release notes. Please try again later.</p>
             </div>
-          ) : blocks.length === 0 ? (
+          ) : groups.length === 0 ? (
             <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-8 text-center">
               <p className="text-zinc-400">No release notes yet. Stay tuned!</p>
             </div>
           ) : (
-            <div className="notion-content">
-              {blocks.map((block) => (
-                <NotionBlock key={block.id} block={block} />
+            <div>
+              {groups.map((group, i) => (
+                <VersionSection
+                  key={group.version || `ungrouped-${i}`}
+                  version={group.version}
+                  blocks={group.blocks}
+                  defaultOpen={i === 0}
+                />
               ))}
             </div>
           )}

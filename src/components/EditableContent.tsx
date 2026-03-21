@@ -151,7 +151,7 @@ export default function EditableContent({
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           rows={10}
-          className="w-full rounded-xl bg-[var(--card)] border border-[var(--border)] p-4 text-sm text-[#F0EDE6] focus:border-[var(--color-gold)]/50 focus:ring-1 focus:ring-[var(--color-gold)]/30 outline-none resize-y font-sans leading-relaxed"
+          className="w-full rounded-xl bg-[var(--card)] border border-[var(--border)] p-4 text-sm text-[var(--foreground)] focus:border-[var(--color-gold)]/50 focus:ring-1 focus:ring-[var(--color-gold)]/30 outline-none resize-y font-sans leading-relaxed"
           disabled={saving}
           placeholder={t('enterContent')}
         />
@@ -179,7 +179,7 @@ export default function EditableContent({
               setWarning(null);
             }}
             disabled={saving}
-            className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm text-[#8A8578] disabled:opacity-50 hover:text-[#F0EDE6] transition-colors"
+            className="px-4 py-2 rounded-lg border border-[var(--border)] text-sm text-[var(--muted-foreground)] disabled:opacity-50 hover:text-[var(--foreground)] transition-colors"
           >
             {t('cancel')}
           </button>

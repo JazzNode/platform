@@ -77,7 +77,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowWithdrawConfirm(false)}>
             <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 max-w-sm mx-4 space-y-4" onClick={(e) => e.stopPropagation()}>
               <h3 className="font-serif text-lg font-bold">{t('withdrawConfirm')}</h3>
-              <p className="text-sm text-[#8A8578]">{t('withdrawConfirmDetail')}</p>
+              <p className="text-sm text-[var(--muted-foreground)]">{t('withdrawConfirmDetail')}</p>
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleWithdraw}
@@ -88,7 +88,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
                 </button>
                 <button
                   onClick={() => setShowWithdrawConfirm(false)}
-                  className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[#8A8578] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
+                  className="px-5 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-[var(--muted-foreground)] border border-[var(--border)] hover:text-[var(--foreground)] transition-colors"
                 >
                   {t('cancelAction')}
                 </button>
@@ -115,7 +115,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     return (
       <>
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-[#8A8578] border border-[var(--border)]">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-[var(--muted-foreground)] border border-[var(--border)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
@@ -123,7 +123,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
           </span>
           <button
             onClick={handleAlsoClaim}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -197,7 +197,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     <>
       <button
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30"
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />

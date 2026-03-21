@@ -62,7 +62,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
             </svg>
           ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#6A6560] group-hover/fav:text-gold transition-colors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)] group-hover/fav:text-gold transition-colors">
               <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
             </svg>
           )}
@@ -78,7 +78,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
       className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
-          : 'border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30'
+          : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'
       }`}
       style={animating ? { animation: 'fav-btn-pop 0.4s ease-out' } : undefined}
     >

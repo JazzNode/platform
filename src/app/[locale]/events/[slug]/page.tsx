@@ -181,7 +181,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Back link */}
-      <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[#8A8578] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
@@ -224,7 +224,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                     { field: 'title_local', label: 'title_local', value: f.title_local || '' },
                     { field: 'title_en', label: 'title_en', value: f.title_en || '' },
                   ]}
-                  className="text-xl text-[#8A8578]"
+                  className="text-xl text-[var(--muted-foreground)]"
                   tag="p"
                 />
               )}
@@ -234,7 +234,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Primary artist */}
           {primaryArtist && (
-            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[#8A8578] hover:text-gold transition-colors link-lift">
+            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
               <span className="text-gold">♪</span> {artistDisplayName(primaryArtist.fields, locale)}
               {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' && (
                 <span className="text-sm capitalize">· {primaryArtist.fields.type}</span>
@@ -244,7 +244,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Price badge */}
           {f.price_info && (
-            <span className="inline-block text-sm text-[#F0EDE6] bg-[#1A1A1A] px-4 py-2 rounded-xl border border-[var(--border)] ml-4">
+            <span className="inline-block text-sm text-[var(--foreground)] bg-[var(--card)] px-4 py-2 rounded-xl border border-[var(--border)] ml-4">
               {formatPriceBadge(venue?.fields.currency, f.price_info)}
             </span>
           )}
@@ -254,32 +254,32 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             {/* City */}
             {venue && deriveCity(venue.fields.address_local || venue.fields.address_en) && (
               <div className="flex gap-3">
-                <span className="text-[#8A8578] w-20 shrink-0">{t('eventCity')}</span>
-                <span className="text-[#F0EDE6]">{deriveCity(venue.fields.address_local || venue.fields.address_en)}</span>
+                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventCity')}</span>
+                <span className="text-[var(--foreground)]">{deriveCity(venue.fields.address_local || venue.fields.address_en)}</span>
               </div>
             )}
             <div className="flex gap-3">
-              <span className="text-[#8A8578] w-20 shrink-0">{t('eventDate')}</span>
-              <span className="text-[#F0EDE6]">{formatDate(f.start_at, locale, tz)}</span>
+              <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventDate')}</span>
+              <span className="text-[var(--foreground)]">{formatDate(f.start_at, locale, tz)}</span>
             </div>
             <div className="flex gap-3">
-              <span className="text-[#8A8578] w-20 shrink-0">{t('eventTime')}</span>
-              <span className="text-[#F0EDE6]">
+              <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventTime')}</span>
+              <span className="text-[var(--foreground)]">
                 {formatTime(f.start_at, tz)}
                 {f.end_at && ` — ${formatTime(f.end_at, tz)}`}
               </span>
             </div>
             {venue && (
               <div className="flex gap-3">
-                <span className="text-[#8A8578] w-20 shrink-0">{t('eventVenue')}</span>
-                <Link href={`/${locale}/venues/${venue.id}`} className="text-gold hover:text-[#E8C868] transition-colors link-lift">
+                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventVenue')}</span>
+                <Link href={`/${locale}/venues/${venue.id}`} className="text-gold hover:text-gold-bright transition-colors link-lift">
                   {displayName(venue.fields)}
                 </Link>
               </div>
             )}
             {(venue?.fields.address_local || venue?.fields.address_en) && (
               <div className="flex gap-3">
-                <span className="text-[#8A8578] w-20 shrink-0">{t('eventAddress')}</span>
+                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventAddress')}</span>
                 <span className="text-[#C4BFB3]">{venue.fields.address_local || venue.fields.address_en}</span>
               </div>
             )}
@@ -342,7 +342,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                           : instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}
                       </p>
                       {bioShort && (
-                        <p className="text-xs text-[#8A8578] mt-3 leading-relaxed line-clamp-3">
+                        <p className="text-xs text-[var(--muted-foreground)] mt-3 leading-relaxed line-clamp-3">
                           {bioShort}
                         </p>
                       )}
@@ -405,7 +405,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                       {eventTitle(related.fields, locale)}
                     </h3>
                     {rVenue && (
-                      <p className="text-xs text-[#8A8578] mt-2">↗ {displayName(rVenue.fields)}</p>
+                      <p className="text-xs text-[var(--muted-foreground)] mt-2">↗ {displayName(rVenue.fields)}</p>
                     )}
                   </Link>
                 );

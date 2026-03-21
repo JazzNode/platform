@@ -142,7 +142,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   if (!artist) {
     return (
       <div className="py-24 text-center">
-        <p className="text-[#8A8578]">Artist not found.</p>
+        <p className="text-[var(--muted-foreground)]">Artist not found.</p>
       </div>
     );
   }

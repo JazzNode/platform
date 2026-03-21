@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
 import { useAdmin } from '@/components/AdminProvider';
+import FadeUp from '@/components/animations/FadeUp';
 
 interface Stats {
   counts: {
@@ -35,14 +36,22 @@ interface Stats {
   }[];
 }
 
-function StatCard({ label, value, icon, href }: { label: string; value: number; icon: React.ReactNode; href?: string }) {
+function StatCard({ label, value, icon, href, highlight }: { label: string; value: number; icon: React.ReactNode; href?: string; highlight?: boolean }) {
   const content = (
-    <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 hover:border-[var(--color-gold)]/30 transition-colors">
-      <div className="flex items-center justify-between mb-3">
+    <div
+      className={`rounded-2xl border p-4 sm:p-5 hover:border-[var(--color-gold)]/30 transition-colors ${
+        highlight
+          ? 'bg-gradient-to-br from-[var(--color-gold)]/8 to-[var(--color-gold)]/3 border-[var(--color-gold)]/20'
+          : 'bg-[var(--card)] border-[var(--border)]'
+      }`}
+    >
+      <div className="flex items-center gap-2 mb-2">
         <span className="text-[var(--muted-foreground)]">{icon}</span>
+        <p className="text-xs uppercase tracking-widest text-[var(--muted-foreground)]">{label}</p>
       </div>
-      <p className="text-2xl font-bold font-serif text-[var(--foreground)]">{value.toLocaleString()}</p>
-      <p className="text-xs text-[var(--muted-foreground)] mt-1 uppercase tracking-widest">{label}</p>
+      <p className={`text-2xl sm:text-3xl font-bold ${highlight ? 'text-[var(--color-gold)]' : ''}`}>
+        {value.toLocaleString()}
+      </p>
     </div>
   );
 
@@ -103,18 +112,22 @@ export default function AdminDashboardPage() {
   const { counts } = stats;
 
   return (
-    <div className="space-y-8 pb-16">
+    <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="font-serif text-3xl font-bold">{t('dashboardTitle')}</h1>
-        <p className="text-sm text-[var(--muted-foreground)] mt-1">{t('dashboardDescription')}</p>
-      </div>
+      <FadeUp>
+        <div>
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('dashboardTitle')}</h1>
+          <p className="text-sm text-[var(--muted-foreground)] mt-1">{t('dashboardDescription')}</p>
+        </div>
+      </FadeUp>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <FadeUp>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label={t('statArtists')}
           value={counts.artists}
+          highlight
           icon={
             <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
@@ -149,9 +162,11 @@ export default function AdminDashboardPage() {
           }
         />
       </div>
+      </FadeUp>
 
       {/* Secondary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <FadeUp>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label={t('statUsers')}
           value={counts.users}
@@ -190,8 +205,10 @@ export default function AdminDashboardPage() {
           }
         />
       </div>
+      </FadeUp>
 
       {/* Recent Claims */}
+      <FadeUp>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-serif text-xl font-bold">{t('recentClaims')}</h2>
@@ -230,9 +247,11 @@ export default function AdminDashboardPage() {
           </div>
         )}
       </div>
+      </FadeUp>
 
       {/* Recent Audit Logs */}
       {stats.recentAuditLogs.length > 0 && (
+        <FadeUp>
         <div className="space-y-4">
           <h2 className="font-serif text-xl font-bold">{t('recentActivity')}</h2>
           <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl divide-y divide-[var(--border)]">
@@ -252,6 +271,7 @@ export default function AdminDashboardPage() {
             ))}
           </div>
         </div>
+        </FadeUp>
       )}
     </div>
   );

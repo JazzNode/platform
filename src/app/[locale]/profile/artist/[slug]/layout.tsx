@@ -110,6 +110,7 @@ export default function ArtistDashboardLayout({
   const [slug, setSlug] = useState('');
   const [artist, setArtist] = useState<ArtistBasic | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   // Resolve params
   useEffect(() => {
@@ -142,6 +143,22 @@ export default function ArtistDashboardLayout({
         if (data) setArtist(data);
       });
   }, [slug]);
+
+  // Fetch unread count for inbox badge
+  useEffect(() => {
+    if (!user || !slug) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/inbox/unread-count');
+        const data = await res.json();
+        if (!cancelled) {
+          setUnreadCount(data.breakdown?.[`artist:${slug}`] || 0);
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [user, slug]);
 
   if (loading || !slug || !artist) {
     return (
@@ -209,6 +226,11 @@ export default function ArtistDashboardLayout({
                 >
                   <NavIcon icon={item.icon} />
                   <span>{t(item.key)}</span>
+                  {item.key === 'inbox' && unreadCount > 0 && (
+                    <span className="ml-auto bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                      {unreadCount > 99 ? '99+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -258,6 +280,11 @@ export default function ArtistDashboardLayout({
                 >
                   <NavIcon icon={item.icon} className="w-3.5 h-3.5" />
                   <span>{t(item.key)}</span>
+                  {item.key === 'inbox' && unreadCount > 0 && (
+                    <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

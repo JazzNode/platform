@@ -150,7 +150,8 @@ export default function AdminInboxPage() {
       if (!cancelled) setLoadingNotifs(false);
     })();
 
-    // Realtime: listen for new admin notifications
+    // Realtime: listen for new HQ admin notifications only
+    const HQ_TYPES = ['new_member', 'system'];
     const supabase = createClient();
     const channel = supabase
       .channel('admin-notifications')
@@ -163,6 +164,7 @@ export default function AdminInboxPage() {
         },
         (payload) => {
           const n = payload.new as Notification;
+          if (!HQ_TYPES.includes(n.type)) return;
           setNotifications((prev) => [n, ...prev]);
           if (!n.read_at) setUnreadCount((prev) => prev + 1);
         },
@@ -339,37 +341,28 @@ export default function AdminInboxPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1 w-fit">
-        <button
-          onClick={() => { setTab('notifications'); setSelectedConvo(null); }}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-            tab === 'notifications'
-              ? 'bg-[var(--card)] text-[var(--foreground)]'
-              : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-          }`}
-        >
-          {t('inboxNotifications')}
-          {unreadCount > 0 && (
-            <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {unreadCount}
-            </span>
-          )}
-        </button>
-        <button
-          onClick={() => setTab('messages')}
-          className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-            tab === 'messages'
-              ? 'bg-[var(--card)] text-[var(--foreground)]'
-              : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-          }`}
-        >
-          {t('inboxMessages')}
-          {(totalMsgUnread + guestUnread) > 0 && (
-            <span className="ml-1.5 bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-              {totalMsgUnread + guestUnread}
-            </span>
-          )}
-        </button>
+      <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1">
+        {([
+          { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadCount },
+          { key: 'messages' as Tab, label: t('inboxMessages'), badge: totalMsgUnread + guestUnread },
+        ]).map(({ key, label, badge }) => (
+          <button
+            key={key}
+            onClick={() => { setTab(key); setSelectedConvo(null); setSelectedGuest(null); }}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+              tab === key
+                ? 'bg-[var(--card)] text-[var(--foreground)]'
+                : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+            }`}
+          >
+            {label}
+            {badge > 0 && (
+              <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                {badge}
+              </span>
+            )}
+          </button>
+        ))}
       </div>
 
       {/* Notifications Tab */}
@@ -399,22 +392,20 @@ export default function AdminInboxPage() {
               {notifications.map((notif) => (
                 <div
                   key={notif.id}
-                  className={`px-5 py-4 transition-colors cursor-pointer hover:bg-[var(--muted)]/50 ${
-                    !notif.read_at ? 'bg-[var(--color-gold)]/[0.02]' : ''
+                  className={`px-5 py-4 transition-colors ${
+                    !notif.read_at ? 'bg-[var(--color-gold)]/[0.02] cursor-pointer' : ''
                   }`}
                   onClick={() => !notif.read_at && markRead(notif.id)}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    {!notif.read_at && <span className="w-2 h-2 rounded-full bg-[var(--color-gold)] mt-1.5 shrink-0" />}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {!notif.read_at && (
-                          <span className="w-2 h-2 rounded-full bg-[var(--color-gold)] shrink-0" />
-                        )}
-                        <p className="text-sm font-semibold truncate">{notif.title}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold">{notif.title}</p>
                         <TypeBadge type={notif.type} />
                       </div>
                       {notif.body && (
-                        <p className="text-sm text-[var(--muted-foreground)] line-clamp-2">{notif.body}</p>
+                        <p className="text-sm text-[var(--muted-foreground)] mt-0.5">{notif.body}</p>
                       )}
                       <p className="text-xs text-[var(--muted-foreground)]/50 mt-1">
                         {new Date(notif.created_at).toLocaleString()}

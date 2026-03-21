@@ -97,7 +97,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
       <FadeUp>
         <div>
           <h1 className="font-serif text-4xl sm:text-5xl font-bold">{labels.cities}</h1>
-          <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
+          <p className="text-[var(--muted-foreground)] mt-2 text-sm uppercase tracking-widest">
             {filteredCities.length} {labels.citiesCount}
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
             className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
-                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
             {worldMapLabel}
@@ -125,7 +125,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
               className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                 activeRegion === code
                   ? 'bg-gold/20 border-gold text-gold'
-                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
               }`}
             >
               {regionLabels[code] || code}
@@ -156,7 +156,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
                     />
                   ))}
                   {city.venues.length > city.venuePhotos.length && (
-                    <span className="text-xs text-[#8A8578] ml-4">
+                    <span className="text-xs text-[var(--muted-foreground)] ml-4">
                       +{city.venues.length - city.venuePhotos.length}
                     </span>
                   )}
@@ -199,7 +199,7 @@ export default function CitiesClient({ cities, locale, regionLabels, worldMapLab
               {/* Top artist pills */}
               {city.topArtists.length > 0 && (
                 <div className="mb-5">
-                  <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-2">
+                  <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
                     {labels.topPerformers}
                   </p>
                   <div className="flex flex-wrap gap-1.5">

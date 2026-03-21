@@ -75,7 +75,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
           ) : (
-            <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${glass ? 'text-white/80' : 'text-[#6A6560]'} group-hover/fav:text-gold transition-colors drop-shadow-sm`}>
+            <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${glass ? 'text-white/80' : 'text-[var(--muted-foreground)]'} group-hover/fav:text-gold transition-colors drop-shadow-sm`}>
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
               <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
             </svg>
@@ -92,7 +92,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
-          : 'border border-[var(--border)] text-[#8A8578] hover:text-gold hover:border-gold/30'
+          : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'
       }`}
       style={animating ? { animation: 'fav-btn-pop 0.4s ease-out' } : undefined}
     >
@@ -124,7 +124,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
       </span>
       <span className="uppercase tracking-widest text-xs relative">{active ? t('following') : t('follow')}</span>
       {followerCount != null && followerCount > 0 && (
-        <span className="text-[10px] text-[#8A8578] tabular-nums">{followerCount}</span>
+        <span className="text-[10px] text-[var(--muted-foreground)] tabular-nums">{followerCount}</span>
       )}
     </button>
   );

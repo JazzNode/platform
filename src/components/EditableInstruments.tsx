@@ -121,7 +121,7 @@ export default function EditableInstruments({
 
         {/* Primary instrument */}
         <div>
-          <label className="text-xs text-[#8A8578] font-mono block mb-1">Primary Instrument</label>
+          <label className="text-xs text-[var(--muted-foreground)] font-mono block mb-1">Primary Instrument</label>
           <select
             value={draftPrimary}
             onChange={(e) => {
@@ -131,7 +131,7 @@ export default function EditableInstruments({
                 setDraftList((prev) => [e.target.value, ...prev]);
               }
             }}
-            className="w-full bg-[#0A0A0A] text-sm text-[#F0EDE6] border border-[#8A8578]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-2 [&>option]:bg-[#0A0A0A] [&>option]:text-[#F0EDE6]"
+            className="w-full bg-[var(--background)] text-sm text-[var(--foreground)] border border-[var(--muted-foreground)]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-2 [&>option]:bg-[var(--background)] [&>option]:text-[var(--foreground)]"
             disabled={saving}
           >
             <option value="">(none)</option>
@@ -143,13 +143,13 @@ export default function EditableInstruments({
 
         {/* Instrument list */}
         <div>
-          <label className="text-xs text-[#8A8578] font-mono block mb-1">Instrument List</label>
+          <label className="text-xs text-[var(--muted-foreground)] font-mono block mb-1">Instrument List</label>
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜尋樂器..."
-            className="w-full bg-[#0A0A0A] text-sm text-[#F0EDE6] border border-[#8A8578]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-1.5 mb-2 placeholder:text-[#8A8578]/40"
+            className="w-full bg-[var(--background)] text-sm text-[var(--foreground)] border border-[var(--muted-foreground)]/30 focus:border-[var(--color-gold)] outline-none rounded-lg px-3 py-1.5 mb-2 placeholder:text-[var(--muted-foreground)]/40"
             disabled={saving}
           />
           <div className="flex flex-wrap gap-1.5 max-h-40 overflow-y-auto">
@@ -163,7 +163,7 @@ export default function EditableInstruments({
                   className={`text-xs px-2.5 py-1 rounded-lg border transition-colors ${
                     selected
                       ? 'border-[var(--color-gold)] bg-[var(--color-gold)]/20 text-[var(--color-gold)]'
-                      : 'border-[#8A8578]/20 text-[#8A8578] hover:border-[#8A8578]/50 hover:text-[#C4BFB3]'
+                      : 'border-[var(--muted-foreground)]/20 text-[var(--muted-foreground)] hover:border-[var(--muted-foreground)]/50 hover:text-[#C4BFB3]'
                   }`}
                 >
                   {instLabel(k)}
@@ -191,7 +191,7 @@ export default function EditableInstruments({
               setSearch('');
             }}
             disabled={saving}
-            className="text-xs px-3 py-1.5 rounded-lg border border-[#8A8578]/30 text-[#8A8578] hover:text-[#F0EDE6] hover:border-[#F0EDE6]/30"
+            className="text-xs px-3 py-1.5 rounded-lg border border-[var(--muted-foreground)]/30 text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--foreground)]/30"
           >
             取消
           </button>

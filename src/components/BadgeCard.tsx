@@ -191,7 +191,7 @@ export default function BadgeCard({ badge }: { badge: BadgeProgress }) {
   return (
     <div className={`relative rounded-2xl border p-4 transition-all ${
       earned
-        ? 'border-[var(--color-gold)]/40 bg-[var(--color-gold)]/[0.04] shadow-[0_0_20px_rgba(200,168,78,0.08)]'
+        ? 'border-[var(--color-gold)]/40 bg-[var(--color-gold)]/[0.04] shadow-[0_0_20px_rgba(var(--theme-glow-rgb),0.08)]'
         : 'border-[var(--border)] bg-[var(--card)]'
     }`}>
       {/* Badge content */}

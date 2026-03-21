@@ -259,13 +259,13 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             <h1 className="font-serif text-4xl sm:text-5xl font-bold">
               {showPast ? labels.pastEvents : labels.events}
             </h1>
-            <p className="text-[#8A8578] mt-2 text-sm uppercase tracking-widest">
+            <p className="text-[var(--muted-foreground)] mt-2 text-sm uppercase tracking-widest">
               {filteredEvents.length} {showPast ? labels.pastCount : labels.upcomingCount}
             </p>
           </div>
           <Link
             href={`/${locale}/events${showPast ? '' : '?view=past'}`}
-            className="text-sm uppercase tracking-widest text-gold hover:text-[#E8C868] transition-colors link-lift"
+            className="text-sm uppercase tracking-widest text-gold hover:text-gold-bright transition-colors link-lift"
           >
             {labels.toggleLink}
           </Link>
@@ -283,7 +283,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
             className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
               !activeRegion
                 ? 'bg-gold/20 border-gold text-gold'
-                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
             }`}
           >
             {worldMapLabel}
@@ -314,7 +314,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                   className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
                     isActive
                       ? 'bg-gold/20 border-gold text-gold'
-                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[#8A8578] hover:border-[rgba(240,237,230,0.3)]'
+                      : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
                   }`}
                 >
                   {regionLabels[code] || code}
@@ -335,7 +335,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                         className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                           selectedCity === city.recordId
                             ? 'bg-gold/15 border-gold/70 text-gold'
-                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[#8A8578]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[#8A8578]'
+                            : 'bg-transparent border-[rgba(240,237,230,0.08)] text-[var(--muted-foreground)]/80 hover:border-[rgba(240,237,230,0.25)] hover:text-[var(--muted-foreground)]'
                         }`}
                       >
                         {city.label}
@@ -358,7 +358,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedVenues.size === 0
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
               }`}
             >
               {labels.allVenues}
@@ -370,7 +370,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                 className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                   selectedVenues.has(venue.recordId)
                     ? 'bg-gold/10 border-gold/60 text-gold'
-                    : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                    : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
                 }`}
               >
                 {venue.label}
@@ -395,7 +395,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
               className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-200 border font-serif font-light ${
                 selectedCategory === key
                   ? 'bg-gold/10 border-gold/60 text-gold'
-                  : 'bg-transparent border-[var(--border)] text-[#6A6560] hover:border-[rgba(240,237,230,0.2)]'
+                  : 'bg-transparent border-[var(--border)] text-[var(--muted-foreground)] hover:border-[rgba(var(--theme-glow-rgb),0.20)]'
               }`}
             >
               {label}
@@ -408,7 +408,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
       <div key={filterKey}>
         {filteredEvents.length === 0 && (
           <FadeUp>
-            <p className="text-[#8A8578]">{labels.noEvents}</p>
+            <p className="text-[var(--muted-foreground)]">{labels.noEvents}</p>
           </FadeUp>
         )}
 
@@ -435,7 +435,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                       <BookmarkButton itemId={event.id} />
                     </div>
                     {event.venue_name && (
-                      <p className="text-[10px] uppercase tracking-widest text-[#8A8578] mb-1">
+                      <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">
                         {event.city_record_id && cityById.get(event.city_record_id) ? `${cityById.get(event.city_record_id)} · ` : ''}{event.venue_name}
                       </p>
                     )}
@@ -446,7 +446,7 @@ export default function EventsClient({ events, cities, venues, locale, showPast,
                       {event.title}
                     </h3>
                     {event.sidemen.length > 0 && (
-                      <p className="text-xs text-[#6A6560] mt-2">
+                      <p className="text-xs text-[var(--muted-foreground)] mt-2">
                         w/ {event.sidemen.join(', ')}
                       </p>
                     )}
