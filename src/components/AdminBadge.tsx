@@ -46,7 +46,8 @@ export default function AdminBadge() {
   return (
     <button
       onClick={handleClick}
-      className={`fixed bottom-20 md:bottom-4 right-4 z-50 px-2 py-1 rounded-lg text-[10px] uppercase tracking-widest font-bold border transition-colors ${MODE_COLORS[viewMode]}`}
+      className={`fixed md:bottom-4 right-4 z-50 px-2 py-1 rounded-lg text-[10px] uppercase tracking-widest font-bold border transition-colors ${MODE_COLORS[viewMode]}`}
+      style={{ bottom: 'calc(5rem + env(safe-area-inset-bottom, 0px))' }}
       title="Ctrl+Shift+A: Artist tiers · Ctrl+Shift+V: Venue tiers"
     >
       {MODE_LABELS[viewMode]}
