@@ -323,7 +323,15 @@
     "myReviews": "Ulasan Saya",
     "noMyReviews": "Anda belum menulis ulasan.",
     "viewVenue": "Lihat tempat",
-    "anonymous": "Anonim"
+    "anonymous": "Anonim",
+    "pushNotifications": "Notifikasi Push",
+    "pushNotificationsHint": "Terima pemberitahuan pesan dan pembaruan baru."
+  },
+  "pushPrompt": {
+    "title": "Tetap Terhubung",
+    "description": "Dapatkan notifikasi saat artis, venue, atau anggota mengirimi Anda pesan.",
+    "enable": "Aktifkan Notifikasi",
+    "later": "Nanti Saja"
   },
   "regions": {
     "worldMap": "Peta Dunia",
@@ -826,6 +834,7 @@
     "deleteConversationConfirm": "Hapus percakapan ini?",
     "fanInboxNoDM": "Belum ada pesan langsung.",
     "fanInboxNoNotifications": "Belum ada notifikasi.",
+    "enablePush": "Aktifkan Notifikasi",
     "inboxMessages": "Pesan",
     "inboxNotifications": "Notifikasi",
     "markAllRead": "Tandai Semua Dibaca",

@@ -24,6 +24,7 @@ import ComingSoonToast from '@/components/ComingSoonToast';
 import CatEasterEgg from '@/components/CatEasterEgg';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import PWAInstallBanner from '@/components/PWAInstallBanner';
+import PushPromptModal from '@/components/PushPromptModal';
 import PullToRefresh from '@/components/PullToRefresh';
 import dynamic from 'next/dynamic';
 const SearchOverlay = dynamic(() => import('@/components/SearchOverlay'));
@@ -113,6 +114,7 @@ export default async function LocaleLayout({
                   <CatEasterEgg />
                   <ServiceWorkerRegister />
                   <PWAInstallBanner />
+                  <PushPromptModal />
                   <PullToRefresh />
               </TierConfigProvider>
               </AdminProvider>

@@ -323,7 +323,15 @@
     "myReviews": "My Reviews",
     "noMyReviews": "You haven't left any reviews yet.",
     "viewVenue": "View venue",
-    "anonymous": "Anonymous"
+    "anonymous": "Anonymous",
+    "pushNotifications": "Push Notifications",
+    "pushNotificationsHint": "Receive alerts for new messages and updates."
+  },
+  "pushPrompt": {
+    "title": "Stay in the Loop",
+    "description": "Get notified when artists, venues, or members send you messages — even when you're away.",
+    "enable": "Enable Notifications",
+    "later": "Maybe Later"
   },
   "regions": {
     "worldMap": "World Map",
@@ -826,6 +834,7 @@
     "deleteConversationConfirm": "Delete this conversation?",
     "fanInboxNoDM": "No direct messages yet.",
     "fanInboxNoNotifications": "No notifications yet.",
+    "enablePush": "Get Notified",
     "inboxMessages": "Messages",
     "inboxNotifications": "Notifications",
     "markAllRead": "Mark All Read",

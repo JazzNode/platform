@@ -9,6 +9,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import SourceBadge from '@/components/inbox/SourceBadge';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
 import FilterChips, { type FilterType } from '@/components/inbox/FilterChips';
+import PushNotificationToggle from '@/components/PushNotificationToggle';
 
 type Tab = 'messages' | 'notifications';
 
@@ -789,7 +790,10 @@ export default function FanInboxPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-4">
       <FadeUp>
-        <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('fanInbox')}</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('fanInbox')}</h1>
+          <PushNotificationToggle label={t('enablePush')} />
+        </div>
       </FadeUp>
 
       {/* 2 Tabs */}

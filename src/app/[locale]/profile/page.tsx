@@ -10,6 +10,7 @@ import { createClient } from '@/utils/supabase/client';
 import AvatarCropModal from '@/components/AvatarCropModal';
 import FadeUp from '@/components/animations/FadeUp';
 import BadgeShowcase from '@/components/BadgeShowcase';
+import PushNotificationToggle from '@/components/PushNotificationToggle';
 
 interface MyReview {
   id: string;
@@ -400,6 +401,15 @@ export default function ProfilePage() {
             >
               <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow-lg ring-0 transition-transform duration-200 ${isPublic ? 'translate-x-5' : 'translate-x-0'}`} />
             </button>
+          </div>
+
+          {/* Push Notifications */}
+          <div className="flex items-center justify-between py-4 border-t border-[var(--border)]">
+            <div>
+              <p className="text-sm font-medium text-[var(--foreground)]">{t('pushNotifications')}</p>
+              <p className="text-xs text-[var(--muted-foreground)]/60 mt-0.5">{t('pushNotificationsHint')}</p>
+            </div>
+            <PushNotificationToggle />
           </div>
 
           {/* Save button */}

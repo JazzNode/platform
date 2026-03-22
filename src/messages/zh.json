@@ -323,7 +323,15 @@
     "myReviews": "我的留言",
     "noMyReviews": "你還沒有留過任何評論。",
     "viewVenue": "查看場地",
-    "anonymous": "匿名"
+    "anonymous": "匿名",
+    "pushNotifications": "推播通知",
+    "pushNotificationsHint": "接收新訊息與更新的即時通知。"
+  },
+  "pushPrompt": {
+    "title": "不錯過任何動態",
+    "description": "當藝人、場地或會員傳送訊息時，即時收到推播通知 — 即使你不在 app 內。",
+    "enable": "開啟通知",
+    "later": "稍後再說"
   },
   "regions": {
     "worldMap": "世界版圖",
@@ -826,6 +834,7 @@
     "deleteConversationConfirm": "確定要刪除此對話？",
     "fanInboxNoDM": "目前沒有私訊。",
     "fanInboxNoNotifications": "目前沒有通知。",
+    "enablePush": "開啟通知",
     "inboxMessages": "訊息",
     "inboxNotifications": "通知",
     "markAllRead": "全部標為已讀",

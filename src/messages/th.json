@@ -323,7 +323,15 @@
     "myReviews": "รีวิวของฉัน",
     "noMyReviews": "คุณยังไม่ได้เขียนรีวิว",
     "viewVenue": "ดูสถานที่",
-    "anonymous": "ไม่ระบุชื่อ"
+    "anonymous": "ไม่ระบุชื่อ",
+    "pushNotifications": "การแจ้งเตือนแบบพุช",
+    "pushNotificationsHint": "รับการแจ้งเตือนข้อความและอัปเดตใหม่"
+  },
+  "pushPrompt": {
+    "title": "ไม่พลาดทุกความเคลื่อนไหว",
+    "description": "รับการแจ้งเตือนเมื่อศิลปิน สถานที่ หรือสมาชิกส่งข้อความถึงคุณ",
+    "enable": "เปิดการแจ้งเตือน",
+    "later": "ไว้ทีหลัง"
   },
   "regions": {
     "worldMap": "แผนที่โลก",
@@ -826,6 +834,7 @@
     "deleteConversationConfirm": "ลบการสนทนานี้?",
     "fanInboxNoDM": "ยังไม่มีข้อความส่วนตัว",
     "fanInboxNoNotifications": "ยังไม่มีการแจ้งเตือน",
+    "enablePush": "รับการแจ้งเตือน",
     "inboxMessages": "ข้อความ",
     "inboxNotifications": "การแจ้งเตือน",
     "markAllRead": "อ่านทั้งหมด",
