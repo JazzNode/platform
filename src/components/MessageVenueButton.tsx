@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
@@ -86,19 +86,38 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
     </svg>
   );
 
-  // Unclaimed: show faded button with tooltip
+  // Unclaimed: show faded button with tooltip (hover on desktop, tap on mobile)
+  const [showTip, setShowTip] = useState(false);
+  const tipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!showTip) return;
+    const handleOutside = (e: MouseEvent | TouchEvent) => {
+      if (tipRef.current && !tipRef.current.contains(e.target as Node)) {
+        setShowTip(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [showTip]);
+
   if (!claimed) {
     return (
-      <div className="relative group/msg inline-flex">
+      <div ref={tipRef} className="relative group/msg inline-flex">
         <button
-          disabled
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-600/30 bg-zinc-700/10 text-zinc-500 text-xs font-semibold cursor-not-allowed opacity-50"
+          type="button"
+          onClick={() => setShowTip(prev => !prev)}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-zinc-600/30 bg-zinc-700/10 text-zinc-500 text-xs font-semibold opacity-50"
           aria-label={t('messageVenueDisabledLabel')}
         >
           {icon}
           <span className="hidden sm:inline">{t('messageVenue')}</span>
         </button>
-        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 text-center opacity-0 pointer-events-none group-hover/msg:opacity-100 transition-opacity duration-200 z-50 shadow-lg">
+        <div className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 px-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700 text-xs text-zinc-300 text-center transition-opacity duration-200 z-50 shadow-lg ${showTip ? 'opacity-100' : 'opacity-0 pointer-events-none group-hover/msg:opacity-100'}`}>
           {t('messageVenueDisabled')}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px border-4 border-transparent border-t-zinc-700" />
         </div>
