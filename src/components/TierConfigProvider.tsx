@@ -39,8 +39,9 @@ const DEFAULT_ARTIST: TierFeatures = {
   // Tier 0 — full public presence, zero gating
   public_profile: 0, search_listing: 0, event_association: 0,
   collaboration_graph: 0, follower_count_display: 0, tags_badges: 0, performance_history: 0,
+  social_links: 0,
   // Tier 1 (Claimed) — edit rights + identity + inbox
-  edit_profile: 1, verified_badge: 1, custom_bio: 1, social_links: 1,
+  edit_profile: 1, verified_badge: 1, custom_bio: 1,
   teaching_section: 1, gear_showcase: 1, epk_basic: 1, analytics_basic: 1, inbox: 1,
   // Tier 2 (Premium) — proactive reach + full analytics
   broadcasts: 2, featured_wall: 2, available_for_hire: 2,
