@@ -792,7 +792,7 @@ export default function FanInboxPage() {
       <FadeUp>
         <div className="flex items-center justify-between gap-4">
           <h1 className="font-serif text-3xl sm:text-4xl font-bold">{t('fanInbox')}</h1>
-          <PushNotificationToggle label={t('enablePush')} />
+          <PushNotificationToggle label={t('enablePush')} variant="button" />
         </div>
       </FadeUp>
 
