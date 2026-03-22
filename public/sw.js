@@ -1,6 +1,6 @@
 // JazzNode Service Worker — offline cache + push notifications
 // Bump SW_VERSION on each meaningful change to bust the cache.
-const SW_VERSION = 2;
+const SW_VERSION = 3;
 const CACHE_NAME = `jazznode-v${SW_VERSION}`;
 const PRECACHE_URLS = [
   '/search-index.json',
@@ -87,22 +87,41 @@ self.addEventListener('push', (event) => {
 
   const options = {
     body: data.body || '',
-    icon: '/icons/icon-192.png',
-    badge: '/icons/icon-192.png',
+    icon: data.icon || '/icons/icon-192.png',
+    badge: data.badge || '/icons/badge-96.png',
     tag: data.tag || 'jazznode-notification',
     data: { url: data.url || '/' },
-    vibrate: [200, 100, 200],
     actions: data.actions || [],
+    // Large image shown when notification is expanded (e.g. event poster)
+    ...(data.image && { image: data.image }),
+    // Timestamp for notification ordering & grouping
+    timestamp: data.timestamp || Date.now(),
+    // Re-alert even if a notification with the same tag already exists
+    renotify: data.renotify ?? true,
+    // iOS ignores vibrate — sound is controlled by system settings
+    // Android will use device default notification sound
+    silent: false,
   };
 
   event.waitUntil(
     self.registration.showNotification(data.title || 'JazzNode', options)
+      .then(() => {
+        // Update app icon badge count (Badging API)
+        if (self.navigator && 'setAppBadge' in self.navigator) {
+          return self.navigator.setAppBadge();
+        }
+      })
   );
 });
 
 // Notification click handler — open the linked page
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+
+  // Clear app icon badge when user taps a notification
+  if (self.navigator && 'clearAppBadge' in self.navigator) {
+    self.navigator.clearAppBadge();
+  }
 
   const url = event.notification.data?.url || '/';
   event.waitUntil(

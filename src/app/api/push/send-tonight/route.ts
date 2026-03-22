@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   const { data: todayEvents } = await supabase
     .from('events')
-    .select('event_id, title_local, title_en, start_at, venue_id')
+    .select('event_id, title_local, title_en, start_at, venue_id, poster_url')
     .gte('start_at', todayStart)
     .lt('start_at', todayEnd)
     .order('start_at');
@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
   }
 
   // 2. Get venue IDs from tonight's events
-  type EventRow = { event_id: string; title_local: string | null; title_en: string | null; start_at: string; venue_id: string[] | null };
+  type EventRow = { event_id: string; title_local: string | null; title_en: string | null; start_at: string; venue_id: string[] | null; poster_url: string | null };
   const venueIds = [...new Set((todayEvents as EventRow[]).flatMap((e: EventRow) => e.venue_id || []))];
 
   // 3. Find users who follow these venues
@@ -126,11 +126,22 @@ export async function GET(request: NextRequest) {
       ? `${title} @ ${firstVenueName}`
       : `${eventCount} shows tonight at venues you follow`;
 
+    // Use the first event's poster as the notification large image
+    const posterUrl = relevantEvents.find((e) => e.poster_url)?.poster_url || null;
+
     const payload = JSON.stringify({
       title: '🎷 Tonight on JazzNode',
       body,
       url: '/',
       tag: `tonight-${todayStart.slice(0, 10)}`,
+      icon: '/icons/icon-192.png',
+      badge: '/icons/badge-96.png',
+      ...(posterUrl && { image: posterUrl }),
+      timestamp: Date.now(),
+      renotify: true,
+      actions: eventCount === 1
+        ? [{ action: 'view', title: 'View Event' }]
+        : [{ action: 'view', title: 'See All Shows' }],
     });
 
     // In dry-run mode, count but don't send
