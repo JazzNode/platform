@@ -68,7 +68,8 @@ export default function PushPromptModal() {
       let registration = await navigator.serviceWorker.getRegistration('/');
       if (registration && !registration.active) {
         await registration.unregister();
-        registration = undefined;
+        window.location.reload();
+        return;
       }
       if (!registration) {
         registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
@@ -79,7 +80,7 @@ export default function PushPromptModal() {
           sw.addEventListener('statechange', function h() {
             if (sw.state === 'activated') { sw.removeEventListener('statechange', h); resolve(); }
           });
-          setTimeout(() => { registration!.active ? resolve() : reject(new Error('timeout')); }, 15000);
+          setTimeout(() => { registration!.active ? resolve() : reject(new Error('timeout')); }, 10000);
         });
       }
       const subscription = await registration.pushManager.subscribe({

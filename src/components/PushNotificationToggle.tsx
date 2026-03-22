@@ -69,37 +69,32 @@ export default function PushNotificationToggle({
       console.log('[PushToggle] Step 1: Getting active service worker...');
       let registration = await navigator.serviceWorker.getRegistration('/');
 
-      // If there's a stale registration with no active SW, nuke it and start fresh
+      // If there's a stale registration with no active SW, nuke it and reload
       if (registration && !registration.active) {
-        console.log('[PushToggle] Found stale SW registration, unregistering...');
+        console.log('[PushToggle] Found stale SW registration, cleaning up...');
         await registration.unregister();
-        registration = undefined;
+        // Must reload for a clean SW state — register will happen via ServiceWorkerRegister on next load
+        console.log('[PushToggle] Reloading page for clean SW state...');
+        window.location.reload();
+        return;
       }
 
-      // Register fresh if needed
+      // No SW at all — register and wait
       if (!registration) {
-        console.log('[PushToggle] Registering new SW...');
+        console.log('[PushToggle] No SW, registering fresh...');
         registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
-
-        // Wait for activation
+        // Wait for activation with 10s timeout
         await new Promise<void>((resolve, reject) => {
-          const check = () => {
-            if (registration!.active) { resolve(); return; }
-            const sw = registration!.installing || registration!.waiting;
-            if (!sw) { reject(new Error('No SW to wait on')); return; }
+          if (registration!.active) { resolve(); return; }
+          const sw = registration!.installing || registration!.waiting;
+          if (!sw) { reject(new Error('No SW to wait on')); return; }
+          console.log('[PushToggle] Waiting for SW activation, state:', sw.state);
+          sw.addEventListener('statechange', function handler() {
             console.log('[PushToggle] SW state:', sw.state);
-            if (sw.state === 'activated') { resolve(); return; }
-            sw.addEventListener('statechange', function handler() {
-              console.log('[PushToggle] SW state changed:', sw.state);
-              if (sw.state === 'activated') { sw.removeEventListener('statechange', handler); resolve(); }
-              if (sw.state === 'redundant') { sw.removeEventListener('statechange', handler); reject(new Error('SW redundant')); }
-            });
-          };
-          check();
-          setTimeout(() => {
-            if (registration!.active) resolve();
-            else reject(new Error('SW activation timeout (15s)'));
-          }, 15000);
+            if (sw.state === 'activated') { sw.removeEventListener('statechange', handler); resolve(); }
+            if (sw.state === 'redundant') { sw.removeEventListener('statechange', handler); reject(new Error('SW redundant')); }
+          });
+          setTimeout(() => { registration!.active ? resolve() : reject(new Error('SW timeout')); }, 10000);
         });
       }
       console.log('[PushToggle] SW active:', !!registration.active);
