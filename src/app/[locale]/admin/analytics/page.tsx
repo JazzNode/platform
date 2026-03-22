@@ -15,7 +15,7 @@ import { useTheme } from '@/components/ThemeProvider';
 const FALLBACK_ACCENT_2 = '#7C9885';
 const FALLBACK_ACCENT_3 = '#8B7355';
 
-type Range = '7d' | '28d' | '90d' | '365d';
+type Range = '3d' | '7d' | '28d' | '90d' | '365d';
 
 interface KPI {
   current: number;
@@ -155,7 +155,7 @@ export default function AdminAnalyticsPage() {
   const locale = useLocale();
   const { token } = useAdmin();
   const { theme } = useTheme();
-  const [range, setRange] = useState<Range>('28d');
+  const [range, setRange] = useState<Range>('3d');
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -226,6 +226,7 @@ export default function AdminAnalyticsPage() {
   }
 
   const ranges: { key: Range; label: string }[] = [
+    { key: '3d', label: t('range3d') },
     { key: '7d', label: t('range7d') },
     { key: '28d', label: t('range28d') },
     { key: '90d', label: t('range90d') },

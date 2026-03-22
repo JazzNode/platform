@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
   if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const ALLOWED_RANGES: Record<string, number> = { '7d': 7, '28d': 28, '90d': 90, '365d': 365 };
+  const ALLOWED_RANGES: Record<string, number> = { '3d': 3, '7d': 7, '28d': 28, '90d': 90, '365d': 365 };
   const range = request.nextUrl.searchParams.get('range') || '28d';
   const days = ALLOWED_RANGES[range] ?? 28;
 

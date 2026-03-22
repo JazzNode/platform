@@ -490,6 +490,7 @@
     "analytics": "トレンド分析",
     "analyticsTitle": "トレンド分析",
     "analyticsDesc": "プラットフォームのパフォーマンスと成長トレンド。",
+    "range3d": "3日",
     "range7d": "7日",
     "range28d": "28日",
     "range90d": "90日",
