@@ -60,16 +60,42 @@ export default function PushNotificationToggle({
     }
     setLoading(true);
     try {
+      // Step 1: Ensure service worker is registered
+      console.log('[PushToggle] Step 1: Checking service worker...');
+      let registration = await navigator.serviceWorker.getRegistration('/');
+      if (!registration) {
+        console.log('[PushToggle] No SW found, registering...');
+        registration = await navigator.serviceWorker.register('/sw.js');
+        // Wait for it to be active
+        await new Promise<void>((resolve) => {
+          if (registration!.active) { resolve(); return; }
+          const sw = registration!.installing || registration!.waiting;
+          if (sw) {
+            sw.addEventListener('statechange', () => {
+              if (sw.state === 'activated') resolve();
+            });
+          } else {
+            resolve();
+          }
+          // Timeout after 10s
+          setTimeout(resolve, 10000);
+        });
+      }
+      console.log('[PushToggle] SW active:', !!registration?.active);
+
+      // Step 2: Request notification permission
+      console.log('[PushToggle] Step 2: Requesting permission...');
       const perm = await Notification.requestPermission();
       console.log('[PushToggle] Permission result:', perm);
       setPermission(perm);
       if (perm !== 'granted') { setLoading(false); return; }
 
-      const reg = await navigator.serviceWorker.ready;
-      console.log('[PushToggle] SW ready, subscribing...');
-      const subscription = await reg.pushManager.subscribe({
+      // Step 3: Subscribe to push
+      console.log('[PushToggle] Step 3: Subscribing to push...');
+      const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+      const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
+        applicationServerKey: applicationServerKey.buffer as ArrayBuffer,
       });
       console.log('[PushToggle] Push subscription created:', subscription.endpoint.slice(0, 60));
 

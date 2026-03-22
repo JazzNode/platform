@@ -65,8 +65,19 @@ export default function PushPromptModal() {
         return;
       }
 
-      const reg = await navigator.serviceWorker.ready;
-      const subscription = await reg.pushManager.subscribe({
+      let registration = await navigator.serviceWorker.getRegistration('/');
+      if (!registration) {
+        registration = await navigator.serviceWorker.register('/sw.js');
+        await new Promise<void>((resolve) => {
+          if (registration!.active) { resolve(); return; }
+          const sw = registration!.installing || registration!.waiting;
+          if (sw) {
+            sw.addEventListener('statechange', () => { if (sw.state === 'activated') resolve(); });
+          } else { resolve(); }
+          setTimeout(resolve, 10000);
+        });
+      }
+      const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY).buffer as ArrayBuffer,
       });
