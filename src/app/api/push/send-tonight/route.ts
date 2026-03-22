@@ -8,6 +8,9 @@ import { createAdminClient } from '@/utils/supabase/admin';
  *
  * Triggered daily at ~17:00 local time via Vercel Cron.
  * Protected by CRON_SECRET header.
+ *
+ * Query params:
+ *   ?dry=true  — preview what would be sent without actually sending
  */
 
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
@@ -15,6 +18,10 @@ const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:hello@jazznode.com';
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  const supabase = createAdminClient();
+  const dryRun = request.nextUrl.searchParams.get('dry') === 'true';
+
   // Verify cron secret
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -22,12 +29,11 @@ export async function GET(request: NextRequest) {
   }
 
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
+    await logRun(supabase, { dryRun, error: 'VAPID keys not configured', durationMs: Date.now() - startTime });
     return NextResponse.json({ error: 'VAPID keys not configured' }, { status: 500 });
   }
 
   webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
-
-  const supabase = createAdminClient();
 
   // 1. Get today's events (with venue info)
   const now = new Date();
@@ -42,7 +48,8 @@ export async function GET(request: NextRequest) {
     .order('start_at');
 
   if (!todayEvents || todayEvents.length === 0) {
-    return NextResponse.json({ message: 'No events tonight', sent: 0 });
+    await logRun(supabase, { dryRun, eventsTonight: 0, durationMs: Date.now() - startTime });
+    return NextResponse.json({ message: 'No events tonight', sent: 0, dryRun });
   }
 
   // 2. Get venue IDs from tonight's events
@@ -58,7 +65,8 @@ export async function GET(request: NextRequest) {
 
   type FollowRow = { user_id: string; target_id: string };
   if (!follows || follows.length === 0) {
-    return NextResponse.json({ message: 'No followers to notify', sent: 0 });
+    await logRun(supabase, { dryRun, eventsTonight: todayEvents.length, durationMs: Date.now() - startTime });
+    return NextResponse.json({ message: 'No followers to notify', sent: 0, dryRun });
   }
 
   // 4. Get push subscriptions for these users
@@ -70,7 +78,8 @@ export async function GET(request: NextRequest) {
 
   type SubRow = { user_id: string; endpoint: string; p256dh: string; auth: string };
   if (!subscriptions || subscriptions.length === 0) {
-    return NextResponse.json({ message: 'No push subscriptions found', sent: 0 });
+    await logRun(supabase, { dryRun, eventsTonight: todayEvents.length, durationMs: Date.now() - startTime });
+    return NextResponse.json({ message: 'No push subscriptions found', sent: 0, dryRun });
   }
 
   // 5. Build per-user notification: "Tonight: N shows at venues you follow"
@@ -93,6 +102,7 @@ export async function GET(request: NextRequest) {
   let sent = 0;
   let failed = 0;
   const staleEndpoints: string[] = [];
+  const audienceSize = (subscriptions as SubRow[]).length;
 
   for (const sub of subscriptions as SubRow[]) {
     const followedVenues = userVenueMap.get(sub.user_id);
@@ -123,6 +133,12 @@ export async function GET(request: NextRequest) {
       tag: `tonight-${todayStart.slice(0, 10)}`,
     });
 
+    // In dry-run mode, count but don't send
+    if (dryRun) {
+      sent++;
+      continue;
+    }
+
     try {
       await webpush.sendNotification(
         {
@@ -144,19 +160,68 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Remove stale subscriptions
-  if (staleEndpoints.length > 0) {
+  // Remove stale subscriptions (skip in dry-run)
+  if (!dryRun && staleEndpoints.length > 0) {
     await supabase
       .from('push_subscriptions')
       .delete()
       .in('endpoint', staleEndpoints);
   }
 
+  const durationMs = Date.now() - startTime;
+  await logRun(supabase, {
+    dryRun,
+    eventsTonight: todayEvents.length,
+    audienceSize,
+    sent,
+    failed,
+    cleaned: staleEndpoints.length,
+    durationMs,
+  });
+
   return NextResponse.json({
-    message: `Sent ${sent} notifications (${failed} failed, ${staleEndpoints.length} cleaned)`,
+    message: dryRun
+      ? `[DRY RUN] Would send ${sent} notifications`
+      : `Sent ${sent} notifications (${failed} failed, ${staleEndpoints.length} cleaned)`,
+    dryRun,
     sent,
     failed,
     cleaned: staleEndpoints.length,
     eventsTonight: todayEvents.length,
+    audienceSize,
+    durationMs,
   });
+}
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+interface LogRunParams {
+  dryRun: boolean;
+  eventsTonight?: number;
+  audienceSize?: number;
+  sent?: number;
+  failed?: number;
+  cleaned?: number;
+  durationMs: number;
+  error?: string;
+}
+
+async function logRun(
+  supabase: ReturnType<typeof createAdminClient>,
+  params: LogRunParams
+) {
+  try {
+    await supabase.from('push_send_logs').insert({
+      dry_run: params.dryRun,
+      events_tonight: params.eventsTonight ?? 0,
+      audience_size: params.audienceSize ?? 0,
+      sent: params.sent ?? 0,
+      failed: params.failed ?? 0,
+      cleaned: params.cleaned ?? 0,
+      duration_ms: params.durationMs,
+      error: params.error ?? null,
+    });
+  } catch {
+    // Logging failure should not break the cron
+  }
 }

@@ -76,6 +76,10 @@
     "eventAddress": "Alamat",
     "prevEvent": "Sebelumnya",
     "nextEvent": "Berikutnya",
+    "prevArtist": "Sebelumnya",
+    "nextArtist": "Berikutnya",
+    "prevVenue": "Sebelumnya",
+    "nextVenue": "Berikutnya",
     "sameCityEvents": "Lainnya di kota ini",
     "badgesCategoryRecognition": "Pencapaian Artis",
     "badgesCategoryVenueExcellence": "Kehormatan Tempat",
@@ -250,7 +254,8 @@
     "notFoundTitle": "Belum ditemukan?",
     "notFoundDesc": "Database kami terus berkembang setiap hari. Anda dapat mengklaim kapan saja dari halaman artis atau venue.",
     "learnMore": "Apa yang bisa dilakukan setelah klaim? Pelajari lebih lanjut →",
-    "skip": "Lewati, klaim nanti"
+    "skip": "Lewati, klaim nanti",
+    "dontRemind": "Jangan ingatkan lagi"
   },
   "followGuide": {
     "title": "Tetap Terhubung",
@@ -823,6 +828,8 @@
     "fanInboxNoNotifications": "Belum ada notifikasi.",
     "inboxMessages": "Pesan",
     "inboxNotifications": "Notifikasi",
+    "markAllRead": "Tandai Semua Dibaca",
+    "noNotifications": "Belum ada notifikasi.",
     "filterAll": "Semua",
     "filterHQ": "JazzNode HQ",
     "filterArtist": "Artis",

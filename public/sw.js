@@ -1,5 +1,7 @@
 // JazzNode Service Worker — offline cache + push notifications
-const CACHE_NAME = 'jazznode-v1';
+// Bump SW_VERSION on each meaningful change to bust the cache.
+const SW_VERSION = 2;
+const CACHE_NAME = `jazznode-v${SW_VERSION}`;
 const PRECACHE_URLS = [
   '/search-index.json',
 ];
@@ -20,6 +22,15 @@ self.addEventListener('activate', (event) => {
     )
   );
   self.clients.claim();
+});
+
+// Notify all clients when a new SW version activates
+self.addEventListener('activate', () => {
+  self.clients.matchAll({ type: 'window' }).then((clients) => {
+    for (const client of clients) {
+      client.postMessage({ type: 'SW_UPDATED', version: SW_VERSION });
+    }
+  });
 });
 
 // Fetch: network-first for pages, cache-first for static assets

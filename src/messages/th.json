@@ -76,6 +76,10 @@
     "eventAddress": "ที่อยู่",
     "prevEvent": "ก่อนหน้า",
     "nextEvent": "ถัดไป",
+    "prevArtist": "ก่อนหน้า",
+    "nextArtist": "ถัดไป",
+    "prevVenue": "ก่อนหน้า",
+    "nextVenue": "ถัดไป",
     "sameCityEvents": "เพิ่มเติมในเมืองนี้",
     "badgesCategoryRecognition": "ความสำเร็จของศิลปิน",
     "badgesCategoryVenueExcellence": "เกียรติยศสถานที่",
@@ -250,7 +254,8 @@
     "notFoundTitle": "ยังไม่พบ?",
     "notFoundDesc": "ฐานข้อมูลของเรากำลังขยายทุกวัน คุณสามารถยืนยันได้ทุกเมื่อจากหน้าศิลปินหรือสถานที่",
     "learnMore": "ยืนยันแล้วทำอะไรได้บ้าง? เรียนรู้เพิ่มเติม →",
-    "skip": "ข้ามไปก่อน ยืนยันทีหลัง"
+    "skip": "ข้ามไปก่อน ยืนยันทีหลัง",
+    "dontRemind": "อย่าเตือนอีก"
   },
   "followGuide": {
     "title": "ติดตามข่าวสาร",
@@ -823,6 +828,8 @@
     "fanInboxNoNotifications": "ยังไม่มีการแจ้งเตือน",
     "inboxMessages": "ข้อความ",
     "inboxNotifications": "การแจ้งเตือน",
+    "markAllRead": "อ่านทั้งหมด",
+    "noNotifications": "ยังไม่มีการแจ้งเตือน",
     "filterAll": "ทั้งหมด",
     "filterHQ": "JazzNode HQ",
     "filterArtist": "ศิลปิน",

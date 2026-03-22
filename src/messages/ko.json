@@ -76,6 +76,10 @@
     "eventAddress": "주소",
     "prevEvent": "이전",
     "nextEvent": "다음",
+    "prevArtist": "이전",
+    "nextArtist": "다음",
+    "prevVenue": "이전",
+    "nextVenue": "다음",
     "sameCityEvents": "같은 도시의 다른 공연",
     "badgesCategoryRecognition": "아티스트 업적",
     "badgesCategoryVenueExcellence": "공연장 영예",
@@ -250,7 +254,8 @@
     "notFoundTitle": "찾을 수 없나요?",
     "notFoundDesc": "데이터베이스는 매일 확장되고 있습니다. 아티스트나 공연장 페이지에서 언제든지 인증할 수 있습니다.",
     "learnMore": "인증 후 무엇을 할 수 있나요? 자세히 보기 →",
-    "skip": "나중에 인증하기"
+    "skip": "나중에 인증하기",
+    "dontRemind": "다시 표시하지 않기"
   },
   "followGuide": {
     "title": "최신 소식 받기",
@@ -823,6 +828,8 @@
     "fanInboxNoNotifications": "알림이 없습니다.",
     "inboxMessages": "메시지",
     "inboxNotifications": "알림",
+    "markAllRead": "모두 읽음",
+    "noNotifications": "아직 알림이 없습니다.",
     "filterAll": "전체",
     "filterHQ": "JazzNode HQ",
     "filterArtist": "아티스트",

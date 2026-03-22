@@ -76,6 +76,10 @@
     "eventAddress": "住所",
     "prevEvent": "前のイベント",
     "nextEvent": "次のイベント",
+    "prevArtist": "前へ",
+    "nextArtist": "次へ",
+    "prevVenue": "前へ",
+    "nextVenue": "次へ",
     "sameCityEvents": "同じ都市の他会場イベント",
     "badgesCategoryRecognition": "アーティスト実績",
     "badgesCategoryVenueExcellence": "会場の栄誉",
@@ -250,7 +254,8 @@
     "notFoundTitle": "見つかりませんか？",
     "notFoundDesc": "データベースは日々拡大しています。いつでもアーティストや会場ページから認証できます。",
     "learnMore": "認証後にできることは？詳しくはこちら →",
-    "skip": "後で認証する"
+    "skip": "後で認証する",
+    "dontRemind": "今後表示しない"
   },
   "followGuide": {
     "title": "最新情報をキャッチ",
@@ -823,6 +828,8 @@
     "fanInboxNoNotifications": "通知はまだありません。",
     "inboxMessages": "メッセージ",
     "inboxNotifications": "通知",
+    "markAllRead": "すべて既読",
+    "noNotifications": "通知はまだありません。",
     "filterAll": "すべて",
     "filterHQ": "JazzNode HQ",
     "filterArtist": "アーティスト",

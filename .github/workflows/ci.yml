@@ -31,6 +31,9 @@ jobs:
             npm install
           fi
 
+      - name: Check i18n key completeness
+        run: node scripts/check-i18n-keys.js
+
       - name: Lint
         run: npm run lint --if-present
 
