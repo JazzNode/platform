@@ -65,28 +65,40 @@ export default function PushNotificationToggle({
     }
     setLoading(true);
     try {
-      // Step 1: Ensure service worker is registered
+      // Step 1: Ensure service worker is registered AND active
       console.log('[PushToggle] Step 1: Checking service worker...');
       let registration = await navigator.serviceWorker.getRegistration('/');
       if (!registration) {
         console.log('[PushToggle] No SW found, registering...');
         registration = await navigator.serviceWorker.register('/sw.js');
-        // Wait for it to be active
-        await new Promise<void>((resolve) => {
-          if (registration!.active) { resolve(); return; }
+      }
+      // Wait for the SW to become active (may be installing/waiting)
+      if (!registration.active) {
+        console.log('[PushToggle] SW not active yet, waiting...');
+        await new Promise<void>((resolve, reject) => {
           const sw = registration!.installing || registration!.waiting;
-          if (sw) {
-            sw.addEventListener('statechange', () => {
-              if (sw.state === 'activated') resolve();
-            });
-          } else {
-            resolve();
-          }
-          // Timeout after 10s
-          setTimeout(resolve, 10000);
+          if (!sw) { reject(new Error('No installing/waiting SW')); return; }
+          const onStateChange = () => {
+            console.log('[PushToggle] SW state:', sw.state);
+            if (sw.state === 'activated') {
+              sw.removeEventListener('statechange', onStateChange);
+              resolve();
+            } else if (sw.state === 'redundant') {
+              sw.removeEventListener('statechange', onStateChange);
+              reject(new Error('SW became redundant'));
+            }
+          };
+          sw.addEventListener('statechange', onStateChange);
+          // Timeout after 15s
+          setTimeout(() => {
+            sw.removeEventListener('statechange', onStateChange);
+            // Even if timeout, check if active now
+            if (registration!.active) resolve();
+            else reject(new Error('SW activation timeout'));
+          }, 15000);
         });
       }
-      console.log('[PushToggle] SW active:', !!registration?.active);
+      console.log('[PushToggle] SW active:', !!registration.active);
 
       // Step 2: Request notification permission
       console.log('[PushToggle] Step 2: Requesting permission...');
