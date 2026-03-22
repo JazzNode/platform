@@ -1,17 +1,19 @@
 // JazzNode Service Worker — offline cache + push notifications
 // Bump SW_VERSION on each meaningful change to bust the cache.
-const SW_VERSION = 3;
+const SW_VERSION = 4;
 const CACHE_NAME = `jazznode-v${SW_VERSION}`;
 const PRECACHE_URLS = [
   '/search-index.json',
 ];
 
-// Install: precache essential resources
+// Install: precache essential resources (non-blocking — failures don't prevent activation)
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_URLS))
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .catch((err) => console.warn('[SW] Precache failed (non-fatal):', err))
+      .then(() => self.skipWaiting())
   );
-  self.skipWaiting();
 });
 
 // Activate: clean old caches

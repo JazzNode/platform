@@ -65,7 +65,7 @@ export const config = {
   // Match all paths EXCEPT: api routes, Next.js internals, Vercel internals,
   // and static/metadata files (sitemap.xml, robots.txt, favicon, OG images, etc.)
   matcher: [
-    '/((?!api|auth|_next|_vercel|sw\\.js|sitemap\\.xml|robots\\.txt|favicon\\.ico|manifest\\.json|opengraph-image|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico)$).*)',
+    '/((?!api|auth|_next|_vercel|sw\\.js|sitemap\\.xml|robots\\.txt|favicon\\.ico|manifest\\.json|opengraph-image|.*\\.(?:png|jpg|jpeg|gif|webp|svg|ico|json|xml|txt|webmanifest|js)$).*)',
     '/(en|zh|ja|ko|th|id)/:path*',
   ],
 };
