@@ -66,18 +66,20 @@ export default function PushPromptModal() {
       }
 
       let registration = await navigator.serviceWorker.getRegistration('/');
-      if (!registration) {
-        registration = await navigator.serviceWorker.register('/sw.js');
+      if (registration && !registration.active) {
+        await registration.unregister();
+        registration = undefined;
       }
-      if (!registration.active) {
+      if (!registration) {
+        registration = await navigator.serviceWorker.register('/sw.js', { scope: '/' });
         await new Promise<void>((resolve, reject) => {
+          if (registration!.active) { resolve(); return; }
           const sw = registration!.installing || registration!.waiting;
           if (!sw) { reject(new Error('No SW')); return; }
-          const onState = () => {
-            if (sw.state === 'activated') { sw.removeEventListener('statechange', onState); resolve(); }
-          };
-          sw.addEventListener('statechange', onState);
-          setTimeout(() => { sw.removeEventListener('statechange', onState); registration!.active ? resolve() : reject(new Error('timeout')); }, 15000);
+          sw.addEventListener('statechange', function h() {
+            if (sw.state === 'activated') { sw.removeEventListener('statechange', h); resolve(); }
+          });
+          setTimeout(() => { registration!.active ? resolve() : reject(new Error('timeout')); }, 15000);
         });
       }
       const subscription = await registration.pushManager.subscribe({
