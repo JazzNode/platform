@@ -11,6 +11,7 @@ import CollapsibleSection from '@/components/CollapsibleSection';
 import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
+import ShareButton from '@/components/ShareButton';
 import EditableContent from '@/components/EditableContent';
 import RecordNav from '@/components/RecordNav';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
@@ -313,6 +314,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               </TierGate>
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" followerCount={followerCount} />
+              <ShareButton title={displayName(f)} url={`/${locale}/venues/${slug}`} variant="compact" label={t('share')} />
           </div>
 
           {/* Unclaimed notice */}

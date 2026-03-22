@@ -7,6 +7,7 @@ import { displayName, artistDisplayName, photoUrl, cityName, eventTitle, normali
 import FadeUp from '@/components/animations/FadeUp';
 import DMButton from '@/components/DMButton';
 import FollowButton from '@/components/FollowButton';
+import ShareButton from '@/components/ShareButton';
 import SocialIcons from '@/components/SocialIcons';
 
 interface Props {
@@ -92,6 +93,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
               <span className="text-[var(--muted-foreground)]/30 select-none">|</span>
               <DMButton targetUserId={profile.id} />
               <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
+              <ShareButton title={profile.display_name || `@${username}`} url={`/${locale}/user/${username}`} variant="compact" label={t('share')} />
             </div>
 
             {/* Bio */}

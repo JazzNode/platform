@@ -6,7 +6,7 @@ interface Props {
   title: string;
   url: string;
   text?: string;
-  variant?: 'icon' | 'full';
+  variant?: 'icon' | 'compact' | 'full';
   label?: string;
   /** Adds frosted glass backdrop — best for overlaying photos */
   glass?: boolean;
@@ -80,17 +80,23 @@ export default function ShareButton({ title, url, text, variant = 'icon', label 
     );
   }
 
+  const isCompact = variant === 'compact';
+  const iconSize = isCompact ? 14 : 16;
+
   return (
     <button
       onClick={handleShare}
-      className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+      className={isCompact
+        ? "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium tracking-wide rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-all duration-200"
+        : "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+      }
     >
       {copied ? (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width={iconSize} height={iconSize} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20 6L9 17l-5-5" />
         </svg>
       ) : (
-        <ShareIcon />
+        <ShareIcon size={iconSize} />
       )}
       <span>{copied ? 'Copied!' : label}</span>
     </button>

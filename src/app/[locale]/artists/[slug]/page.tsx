@@ -23,6 +23,7 @@ import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
 import PageViewTracker from '@/components/PageViewTracker';
 import HireMeButton from '@/components/HireMeButton';
+import ShareButton from '@/components/ShareButton';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import TierGate from '@/components/TierGate';
 import VerifiedBadge from '@/components/VerifiedBadge';
@@ -434,6 +435,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               </TierGate>
               <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
               <FollowButton itemType="artist" itemId={artist.id} variant="full" followerCount={followerCount} />
+              <ShareButton title={artistDisplayName(f, locale)} url={`/${locale}/artists/${slug}`} variant="compact" label={t('share')} />
             </div>
 
             {/* Data source notice */}
