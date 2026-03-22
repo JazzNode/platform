@@ -45,11 +45,16 @@ export default function PushNotificationToggle({
     }
     setPermission(Notification.permission);
 
-    // Check existing subscription
-    navigator.serviceWorker.ready.then((reg) => {
-      reg.pushManager.getSubscription().then((sub) => {
-        setSubscribed(!!sub);
-      });
+    // Check existing subscription (don't use .ready — it can hang)
+    navigator.serviceWorker.getRegistration('/').then((reg) => {
+      if (reg) {
+        reg.pushManager.getSubscription().then((sub) => {
+          console.log('[PushToggle] Init: existing subscription =', !!sub);
+          setSubscribed(!!sub);
+        });
+      } else {
+        console.log('[PushToggle] Init: no SW registration found');
+      }
     });
   }, []);
 
@@ -123,9 +128,11 @@ export default function PushNotificationToggle({
   }, [user]);
 
   const unsubscribe = useCallback(async () => {
+    console.log('[PushToggle] Unsubscribing...');
     setLoading(true);
     try {
-      const reg = await navigator.serviceWorker.ready;
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      if (!reg) { setSubscribed(false); setLoading(false); return; }
       const subscription = await reg.pushManager.getSubscription();
       if (subscription) {
         const res = await fetch('/api/push/subscribe', {
@@ -146,13 +153,17 @@ export default function PushNotificationToggle({
   }, []);
 
   const handleToggle = useCallback(() => {
-    if (loading) return;
+    console.log('[PushToggle] Toggle clicked! loading=%s, subscribed=%s, permission=%s', loading, subscribed, permission);
+    if (loading) {
+      console.log('[PushToggle] Blocked: still loading');
+      return;
+    }
     if (subscribed) {
       unsubscribe();
     } else {
       subscribe();
     }
-  }, [loading, subscribed, subscribe, unsubscribe]);
+  }, [loading, subscribed, permission, subscribe, unsubscribe]);
 
   // Don't show if not supported or no VAPID key configured
   if (permission === 'unsupported' || !VAPID_PUBLIC_KEY || !user) return null;
