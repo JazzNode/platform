@@ -12,6 +12,7 @@ const BASE_navItems = [
   { key: 'settings', icon: 'settings', path: '' },
   { key: 'badges', icon: 'badges', path: '/badges' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
+  { key: 'comments', icon: 'comments', path: '/comments' },
 ] as const;
 
 const OWNER_navItems = [
@@ -40,6 +41,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="8" r="7" />
           <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+        </svg>
+      );
+    case 'comments':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       );
     case 'members':

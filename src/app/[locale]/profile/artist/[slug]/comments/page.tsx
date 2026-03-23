@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import DashboardCommentsTab from '@/components/DashboardCommentsTab';
 
-export default function VenueCommentsManagementPage({ params }: { params: Promise<{ slug: string }> }) {
+export default function ArtistCommentsPage({ params }: { params: Promise<{ slug: string }> }) {
   const [slug, setSlug] = useState('');
 
   useEffect(() => {
@@ -11,5 +11,5 @@ export default function VenueCommentsManagementPage({ params }: { params: Promis
   }, [params]);
 
   if (!slug) return null;
-  return <DashboardCommentsTab mode="venue" venueId={slug} />;
+  return <DashboardCommentsTab mode="artist" artistId={slug} />;
 }

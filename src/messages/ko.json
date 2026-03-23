@@ -294,6 +294,7 @@
     "nav_settings": "설정",
     "nav_inbox": "수신함",
     "nav_badges": "배지",
+    "nav_comments": "댓글",
     "nav_members": "회원",
     "badgesTitle": "나의 배지",
     "badgesEarned": "획득",
@@ -486,6 +487,7 @@
   },
   "adminHQ": {
     "overview": "개요",
+    "comments": "댓글",
     "claims": "소유권 심사",
     "dashboardTitle": "JazzNode HQ",
     "dashboardDescription": "플랫폼 개요 및 관리 도구.",
@@ -755,6 +757,7 @@
     "overview": "개요",
     "badges": "배지",
     "inbox": "받은편지함",
+    "comments": "댓글",
     "broadcasts": "브로드캐스트",
     "edit": "프로필 편집",
     "viewArtistPage": "아티스트 페이지 보기",
@@ -988,6 +991,13 @@
     "ctaTitle": "레벨 업할 준비 되셨나요?",
     "ctaDesc": "아티스트 또는 베뉴 페이지를 무료로 클레임하고, 언제든 업그레이드하여 모든 도구를 잠금 해제하세요.",
     "ctaButton": "아티스트 둘러보기"
+  },
+  "dashboardComments": {
+    "title": "댓글",
+    "filterAll": "전체",
+    "filterUnreplied": "미답변",
+    "noComments": "아직 댓글이 없습니다.",
+    "noUnreplied": "모든 댓글에 답변 완료!"
   },
   "reviews": {
     "sectionTitle": "커뮤니티 보드",

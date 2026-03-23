@@ -21,6 +21,7 @@ const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
   { key: 'badges', icon: 'badges', path: '/badges' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
+  { key: 'comments', icon: 'comments', path: '/comments' },
   { key: 'bookings', icon: 'calendar', path: '/bookings' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
   { key: 'gear', icon: 'guitar', path: '/gear' },
@@ -65,6 +66,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M20.8 3.2a2.4 2.4 0 0 0-3.4 0L14 6.6l-1.7-1.7a1 1 0 0 0-1.4 0L9.5 6.3a1 1 0 0 0 0 1.4l.3.3-4.5 4.5a5 5 0 0 0-1.1 5.3l-.7.7a1 1 0 0 0 0 1.4l.6.6a1 1 0 0 0 1.4 0l.7-.7a5 5 0 0 0 5.3-1.1l4.5-4.5.3.3a1 1 0 0 0 1.4 0l1.4-1.4a1 1 0 0 0 0-1.4L17.4 10l3.4-3.4a2.4 2.4 0 0 0 0-3.4z" />
           <circle cx="9.5" cy="14.5" r="1.5" />
+        </svg>
+      );
+    case 'comments':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
         </svg>
       );
     case 'analytics':

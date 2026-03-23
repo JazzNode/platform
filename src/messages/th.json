@@ -294,6 +294,7 @@
     "nav_settings": "ตั้งค่า",
     "nav_inbox": "กล่องข้อความ",
     "nav_badges": "เหรียญตรา",
+    "nav_comments": "ความคิดเห็น",
     "nav_members": "สมาชิก",
     "badgesTitle": "เหรียญตราของคุณ",
     "badgesEarned": "ได้รับแล้ว",
@@ -486,6 +487,7 @@
   },
   "adminHQ": {
     "overview": "ภาพรวม",
+    "comments": "ความคิดเห็น",
     "claims": "การตรวจสอบ",
     "dashboardTitle": "JazzNode HQ",
     "dashboardDescription": "ภาพรวมแพลตฟอร์มและเครื่องมือผู้ดูแล",
@@ -755,6 +757,7 @@
     "overview": "ภาพรวม",
     "badges": "เหรียญตรา",
     "inbox": "กล่องข้อความ",
+    "comments": "ความคิดเห็น",
     "broadcasts": "ประกาศ",
     "edit": "แก้ไขโปรไฟล์",
     "viewArtistPage": "ดูหน้าศิลปิน",
@@ -988,6 +991,13 @@
     "ctaTitle": "พร้อมอัปเลเวลหรือยัง?",
     "ctaDesc": "เคลมหน้าศิลปินหรือสถานที่ของคุณฟรี และอัปเกรดเมื่อไหร่ก็ได้เพื่อปลดล็อกเครื่องมือทั้งหมด",
     "ctaButton": "สำรวจศิลปิน"
+  },
+  "dashboardComments": {
+    "title": "ความคิดเห็น",
+    "filterAll": "ทั้งหมด",
+    "filterUnreplied": "ยังไม่ตอบ",
+    "noComments": "ยังไม่มีความคิดเห็น",
+    "noUnreplied": "ตอบกลับความคิดเห็นทั้งหมดแล้ว!"
   },
   "reviews": {
     "sectionTitle": "บอร์ดชุมชน",

@@ -294,6 +294,7 @@
     "nav_settings": "設定",
     "nav_inbox": "受信トレイ",
     "nav_badges": "バッジ",
+    "nav_comments": "コメント",
     "nav_members": "メンバー",
     "badgesTitle": "あなたのバッジ",
     "badgesEarned": "獲得済み",
@@ -486,6 +487,7 @@
   },
   "adminHQ": {
     "overview": "概要",
+    "comments": "コメント",
     "claims": "申請審査",
     "dashboardTitle": "JazzNode HQ",
     "dashboardDescription": "プラットフォーム概要と管理ツール。",
@@ -755,6 +757,7 @@
     "overview": "概要",
     "badges": "バッジ",
     "inbox": "受信箱",
+    "comments": "コメント",
     "broadcasts": "ブロードキャスト",
     "edit": "プロフィール編集",
     "viewArtistPage": "アーティストページを見る",
@@ -988,6 +991,13 @@
     "ctaTitle": "レベルアップしませんか？",
     "ctaDesc": "アーティストや会場ページを無料でクレームし、いつでもアップグレードしてすべてのツールを解放できます。",
     "ctaButton": "アーティストを探す"
+  },
+  "dashboardComments": {
+    "title": "コメント",
+    "filterAll": "すべて",
+    "filterUnreplied": "未返信",
+    "noComments": "コメントはまだありません。",
+    "noUnreplied": "すべてのコメントに返信済みです！"
   },
   "reviews": {
     "sectionTitle": "コミュニティボード",

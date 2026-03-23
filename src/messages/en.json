@@ -294,6 +294,7 @@
     "nav_settings": "Settings",
     "nav_inbox": "Inbox",
     "nav_badges": "Badges",
+    "nav_comments": "Comments",
     "nav_members": "Members",
     "badgesTitle": "Your Badges",
     "badgesEarned": "earned",
@@ -486,6 +487,7 @@
   },
   "adminHQ": {
     "overview": "Overview",
+    "comments": "Comments",
     "claims": "Claims",
     "dashboardTitle": "JazzNode HQ",
     "dashboardDescription": "Platform overview and admin tools.",
@@ -755,6 +757,7 @@
     "overview": "Overview",
     "badges": "Badges",
     "inbox": "Inbox",
+    "comments": "Comments",
     "broadcasts": "Broadcasts",
     "edit": "Edit Profile",
     "viewArtistPage": "View Artist Page",
@@ -990,6 +993,13 @@
     "ctaTitle": "Ready to Level Up?",
     "ctaDesc": "Claim your artist or venue page for free, and upgrade anytime to unlock the full suite of tools.",
     "ctaButton": "Explore Artists"
+  },
+  "dashboardComments": {
+    "title": "Comments",
+    "filterAll": "All",
+    "filterUnreplied": "Unreplied",
+    "noComments": "No comments yet.",
+    "noUnreplied": "All comments have been replied to!"
   },
   "reviews": {
     "sectionTitle": "Community Board",

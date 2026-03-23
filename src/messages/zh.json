@@ -294,6 +294,7 @@
     "nav_settings": "個人設定",
     "nav_inbox": "收件匣",
     "nav_badges": "徽章",
+    "nav_comments": "留言區",
     "nav_members": "會員管理",
     "badgesTitle": "你的徽章",
     "badgesEarned": "已獲得",
@@ -486,6 +487,7 @@
   },
   "adminHQ": {
     "overview": "總覽",
+    "comments": "留言區",
     "claims": "認領審核",
     "dashboardTitle": "JazzNode HQ",
     "dashboardDescription": "平台總覽與管理工具。",
@@ -755,6 +757,7 @@
     "overview": "總覽",
     "badges": "徽章",
     "inbox": "收件匣",
+    "comments": "留言區",
     "broadcasts": "廣播",
     "edit": "編輯檔案",
     "viewArtistPage": "查看藝人頁面",
@@ -990,6 +993,13 @@
     "ctaTitle": "準備好升級了嗎？",
     "ctaDesc": "免費認領你的藝人或場地頁面，隨時升級解鎖完整工具套件。",
     "ctaButton": "探索藝人"
+  },
+  "dashboardComments": {
+    "title": "留言區",
+    "filterAll": "全部",
+    "filterUnreplied": "未回覆",
+    "noComments": "還沒有留言。",
+    "noUnreplied": "所有留言都已回覆！"
   },
   "reviews": {
     "sectionTitle": "留言板",

@@ -4,114 +4,12 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import AvatarCropModal from '@/components/AvatarCropModal';
 import FadeUp from '@/components/animations/FadeUp';
 import BadgeShowcase from '@/components/BadgeShowcase';
 import PushNotificationToggle from '@/components/PushNotificationToggle';
-
-interface MyReview {
-  id: string;
-  venue_id: string;
-  venue_name: string | null;
-  text: string | null;
-  tags: string[] | null;
-  image_url: string | null;
-  is_anonymous: boolean;
-  created_at: string;
-}
-
-function MyReviews() {
-  const t = useTranslations('profile');
-  const locale = useLocale();
-  const { user } = useAuth();
-  const [reviews, setReviews] = useState<MyReview[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!user) return;
-    const supabase = createClient();
-    supabase
-      .from('venue_comments')
-      .select('id, venue_id, text, tags, image_url, is_anonymous, created_at')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .then(async ({ data }) => {
-        if (!data || data.length === 0) { setReviews([]); setLoading(false); return; }
-        // Fetch venue names from Airtable venues cache via existing helper isn't available client-side,
-        // so we just display the venue_id as link. Venue pages will show the name.
-        setReviews(data.map((r) => ({ ...r, venue_name: null })));
-        setLoading(false);
-      });
-  }, [user]);
-
-  if (loading) {
-    return (
-      <div className="py-8 text-center">
-        <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <h2 className="font-serif text-xl font-bold flex items-center gap-3">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
-        {t('myReviews')}
-      </h2>
-
-      {reviews.length === 0 ? (
-        <p className="text-[var(--muted-foreground)] text-sm">{t('noMyReviews')}</p>
-      ) : (
-        <div className="space-y-3">
-          {reviews.map((review) => {
-            const dateStr = new Date(review.created_at).toLocaleDateString(
-              locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US',
-              { year: 'numeric', month: 'short', day: 'numeric' },
-            );
-            return (
-              <Link
-                key={review.id}
-                href={`/${locale}/venues/${review.venue_id}`}
-                className="block bg-[var(--background)] p-4 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/30 transition-colors group"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium group-hover:text-[var(--color-gold)] transition-colors">
-                      {t('viewVenue')} →
-                    </span>
-                    {review.is_anonymous && (
-                      <span className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-md bg-[var(--border)]/50 text-[var(--muted-foreground)]">
-                        {t('anonymous')}
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-xs text-[var(--muted-foreground)]">{dateStr}</span>
-                </div>
-                {review.tags && review.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-1.5">
-                    {review.tags.map((tag: string) => (
-                      <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)]/80">
-                        {tag.replace(/_/g, ' ')}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                {review.text && (
-                  <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{review.text}</p>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function ProfilePage() {
   const t = useTranslations('profile');
@@ -440,13 +338,6 @@ export default function ProfilePage() {
               </a>
             )}
           </div>
-        </div>
-      </FadeUp>
-
-      {/* My Reviews */}
-      <FadeUp>
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8">
-          <MyReviews />
         </div>
       </FadeUp>
 
