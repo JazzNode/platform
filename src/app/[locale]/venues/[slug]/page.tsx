@@ -322,7 +322,17 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
               </TierGate>
               <ClaimButton targetType="venue" targetId={venue.id} targetName={displayName(f)} />
               <FollowButton itemType="venue" itemId={venue.id} variant="full" followerCount={followerCount} />
-              <ShareButton title={displayName(f)} url={`/${locale}/venues/${slug}`} variant="compact" label={t('share')} />
+              <ShareButton
+                title={displayName(f)}
+                url={`/${locale}/venues/${slug}`}
+                text={[
+                  `📍 ${f.city_id?.[0] && cityMap.get(f.city_id[0]) ? `${cityName(cityMap.get(f.city_id[0])!, locale)}｜` : ''}${displayName(f)}`,
+                  localized(f as Record<string, unknown>, 'description', locale)?.slice(0, 100) || '',
+                  'via JazzNode — The Jazz Scene, Connected.',
+                ].filter(Boolean).join('\n')}
+                variant="compact"
+                label={t('share')}
+              />
           </div>
 
           {/* Unclaimed notice */}

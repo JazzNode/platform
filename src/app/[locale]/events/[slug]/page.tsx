@@ -338,6 +338,11 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             <ShareButton
               title={eventTitle(f, locale)}
               url={`/${locale}/events/${slug}`}
+              text={[
+                eventTitle(f, locale),
+                `📅 ${f.start_at ? formatDate(f.start_at, locale, tz) : ''}${venue ? ` · 📍 ${displayName(venue.fields)}` : ''}`,
+                'via JazzNode — The Jazz Scene, Connected.',
+              ].filter(Boolean).join('\n')}
               variant="full"
               label={t('share')}
             />

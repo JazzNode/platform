@@ -442,7 +442,17 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               </TierGate>
               <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
               <FollowButton itemType="artist" itemId={artist.id} variant="full" followerCount={followerCount} />
-              <ShareButton title={artistDisplayName(f, locale)} url={`/${locale}/artists/${slug}`} variant="compact" label={t('share')} />
+              <ShareButton
+                title={artistDisplayName(f, locale)}
+                url={`/${locale}/artists/${slug}`}
+                text={[
+                  `${artistDisplayName(f, locale)}${f.primary_instrument ? ` — ${instLabel(f.primary_instrument)}` : ''}`,
+                  localized(f as Record<string, unknown>, 'bio', locale)?.slice(0, 100) || localized(f as Record<string, unknown>, 'bio_short', locale)?.slice(0, 100) || '',
+                  'via JazzNode — The Jazz Scene, Connected.',
+                ].filter(Boolean).join('\n')}
+                variant="compact"
+                label={t('share')}
+              />
             </div>
 
             {/* Data source notice */}
