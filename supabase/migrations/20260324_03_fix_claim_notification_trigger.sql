@@ -1,6 +1,14 @@
--- Fix: notify_admins_on_new_claim used non-existent columns (slug, name)
--- Correct columns: venue_id / artist_id, and COALESCE(name_en, name_local, display_name)
+-- Fix: original migration 20260323_04 was never fully applied to the database.
+-- Three issues: (1) claim_review missing from notifications type CHECK constraint,
+-- (2) trigger on_claim_insert_notify_admins never created,
+-- (3) function used non-existent columns (slug, name).
 
+-- 1. Add claim_review to notification type CHECK constraint
+ALTER TABLE public.notifications DROP CONSTRAINT IF EXISTS notifications_type_check;
+ALTER TABLE public.notifications ADD CONSTRAINT notifications_type_check
+  CHECK (type IN ('general', 'follow_update', 'claim_status', 'system', 'new_member', 'badge', 'message', 'comment_reply', 'claim_review'));
+
+-- 2. Fix function: use correct column names (venue_id/artist_id, COALESCE name fields)
 CREATE OR REPLACE FUNCTION public.notify_admins_on_new_claim()
 RETURNS TRIGGER AS $$
 DECLARE
@@ -48,3 +56,10 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Re-create the trigger (original migration's trigger was never applied)
+DROP TRIGGER IF EXISTS on_claim_insert_notify_admins ON public.claims;
+CREATE TRIGGER on_claim_insert_notify_admins
+  AFTER INSERT ON public.claims
+  FOR EACH ROW
+  EXECUTE FUNCTION public.notify_admins_on_new_claim();
