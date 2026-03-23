@@ -78,6 +78,7 @@ self.addEventListener('fetch', (event) => {
 
 // Push notification handler
 self.addEventListener('push', (event) => {
+  console.log('[SW] Push event received!', event.data?.text());
   if (!event.data) return;
 
   let data;
