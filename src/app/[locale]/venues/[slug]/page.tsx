@@ -21,6 +21,7 @@ import type { BadgeProgress } from '@/lib/badges';
 import MessageVenueButton from '@/components/MessageVenueButton';
 import TierGate from '@/components/TierGate';
 import VenueCommentsSection from '@/components/VenueCommentsSection';
+import VenuePhotoGallery from '@/components/VenuePhotoGallery';
 import VerifiedBadge from '@/components/VerifiedBadge';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -425,6 +426,10 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       </FadeUp>
 
+      {/* Photo Gallery */}
+      <FadeUp stagger={0.1}>
+        <VenuePhotoGallery venueId={slug} label={t('photoGallery')} />
+      </FadeUp>
 
       {/* Location & Map */}
       {((f.lat && f.lng) || f.address_local || f.address_en) && (

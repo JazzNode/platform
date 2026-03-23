@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useFilterParams } from '@/hooks/useFilterParams';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -27,6 +27,7 @@ interface SerializedVenue {
   jamBadgeLabel?: string;
   tier: number;
   badgeList?: string[];
+  galleryPhotos?: string[];
 }
 
 interface CityOption {
@@ -54,6 +55,60 @@ interface Props {
     allCities: string;
     noVenues: string;
   };
+}
+
+/* ── Card image carousel (fade transition, auto-rotate) ── */
+
+function CardCarousel({ images, alt }: { images: string[]; alt: string }) {
+  const [current, setCurrent] = useState(0);
+  const [phase, setPhase] = useState<'visible' | 'fading'>('visible');
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [hovered, setHovered] = useState(false);
+
+  const advance = useCallback(() => {
+    if (images.length <= 1) return;
+    setPhase('fading');
+    setTimeout(() => {
+      setCurrent((i) => (i + 1) % images.length);
+      setPhase('visible');
+    }, 500);
+  }, [images.length]);
+
+  useEffect(() => {
+    if (images.length <= 1 || hovered) return;
+    intervalRef.current = setInterval(advance, 6000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [images.length, advance, hovered]);
+
+  return (
+    <div
+      className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl relative"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <Image
+        src={images[current]}
+        alt={alt}
+        fill
+        className="object-cover opacity-70 group-hover:opacity-100 transition-all duration-500"
+        style={{ opacity: phase === 'fading' ? 0.3 : undefined }}
+        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+      />
+      {/* Dot indicators */}
+      {images.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
+          {images.map((_, i) => (
+            <span
+              key={i}
+              className={`rounded-full transition-all duration-300 ${
+                i === current ? 'w-3 h-1.5 bg-[var(--color-gold)]' : 'w-1.5 h-1.5 bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // Shared pill base: visual stays compact, but an invisible ::after pseudo-element
@@ -259,22 +314,34 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   />
                   <FollowButton itemType="venue" itemId={venue.id} glass />
                 </div>
-                {venue.photoUrl && (
-                  <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl relative">
-                    <Image
-                      src={venue.photoUrl}
-                      alt={venue.displayName}
-                      fill
-                      className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
-                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    />
-                    {venue.hasUpcomingJam && (
-                      <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">
-                        ♪ {venue.jamBadgeLabel}
-                      </span>
-                    )}
-                  </div>
-                )}
+                {venue.photoUrl && (() => {
+                  const allImages = [venue.photoUrl, ...(venue.galleryPhotos || [])].slice(0, 5);
+                  return allImages.length > 1 ? (
+                    <div className="relative">
+                      <CardCarousel images={allImages} alt={venue.displayName} />
+                      {venue.hasUpcomingJam && (
+                        <span className="absolute bottom-2 right-2 z-10 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">
+                          ♪ {venue.jamBadgeLabel}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="h-44 overflow-hidden mb-5 -mx-6 -mt-6 rounded-t-2xl relative">
+                      <Image
+                        src={venue.photoUrl}
+                        alt={venue.displayName}
+                        fill
+                        className="object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-500"
+                        sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      />
+                      {venue.hasUpcomingJam && (
+                        <span className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18] backdrop-blur-sm shadow-lg">
+                          ♪ {venue.jamBadgeLabel}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
                 {!venue.photoUrl && venue.hasUpcomingJam && (
                   <span className="inline-block mb-3 px-2.5 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-gold/90 text-[#1a1a18]">
                     ♪ {venue.jamBadgeLabel}

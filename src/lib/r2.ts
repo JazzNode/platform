@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 const R2 = new S3Client({
   region: 'auto',
@@ -41,4 +41,24 @@ export async function uploadToR2(
   const url = PUBLIC_URL.endsWith('/') ? `${PUBLIC_URL}${key}` : `${PUBLIC_URL}/${key}`;
 
   return { key, url };
+}
+
+/**
+ * Extract the R2 object key from a full public URL.
+ */
+export function r2KeyFromUrl(url: string): string {
+  const prefix = PUBLIC_URL.endsWith('/') ? PUBLIC_URL : `${PUBLIC_URL}/`;
+  return url.startsWith(prefix) ? url.slice(prefix.length) : url;
+}
+
+/**
+ * Delete an object from Cloudflare R2 by its key.
+ */
+export async function deleteFromR2(key: string): Promise<void> {
+  await R2.send(
+    new DeleteObjectCommand({
+      Bucket: BUCKET,
+      Key: key,
+    }),
+  );
 }

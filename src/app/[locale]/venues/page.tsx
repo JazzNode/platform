@@ -2,6 +2,7 @@ export const revalidate = 3600;
 import { getTranslations } from 'next-intl/server';
 import { getVenues, getEvents, getCities, getBadges, buildVenueEventCounts, venueEventCount } from '@/lib/supabase';
 import { displayName, photoUrl, localized, cityName } from '@/lib/helpers';
+import { createClient } from '@/utils/supabase/server';
 import VenuesClient from '@/components/VenuesClient';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -35,6 +36,21 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
   const tRegions = await getTranslations('regions');
 
   const [venues, events, cities, badges] = await Promise.all([getVenues(), getEvents(), getCities(), getBadges()]);
+
+  // Fetch gallery photos for all venues (grouped by venue_id, max 5 per venue)
+  const supabase = await createClient();
+  const { data: allGalleryPhotos } = await supabase
+    .from('venue_photos')
+    .select('venue_id, photo_url, sort_order')
+    .order('sort_order', { ascending: true });
+
+  const galleryMap: Record<string, string[]> = {};
+  for (const row of allGalleryPhotos ?? []) {
+    if (!galleryMap[row.venue_id]) galleryMap[row.venue_id] = [];
+    if (galleryMap[row.venue_id].length < 5) {
+      galleryMap[row.venue_id].push(row.photo_url);
+    }
+  }
 
   // Build badge name map (badge_id → localized name)
   const badgeNameMap: Record<string, string> = {};
@@ -86,6 +102,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
       jamBadgeLabel: t('jamThisWeek'),
       tier: f.tier || 0,
       badgeList: f.badge_list || [],
+      galleryPhotos: galleryMap[venue.id] || [],
     };
   });
 

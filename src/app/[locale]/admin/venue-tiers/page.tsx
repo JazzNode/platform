@@ -27,7 +27,6 @@ interface FeatureKey {
 
 /** Features listed in the tier config but not yet built in the frontend */
 const NOT_IMPLEMENTED = new Set([
-  'photos',
   'schedule_manager',
   'backline',
   'artist_discovery',
