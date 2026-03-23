@@ -16,6 +16,7 @@ import { createAdminClient } from '@/utils/supabase/admin';
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || '';
 const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:hello@jazznode.com';
+const DEPLOY_ENV = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    await logRun(supabase, { dryRun, error: 'VAPID keys not configured', durationMs: Date.now() - startTime });
+    await logRun(supabase, { dryRun, error: 'VAPID keys not configured', errorCode: 'VAPID_MISSING', durationMs: Date.now() - startTime });
     return NextResponse.json({ error: 'VAPID keys not configured' }, { status: 500 });
   }
 
@@ -188,6 +189,7 @@ export async function GET(request: NextRequest) {
     failed,
     cleaned: staleEndpoints.length,
     durationMs,
+    errorCode: failed > 0 ? 'SEND_PARTIAL' : undefined,
   });
 
   return NextResponse.json({
@@ -215,6 +217,7 @@ interface LogRunParams {
   cleaned?: number;
   durationMs: number;
   error?: string;
+  errorCode?: string;
 }
 
 async function logRun(
@@ -231,6 +234,8 @@ async function logRun(
       cleaned: params.cleaned ?? 0,
       duration_ms: params.durationMs,
       error: params.error ?? null,
+      env: DEPLOY_ENV,
+      error_code: params.errorCode ?? null,
     });
   } catch {
     // Logging failure should not break the cron
