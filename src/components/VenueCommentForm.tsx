@@ -75,62 +75,59 @@ export default function VenueCommentForm({ venueId }: { venueId: string }) {
   useEffect(() => {
     if (!showForm || !profile) return;
 
-    const opts: IdentityOption[] = [];
+    (async () => {
+      const opts: IdentityOption[] = [];
 
-    // Member is always first (default)
-    opts.push({
-      role: null,
-      artistId: null,
-      label: t('identity.member'),
-      dotColor: ROLE_DOT_COLORS.member,
-    });
-
-    // Admin / HQ
-    if (profile.role === 'admin' || profile.role === 'owner') {
+      // Member is always first (default)
       opts.push({
-        role: 'admin',
+        role: null,
         artistId: null,
-        label: t('identity.admin'),
-        dotColor: ROLE_DOT_COLORS.admin,
+        label: t('identity.member'),
+        dotColor: ROLE_DOT_COLORS.member,
       });
-    }
 
-    // Venue manager for this venue
-    if (profile.claimed_venue_ids?.includes(venueId)) {
-      opts.push({
-        role: 'venue_manager',
-        artistId: null,
-        label: t('identity.venue_manager'),
-        dotColor: ROLE_DOT_COLORS.venue_manager,
-      });
-    }
+      // Admin / HQ
+      if (profile.role === 'admin' || profile.role === 'owner') {
+        opts.push({
+          role: 'admin',
+          artistId: null,
+          label: t('identity.admin'),
+          dotColor: ROLE_DOT_COLORS.admin,
+        });
+      }
 
-    // Artists — need to fetch names
-    if (profile.claimed_artist_ids?.length) {
-      const supabase = createClient();
-      supabase
-        .from('artists')
-        .select('artist_id, display_name, name_local, name_en')
-        .in('artist_id', profile.claimed_artist_ids)
-        .then(({ data }) => {
-          if (data) {
-            const artistOpts: IdentityOption[] = data.map((a) => ({
+      // Venue manager for this venue
+      if (profile.claimed_venue_ids?.includes(venueId)) {
+        opts.push({
+          role: 'venue_manager',
+          artistId: null,
+          label: t('identity.venue_manager'),
+          dotColor: ROLE_DOT_COLORS.venue_manager,
+        });
+      }
+
+      // Artists — fetch names and include in initial set
+      if (profile.claimed_artist_ids?.length) {
+        const supabase = createClient();
+        const { data } = await supabase
+          .from('artists')
+          .select('artist_id, display_name, name_local, name_en')
+          .in('artist_id', profile.claimed_artist_ids);
+        if (data) {
+          data.forEach((a) => {
+            opts.push({
               role: 'artist',
               artistId: a.artist_id,
               label: a.display_name || a.name_local || a.name_en || a.artist_id,
               dotColor: ROLE_DOT_COLORS.artist,
-            }));
-            setIdentities((prev) => {
-              // Replace any existing artist options and append new ones
-              const nonArtist = prev.filter((o) => o.role !== 'artist');
-              return [...nonArtist, ...artistOpts];
             });
-          }
-        });
-    }
+          });
+        }
+      }
 
-    setIdentities(opts);
-    setSelectedIdentity(opts[0]); // Default to member
+      setIdentities(opts);
+      setSelectedIdentity(opts[0]);
+    })();
   }, [showForm, profile, venueId, t]);
 
   // Close identity menu on outside click
