@@ -326,7 +326,8 @@
     "viewVenue": "ดูสถานที่",
     "anonymous": "ไม่ระบุชื่อ",
     "pushNotifications": "การแจ้งเตือนแบบพุช",
-    "pushNotificationsHint": "รับการแจ้งเตือนข้อความและอัปเดตใหม่"
+    "pushNotificationsHint": "รับการแจ้งเตือนข้อความและอัปเดตใหม่",
+    "share": "แชร์"
   },
   "pushPrompt": {
     "title": "ไม่พลาดทุกความเคลื่อนไหว",
@@ -908,7 +909,6 @@
     "artistTier1Desc": "เคลมและแก้ไขหน้าของคุณ รับการยืนยัน",
     "artistTier2Desc": "บรอดแคสต์ กล่องข้อความ การวิเคราะห์เต็มรูปแบบ & EPK",
     "artistTier3Desc": "โดเมนกำหนดเอง ระบบจอง & เครื่องมือแบรนด์",
-
     "artistCatFanFacing": "สำหรับแฟนคลับ (แสดงเสมอ)",
     "artistPublicProfile": "โปรไฟล์ศิลปินสาธารณะ",
     "artistSearchListing": "แสดงในผลค้นหาและหน้าเมือง",
@@ -917,7 +917,6 @@
     "artistFollowerCount": "แสดงจำนวนผู้ติดตาม",
     "artistTagsBadges": "แท็กและเครื่องหมาย",
     "artistPerformanceHistory": "ประวัติการแสดงทั้งหมด",
-
     "artistCatClaimed": "เคลมแล้ว (สิทธิ์แก้ไข)",
     "artistEditProfile": "แก้ไขประวัติ รูปภาพ และรายละเอียด",
     "artistVerifiedBadge": "เครื่องหมายยืนยัน",
@@ -932,7 +931,6 @@
     "artistEPKFull": "เต็มรูปแบบ + การวิเคราะห์",
     "artistEPKBranded": "PDF แบบมีแบรนด์",
     "artistAnalyticsBasic": "ยอดเข้าชมหน้าและแนวโน้มผู้ติดตาม",
-
     "artistCatPremium": "Premium (เข้าถึงเชิงรุก)",
     "artistBroadcasts": "บรอดแคสต์ถึงแฟน",
     "broadcastsLimited": "จำกัดรายเดือน",
@@ -942,34 +940,29 @@
     "artistAvailableForHire": "รายชื่อพร้อมรับจ้างงาน",
     "artistAnalyticsAdvanced": "วิเคราะห์เต็มรูปแบบ (เมือง, แหล่งที่มา, แนวโน้ม)",
     "artistPrioritySearch": "แสดงลำดับต้นในผลค้นหา",
-
     "artistCatElite": "Elite (แบรนด์อิสระ)",
     "artistCustomDomain": "โดเมนกำหนดเอง",
     "artistCustomTheme": "ธีมและสไตล์กำหนดเอง",
     "artistBookingRequests": "ระบบสอบถามการจอง",
     "artistSpotlight": "สปอตไลท์หน้าแรกและหน้าเมือง",
     "artistDataExport": "ส่งออกข้อมูล / เข้าถึง API",
-
     "venueSectionTitle": "ระดับสถานที่",
     "venueSectionDesc": "หน้าสถานที่ของคุณเป็นคู่มือแจ๊สที่ดีที่สุดสำหรับแฟนอยู่แล้ว การอัปเกรดระดับจะปลดล็อกเครื่องมือจัดการ — แก้ไขรายชื่อ เข้าถึงผู้ติดตาม และดำเนินธุรกิจ",
     "venueTier0Desc": "คู่มือสถานที่เต็มรูปแบบ สร้างอัตโนมัติจากข้อมูลกิจกรรม",
     "venueTier1Desc": "เคลมและแก้ไขหน้าของคุณ รับการยืนยัน",
     "venueTier2Desc": "จัดการตารางเวลา การวิเคราะห์ กล่องข้อความ & แบ็คไลน์",
     "venueTier3Desc": "โดเมนกำหนดเอง ระบบจำหน่ายตั๋ว & แดชบอร์ดการจอง",
-
     "venueCatFanFacing": "สำหรับแฟนคลับ (แสดงเสมอ)",
     "venuePublicListing": "รายชื่อสถานที่สาธารณะ",
     "venueSearchListing": "แสดงในผลค้นหาและหน้าเมือง",
     "venueMapPin": "ปักหมุดในแผนที่หน้าเมือง",
     "venueEventShowcase": "รายชื่อกิจกรรมบนหน้าสถานที่",
     "venueVenueTags": "แท็กบรรยากาศและรีวิว",
-
     "venueCatClaimed": "เคลมแล้ว (สิทธิ์แก้ไข)",
     "venueEditProfile": "แก้ไขคำอธิบาย รูปภาพ และเวลาเปิด-ปิด",
     "venueVerifiedBadge": "เครื่องหมายยืนยัน",
     "venuePhotos": "แกลเลอรีรูปภาพ",
     "venueDescription": "คำอธิบายแบบกำหนดเอง",
-
     "venueCatPremium": "Premium (เครื่องมือดำเนินงาน)",
     "venueScheduleManager": "ปฏิทินจัดการตารางเวลา",
     "venueBackline": "จัดการอุปกรณ์แบ็คไลน์",
@@ -979,7 +972,6 @@
     "venueArtistDiscovery": "ค้นพบศิลปินและการเข้าถึง",
     "venueBroadcasts": "บรอดแคสต์ถึงแฟน",
     "venuePrioritySearch": "แสดงลำดับต้นในผลค้นหา",
-
     "venueCatElite": "Elite (เครื่องยนต์ธุรกิจ)",
     "venueCustomDomain": "โดเมนกำหนดเอง",
     "venueCustomTheme": "ธีมและการสร้างแบรนด์กำหนดเอง",

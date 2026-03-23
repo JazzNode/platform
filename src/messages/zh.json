@@ -326,7 +326,8 @@
     "viewVenue": "查看場地",
     "anonymous": "匿名",
     "pushNotifications": "推播通知",
-    "pushNotificationsHint": "接收新訊息與更新的即時通知。"
+    "pushNotificationsHint": "接收新訊息與更新的即時通知。",
+    "share": "分享"
   },
   "pushPrompt": {
     "title": "不錯過任何動態",
@@ -902,14 +903,12 @@
     "claimed": "已認領",
     "premium": "進階",
     "elite": "菁英",
-
     "artistSectionTitle": "藝人等級",
     "artistSectionDesc": "你的檔案已經上線，對粉絲完整呈現。升級等級可解鎖創作者工具——編輯你的頁面、觸及追蹤者，並打造你的品牌。",
     "artistTier0Desc": "由演出資料自動產生的完整檔案",
     "artistTier1Desc": "認領並編輯你的頁面，取得認證",
     "artistTier2Desc": "廣播、收件匣、完整數據分析與 EPK",
     "artistTier3Desc": "自訂網域、訂票系統與品牌工具",
-
     "artistCatFanFacing": "粉絲端（永遠可見）",
     "artistPublicProfile": "公開藝人頁面",
     "artistSearchListing": "出現在搜尋與城市頁面",
@@ -918,7 +917,6 @@
     "artistFollowerCount": "粉絲數量顯示",
     "artistTagsBadges": "標籤與標章",
     "artistPerformanceHistory": "完整演出歷程",
-
     "artistCatClaimed": "已認領（編輯權限）",
     "artistEditProfile": "編輯簡介、照片與資料",
     "artistVerifiedBadge": "認證標章",
@@ -933,7 +931,6 @@
     "artistEPKFull": "完整版 + 數據分析",
     "artistEPKBranded": "品牌化 PDF",
     "artistAnalyticsBasic": "頁面瀏覽量與粉絲趨勢",
-
     "artistCatPremium": "Premium（主動推廣）",
     "artistBroadcasts": "粉絲廣播",
     "broadcastsLimited": "每月限額",
@@ -943,34 +940,29 @@
     "artistAvailableForHire": "開放接案列表",
     "artistAnalyticsAdvanced": "完整分析（城市、來源、趨勢）",
     "artistPrioritySearch": "搜尋結果優先排序",
-
     "artistCatElite": "Elite（品牌獨立）",
     "artistCustomDomain": "自訂網域",
     "artistCustomTheme": "自訂主題與樣式",
     "artistBookingRequests": "演出邀約系統",
     "artistSpotlight": "首頁與城市頁面焦點推薦",
     "artistDataExport": "資料匯出 / API 存取",
-
     "venueSectionTitle": "場地等級",
     "venueSectionDesc": "你的場地頁面已是粉絲的最佳爵士指南。升級等級可解鎖管理工具——編輯你的列表、觸及追蹤者，並經營你的事業。",
     "venueTier0Desc": "由演出資料自動產生的完整場地指南",
     "venueTier1Desc": "認領並編輯你的頁面，取得認證",
     "venueTier2Desc": "排班管理、數據分析、收件匣與場地設備",
     "venueTier3Desc": "自訂網域、售票整合與預約管理",
-
     "venueCatFanFacing": "粉絲端（永遠可見）",
     "venuePublicListing": "公開場地列表",
     "venueSearchListing": "出現在搜尋與城市頁面",
     "venueMapPin": "城市頁面地圖標記",
     "venueEventShowcase": "場地頁面演出列表",
     "venueVenueTags": "氛圍與評價標籤",
-
     "venueCatClaimed": "已認領（編輯權限）",
     "venueEditProfile": "編輯描述、照片與營業時間",
     "venueVerifiedBadge": "認證標章",
     "venuePhotos": "照片圖庫",
     "venueDescription": "自訂場地描述",
-
     "venueCatPremium": "Premium（營運工具）",
     "venueScheduleManager": "行事曆排程管理",
     "venueBackline": "場地設備管理",
@@ -980,7 +972,6 @@
     "venueArtistDiscovery": "藝人探索與邀約",
     "venueBroadcasts": "粉絲廣播",
     "venuePrioritySearch": "搜尋結果優先排序",
-
     "venueCatElite": "Elite（商業引擎）",
     "venueCustomDomain": "自訂網域",
     "venueCustomTheme": "自訂主題與品牌風格",
@@ -989,7 +980,6 @@
     "venueRevenueAnalytics": "營收分析",
     "venueMultiLocation": "多據點管理",
     "venueIcalApi": "iCal / API 匯出",
-
     "ctaTitle": "準備好升級了嗎？",
     "ctaDesc": "免費認領你的藝人或場地頁面，隨時升級解鎖完整工具套件。",
     "ctaButton": "探索藝人"

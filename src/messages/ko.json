@@ -326,7 +326,8 @@
     "viewVenue": "공연장 보기",
     "anonymous": "익명",
     "pushNotifications": "푸시 알림",
-    "pushNotificationsHint": "새 메시지 및 업데이트 알림을 받습니다."
+    "pushNotificationsHint": "새 메시지 및 업데이트 알림을 받습니다.",
+    "share": "공유"
   },
   "pushPrompt": {
     "title": "소식을 놓치지 마세요",
@@ -908,7 +909,6 @@
     "artistTier1Desc": "페이지를 클레임하고 편집, 인증 획득",
     "artistTier2Desc": "브로드캐스트, 수신함, 전체 분석 & EPK",
     "artistTier3Desc": "커스텀 도메인, 부킹 시스템 & 브랜드 도구",
-
     "artistCatFanFacing": "팬 대상 (항상 표시)",
     "artistPublicProfile": "공개 아티스트 프로필",
     "artistSearchListing": "검색 및 도시 페이지에 등록",
@@ -917,7 +917,6 @@
     "artistFollowerCount": "팔로워 수 표시",
     "artistTagsBadges": "태그 & 배지",
     "artistPerformanceHistory": "전체 공연 이력",
-
     "artistCatClaimed": "클레임 완료 (편집 권한)",
     "artistEditProfile": "소개, 사진 및 상세 정보 편집",
     "artistVerifiedBadge": "인증 배지",
@@ -932,7 +931,6 @@
     "artistEPKFull": "전체 + 분석",
     "artistEPKBranded": "브랜드 PDF",
     "artistAnalyticsBasic": "페이지 조회수 & 팔로워 트렌드",
-
     "artistCatPremium": "Premium (적극적 홍보)",
     "artistBroadcasts": "팬 브로드캐스트",
     "broadcastsLimited": "월간 제한",
@@ -942,34 +940,29 @@
     "artistAvailableForHire": "섭외 가능 등록",
     "artistAnalyticsAdvanced": "전체 분석 (도시, 유입 경로, 트렌드)",
     "artistPrioritySearch": "검색 결과 우선 표시",
-
     "artistCatElite": "Elite (브랜드 독립)",
     "artistCustomDomain": "맞춤 도메인",
     "artistCustomTheme": "맞춤 테마 & 스타일링",
     "artistBookingRequests": "부킹 문의 시스템",
     "artistSpotlight": "홈페이지 & 도시 페이지 스포트라이트",
     "artistDataExport": "데이터 내보내기 / API 접근",
-
     "venueSectionTitle": "베뉴 티어",
     "venueSectionDesc": "베뉴 페이지는 이미 팬을 위한 최고의 재즈 가이드입니다. 티어는 관리 도구를 잠금 해제합니다 — 리스팅을 편집하고, 팔로워에게 다가가고, 비즈니스를 운영하세요.",
     "venueTier0Desc": "이벤트 데이터에서 자동 생성된 전체 베뉴 가이드",
     "venueTier1Desc": "페이지를 클레임하고 편집, 인증 획득",
     "venueTier2Desc": "스케줄 관리, 분석, 수신함 & 백라인",
     "venueTier3Desc": "커스텀 도메인, 티켓 판매 & 부킹 대시보드",
-
     "venueCatFanFacing": "팬 대상 (항상 표시)",
     "venuePublicListing": "공개 베뉴 리스팅",
     "venueSearchListing": "검색 및 도시 페이지에 등록",
     "venueMapPin": "도시 페이지 지도 핀",
     "venueEventShowcase": "베뉴 페이지에 이벤트 등록",
     "venueVenueTags": "분위기 & 리뷰 태그",
-
     "venueCatClaimed": "클레임 완료 (편집 권한)",
     "venueEditProfile": "설명, 사진 및 영업시간 편집",
     "venueVerifiedBadge": "인증 배지",
     "venuePhotos": "포토 갤러리",
     "venueDescription": "커스텀 설명",
-
     "venueCatPremium": "Premium (운영 도구)",
     "venueScheduleManager": "스케줄 관리 캘린더",
     "venueBackline": "백라인 장비 관리",
@@ -979,7 +972,6 @@
     "venueArtistDiscovery": "아티스트 발굴 & 아웃리치",
     "venueBroadcasts": "팬 브로드캐스트",
     "venuePrioritySearch": "검색 결과 우선 표시",
-
     "venueCatElite": "Elite (비즈니스 엔진)",
     "venueCustomDomain": "맞춤 도메인",
     "venueCustomTheme": "맞춤 테마 & 브랜딩",

@@ -326,7 +326,8 @@
     "viewVenue": "View venue",
     "anonymous": "Anonymous",
     "pushNotifications": "Push Notifications",
-    "pushNotificationsHint": "Receive alerts for new messages and updates."
+    "pushNotificationsHint": "Receive alerts for new messages and updates.",
+    "share": "Share"
   },
   "pushPrompt": {
     "title": "Stay in the Loop",
@@ -902,14 +903,12 @@
     "claimed": "Claimed",
     "premium": "Premium",
     "elite": "Elite",
-
     "artistSectionTitle": "Artist Tiers",
     "artistSectionDesc": "Your profile is already live and complete for fans. Tiers unlock creator tools — edit your page, reach your followers, and build your brand.",
     "artistTier0Desc": "Full profile, auto-generated from event data",
     "artistTier1Desc": "Claim & edit your page, get verified",
     "artistTier2Desc": "Broadcasts, inbox, full analytics & EPK",
     "artistTier3Desc": "Custom domain, booking system & brand tools",
-
     "artistCatFanFacing": "Fan-Facing (Always Visible)",
     "artistPublicProfile": "Public artist profile",
     "artistSearchListing": "Listed in search & city pages",
@@ -918,7 +917,6 @@
     "artistFollowerCount": "Follower count display",
     "artistTagsBadges": "Tags & badges",
     "artistPerformanceHistory": "Full performance history",
-
     "artistCatClaimed": "Claimed (Edit Rights)",
     "artistEditProfile": "Edit bio, photo & details",
     "artistVerifiedBadge": "Verified badge",
@@ -933,7 +931,6 @@
     "artistEPKFull": "Full + analytics",
     "artistEPKBranded": "Branded PDF",
     "artistAnalyticsBasic": "Page views & follower trends",
-
     "artistCatPremium": "Premium (Proactive Reach)",
     "artistBroadcasts": "Fan broadcasts",
     "broadcastsLimited": "Monthly limit",
@@ -943,34 +940,29 @@
     "artistAvailableForHire": "Available for Hire listing",
     "artistAnalyticsAdvanced": "Full analytics (cities, sources, trends)",
     "artistPrioritySearch": "Priority in search results",
-
     "artistCatElite": "Elite (Brand Independence)",
     "artistCustomDomain": "Custom domain",
     "artistCustomTheme": "Custom theme & styling",
     "artistBookingRequests": "Booking inquiry system",
     "artistSpotlight": "Homepage & city page spotlight",
     "artistDataExport": "Data export / API access",
-
     "venueSectionTitle": "Venue Tiers",
     "venueSectionDesc": "Your venue page is already the best jazz guide for fans. Tiers unlock management tools — edit your listing, reach followers, and run your business.",
     "venueTier0Desc": "Full venue guide, auto-generated from event data",
     "venueTier1Desc": "Claim & edit your page, get verified",
     "venueTier2Desc": "Schedule manager, analytics, inbox & backline",
     "venueTier3Desc": "Custom domain, ticketing & booking dashboard",
-
     "venueCatFanFacing": "Fan-Facing (Always Visible)",
     "venuePublicListing": "Public venue listing",
     "venueSearchListing": "Listed in search & city pages",
     "venueMapPin": "Map pin on city page",
     "venueEventShowcase": "Event listings on venue page",
     "venueVenueTags": "Atmosphere & review tags",
-
     "venueCatClaimed": "Claimed (Edit Rights)",
     "venueEditProfile": "Edit description, photos & hours",
     "venueVerifiedBadge": "Verified badge",
     "venuePhotos": "Photo gallery",
     "venueDescription": "Custom description",
-
     "venueCatPremium": "Premium (Operational Tools)",
     "venueScheduleManager": "Schedule manager calendar",
     "venueBackline": "Backline equipment management",
@@ -980,7 +972,6 @@
     "venueArtistDiscovery": "Artist discovery & outreach",
     "venueBroadcasts": "Fan broadcasts",
     "venuePrioritySearch": "Priority in search results",
-
     "venueCatElite": "Elite (Business Engine)",
     "venueCustomDomain": "Custom domain",
     "venueCustomTheme": "Custom theme & branding",
@@ -989,7 +980,6 @@
     "venueRevenueAnalytics": "Revenue analytics",
     "venueMultiLocation": "Multi-location management",
     "venueIcalApi": "iCal / API export",
-
     "ctaTitle": "Ready to Level Up?",
     "ctaDesc": "Claim your artist or venue page for free, and upgrade anytime to unlock the full suite of tools.",
     "ctaButton": "Explore Artists"

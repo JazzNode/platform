@@ -326,7 +326,8 @@
     "viewVenue": "会場を見る",
     "anonymous": "匿名",
     "pushNotifications": "プッシュ通知",
-    "pushNotificationsHint": "新しいメッセージや更新の通知を受け取ります。"
+    "pushNotificationsHint": "新しいメッセージや更新の通知を受け取ります。",
+    "share": "シェア"
   },
   "pushPrompt": {
     "title": "最新情報をお見逃しなく",
@@ -908,7 +909,6 @@
     "artistTier1Desc": "ページをクレームして編集、認証を取得",
     "artistTier2Desc": "ブロードキャスト、受信箱、フル分析＆EPK",
     "artistTier3Desc": "カスタムドメイン、予約システム＆ブランドツール",
-
     "artistCatFanFacing": "ファン向け（常時表示）",
     "artistPublicProfile": "公開アーティストプロフィール",
     "artistSearchListing": "検索＆都市ページに掲載",
@@ -917,7 +917,6 @@
     "artistFollowerCount": "フォロワー数表示",
     "artistTagsBadges": "タグ＆バッジ",
     "artistPerformanceHistory": "完全な出演履歴",
-
     "artistCatClaimed": "クレーム済み（編集権限）",
     "artistEditProfile": "自己紹介、写真、詳細を編集",
     "artistVerifiedBadge": "認証バッジ",
@@ -932,7 +931,6 @@
     "artistEPKFull": "フル + 分析",
     "artistEPKBranded": "ブランドPDF",
     "artistAnalyticsBasic": "ページ閲覧数＆フォロワートレンド",
-
     "artistCatPremium": "Premium（積極的リーチ）",
     "artistBroadcasts": "ファンブロードキャスト",
     "broadcastsLimited": "月間制限あり",
@@ -942,34 +940,29 @@
     "artistAvailableForHire": "出演依頼可能リスティング",
     "artistAnalyticsAdvanced": "詳細分析（都市・流入元・トレンド）",
     "artistPrioritySearch": "検索結果で優先表示",
-
     "artistCatElite": "Elite（ブランド独立）",
     "artistCustomDomain": "カスタムドメイン",
     "artistCustomTheme": "カスタムテーマ＆スタイリング",
     "artistBookingRequests": "予約問い合わせシステム",
     "artistSpotlight": "トップページ＆都市ページのスポットライト",
     "artistDataExport": "データエクスポート / APIアクセス",
-
     "venueSectionTitle": "会場ティア",
     "venueSectionDesc": "あなたの会場ページはすでにファンにとって最高のジャズガイドです。ティアでは管理ツールを解放 — リスティングを編集し、フォロワーに届け、ビジネスを運営しましょう。",
     "venueTier0Desc": "イベントデータから自動生成された完全な会場ガイド",
     "venueTier1Desc": "ページをクレームして編集、認証を取得",
     "venueTier2Desc": "スケジュール管理、分析、受信箱＆バックライン",
     "venueTier3Desc": "カスタムドメイン、チケット販売＆予約ダッシュボード",
-
     "venueCatFanFacing": "ファン向け（常時表示）",
     "venuePublicListing": "公開会場リスティング",
     "venueSearchListing": "検索＆都市ページに掲載",
     "venueMapPin": "都市ページのマップピン",
     "venueEventShowcase": "会場ページにイベント掲載",
     "venueVenueTags": "雰囲気＆レビュータグ",
-
     "venueCatClaimed": "クレーム済み（編集権限）",
     "venueEditProfile": "説明、写真、営業時間を編集",
     "venueVerifiedBadge": "認証バッジ",
     "venuePhotos": "フォトギャラリー",
     "venueDescription": "カスタム説明文",
-
     "venueCatPremium": "Premium（運営ツール）",
     "venueScheduleManager": "スケジュール管理カレンダー",
     "venueBackline": "バックライン機材管理",
@@ -979,7 +972,6 @@
     "venueArtistDiscovery": "アーティスト発掘＆アウトリーチ",
     "venueBroadcasts": "ファンブロードキャスト",
     "venuePrioritySearch": "検索結果で優先表示",
-
     "venueCatElite": "Elite（ビジネスエンジン）",
     "venueCustomDomain": "カスタムドメイン",
     "venueCustomTheme": "カスタムテーマ＆ブランディング",

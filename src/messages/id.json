@@ -326,7 +326,8 @@
     "viewVenue": "Lihat tempat",
     "anonymous": "Anonim",
     "pushNotifications": "Notifikasi Push",
-    "pushNotificationsHint": "Terima pemberitahuan pesan dan pembaruan baru."
+    "pushNotificationsHint": "Terima pemberitahuan pesan dan pembaruan baru.",
+    "share": "Bagikan"
   },
   "pushPrompt": {
     "title": "Tetap Terhubung",
@@ -908,7 +909,6 @@
     "artistTier1Desc": "Klaim & edit halaman Anda, dapatkan verifikasi",
     "artistTier2Desc": "Broadcast, kotak masuk, analitik lengkap & EPK",
     "artistTier3Desc": "Domain kustom, sistem pemesanan & alat merek",
-
     "artistCatFanFacing": "Untuk Penggemar (Selalu Terlihat)",
     "artistPublicProfile": "Profil artis publik",
     "artistSearchListing": "Terdaftar di pencarian & halaman kota",
@@ -917,7 +917,6 @@
     "artistFollowerCount": "Tampilan jumlah pengikut",
     "artistTagsBadges": "Tag & lencana",
     "artistPerformanceHistory": "Riwayat penampilan lengkap",
-
     "artistCatClaimed": "Diklaim (Hak Edit)",
     "artistEditProfile": "Edit bio, foto & detail",
     "artistVerifiedBadge": "Lencana terverifikasi",
@@ -932,7 +931,6 @@
     "artistEPKFull": "Lengkap + analitik",
     "artistEPKBranded": "PDF bermerek",
     "artistAnalyticsBasic": "Kunjungan halaman & tren pengikut",
-
     "artistCatPremium": "Premium (Jangkauan Proaktif)",
     "artistBroadcasts": "Broadcast ke penggemar",
     "broadcastsLimited": "Batas bulanan",
@@ -942,34 +940,29 @@
     "artistAvailableForHire": "Listing tersedia untuk disewa",
     "artistAnalyticsAdvanced": "Analitik lengkap (kota, sumber, tren)",
     "artistPrioritySearch": "Prioritas di hasil pencarian",
-
     "artistCatElite": "Elite (Kemandirian Merek)",
     "artistCustomDomain": "Domain kustom",
     "artistCustomTheme": "Tema & gaya kustom",
     "artistBookingRequests": "Sistem pertanyaan booking",
     "artistSpotlight": "Sorotan halaman utama & halaman kota",
     "artistDataExport": "Ekspor data / akses API",
-
     "venueSectionTitle": "Tier Tempat",
     "venueSectionDesc": "Halaman venue Anda sudah menjadi panduan jazz terbaik bagi penggemar. Tier membuka alat manajemen — edit listing Anda, jangkau pengikut, dan jalankan bisnis Anda.",
     "venueTier0Desc": "Panduan venue lengkap, dibuat otomatis dari data acara",
     "venueTier1Desc": "Klaim & edit halaman Anda, dapatkan verifikasi",
     "venueTier2Desc": "Pengelola jadwal, analitik, kotak masuk & backline",
     "venueTier3Desc": "Domain kustom, tiket & dasbor pemesanan",
-
     "venueCatFanFacing": "Untuk Penggemar (Selalu Terlihat)",
     "venuePublicListing": "Listing tempat publik",
     "venueSearchListing": "Terdaftar di pencarian & halaman kota",
     "venueMapPin": "Pin peta di halaman kota",
     "venueEventShowcase": "Daftar acara di halaman tempat",
     "venueVenueTags": "Tag suasana & ulasan",
-
     "venueCatClaimed": "Diklaim (Hak Edit)",
     "venueEditProfile": "Edit deskripsi, foto & jam operasional",
     "venueVerifiedBadge": "Lencana terverifikasi",
     "venuePhotos": "Galeri foto",
     "venueDescription": "Deskripsi kustom",
-
     "venueCatPremium": "Premium (Alat Operasional)",
     "venueScheduleManager": "Kalender pengelola jadwal",
     "venueBackline": "Manajemen peralatan backline",
@@ -979,7 +972,6 @@
     "venueArtistDiscovery": "Penemuan artis & penjangkauan",
     "venueBroadcasts": "Broadcast ke penggemar",
     "venuePrioritySearch": "Prioritas di hasil pencarian",
-
     "venueCatElite": "Elite (Mesin Bisnis)",
     "venueCustomDomain": "Domain kustom",
     "venueCustomTheme": "Tema & branding kustom",

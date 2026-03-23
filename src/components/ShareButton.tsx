@@ -81,7 +81,7 @@ function ShareMenu({ fullUrl, title, text, onCopy, copied }: {
   ];
 
   return (
-    <div className="absolute bottom-full right-0 mb-2 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+    <div className="absolute top-full right-0 mt-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden min-w-[160px]">
         {platforms.map((p) => (
           <a
