@@ -13,7 +13,7 @@ import { sendPushToUser, type PushPayload } from '@/lib/push';
  * Protected by PUSH_WEBHOOK_SECRET (shared with Supabase vault).
  */
 
-const WEBHOOK_SECRET = process.env.PUSH_WEBHOOK_SECRET || process.env.CRON_SECRET || '';
+const WEBHOOK_SECRET = (process.env.PUSH_WEBHOOK_SECRET || process.env.CRON_SECRET || '').trim();
 
 export async function POST(request: NextRequest) {
   // Verify webhook secret
