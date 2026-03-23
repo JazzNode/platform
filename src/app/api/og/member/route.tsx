@@ -5,9 +5,17 @@ import { getSpaceGrotesk, fontConfig } from '../_fonts';
 export async function GET(req: NextRequest) {
   const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
-  const name = searchParams.get('name') || 'Artist';
-  const instrument = searchParams.get('instrument') || '';
-  const photo = searchParams.get('photo') || '';
+  const name = searchParams.get('name') || 'Member';
+  const username = searchParams.get('username') || '';
+  const avatar = searchParams.get('avatar') || '';
+  const role = searchParams.get('role') || '';
+
+  const roleLabel: Record<string, string> = {
+    member: 'Member',
+    artist_manager: 'Artist',
+    venue_manager: 'Venue Manager',
+    admin: 'Admin',
+  };
 
   return new ImageResponse(
     (
@@ -22,29 +30,28 @@ export async function GET(req: NextRequest) {
           background: 'linear-gradient(135deg, #0a0a0f 0%, #141428 40%, #1a1020 70%, #0a0a0f 100%)',
         }}
       >
-        {/* Decorative circle top-right */}
+        {/* Decorative circles */}
         <div
           style={{
             position: 'absolute',
-            top: -120,
-            right: -120,
-            width: 400,
-            height: 400,
+            top: -150,
+            right: -150,
+            width: 500,
+            height: 500,
             borderRadius: '50%',
-            border: '1px solid rgba(196,163,90,0.15)',
+            border: '1px solid rgba(196,163,90,0.1)',
             display: 'flex',
           }}
         />
-        {/* Decorative circle bottom-left */}
         <div
           style={{
             position: 'absolute',
-            bottom: -80,
-            left: -80,
-            width: 300,
-            height: 300,
+            bottom: -100,
+            left: -100,
+            width: 350,
+            height: 350,
             borderRadius: '50%',
-            border: '1px solid rgba(196,163,90,0.1)',
+            border: '1px solid rgba(196,163,90,0.07)',
             display: 'flex',
           }}
         />
@@ -53,128 +60,134 @@ export async function GET(req: NextRequest) {
         <div
           style={{
             display: 'flex',
-            flexDirection: 'row',
+            flexDirection: 'column',
             alignItems: 'center',
+            justifyContent: 'center',
             width: '100%',
             height: '100%',
             padding: '60px 80px',
             position: 'relative',
           }}
         >
-          {/* Photo or placeholder */}
+          {/* Avatar */}
           <div
             style={{
               display: 'flex',
               flexShrink: 0,
-              width: 280,
-              height: 280,
+              width: 200,
+              height: 200,
               borderRadius: '50%',
               overflow: 'hidden',
-              border: '3px solid rgba(196,163,90,0.6)',
-              boxShadow: '0 0 60px rgba(196,163,90,0.2)',
-              marginRight: 60,
+              border: '3px solid rgba(196,163,90,0.5)',
+              boxShadow: '0 0 60px rgba(196,163,90,0.15)',
+              marginBottom: 32,
               alignItems: 'center',
               justifyContent: 'center',
-              background: photo
+              background: avatar
                 ? 'transparent'
                 : 'linear-gradient(135deg, #1a1a2e 0%, #2a1a3e 100%)',
             }}
           >
-            {photo ? (
+            {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={photo}
+                src={avatar}
                 alt=""
-                width={280}
-                height={280}
-                style={{ objectFit: 'cover', width: 280, height: 280 }}
+                width={200}
+                height={200}
+                style={{ objectFit: 'cover', width: 200, height: 200 }}
               />
             ) : (
               <svg
-                width="100"
-                height="100"
+                width="80"
+                height="80"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="rgba(196,163,90,0.5)"
+                stroke="rgba(196,163,90,0.45)"
                 strokeWidth="1.5"
               >
-                <path d="M9 18V5l12-2v13" />
-                <circle cx="6" cy="18" r="3" />
-                <circle cx="18" cy="16" r="3" />
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
               </svg>
             )}
           </div>
 
-          {/* Text content */}
+          {/* Name */}
+          <div
+            style={{
+              fontSize: name.length > 20 ? 44 : 52,
+              fontWeight: 700,
+              color: '#ffffff',
+              lineHeight: 1.2,
+              letterSpacing: '-0.02em',
+              marginBottom: 8,
+              display: 'flex',
+              textAlign: 'center',
+            }}
+          >
+            {name}
+          </div>
+
+          {/* Username */}
+          {username && (
+            <div
+              style={{
+                fontSize: 24,
+                color: 'rgba(255,255,255,0.45)',
+                fontWeight: 400,
+                marginBottom: 16,
+                display: 'flex',
+              }}
+            >
+              @{username}
+            </div>
+          )}
+
+          {/* Role badge */}
+          {role && roleLabel[role] && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                marginBottom: 32,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 16,
+                  color: '#C4A35A',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  padding: '6px 20px',
+                  border: '1px solid rgba(196,163,90,0.3)',
+                  borderRadius: 20,
+                  display: 'flex',
+                }}
+              >
+                {roleLabel[role]}
+              </div>
+            </div>
+          )}
+
+          {/* Brand */}
           <div
             style={{
               display: 'flex',
               flexDirection: 'column',
-              flex: 1,
-              minWidth: 0,
+              alignItems: 'center',
+              gap: 12,
+              marginTop: 'auto',
             }}
           >
-            {/* Artist name */}
-            <div
-              style={{
-                fontSize: name.length > 20 ? 48 : 56,
-                fontWeight: 700,
-                color: '#ffffff',
-                lineHeight: 1.15,
-                letterSpacing: '-0.02em',
-                marginBottom: 16,
-                display: 'flex',
-                flexWrap: 'wrap',
-              }}
-            >
-              {name}
-            </div>
-
-            {/* Instrument */}
-            {instrument && (
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  marginBottom: 24,
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 2,
-                    background: 'rgba(196,163,90,0.6)',
-                    display: 'flex',
-                  }}
-                />
-                <div
-                  style={{
-                    fontSize: 26,
-                    color: '#C4A35A',
-                    fontWeight: 500,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                    display: 'flex',
-                  }}
-                >
-                  {instrument}
-                </div>
-              </div>
-            )}
-
-            {/* Divider */}
             <div
               style={{
                 width: 60,
                 height: 2,
-                background: 'linear-gradient(90deg, #C4A35A, transparent)',
-                marginBottom: 24,
+                background: 'linear-gradient(90deg, transparent, #C4A35A, transparent)',
                 display: 'flex',
               }}
             />
-
-            {/* Brand */}
             <div
               style={{
                 display: 'flex',
@@ -184,7 +197,7 @@ export async function GET(req: NextRequest) {
             >
               <div
                 style={{
-                  fontSize: 22,
+                  fontSize: 20,
                   fontWeight: 700,
                   color: '#C4A35A',
                   letterSpacing: '0.15em',
@@ -195,9 +208,8 @@ export async function GET(req: NextRequest) {
               </div>
               <div
                 style={{
-                  fontSize: 18,
-                  color: 'rgba(255,255,255,0.35)',
-                  fontWeight: 400,
+                  fontSize: 16,
+                  color: 'rgba(255,255,255,0.3)',
                   display: 'flex',
                 }}
               >

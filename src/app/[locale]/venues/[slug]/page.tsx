@@ -35,10 +35,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const desc = localized(f as Record<string, unknown>, 'description', locale);
   const description = desc || (cityLabel ? `${name} — ${cityLabel}` : name);
   const photo = photoUrl(f.photo_url);
+  const ogParams = new URLSearchParams({ name });
+  if (cityLabel) ogParams.set('city', cityLabel);
+  if (photo) ogParams.set('photo', photo);
+  const ogUrl = `/api/og/venue?${ogParams.toString()}`;
   return {
     title: name,
     description,
-    ...(photo && { openGraph: { images: [{ url: photo }] } }),
+    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/venues/${slug}`,
       languages: {

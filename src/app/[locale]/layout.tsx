@@ -42,6 +42,14 @@ export const metadata: Metadata = {
     default: 'JazzNode — The Jazz Scene, Connected.',
   },
   description: 'Discover jazz venues, artists, and events worldwide.',
+  openGraph: {
+    type: 'website',
+    siteName: 'JazzNode',
+    images: [{ url: '/api/og/default', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
   alternates: {
     languages: {
       'x-default': '/en',

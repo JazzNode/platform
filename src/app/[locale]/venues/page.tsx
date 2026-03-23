@@ -7,9 +7,12 @@ import VenuesClient from '@/components/VenuesClient';
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations('common');
+  const ogUrl = `/api/og/default?${new URLSearchParams({ title: t('venues'), subtitle: t('venuesPageDescription') })}`;
   return {
     title: t('venues'),
     description: t('venuesPageDescription'),
+    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/venues`,
       languages: {

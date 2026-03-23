@@ -43,6 +43,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: name,
     ...(bio && { description: bio.slice(0, 160) }),
     openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/artists/${slug}`,
       languages: {

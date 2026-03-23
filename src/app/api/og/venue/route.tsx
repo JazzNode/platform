@@ -5,10 +5,10 @@ import { getSpaceGrotesk, fontConfig } from '../_fonts';
 export async function GET(req: NextRequest) {
   const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
-  const title = searchParams.get('title') || 'Event';
-  const venue = searchParams.get('venue') || '';
-  const date = searchParams.get('date') || '';
-  const poster = searchParams.get('poster') || '';
+  const name = searchParams.get('name') || 'Venue';
+  const city = searchParams.get('city') || '';
+  const photo = searchParams.get('photo') || '';
+  const type = searchParams.get('type') || '';
 
   return new ImageResponse(
     (
@@ -20,10 +20,10 @@ export async function GET(req: NextRequest) {
           position: 'relative',
           overflow: 'hidden',
           fontFamily: '"Space Grotesk", system-ui, sans-serif',
-          background: 'linear-gradient(135deg, #0a0a0f 0%, #0f1428 30%, #1a0f20 60%, #0a0a0f 100%)',
+          background: 'linear-gradient(135deg, #0a0a0f 0%, #0f1a28 35%, #1a1020 65%, #0a0a0f 100%)',
         }}
       >
-        {/* Content layout */}
+        {/* Content */}
         <div
           style={{
             display: 'flex',
@@ -33,12 +33,12 @@ export async function GET(req: NextRequest) {
             position: 'relative',
           }}
         >
-          {/* Poster section (left) */}
-          {poster && (
+          {/* Photo section (left) */}
+          {photo ? (
             <div
               style={{
                 display: 'flex',
-                width: 400,
+                width: 440,
                 height: '100%',
                 flexShrink: 0,
                 position: 'relative',
@@ -47,35 +47,75 @@ export async function GET(req: NextRequest) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={poster}
+                src={photo}
                 alt=""
-                width={400}
+                width={440}
                 height={630}
-                style={{ objectFit: 'cover', width: 400, height: 630 }}
+                style={{ objectFit: 'cover', width: 440, height: 630 }}
               />
-              {/* Gradient overlay from poster to content */}
+              {/* Right fade */}
               <div
                 style={{
                   position: 'absolute',
                   top: 0,
                   right: 0,
-                  width: 120,
+                  width: 140,
                   height: '100%',
                   display: 'flex',
                   background: 'linear-gradient(90deg, transparent, #0a0a0f)',
                 }}
               />
+              {/* Bottom fade */}
               <div
                 style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   width: '100%',
-                  height: 80,
+                  height: 100,
                   display: 'flex',
                   background: 'linear-gradient(transparent, rgba(10,10,15,0.8))',
                 }}
               />
+            </div>
+          ) : (
+            /* No-photo: decorative venue icon */
+            <div
+              style={{
+                display: 'flex',
+                width: 320,
+                height: '100%',
+                flexShrink: 0,
+                alignItems: 'center',
+                justifyContent: 'center',
+                position: 'relative',
+              }}
+            >
+              <div
+                style={{
+                  width: 180,
+                  height: 180,
+                  borderRadius: 24,
+                  border: '2px solid rgba(196,163,90,0.25)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: 'linear-gradient(135deg, rgba(196,163,90,0.08), rgba(196,163,90,0.02))',
+                }}
+              >
+                <svg
+                  width="80"
+                  height="80"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(196,163,90,0.5)"
+                  strokeWidth="1.2"
+                >
+                  <path d="M9 18V5l12-2v13" />
+                  <circle cx="6" cy="18" r="3" />
+                  <circle cx="18" cy="16" r="3" />
+                </svg>
+              </div>
             </div>
           )}
 
@@ -86,53 +126,55 @@ export async function GET(req: NextRequest) {
               flexDirection: 'column',
               justifyContent: 'center',
               flex: 1,
-              padding: poster ? '60px 60px 60px 40px' : '60px 80px',
+              padding: photo ? '60px 60px 60px 20px' : '60px 60px 60px 0',
               minWidth: 0,
             }}
           >
-            {/* Date badge */}
-            {date && (
+            {/* Type badge */}
+            {type && (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 10,
-                  marginBottom: 20,
+                  marginBottom: 16,
                 }}
               >
                 <div
                   style={{
-                    fontSize: 20,
+                    fontSize: 16,
                     color: '#C4A35A',
                     fontWeight: 600,
-                    letterSpacing: '0.08em',
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase',
+                    padding: '6px 16px',
+                    border: '1px solid rgba(196,163,90,0.3)',
+                    borderRadius: 8,
                     display: 'flex',
                   }}
                 >
-                  {date}
+                  {type}
                 </div>
               </div>
             )}
 
-            {/* Title */}
+            {/* Venue name */}
             <div
               style={{
-                fontSize: title.length > 40 ? 36 : title.length > 25 ? 44 : 52,
+                fontSize: name.length > 30 ? 38 : name.length > 20 ? 46 : 54,
                 fontWeight: 700,
                 color: '#ffffff',
                 lineHeight: 1.15,
                 letterSpacing: '-0.02em',
-                marginBottom: 24,
+                marginBottom: 20,
                 display: 'flex',
                 flexWrap: 'wrap',
               }}
             >
-              {title}
+              {name}
             </div>
 
-            {/* Venue */}
-            {venue && (
+            {/* City */}
+            {city && (
               <div
                 style={{
                   display: 'flex',
@@ -142,8 +184,8 @@ export async function GET(req: NextRequest) {
                 }}
               >
                 <svg
-                  width="20"
-                  height="20"
+                  width="22"
+                  height="22"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="#C4A35A"
@@ -154,13 +196,13 @@ export async function GET(req: NextRequest) {
                 </svg>
                 <div
                   style={{
-                    fontSize: 24,
+                    fontSize: 26,
                     color: 'rgba(255,255,255,0.7)',
                     fontWeight: 500,
                     display: 'flex',
                   }}
                 >
-                  {venue}
+                  {city}
                 </div>
               </div>
             )}
@@ -212,36 +254,6 @@ export async function GET(req: NextRequest) {
               </div>
             </div>
           </div>
-
-          {/* No-poster fallback: decorative elements */}
-          {!poster && (
-            <>
-              <div
-                style={{
-                  position: 'absolute',
-                  top: -100,
-                  right: -100,
-                  width: 350,
-                  height: 350,
-                  borderRadius: '50%',
-                  border: '1px solid rgba(196,163,90,0.12)',
-                  display: 'flex',
-                }}
-              />
-              <div
-                style={{
-                  position: 'absolute',
-                  bottom: -60,
-                  right: 100,
-                  width: 200,
-                  height: 200,
-                  borderRadius: '50%',
-                  border: '1px solid rgba(196,163,90,0.08)',
-                  display: 'flex',
-                }}
-              />
-            </>
-          )}
         </div>
       </div>
     ),

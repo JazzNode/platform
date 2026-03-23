@@ -6,8 +6,17 @@ import PublicProfileContent from '@/components/PublicProfileContent';
 export async function generateMetadata({ params }: { params: Promise<{ username: string }> }) {
   const { username } = await params;
   const profile = await getProfileByUsername(username);
+  const displayName = profile?.display_name || `@${username}`;
+  const ogParams = new URLSearchParams({ name: displayName });
+  if (profile?.username) ogParams.set('username', profile.username);
+  if (profile?.avatar_url) ogParams.set('avatar', profile.avatar_url);
+  if (profile?.role) ogParams.set('role', profile.role);
+  const ogUrl = `/api/og/member?${ogParams.toString()}`;
   return {
-    title: profile?.display_name || `@${username}`,
+    title: displayName,
+    ...(profile?.bio && { description: profile.bio.slice(0, 160) }),
+    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    twitter: { card: 'summary_large_image' },
     robots: { index: false, follow: false },
   };
 }
