@@ -109,7 +109,7 @@ function ReplyForm({ commentId, onSubmit, onCancel, t }: {
   commentId: string;
   onSubmit: (body: string) => Promise<void>;
   onCancel: () => void;
-  t: (key: string, values?: Record<string, unknown>) => string;
+  t: ReturnType<typeof import('next-intl').useTranslations>;
 }) {
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
