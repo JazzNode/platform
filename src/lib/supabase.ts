@@ -408,6 +408,10 @@ interface EventRow {
   raw_payload_hash: string | null;
   raw_payload_url: string | null;
   created_at: string | null;
+  // Schedule Manager fields (venue-created events)
+  data_source: string | null;
+  created_by: string | null;
+  updated_by: string | null;
 }
 
 interface LineupRow {

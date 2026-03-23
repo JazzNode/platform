@@ -19,6 +19,7 @@ interface VenueBasic {
 
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
+  { key: 'schedule', icon: 'calendar', path: '/schedule' },
   { key: 'badges', icon: 'badges', path: '/badges' },
   { key: 'photos', icon: 'images', path: '/photos' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
