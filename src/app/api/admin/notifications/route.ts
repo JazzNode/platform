@@ -3,7 +3,7 @@ import { verifyAdminToken } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 // Notification types that belong to HQ admin (not personal user notifications)
-const HQ_NOTIFICATION_TYPES = ['new_member', 'system'];
+const HQ_NOTIFICATION_TYPES = ['new_member', 'system', 'claim_review'];
 
 /**
  * GET /api/admin/notifications — Fetch HQ admin notifications only
