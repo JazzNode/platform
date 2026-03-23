@@ -117,21 +117,17 @@ export default function VenueCommentsProvider({ venueId, children }: { venueId: 
 
       setComments((prev) => [optimistic, ...prev]);
 
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('venue_comments')
-        .insert({
-          user_id: user.id,
-          venue_id: venueId,
-          text: text || null,
-          tags,
-          image_url: imageUrl,
-          is_anonymous: isAnonymous,
-          updated_at: now,
+      try {
+        const res = await fetch('/api/venue/comment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ venueId, text: text || null, tags, imageUrl, isAnonymous }),
         });
-
-      if (error) {
-        // Revert optimistic
+        if (!res.ok) {
+          // Revert optimistic
+          setComments((prev) => prev.filter((c) => c.id !== optimistic.id));
+        }
+      } catch {
         setComments((prev) => prev.filter((c) => c.id !== optimistic.id));
       }
     },

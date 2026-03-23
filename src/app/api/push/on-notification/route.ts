@@ -100,6 +100,11 @@ function getNotificationUrl(
       if (referenceType === 'venue' && referenceId) return `/venues/${referenceId}`;
       return '/profile/inbox';
 
+    case 'comment_reply':
+      // Link to the venue page where the comment was made
+      if (referenceType === 'venue' && referenceId) return `/venues/${referenceId}`;
+      return '/profile/comments';
+
     case 'claim_status':
       return '/profile';
 
@@ -131,6 +136,8 @@ function getNotificationActions(type: string): Array<{ action: string; title: st
       return [{ action: 'reply', title: 'Reply' }];
     case 'follow_update':
       return [{ action: 'view', title: 'View Profile' }];
+    case 'comment_reply':
+      return [{ action: 'view', title: 'View Comment' }];
     case 'badge':
       return [{ action: 'view', title: 'View Badge' }];
     default:

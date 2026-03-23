@@ -63,6 +63,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // ── Notify original comment author (if not replying to self) ──
+    try {
+      const { data: comment } = await admin
+        .from('venue_comments')
+        .select('user_id')
+        .eq('id', commentId)
+        .single();
+
+      if (comment && comment.user_id && comment.user_id !== user.id) {
+        // Look up replier display name & venue name for notification text
+        const [{ data: replierProfile }, { data: venue }] = await Promise.all([
+          admin.from('profiles').select('display_name').eq('id', user.id).single(),
+          admin.from('venues').select('display_name, name_local, name_en').eq('venue_id', venueId).single(),
+        ]);
+
+        const replierName = replierProfile?.display_name || 'Someone';
+        const venueName = venue?.display_name || venue?.name_local || venue?.name_en || '';
+
+        const roleLabel = senderRole === 'venue_manager' ? '🏠'
+          : senderRole === 'artist' ? '🎵'
+          : senderRole === 'admin' ? '⭐'
+          : '';
+
+        await admin.from('notifications').insert({
+          user_id: comment.user_id,
+          title: `${roleLabel} ${replierName} replied to your comment`,
+          body: venueName ? `On ${venueName}: "${body.trim().slice(0, 80)}"` : body.trim().slice(0, 100),
+          type: 'comment_reply',
+          reference_type: 'venue',
+          reference_id: venueId,
+        });
+      }
+    } catch (notifErr) {
+      // Non-blocking — reply was already saved, don't fail the request
+      console.error('Comment reply notification error:', notifErr);
+    }
+
     return NextResponse.json({ reply });
   } catch (err) {
     console.error('Comment reply error:', err);
