@@ -257,7 +257,7 @@ export default function VenueDashboardLayout({
         </aside>
 
         {/* ─── Mobile Top Bar ─── */}
-        <div className="lg:hidden fixed top-[60px] left-0 right-0 z-30 bg-[var(--background)]/95 backdrop-blur-md border-b border-[var(--border)]">
+        <div className="lg:hidden fixed left-0 right-0 z-30 bg-[var(--background)]/95 backdrop-blur-md border-b border-[var(--border)]" style={{ top: 'calc(env(safe-area-inset-top, 0px) + 60px)' }}>
           {/* Identity row — fixed, not scrollable */}
           <div className="px-4 pt-2 pb-1">
             <p className="text-xs text-[var(--muted-foreground)] truncate">
@@ -296,7 +296,7 @@ export default function VenueDashboardLayout({
         </div>
 
         {/* ─── Content Area ─── */}
-        <main className="flex-1 min-w-0 pt-[5.5rem] lg:pt-0">
+        <main className="flex-1 min-w-0 lg:pt-0" style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 5.5rem)' }}>
           {children}
         </main>
       </div>
