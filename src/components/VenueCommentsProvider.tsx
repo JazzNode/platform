@@ -22,6 +22,9 @@ export interface VenueComment {
   tags: string[];
   image_url: string | null;
   is_anonymous: boolean;
+  sender_role: string | null;
+  sender_artist_id: string | null;
+  sender_artist: { name_en: string | null; name_local: string | null; display_name: string | null } | null;
   created_at: string;
   updated_at: string;
   profile: { display_name: string | null; avatar_url: string | null } | null;
@@ -32,7 +35,7 @@ interface VenueCommentsContextType {
   comments: VenueComment[];
   commentCount: number;
   loading: boolean;
-  submitComment: (text: string | null, tags: string[], imageUrl: string | null, isAnonymous: boolean) => Promise<void>;
+  submitComment: (text: string | null, tags: string[], imageUrl: string | null, isAnonymous: boolean, senderRole?: string | null, senderArtistId?: string | null) => Promise<void>;
   deleteComment: (commentId: string) => Promise<void>;
   submitReply: (commentId: string, body: string) => Promise<CommentReply | null>;
   deleteReply: (replyId: string, commentId: string) => Promise<void>;
@@ -50,6 +53,9 @@ function mapRow(r: Record<string, unknown>): VenueComment {
     tags: (r.tags as string[]) || [],
     image_url: r.image_url as string | null,
     is_anonymous: r.is_anonymous as boolean,
+    sender_role: (r.sender_role as string | null) || null,
+    sender_artist_id: (r.sender_artist_id as string | null) || null,
+    sender_artist: r.sender_artist as { name_en: string | null; name_local: string | null; display_name: string | null } | null,
     created_at: r.created_at as string,
     updated_at: r.updated_at as string,
     profile: r.profiles as { display_name: string | null; avatar_url: string | null } | null,
@@ -82,7 +88,7 @@ export default function VenueCommentsProvider({ venueId, children }: { venueId: 
     const supabase = createClient();
     supabase
       .from('venue_comments')
-      .select('id, user_id, venue_id, text, tags, image_url, is_anonymous, created_at, updated_at, profiles(display_name, avatar_url), venue_comment_replies(id, comment_id, user_id, sender_role, body, created_at, profiles(display_name, avatar_url))')
+      .select('id, user_id, venue_id, text, tags, image_url, is_anonymous, sender_role, sender_artist_id, created_at, updated_at, profiles(display_name, avatar_url), sender_artist:artists!sender_artist_id(name_en, name_local, display_name), venue_comment_replies(id, comment_id, user_id, sender_role, body, created_at, profiles(display_name, avatar_url))')
       .eq('venue_id', venueId)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
@@ -97,7 +103,7 @@ export default function VenueCommentsProvider({ venueId, children }: { venueId: 
   }, [venueId]);
 
   const submitComment = useCallback(
-    async (text: string | null, tags: string[], imageUrl: string | null, isAnonymous: boolean) => {
+    async (text: string | null, tags: string[], imageUrl: string | null, isAnonymous: boolean, senderRole?: string | null, senderArtistId?: string | null) => {
       if (!user) return;
 
       const now = new Date().toISOString();
@@ -109,6 +115,9 @@ export default function VenueCommentsProvider({ venueId, children }: { venueId: 
         tags,
         image_url: imageUrl,
         is_anonymous: isAnonymous,
+        sender_role: isAnonymous ? null : (senderRole || null),
+        sender_artist_id: isAnonymous ? null : (senderArtistId || null),
+        sender_artist: null, // Will be populated on refetch
         created_at: now,
         updated_at: now,
         profile: { display_name: user.user_metadata?.full_name || null, avatar_url: user.user_metadata?.avatar_url || null },
@@ -121,10 +130,17 @@ export default function VenueCommentsProvider({ venueId, children }: { venueId: 
         const res = await fetch('/api/venue/comment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ venueId, text: text || null, tags, imageUrl, isAnonymous }),
+          body: JSON.stringify({
+            venueId,
+            text: text || null,
+            tags,
+            imageUrl,
+            isAnonymous,
+            senderRole: isAnonymous ? null : (senderRole || null),
+            senderArtistId: isAnonymous ? null : (senderArtistId || null),
+          }),
         });
         if (!res.ok) {
-          // Revert optimistic
           setComments((prev) => prev.filter((c) => c.id !== optimistic.id));
         }
       } catch {

@@ -146,6 +146,7 @@
     "contact": "ติดต่อ",
     "goldPartner": "พันธมิตรทอง",
     "locationMap": "ที่ตั้ง & แผนที่",
+    "photoGallery": "แกลเลอรีรูปภาพ",
     "openInGoogleMaps": "เปิดใน Google Maps",
     "openInAppleMaps": "เปิดใน Apple Maps",
     "venueStats": "ข้อมูลสถานที่",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "อัปเกรดเป็นสถานที่พรีเมียมเพื่อปลดล็อกเครื่องมือประกาศการตลาด",
     "noConversations": "ยังไม่มีข้อความ",
     "noConversationsHint": "แฟนๆ สามารถส่งข้อความจากหน้าสถานที่ของคุณ",
-    "archive": "เก็บถาวร"
+    "archive": "เก็บถาวร",
+    "photos": "รูปภาพ",
+    "photoGallery": "แกลเลอรีรูปภาพ",
+    "uploadPhotos": "อัปโหลดรูปภาพ",
+    "deletePhoto": "ลบรูปภาพ",
+    "deletePhotoConfirm": "ลบรูปภาพนี้หรือไม่?",
+    "setAsCover": "ตั้งเป็นภาพปก",
+    "coverPhoto": "ภาพปก",
+    "dragToUpload": "คลิกเพื่ออัปโหลดหรือลากไฟล์มาที่นี่",
+    "maxPhotos": "{count} / {max} รูป",
+    "noPhotos": "ยังไม่มีรูปภาพ อัปโหลดรูปภาพสถานที่แรกของคุณ!",
+    "photoUploaded": "อัปโหลดรูปภาพแล้ว!",
+    "photoDeleted": "ลบรูปภาพแล้ว",
+    "uploadFailed": "อัปโหลดล้มเหลว กรุณาลองอีกครั้ง",
+    "reorderSaved": "บันทึกลำดับแล้ว",
+    "maxPhotosReached": "อัปโหลดได้สูงสุด {max} รูป",
+    "moveUp": "เลื่อนขึ้น",
+    "moveDown": "เลื่อนลง"
   },
   "admin": {
     "saveAndTranslate": "บันทึกและแปล",
@@ -1028,6 +1046,14 @@
       "venue_manager": "สถานที่",
       "artist": "ศิลปิน",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "โพสต์ในฐานะ",
+      "member": "สมาชิก",
+      "artist": "ศิลปิน",
+      "venue_manager": "สถานที่",
+      "admin": "JazzNode HQ",
+      "hint": "เปลี่ยนตัวตน"
     }
   }
 }

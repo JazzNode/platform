@@ -146,6 +146,7 @@
     "contact": "Kontak",
     "goldPartner": "Mitra Emas",
     "locationMap": "Lokasi & Peta",
+    "photoGallery": "Galeri Foto",
     "openInGoogleMaps": "Buka di Google Maps",
     "openInAppleMaps": "Buka di Apple Maps",
     "venueStats": "Data Tempat",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "Upgrade ke Premium Venue untuk membuka alat siaran pemasaran.",
     "noConversations": "Belum ada pesan.",
     "noConversationsHint": "Penggemar dapat mengirim pesan dari halaman venue Anda.",
-    "archive": "Arsipkan"
+    "archive": "Arsipkan",
+    "photos": "Foto",
+    "photoGallery": "Galeri Foto",
+    "uploadPhotos": "Unggah Foto",
+    "deletePhoto": "Hapus Foto",
+    "deletePhotoConfirm": "Hapus foto ini?",
+    "setAsCover": "Jadikan Sampul",
+    "coverPhoto": "Sampul",
+    "dragToUpload": "Klik untuk mengunggah atau seret file ke sini",
+    "maxPhotos": "{count} / {max} foto",
+    "noPhotos": "Belum ada foto. Unggah foto venue pertama Anda!",
+    "photoUploaded": "Foto berhasil diunggah!",
+    "photoDeleted": "Foto dihapus.",
+    "uploadFailed": "Gagal mengunggah. Silakan coba lagi.",
+    "reorderSaved": "Urutan disimpan.",
+    "maxPhotosReached": "Maksimal {max} foto.",
+    "moveUp": "Pindah ke Atas",
+    "moveDown": "Pindah ke Bawah"
   },
   "admin": {
     "saveAndTranslate": "Simpan & Terjemahkan",
@@ -1028,6 +1046,14 @@
       "venue_manager": "Venue",
       "artist": "Artis",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "Posting sebagai",
+      "member": "Anggota",
+      "artist": "Artis",
+      "venue_manager": "Venue",
+      "admin": "JazzNode HQ",
+      "hint": "Ganti identitas"
     }
   }
 }

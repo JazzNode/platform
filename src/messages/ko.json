@@ -146,6 +146,7 @@
     "contact": "연락처",
     "goldPartner": "골드 파트너",
     "locationMap": "위치 & 지도",
+    "photoGallery": "포토 갤러리",
     "openInGoogleMaps": "Google Maps에서 열기",
     "openInAppleMaps": "Apple Maps에서 열기",
     "venueStats": "공연장 데이터",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "프리미엄 공연장으로 업그레이드하여 마케팅 방송 도구를 잠금 해제하세요.",
     "noConversations": "아직 메시지가 없습니다.",
     "noConversationsHint": "팬들이 공연장 페이지에서 메시지를 보낼 수 있습니다.",
-    "archive": "보관"
+    "archive": "보관",
+    "photos": "사진",
+    "photoGallery": "포토 갤러리",
+    "uploadPhotos": "사진 업로드",
+    "deletePhoto": "사진 삭제",
+    "deletePhotoConfirm": "이 사진을 삭제하시겠습니까?",
+    "setAsCover": "커버로 설정",
+    "coverPhoto": "커버",
+    "dragToUpload": "클릭하여 업로드하거나 파일을 드래그하세요",
+    "maxPhotos": "{count} / {max} 장",
+    "noPhotos": "아직 사진이 없습니다. 첫 번째 공연장 사진을 업로드하세요!",
+    "photoUploaded": "사진이 업로드되었습니다!",
+    "photoDeleted": "사진이 삭제되었습니다.",
+    "uploadFailed": "업로드에 실패했습니다. 다시 시도해주세요.",
+    "reorderSaved": "순서가 저장되었습니다.",
+    "maxPhotosReached": "최대 {max}장까지 업로드할 수 있습니다.",
+    "moveUp": "위로 이동",
+    "moveDown": "아래로 이동"
   },
   "admin": {
     "saveAndTranslate": "저장 및 번역",
@@ -1028,6 +1046,14 @@
       "venue_manager": "공연장",
       "artist": "아티스트",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "게시자",
+      "member": "회원",
+      "artist": "아티스트",
+      "venue_manager": "공연장",
+      "admin": "JazzNode HQ",
+      "hint": "신분 전환"
     }
   }
 }

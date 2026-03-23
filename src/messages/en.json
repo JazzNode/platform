@@ -146,6 +146,7 @@
     "contact": "Contact",
     "goldPartner": "Gold Partner",
     "locationMap": "Location & Map",
+    "photoGallery": "Photo Gallery",
     "openInGoogleMaps": "Open in Google Maps",
     "openInAppleMaps": "Open in Apple Maps",
     "venueStats": "Venue Stats",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "Upgrade to Premium Venue to unlock marketing broadcast tools.",
     "noConversations": "No messages yet.",
     "noConversationsHint": "Fans can message you from your venue page.",
-    "archive": "Archive"
+    "archive": "Archive",
+    "photos": "Photos",
+    "photoGallery": "Photo Gallery",
+    "uploadPhotos": "Upload Photos",
+    "deletePhoto": "Delete Photo",
+    "deletePhotoConfirm": "Delete this photo?",
+    "setAsCover": "Set as Cover",
+    "coverPhoto": "Cover",
+    "dragToUpload": "Click to upload or drag files here",
+    "maxPhotos": "{count} / {max} photos",
+    "noPhotos": "No photos yet. Upload your first venue photo!",
+    "photoUploaded": "Photo uploaded!",
+    "photoDeleted": "Photo deleted.",
+    "uploadFailed": "Upload failed. Please try again.",
+    "reorderSaved": "Order saved.",
+    "maxPhotosReached": "Maximum {max} photos allowed.",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down"
   },
   "admin": {
     "saveAndTranslate": "Save & Translate",
@@ -1028,6 +1046,14 @@
       "venue_manager": "Venue",
       "artist": "Artist",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "Post as",
+      "member": "Member",
+      "artist": "Artist",
+      "venue_manager": "Venue",
+      "admin": "JazzNode HQ",
+      "hint": "Switch identity"
     }
   }
 }

@@ -146,6 +146,7 @@
     "contact": "連絡先",
     "goldPartner": "ゴールドパートナー",
     "locationMap": "場所 & 地図",
+    "photoGallery": "フォトギャラリー",
     "openInGoogleMaps": "Google Mapsで開く",
     "openInAppleMaps": "Apple Mapsで開く",
     "venueStats": "会場データ",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "プレミアム会場にアップグレードしてマーケティングブロードキャストツールを解除しましょう。",
     "noConversations": "まだメッセージはありません。",
     "noConversationsHint": "ファンが会場ページからメッセージを送ることができます。",
-    "archive": "アーカイブ"
+    "archive": "アーカイブ",
+    "photos": "写真",
+    "photoGallery": "フォトギャラリー",
+    "uploadPhotos": "写真をアップロード",
+    "deletePhoto": "写真を削除",
+    "deletePhotoConfirm": "この写真を削除しますか？",
+    "setAsCover": "カバーに設定",
+    "coverPhoto": "カバー",
+    "dragToUpload": "クリックしてアップロード、またはファイルをドラッグ",
+    "maxPhotos": "{count} / {max} 枚",
+    "noPhotos": "まだ写真がありません。最初の写真をアップロードしましょう！",
+    "photoUploaded": "写真をアップロードしました！",
+    "photoDeleted": "写真を削除しました。",
+    "uploadFailed": "アップロードに失敗しました。もう一度お試しください。",
+    "reorderSaved": "順序を保存しました。",
+    "maxPhotosReached": "最大{max}枚まで追加できます。",
+    "moveUp": "上に移動",
+    "moveDown": "下に移動"
   },
   "admin": {
     "saveAndTranslate": "保存して翻訳",
@@ -1028,6 +1046,14 @@
       "venue_manager": "会場",
       "artist": "アーティスト",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "投稿者",
+      "member": "メンバー",
+      "artist": "アーティスト",
+      "venue_manager": "会場",
+      "admin": "JazzNode HQ",
+      "hint": "身分を切替"
     }
   }
 }

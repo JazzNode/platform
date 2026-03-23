@@ -5,6 +5,7 @@ import { useAuth } from './AuthProvider';
 import { useVenueComments, type CommentReply } from './VenueCommentsProvider';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
+import ImageLightbox from './ImageLightbox';
 
 /* ── Translate button (reused from inbox pattern) ── */
 
@@ -48,11 +49,11 @@ function TranslateButton({ text, locale }: { text: string; locale: string }) {
 
 /* ── Role badge ── */
 
-function RoleBadge({ role, t }: { role: string | null; t: (key: string) => string }) {
+function RoleBadge({ role, artistName, t }: { role: string | null; artistName?: string | null; t: (key: string) => string }) {
   if (!role) return null;
   const config: Record<string, { label: string; color: string }> = {
     venue_manager: { label: t('roleBadge.venue_manager'), color: 'bg-emerald-400/15 text-emerald-400 border-emerald-400/30' },
-    artist: { label: t('roleBadge.artist'), color: 'bg-purple-400/15 text-purple-400 border-purple-400/30' },
+    artist: { label: artistName || t('roleBadge.artist'), color: 'bg-purple-400/15 text-purple-400 border-purple-400/30' },
     admin: { label: t('roleBadge.admin'), color: 'bg-gold/15 text-gold border-gold/30' },
   };
   const c = config[role];
@@ -148,27 +149,6 @@ function ReplyForm({ commentId, onSubmit, onCancel, t }: {
   );
 }
 
-/* ── Image lightbox ── */
-
-function ImageLightbox({ src, onClose }: { src: string; onClose: () => void }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <div className="relative max-w-[90vw] max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-        <img src={src} alt="" className="max-w-full max-h-[90vh] rounded-xl object-contain" />
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80 transition-colors"
-        >
-          &times;
-        </button>
-      </div>
-    </div>
-  );
-}
-
 /* ── Main list ── */
 
 export default function VenueCommentList() {
@@ -203,7 +183,7 @@ export default function VenueCommentList() {
 
   return (
     <>
-      {lightboxSrc && <ImageLightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />}
+      {lightboxSrc && <ImageLightbox images={[lightboxSrc]} onClose={() => setLightboxSrc(null)} />}
 
       <div className="space-y-4 mt-6">
         {comments.map((comment) => {
@@ -239,6 +219,11 @@ export default function VenueCommentList() {
                 )}
                 <div className="flex items-center gap-2 min-w-0">
                   <span className="text-sm font-medium truncate">{displayName}</span>
+                  <RoleBadge
+                    role={comment.sender_role}
+                    artistName={comment.sender_artist?.display_name || comment.sender_artist?.name_local || comment.sender_artist?.name_en}
+                    t={t}
+                  />
                   {isOwn && (
                     <span className="text-[10px] text-gold bg-gold/10 px-1.5 py-0.5 rounded-full shrink-0">
                       {t('you')}

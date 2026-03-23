@@ -146,6 +146,7 @@
     "contact": "聯絡方式",
     "goldPartner": "金牌認證夥伴",
     "locationMap": "位置與地圖",
+    "photoGallery": "照片圖庫",
     "openInGoogleMaps": "在 Google Maps 中開啟",
     "openInAppleMaps": "在 Apple Maps 中開啟",
     "venueStats": "場地數據",
@@ -472,7 +473,24 @@
     "broadcastsLockedDesc": "升級至 Premium 場地以解鎖行銷廣播工具。",
     "noConversations": "目前沒有訊息。",
     "noConversationsHint": "粉絲可從你的場地頁面傳訊息給你。",
-    "archive": "封存"
+    "archive": "封存",
+    "photos": "照片",
+    "photoGallery": "照片圖庫",
+    "uploadPhotos": "上傳照片",
+    "deletePhoto": "刪除照片",
+    "deletePhotoConfirm": "確定刪除這張照片？",
+    "setAsCover": "設為封面",
+    "coverPhoto": "封面",
+    "dragToUpload": "點擊上傳或拖曳檔案至此",
+    "maxPhotos": "{count} / {max} 張照片",
+    "noPhotos": "尚無照片。上傳第一張場地照片吧！",
+    "photoUploaded": "照片已上傳！",
+    "photoDeleted": "照片已刪除。",
+    "uploadFailed": "上傳失敗，請再試一次。",
+    "reorderSaved": "順序已儲存。",
+    "maxPhotosReached": "最多可上傳 {max} 張照片。",
+    "moveUp": "上移",
+    "moveDown": "下移"
   },
   "admin": {
     "saveAndTranslate": "儲存並翻譯",
@@ -1028,6 +1046,14 @@
       "venue_manager": "場地",
       "artist": "藝人",
       "admin": "JazzNode HQ"
+    },
+    "identity": {
+      "label": "留言身份",
+      "member": "會員",
+      "artist": "藝人",
+      "venue_manager": "場地",
+      "admin": "JazzNode HQ",
+      "hint": "可切換身份"
     }
   }
 }
