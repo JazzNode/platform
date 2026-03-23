@@ -29,13 +29,7 @@ const TAG_EMOJIS: Record<string, string> = {
   love_vibe: '\u2728',
 };
 
-interface VenueCommentFormProps {
-  venueId: string;
-  onFormOpen?: () => void;
-  onFormClose?: () => void;
-}
-
-export default function VenueCommentForm({ venueId, onFormOpen, onFormClose }: VenueCommentFormProps) {
+export default function VenueCommentForm({ venueId }: { venueId: string }) {
   const { user, setShowAuthModal } = useAuth();
   const { submitComment } = useVenueComments();
   const t = useTranslations('reviews');
@@ -56,7 +50,6 @@ export default function VenueCommentForm({ venueId, onFormOpen, onFormClose }: V
       return;
     }
     setShowForm(true);
-    onFormOpen?.();
   };
 
   const handleClose = () => {
@@ -66,7 +59,6 @@ export default function VenueCommentForm({ venueId, onFormOpen, onFormClose }: V
     setImageUrl(null);
     setImagePreview(null);
     setIsAnonymous(false);
-    onFormClose?.();
   };
 
   const toggleTag = (tag: string) => {
@@ -125,18 +117,21 @@ export default function VenueCommentForm({ venueId, onFormOpen, onFormClose }: V
     return (
       <button
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium bg-gold/10 text-gold border border-gold/25 hover:bg-gold/20 hover:border-gold/40 transition-all duration-200"
+        className="group w-full text-left rounded-2xl border border-[var(--border)] hover:border-gold/30 bg-[var(--card)] px-4 py-3 transition-all duration-200 cursor-text"
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-        {t('writeComment')}
+        <div className="relative overflow-hidden">
+          <span className="text-sm text-[var(--muted-foreground)] pointer-events-none">
+            {t('inputPrompt')}
+          </span>
+          {/* Right-side fadeout gradient */}
+          <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-[var(--card)] to-transparent pointer-events-none" />
+        </div>
       </button>
     );
   }
 
   return (
-    <div className="bg-[var(--card)] rounded-2xl border border-gold/15 p-5 space-y-4 mt-4">
+    <div className="bg-[var(--card)] rounded-2xl border border-gold/15 p-5 space-y-4">
       {/* Tag chips */}
       <div>
         <label className="text-xs text-[var(--muted-foreground)] uppercase tracking-widest mb-2.5 block">
