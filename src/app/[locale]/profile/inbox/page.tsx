@@ -712,6 +712,7 @@ export default function FanInboxPage() {
       .select('id, title, body, type, read_at, created_at')
       .eq('user_id', user.id)
       .or('reference_type.is.null,reference_type.not.in.(artist,venue)')
+      .neq('type', 'message')
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data }) => {
@@ -734,6 +735,7 @@ export default function FanInboxPage() {
         (payload) => {
           const n = payload.new as { id: string; title: string; body: string | null; type: string; read_at: string | null; created_at: string; reference_type?: string | null };
           if (n.reference_type && ENTITY_TYPES.includes(n.reference_type)) return;
+          if (n.type === 'message') return;
           setNotifications((prev) => [{ id: n.id, title: n.title, body: n.body, type: n.type, read_at: n.read_at, created_at: n.created_at }, ...prev]);
         },
       )
