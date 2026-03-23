@@ -1,13 +1,18 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { getSpaceGrotesk, fontConfig } from '../_fonts';
+import { getSpaceGrotesk, fontConfig, fetchImageAsDataUrl } from '../_fonts';
 
 export async function GET(req: NextRequest) {
-  const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
   const name = searchParams.get('name') || 'Artist';
   const instrument = searchParams.get('instrument') || '';
-  const photo = searchParams.get('photo') || '';
+  const photoParam = searchParams.get('photo') || '';
+  const bio = searchParams.get('bio') || '';
+
+  const [fontData, photoSrc] = await Promise.all([
+    getSpaceGrotesk(),
+    photoParam ? fetchImageAsDataUrl(photoParam) : Promise.resolve(null),
+  ]);
 
   return new ImageResponse(
     (
@@ -75,15 +80,15 @@ export async function GET(req: NextRequest) {
               marginRight: 60,
               alignItems: 'center',
               justifyContent: 'center',
-              background: photo
+              background: photoSrc
                 ? 'transparent'
                 : 'linear-gradient(135deg, #1a1a2e 0%, #2a1a3e 100%)',
             }}
           >
-            {photo ? (
+            {photoSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={photo}
+                src={photoSrc}
                 alt=""
                 width={280}
                 height={280}
@@ -112,6 +117,7 @@ export async function GET(req: NextRequest) {
               flexDirection: 'column',
               flex: 1,
               minWidth: 0,
+              justifyContent: 'center',
             }}
           >
             {/* Artist name */}
@@ -137,7 +143,7 @@ export async function GET(req: NextRequest) {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 8,
-                  marginBottom: 24,
+                  marginBottom: bio ? 20 : 24,
                 }}
               >
                 <div
@@ -163,18 +169,32 @@ export async function GET(req: NextRequest) {
               </div>
             )}
 
-            {/* Divider */}
+            {/* Bio snippet */}
+            {bio && (
+              <div
+                style={{
+                  fontSize: 18,
+                  color: 'rgba(255,255,255,0.55)',
+                  lineHeight: 1.5,
+                  marginBottom: 24,
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                }}
+              >
+                {bio.length > 100 ? bio.slice(0, 100) + '...' : bio}
+              </div>
+            )}
+
+            {/* Divider + Brand */}
             <div
               style={{
                 width: 60,
                 height: 2,
                 background: 'linear-gradient(90deg, #C4A35A, transparent)',
-                marginBottom: 24,
+                marginBottom: 16,
                 display: 'flex',
               }}
             />
-
-            {/* Brand */}
             <div
               style={{
                 display: 'flex',

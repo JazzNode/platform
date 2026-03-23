@@ -38,7 +38,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title,
     ...(desc && { description: desc.slice(0, 160) }),
-    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    openGraph: {
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      ...(desc && { description: desc.slice(0, 160) }),
+    },
     twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/events/${slug}`,

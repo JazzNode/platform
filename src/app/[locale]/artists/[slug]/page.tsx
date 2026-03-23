@@ -38,11 +38,17 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const ogParams = new URLSearchParams({ name });
   if (artist?.fields.primary_instrument) ogParams.set('instrument', artist.fields.primary_instrument);
   if (artist?.fields.photo_url) ogParams.set('photo', artist.fields.photo_url);
+  const bioSnippet = bio ? bio.slice(0, 120) : '';
+  if (bioSnippet) ogParams.set('bio', bioSnippet);
   const ogUrl = `/api/og/artist?${ogParams.toString()}`;
+  const description = bio ? bio.slice(0, 160) : undefined;
   return {
     title: name,
-    ...(bio && { description: bio.slice(0, 160) }),
-    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    ...(description && { description }),
+    openGraph: {
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      ...(description && { description }),
+    },
     twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/artists/${slug}`,

@@ -1,14 +1,18 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { getSpaceGrotesk, fontConfig } from '../_fonts';
+import { getSpaceGrotesk, fontConfig, fetchImageAsDataUrl } from '../_fonts';
 
 export async function GET(req: NextRequest) {
-  const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
   const name = searchParams.get('name') || 'Venue';
   const city = searchParams.get('city') || '';
-  const photo = searchParams.get('photo') || '';
+  const photoParam = searchParams.get('photo') || '';
   const type = searchParams.get('type') || '';
+
+  const [fontData, photoSrc] = await Promise.all([
+    getSpaceGrotesk(),
+    photoParam ? fetchImageAsDataUrl(photoParam) : Promise.resolve(null),
+  ]);
 
   return new ImageResponse(
     (
@@ -34,7 +38,7 @@ export async function GET(req: NextRequest) {
           }}
         >
           {/* Photo section (left) */}
-          {photo ? (
+          {photoSrc ? (
             <div
               style={{
                 display: 'flex',
@@ -47,7 +51,7 @@ export async function GET(req: NextRequest) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={photo}
+                src={photoSrc}
                 alt=""
                 width={440}
                 height={630}
@@ -126,7 +130,7 @@ export async function GET(req: NextRequest) {
               flexDirection: 'column',
               justifyContent: 'center',
               flex: 1,
-              padding: photo ? '60px 60px 60px 20px' : '60px 60px 60px 0',
+              padding: photoSrc ? '60px 60px 60px 20px' : '60px 60px 60px 0',
               minWidth: 0,
             }}
           >

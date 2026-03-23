@@ -1,14 +1,18 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { getSpaceGrotesk, fontConfig } from '../_fonts';
+import { getSpaceGrotesk, fontConfig, fetchImageAsDataUrl } from '../_fonts';
 
 export async function GET(req: NextRequest) {
-  const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
   const name = searchParams.get('name') || 'Member';
   const username = searchParams.get('username') || '';
-  const avatar = searchParams.get('avatar') || '';
+  const avatarParam = searchParams.get('avatar') || '';
   const role = searchParams.get('role') || '';
+
+  const [fontData, avatarSrc] = await Promise.all([
+    getSpaceGrotesk(),
+    avatarParam ? fetchImageAsDataUrl(avatarParam) : Promise.resolve(null),
+  ]);
 
   const roleLabel: Record<string, string> = {
     member: 'Member',
@@ -83,15 +87,15 @@ export async function GET(req: NextRequest) {
               marginBottom: 32,
               alignItems: 'center',
               justifyContent: 'center',
-              background: avatar
+              background: avatarSrc
                 ? 'transparent'
                 : 'linear-gradient(135deg, #1a1a2e 0%, #2a1a3e 100%)',
             }}
           >
-            {avatar ? (
+            {avatarSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={avatar}
+                src={avatarSrc}
                 alt=""
                 width={200}
                 height={200}

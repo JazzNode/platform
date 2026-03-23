@@ -1,14 +1,18 @@
 import { ImageResponse } from 'next/og';
 import { NextRequest } from 'next/server';
-import { getSpaceGrotesk, fontConfig } from '../_fonts';
+import { getSpaceGrotesk, fontConfig, fetchImageAsDataUrl } from '../_fonts';
 
 export async function GET(req: NextRequest) {
-  const fontData = await getSpaceGrotesk();
   const { searchParams } = req.nextUrl;
   const title = searchParams.get('title') || 'Event';
   const venue = searchParams.get('venue') || '';
   const date = searchParams.get('date') || '';
-  const poster = searchParams.get('poster') || '';
+  const posterParam = searchParams.get('poster') || '';
+
+  const [fontData, poster] = await Promise.all([
+    getSpaceGrotesk(),
+    posterParam ? fetchImageAsDataUrl(posterParam) : Promise.resolve(null),
+  ]);
 
   return new ImageResponse(
     (

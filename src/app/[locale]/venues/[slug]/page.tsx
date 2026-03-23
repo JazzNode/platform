@@ -42,7 +42,10 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: name,
     description,
-    openGraph: { images: [{ url: ogUrl, width: 1200, height: 630 }] },
+    openGraph: {
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      description,
+    },
     twitter: { card: 'summary_large_image' },
     alternates: {
       canonical: `/${locale}/venues/${slug}`,
