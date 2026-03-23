@@ -102,7 +102,7 @@ function ArtistSearchCombobox({
   const [showNewForm, setShowNewForm] = useState(false);
   const [newInstrument, setNewInstrument] = useState('');
   const ref = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
