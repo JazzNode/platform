@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useSyncExternalStore } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import Image from 'next/image';
@@ -103,9 +103,23 @@ function RoleBadge({ role, t }: { role: string | null; t: (key: string) => strin
   return <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full border ${c.color}`}>{c.label}</span>;
 }
 
+// React-pure way to read current time: subscribe to a clock that ticks every 60s
+let currentNow = Date.now();
+const clockListeners = new Set<() => void>();
+if (typeof window !== 'undefined') {
+  setInterval(() => {
+    currentNow = Date.now();
+    clockListeners.forEach((l) => l());
+  }, 60_000);
+}
+function subscribeNow(cb: () => void) { clockListeners.add(cb); return () => { clockListeners.delete(cb); }; }
+function getNow() { return currentNow; }
+function getServerNow() { return Date.now(); }
+
 function RelativeTime({ dateStr, locale }: { dateStr: string; locale: string }) {
+  const now = useSyncExternalStore(subscribeNow, getNow, getServerNow);
   const d = new Date(dateStr);
-  const diff = Math.floor((Date.now() - d.getTime()) / 86400000);
+  const diff = Math.floor((now - d.getTime()) / 86400000);
   let label: string;
   if (diff === 0) label = locale === 'zh' ? '今天' : locale === 'ja' ? '今日' : 'today';
   else if (diff === 1) label = locale === 'zh' ? '昨天' : locale === 'ja' ? '昨日' : 'yesterday';
@@ -149,20 +163,23 @@ export default function DashboardCommentsTab({ mode, venueId, artistId }: Dashbo
   const showVenueLink = mode !== 'venue';
 
   // Fetch comments
-  const fetchComments = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ mode });
-      if (venueId) params.set('venueId', venueId);
-      if (artistId) params.set('artistId', artistId);
-      const res = await fetch(`/api/dashboard/comments?${params}`);
-      const data = await res.json();
-      if (data.comments) setComments(data.comments);
-    } catch { /* silent */ }
-    setLoading(false);
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams({ mode });
+        if (venueId) params.set('venueId', venueId);
+        if (artistId) params.set('artistId', artistId);
+        const res = await fetch(`/api/dashboard/comments?${params}`);
+        const data = await res.json();
+        if (!cancelled && data.comments) setComments(data.comments);
+      } catch { /* silent */ }
+      if (!cancelled) setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
   }, [mode, venueId, artistId]);
-
-  useEffect(() => { fetchComments(); }, [fetchComments]);
 
   // Reply
   const handleReply = async (commentId: string) => {
