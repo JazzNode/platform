@@ -58,10 +58,10 @@ const DEFAULT_VENUE: TierFeatures = {
   edit_profile: 1, verified_badge: 1, photos: 1, description: 1, inbox: 1,
   // Tier 2 (Premium) — operational tools
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
-  artist_discovery: 2, broadcasts: 2, priority_search: 2,
+  broadcasts: 2, priority_search: 2,
   // Tier 3 (Elite) — business engine
   custom_domain: 3, custom_theme: 3, ticketing: 3, broadcasts_unlimited: 3,
-  booking_management: 3, revenue_analytics: 3, multi_location: 3, ical_api: 3,
+  revenue_analytics: 3, multi_location: 3, ical_api: 3,
 };
 
 export default function TierConfigProvider({ children }: { children: React.ReactNode }) {

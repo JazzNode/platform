@@ -28,13 +28,11 @@ interface FeatureKey {
 /** Features listed in the tier config but not yet built in the frontend */
 const NOT_IMPLEMENTED = new Set([
   'backline',
-  'artist_discovery',
   'priority_search',
   'custom_domain',
   'custom_theme',
   'ticketing',
   'broadcasts_unlimited',
-  'booking_management',
   'revenue_analytics',
   'multi_location',
   'ical_api',
@@ -58,7 +56,6 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_premium' },
   { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_premium' },
   { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_premium' },
-  { key: 'artist_discovery', labelKey: 'vf_artistDiscovery', categoryKey: 'vc_premium' },
   { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_premium' },
   { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_premium' },
   // Tier 3 — Elite (business engine)
@@ -66,7 +63,6 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'custom_theme', labelKey: 'vf_customTheme', categoryKey: 'vc_elite' },
   { key: 'ticketing', labelKey: 'vf_ticketing', categoryKey: 'vc_elite' },
   { key: 'broadcasts_unlimited', labelKey: 'vf_broadcastsUnlimited', categoryKey: 'vc_elite' },
-  { key: 'booking_management', labelKey: 'vf_bookingManagement', categoryKey: 'vc_elite' },
   { key: 'revenue_analytics', labelKey: 'vf_revenueAnalytics', categoryKey: 'vc_elite' },
   { key: 'multi_location', labelKey: 'vf_multiLocation', categoryKey: 'vc_elite' },
   { key: 'ical_api', labelKey: 'vf_icalApi', categoryKey: 'vc_elite' },

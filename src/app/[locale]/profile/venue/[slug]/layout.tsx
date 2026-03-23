@@ -24,7 +24,6 @@ const NAV_ITEMS = [
   { key: 'photos', icon: 'images', path: '/photos' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
   { key: 'comments', icon: 'comments', path: '/comments' },
-  { key: 'bookings', icon: 'calendar', path: '/bookings' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
   { key: 'backline', icon: 'backline', path: '/backline' },
   { key: 'analytics', icon: 'analytics', path: '/analytics' },
