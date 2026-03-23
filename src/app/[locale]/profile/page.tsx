@@ -16,8 +16,9 @@ interface MyReview {
   id: string;
   venue_id: string;
   venue_name: string | null;
-  rating: number;
   text: string | null;
+  tags: string[] | null;
+  image_url: string | null;
   is_anonymous: boolean;
   created_at: string;
 }
