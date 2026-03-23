@@ -37,41 +37,47 @@ export default function ClaimsProvider({ children }: { children: React.ReactNode
   const [approvedCounts, setApprovedCounts] = useState<Map<string, number>>(new Map());
   const [fetched, setFetched] = useState(false);
 
-  // Fetch user's own claims + all approved claims
+  // Fetch all approved claims (public via RLS) — works for both guests and logged-in users
+  useEffect(() => {
+    let cancelled = false;
+    const supabase = createClient();
+
+    supabase
+      .from('claims')
+      .select('target_type, target_id')
+      .eq('status', 'approved')
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data) {
+          const counts = new Map<string, number>();
+          for (const r of data) {
+            const key = `${r.target_type}:${r.target_id}`;
+            counts.set(key, (counts.get(key) || 0) + 1);
+          }
+          setApprovedCounts(counts);
+        }
+        if (!user) setFetched(true);
+      });
+
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Fetch user's own claims (requires auth)
   useEffect(() => {
     if (!user) return;
 
     let cancelled = false;
-
     const supabase = createClient();
 
-    // Fetch user's own claims
-    const fetchMyClaims = supabase
+    supabase
       .from('claims')
       .select('target_type, target_id, status')
-      .eq('user_id', user.id);
-
-    // Fetch all approved claims (public via RLS) — now there can be multiple per entity
-    const fetchApproved = supabase
-      .from('claims')
-      .select('target_type, target_id')
-      .eq('status', 'approved');
-
-    Promise.all([fetchMyClaims, fetchApproved]).then(([myRes, approvedRes]) => {
-      if (cancelled) return;
-      if (myRes.data) {
-        setMyClaims(myRes.data as ClaimRecord[]);
-      }
-      if (approvedRes.data) {
-        const counts = new Map<string, number>();
-        for (const r of approvedRes.data) {
-          const key = `${r.target_type}:${r.target_id}`;
-          counts.set(key, (counts.get(key) || 0) + 1);
-        }
-        setApprovedCounts(counts);
-      }
-      setFetched(true);
-    });
+      .eq('user_id', user.id)
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (data) setMyClaims(data as ClaimRecord[]);
+        setFetched(true);
+      });
 
     return () => { cancelled = true; };
   }, [user]);
