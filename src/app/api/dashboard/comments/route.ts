@@ -56,12 +56,23 @@ export async function GET(req: NextRequest) {
         break;
 
       case 'artist': {
-        // Artists see all comments on venues they have performed at
-        // For now, show comments on all venues (artists can reply anywhere)
         if (!profile.claimed_artist_ids?.length && profile.role !== 'admin' && profile.role !== 'owner') {
           return NextResponse.json({ error: 'Not an artist' }, { status: 403 });
         }
-        // Show comments the artist has replied to + recent comments across venues
+        // Only show: 1) comments the artist user wrote, 2) comments the artist replied to
+        const { data: repliedCommentIds } = await admin
+          .from('venue_comment_replies')
+          .select('comment_id')
+          .eq('user_id', user.id);
+        const repliedIds = (repliedCommentIds || []).map((r: { comment_id: string }) => r.comment_id);
+
+        if (repliedIds.length > 0) {
+          // Comments by this user OR comments they've replied to
+          query = query.or(`user_id.eq.${user.id},id.in.(${repliedIds.join(',')})`);
+        } else {
+          // Only comments by this user
+          query = query.eq('user_id', user.id);
+        }
         break;
       }
 
