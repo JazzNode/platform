@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 
-type Tab = 'notifications' | 'messages';
+type Tab = 'messages' | 'notifications';
 
 interface Notification {
   id: string;
@@ -118,7 +118,7 @@ export default function AdminInboxPage() {
   const locale = useLocale();
   const t = useTranslations('adminHQ');
 
-  const [tab, setTab] = useState<Tab>('notifications');
+  const [tab, setTab] = useState<Tab>('messages');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [conversations, setConversations] = useState<HQConversation[]>([]);
@@ -343,8 +343,8 @@ export default function AdminInboxPage() {
       {/* Tabs */}
       <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1">
         {([
-          { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadCount },
           { key: 'messages' as Tab, label: t('inboxMessages'), badge: totalMsgUnread + guestUnread },
+          { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadCount },
         ]).map(({ key, label, badge }) => (
           <button
             key={key}
