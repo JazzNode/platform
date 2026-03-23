@@ -33,8 +33,8 @@ function MyReviews() {
     if (!user) return;
     const supabase = createClient();
     supabase
-      .from('venue_reviews')
-      .select('id, venue_id, rating, text, is_anonymous, created_at')
+      .from('venue_comments')
+      .select('id, venue_id, text, tags, image_url, is_anonymous, created_at')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(async ({ data }) => {
@@ -91,13 +91,15 @@ function MyReviews() {
                   </div>
                   <span className="text-xs text-[var(--muted-foreground)]">{dateStr}</span>
                 </div>
-                <div className="flex items-center gap-1 mb-1.5">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < review.rating ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" className={i < review.rating ? 'text-[var(--color-gold)]' : 'text-[var(--muted-foreground)]/30'}>
-                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                    </svg>
-                  ))}
-                </div>
+                {review.tags && review.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-1.5">
+                    {review.tags.map((tag: string) => (
+                      <span key={tag} className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)]/80">
+                        {tag.replace(/_/g, ' ')}
+                      </span>
+                    ))}
+                  </div>
+                )}
                 {review.text && (
                   <p className="text-sm text-[var(--muted-foreground)] leading-relaxed">{review.text}</p>
                 )}

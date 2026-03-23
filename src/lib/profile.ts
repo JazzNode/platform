@@ -58,18 +58,19 @@ export async function getProfileById(id: string): Promise<Profile | null> {
 export interface UserReview {
   id: string;
   venue_id: string;
-  rating: number;
   text: string | null;
+  tags: string[];
+  image_url: string | null;
   is_anonymous: boolean;
   created_at: string;
 }
 
-/** Fetch all reviews by a user. For public profiles, pass publicOnly=true to exclude anonymous reviews. */
+/** Fetch all comments by a user. For public profiles, pass publicOnly=true to exclude anonymous comments. */
 export async function getUserReviews(userId: string, publicOnly = false): Promise<UserReview[]> {
   const supabase = await createClient();
   let query = supabase
-    .from('venue_reviews')
-    .select('id, venue_id, rating, text, is_anonymous, created_at')
+    .from('venue_comments')
+    .select('id, venue_id, text, tags, image_url, is_anonymous, created_at')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
 

@@ -456,6 +456,7 @@
     "schedulePlaceholder": "Your lineup schedule will appear here.",
     "broadcastPlaceholder": "Your marketing broadcasts will appear here.",
     "inbox": "Inbox",
+    "comments": "Comments",
     "bookings": "Bookings",
     "broadcasts": "Broadcasts",
     "backline": "Backline",
@@ -991,25 +992,41 @@
     "ctaButton": "Explore Artists"
   },
   "reviews": {
-    "sectionTitle": "Community Reviews",
-    "writeReview": "Write a Review",
-    "editReview": "Edit Your Review",
-    "ratingLabel": "Your Rating",
-    "textPlaceholder": "Share your experience (optional, max 200 chars)",
+    "sectionTitle": "Community Board",
+    "writeComment": "Leave a Comment",
+    "textPlaceholder": "Share your experience (optional, max 500 chars)",
+    "tagsLabel": "How was it?",
     "anonymousLabel": "Post Anonymously",
     "anonymousUser": "Anonymous",
-    "submitReview": "Submit",
-    "updateReview": "Update",
-    "deleteReview": "Delete Review",
+    "submitComment": "Post",
+    "deleteComment": "Delete",
     "deleteConfirm": "Are you sure?",
     "confirmYes": "Yes",
     "cancel": "Cancel",
-    "averageRating": "Average Rating",
-    "reviewCount": "{count} reviews",
-    "emptyCta": "Been here? Leave a review!",
-    "noReviews": "No reviews yet. Be the first!",
+    "commentCount": "{count} comments",
+    "emptyCta": "Been here? Share your experience!",
+    "noReviews": "No comments yet. Be the first!",
     "charsRemaining": "{count} chars remaining",
-    "loginToReview": "Log in to leave a review",
-    "you": "You"
+    "loginToReview": "Log in to leave a comment",
+    "you": "You",
+    "reply": "Reply",
+    "replyPlaceholder": "Write a reply...",
+    "addPhoto": "Add Photo",
+    "removePhoto": "Remove",
+    "tags": {
+      "great_show": "Great performance",
+      "great_sound": "Incredible sound",
+      "great_drinks": "Amazing drinks",
+      "great_food": "Food exceeded expectations",
+      "easy_access": "Easy to get to",
+      "easy_parking": "Easy parking nearby",
+      "friendly_staff": "Super friendly staff",
+      "love_vibe": "Love the vibe"
+    },
+    "roleBadge": {
+      "venue_manager": "Venue",
+      "artist": "Artist",
+      "admin": "JazzNode HQ"
+    }
   }
 }

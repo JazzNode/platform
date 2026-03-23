@@ -72,7 +72,7 @@ export async function getUserBadgeProgress(
     sb.from('profiles').select('display_name, bio, avatar_url, website, created_at').eq('id', userId).single(),
     sb.from('conversations').select('id').or(`fan_user_id.eq.${userId},user_b_id.eq.${userId}`),
     sb.from('messages').select('id').eq('sender_id', userId).limit(1),
-    sb.from('venue_reviews').select('id', { count: 'exact', head: true }).eq('user_id', userId),
+    sb.from('venue_comments').select('id', { count: 'exact', head: true }).eq('user_id', userId),
   ]);
 
   if (!allBadges) return [];

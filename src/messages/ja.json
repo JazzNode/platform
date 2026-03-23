@@ -456,6 +456,7 @@
     "schedulePlaceholder": "ラインナップスケジュールがここに表示されます。",
     "broadcastPlaceholder": "マーケティング配信がここに表示されます。",
     "inbox": "受信トレイ",
+    "comments": "コメント",
     "bookings": "予約管理",
     "broadcasts": "ブロードキャスト",
     "backline": "バックライン",
@@ -989,25 +990,41 @@
     "ctaButton": "アーティストを探す"
   },
   "reviews": {
-    "sectionTitle": "コミュニティレビュー",
-    "writeReview": "レビューを書く",
-    "editReview": "レビューを編集",
-    "ratingLabel": "あなたの評価",
-    "textPlaceholder": "体験をシェア（任意、最大200文字）",
+    "sectionTitle": "コミュニティボード",
+    "writeComment": "コメントする",
+    "textPlaceholder": "体験をシェア（任意、最大500文字）",
+    "tagsLabel": "どうでしたか？",
     "anonymousLabel": "匿名で投稿",
     "anonymousUser": "匿名",
-    "submitReview": "送信",
-    "updateReview": "更新",
-    "deleteReview": "レビューを削除",
+    "submitComment": "投稿",
+    "deleteComment": "削除",
     "deleteConfirm": "本当に削除しますか？",
     "confirmYes": "はい",
     "cancel": "キャンセル",
-    "averageRating": "平均評価",
-    "reviewCount": "{count}件のレビュー",
-    "emptyCta": "ここに行ったことがありますか？レビューを書きましょう！",
-    "noReviews": "まだレビューがありません。最初のレビューを書きましょう！",
+    "commentCount": "{count}件のコメント",
+    "emptyCta": "ここに行ったことがありますか？体験をシェアしましょう！",
+    "noReviews": "まだコメントがありません。最初のコメントを書きましょう！",
     "charsRemaining": "残り{count}文字",
-    "loginToReview": "ログインしてレビューを書く",
-    "you": "あなた"
+    "loginToReview": "ログインしてコメントする",
+    "you": "あなた",
+    "reply": "返信",
+    "replyPlaceholder": "返信を書く…",
+    "addPhoto": "写真を追加",
+    "removePhoto": "削除",
+    "tags": {
+      "great_show": "パフォーマンス最高",
+      "great_sound": "音響が素晴らしい",
+      "great_drinks": "ドリンクが最高",
+      "great_food": "料理が期待以上",
+      "easy_access": "アクセス便利",
+      "easy_parking": "駐車場が近くにある",
+      "friendly_staff": "スタッフが親切",
+      "love_vibe": "雰囲気が最高"
+    },
+    "roleBadge": {
+      "venue_manager": "会場",
+      "artist": "アーティスト",
+      "admin": "JazzNode HQ"
+    }
   }
 }

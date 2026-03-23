@@ -456,6 +456,7 @@
     "schedulePlaceholder": "您的演出排班將顯示在這裡。",
     "broadcastPlaceholder": "您的行銷廣播將顯示在這裡。",
     "inbox": "收件匣",
+    "comments": "留言區",
     "bookings": "預訂管理",
     "broadcasts": "廣播",
     "backline": "場地設備",
@@ -991,25 +992,41 @@
     "ctaButton": "探索藝人"
   },
   "reviews": {
-    "sectionTitle": "社群評價",
-    "writeReview": "撰寫評價",
-    "editReview": "編輯你的評價",
-    "ratingLabel": "你的評分",
-    "textPlaceholder": "分享你的體驗（選填，最多 200 字）",
+    "sectionTitle": "留言板",
+    "writeComment": "留言",
+    "textPlaceholder": "分享你的體驗（選填，最多 500 字）",
+    "tagsLabel": "體驗如何？",
     "anonymousLabel": "匿名發表",
     "anonymousUser": "匿名樂迷",
-    "submitReview": "送出",
-    "updateReview": "更新",
-    "deleteReview": "刪除評價",
+    "submitComment": "送出",
+    "deleteComment": "刪除",
     "deleteConfirm": "確定要刪除嗎？",
     "confirmYes": "確定",
     "cancel": "取消",
-    "averageRating": "平均評分",
-    "reviewCount": "{count} 則評價",
-    "emptyCta": "你去過這裡嗎？留下評價吧！",
-    "noReviews": "還沒有評價，成為第一個吧！",
+    "commentCount": "{count} 則留言",
+    "emptyCta": "你去過這裡嗎？分享你的體驗吧！",
+    "noReviews": "還沒有留言，成為第一個吧！",
     "charsRemaining": "剩餘 {count} 字",
-    "loginToReview": "登入後即可評價",
-    "you": "你"
+    "loginToReview": "登入後即可留言",
+    "you": "你",
+    "reply": "回覆",
+    "replyPlaceholder": "撰寫回覆⋯",
+    "addPhoto": "上傳照片",
+    "removePhoto": "移除",
+    "tags": {
+      "great_show": "演出內容超棒",
+      "great_sound": "現場音場沒話說",
+      "great_drinks": "調酒超好喝",
+      "great_food": "餐點超乎預期",
+      "easy_access": "交通方便",
+      "easy_parking": "附近好停車",
+      "friendly_staff": "店員超親切",
+      "love_vibe": "超愛店家氛圍"
+    },
+    "roleBadge": {
+      "venue_manager": "場地",
+      "artist": "藝人",
+      "admin": "JazzNode HQ"
+    }
   }
 }

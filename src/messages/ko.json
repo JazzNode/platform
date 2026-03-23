@@ -456,6 +456,7 @@
     "schedulePlaceholder": "라인업 스케줄이 여기에 표시됩니다.",
     "broadcastPlaceholder": "마케팅 브로드캐스트가 여기에 표시됩니다.",
     "inbox": "받은편지함",
+    "comments": "댓글",
     "bookings": "예약 관리",
     "broadcasts": "방송",
     "backline": "백라인",
@@ -989,25 +990,41 @@
     "ctaButton": "아티스트 둘러보기"
   },
   "reviews": {
-    "sectionTitle": "커뮤니티 리뷰",
-    "writeReview": "리뷰 작성",
-    "editReview": "리뷰 수정",
-    "ratingLabel": "평점",
-    "textPlaceholder": "경험을 공유하세요 (선택사항, 최대 200자)",
+    "sectionTitle": "커뮤니티 보드",
+    "writeComment": "댓글 남기기",
+    "textPlaceholder": "경험을 공유하세요 (선택, 최대 500자)",
+    "tagsLabel": "어떠셨나요?",
     "anonymousLabel": "익명으로 게시",
     "anonymousUser": "익명",
-    "submitReview": "제출",
-    "updateReview": "수정",
-    "deleteReview": "리뷰 삭제",
+    "submitComment": "게시",
+    "deleteComment": "삭제",
     "deleteConfirm": "정말 삭제하시겠습니까?",
     "confirmYes": "예",
     "cancel": "취소",
-    "averageRating": "평균 평점",
-    "reviewCount": "리뷰 {count}개",
-    "emptyCta": "이곳에 가본 적 있나요? 리뷰를 남겨주세요!",
-    "noReviews": "아직 리뷰가 없습니다. 첫 번째 리뷰를 남겨주세요!",
+    "commentCount": "댓글 {count}개",
+    "emptyCta": "여기 가보셨나요? 경험을 공유해주세요!",
+    "noReviews": "아직 댓글이 없습니다. 첫 댓글을 남겨보세요!",
     "charsRemaining": "{count}자 남음",
-    "loginToReview": "로그인 후 리뷰를 남기세요",
-    "you": "나"
+    "loginToReview": "로그인 후 댓글을 남길 수 있습니다",
+    "you": "나",
+    "reply": "답글",
+    "replyPlaceholder": "답글 작성...",
+    "addPhoto": "사진 추가",
+    "removePhoto": "삭제",
+    "tags": {
+      "great_show": "공연 최고",
+      "great_sound": "사운드 끝내줌",
+      "great_drinks": "음료 최고",
+      "great_food": "음식 기대 이상",
+      "easy_access": "교통 편리",
+      "easy_parking": "주차 편리",
+      "friendly_staff": "직원이 친절",
+      "love_vibe": "분위기 최고"
+    },
+    "roleBadge": {
+      "venue_manager": "공연장",
+      "artist": "아티스트",
+      "admin": "JazzNode HQ"
+    }
   }
 }
