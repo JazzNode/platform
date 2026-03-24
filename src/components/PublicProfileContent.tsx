@@ -98,7 +98,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
                 url={`/${locale}/user/${username}`}
                 text={[
                   `${profile.display_name || username}${profile.username ? ` (@${profile.username})` : ''}`,
-                  profile.bio?.slice(0, 100) || '',
+                  profile.bio || '',
                   'via JazzNode — The Jazz Scene, Connected.',
                 ].filter(Boolean).join('\n')}
                 variant="compact"

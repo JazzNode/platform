@@ -467,7 +467,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                   url={`/${locale}/artists/${artist.id}`}
                   text={[
                     `${artist.displayName}${artist.primaryInstrument ? ` — ${instLabel(artist.primaryInstrument)}` : ''}`,
-                    artist.bio?.slice(0, 100) || '',
+                    artist.bio || '',
                     'via JazzNode — The Jazz Scene, Connected.',
                   ].filter(Boolean).join('\n')}
                   variant="icon"

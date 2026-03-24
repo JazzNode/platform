@@ -311,7 +311,9 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                     url={`/${locale}/venues/${venue.id}`}
                     text={[
                       `📍 ${venue.cityLabel}｜${venue.displayName}`,
-                      venue.description?.slice(0, 100) || '',
+                      venue.description && venue.description.length > 150
+                        ? venue.description.slice(0, 150).replace(/[，,、\s]+$/, '') + '…'
+                        : venue.description || '',
                       'via JazzNode — The Jazz Scene, Connected.',
                     ].filter(Boolean).join('\n')}
                     variant="icon"
