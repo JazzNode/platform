@@ -30,10 +30,6 @@ interface FeatureKey {
 const NOT_IMPLEMENTED = new Set([
   'backline',
   'priority_search',
-  'fan_insights',
-  'post_show_recap',
-  'artist_recommendations',
-  'weekly_digest',
   'custom_domain',
   'custom_theme',
   'ticketing',
