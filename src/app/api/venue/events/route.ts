@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch lineups + artists for all events
     const eventIds = (events || []).map((e) => e.event_id);
-    let lineupMap: Record<string, Array<{ artist_id: string; display_name: string; name_local: string; name_en: string; photo_url: string; instrument_list: string[]; role: string; sort_order: number }>> = {};
+    const lineupMap: Record<string, Array<{ artist_id: string; display_name: string; name_local: string; name_en: string; photo_url: string; instrument_list: string[]; role: string; sort_order: number }>> = {};
 
     if (eventIds.length > 0) {
       const { data: lineups } = await supabase

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTierConfig } from '@/components/TierConfigProvider';
@@ -88,12 +89,10 @@ function ArtistSearchCombobox({
   onSelect,
   t,
   tInst,
-  token,
 }: {
   onSelect: (artist: SearchArtist | { new_name: string }) => void;
   t: (key: string) => string;
   tInst: (key: string) => string;
-  token: string | null;
 }) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchArtist[]>([]);
@@ -191,7 +190,7 @@ function ArtistSearchCombobox({
               className="w-full flex items-center gap-3 px-4 py-3 hover:bg-[var(--muted)] transition-colors text-left"
             >
               {artist.photo_url ? (
-                <img src={artist.photo_url} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                <Image src={artist.photo_url} alt="" width={40} height={40} className="w-10 h-10 rounded-full object-cover shrink-0" unoptimized />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center text-sm text-[var(--muted-foreground)] shrink-0">
                   {(artist.display_name || artist.name_local || '?').charAt(0)}
@@ -336,7 +335,7 @@ function LineupList({
 
           {/* Artist photo */}
           {member.photo_url ? (
-            <img src={member.photo_url} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+            <Image src={member.photo_url} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0" unoptimized />
           ) : (
             <div className="w-9 h-9 rounded-full bg-[var(--muted)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
               {member.display_name.charAt(0)}
@@ -696,7 +695,6 @@ function EventForm({
             onSelect={handleArtistSelect}
             t={t}
             tInst={tInst}
-            token={token}
           />
 
           <LineupList
@@ -745,10 +743,13 @@ function EventForm({
 
           {posterUrl ? (
             <div className="relative group">
-              <img
+              <Image
                 src={posterUrl}
                 alt="Event poster"
+                width={320}
+                height={400}
                 className="w-full max-w-xs rounded-xl border border-[var(--border)]"
+                unoptimized
               />
               <button
                 onClick={() => { setPosterUrl(''); setPosterFile(null); }}
@@ -898,7 +899,7 @@ function EventCard({
             {event.lineup.slice(0, 5).map((artist) => (
               <div key={artist.artist_id} className="flex items-center gap-1.5 text-xs bg-[var(--muted)] rounded-full pl-1 pr-2.5 py-0.5">
                 {artist.photo_url ? (
-                  <img src={artist.photo_url} alt="" className="w-4 h-4 rounded-full object-cover" />
+                  <Image src={artist.photo_url} alt="" width={16} height={16} className="w-4 h-4 rounded-full object-cover" unoptimized />
                 ) : (
                   <div className="w-4 h-4 rounded-full bg-[var(--background)] flex items-center justify-center text-[8px] text-[var(--muted-foreground)]">
                     {artist.display_name.charAt(0)}
@@ -937,10 +938,13 @@ function EventCard({
       {/* Poster thumbnail */}
       {event.poster_url && (
         <div className="shrink-0 hidden sm:block">
-          <img
+          <Image
             src={event.poster_url}
             alt=""
+            width={64}
+            height={80}
             className="w-16 h-20 rounded-lg object-cover border border-[var(--border)]"
+            unoptimized
           />
         </div>
       )}
@@ -956,7 +960,7 @@ export default function ScheduleManagerPage({ params }: { params: Promise<{ slug
   const locale = useLocale();
   const { previewVenueTier, adminModeEnabled, token } = useAdmin();
   const { isUnlocked } = useTierConfig();
-  const { user } = useAuth();
+  useAuth();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -993,12 +997,9 @@ export default function ScheduleManagerPage({ params }: { params: Promise<{ slug
       .then(({ data }) => {
         if (data) setTier(data.tier);
         setLoading(false);
+        if (slug && token) fetchEvents();
       });
-  }, [slug]);
-
-  useEffect(() => {
-    if (!loading && slug && token) fetchEvents();
-  }, [loading, slug, token, fetchEvents]);
+  }, [slug, token, fetchEvents]);
 
   if (loading) {
     return (
