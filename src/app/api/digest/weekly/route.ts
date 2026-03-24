@@ -4,6 +4,8 @@ import { getVenueWeeklyDigest, getArtistWeeklyDigest } from '@/lib/digest';
 import { buildDigestEmailHtml } from '@/lib/digest-template';
 import { sendEmail } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 /**
  * Cron endpoint: sends weekly digest emails to tier 2+ venue and artist admins.
  *
