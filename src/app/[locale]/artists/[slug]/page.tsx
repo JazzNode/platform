@@ -911,7 +911,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       name: artistDisplayName(f, locale),
                       instrument: f.primary_instrument || null,
                       instrumentLabel: f.primary_instrument ? instLabel(f.primary_instrument) : null,
-                      role: null,
+                      artistType: f.type || null,
                       photoUrl: photoUrl(f.photo_url) || null,
                       gigCount: allEvents.length,
                       isCenter: true,
@@ -921,7 +921,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       name: artistDisplayName(c.fields, locale),
                       instrument: c.fields.primary_instrument || null,
                       instrumentLabel: c.fields.primary_instrument ? instLabel(c.fields.primary_instrument) : null,
-                      role: graphCollabRoles.get(c.id) || null,
+                      artistType: c.fields.type || null,
                       photoUrl: photoUrl(c.fields.photo_url) || null,
                       gigCount: c.count,
                     }))}
@@ -932,13 +932,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       collaborators: t('collaborationGigsCount'),
                       dragHint: t('collaborationGraphHint'),
                       filterInstrument: t('filterInstrument'),
-                      filterRole: t('filterRole'),
+                      filterType: t('filterType'),
                       filterMinGigs: t('filterMinGigs'),
                       filterAll: t('filterClearAll'),
-                      roleBandleader: t('asLeader'),
-                      roleSideman: t('asSideman'),
-                      roleFeaturedGuest: t('asFeaturedGuest'),
-                      roleBandMember: t('asBandMember'),
+                      typePerson: t('filterTypePerson'),
+                      typeGroup: t('filterTypeGroup'),
                     }}
                   />
                 </div>
