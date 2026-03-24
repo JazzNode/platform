@@ -147,7 +147,9 @@ export default function ShareButton({ title, url, text, variant = 'icon', label 
     // On mobile, prefer native share sheet
     if (navigator.share && 'ontouchstart' in window) {
       try {
-        await navigator.share({ title, text: text || title, url: fullUrl });
+        // iOS ignores `text` when `url` is present — embed URL in text instead
+        const shareText = text ? `${text}\n${fullUrl}` : `${title}\n${fullUrl}`;
+        await navigator.share({ title, text: shareText });
       } catch {
         // User cancelled
       }
