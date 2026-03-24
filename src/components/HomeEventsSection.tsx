@@ -83,6 +83,11 @@ function EventCard({ event, locale, index }: { event: HomeEvent; locale: string;
           <ShareButton
             title={event.title}
             url={`/${locale}/events/${event.id}`}
+            text={[
+              event.title,
+              `📅 ${event.relative_label} · ${event.time_display}${event.venue_name ? ` · 📍 ${event.venue_name}` : ''}`,
+              'via JazzNode — The Jazz Scene, Connected.',
+            ].filter(Boolean).join('\n')}
             variant="icon"
           />
           <BookmarkButton itemId={event.id} />
@@ -225,6 +230,10 @@ export default function HomeEventsSection({
                       <ShareButton
                         title={venue.name}
                         url={`/${locale}/venues/${venue.id}`}
+                        text={[
+                          `📍 ${venue.city_name}｜${venue.name}`,
+                          'via JazzNode — The Jazz Scene, Connected.',
+                        ].filter(Boolean).join('\n')}
                         variant="icon"
                       />
                       <FollowButton itemType="venue" itemId={venue.id} />

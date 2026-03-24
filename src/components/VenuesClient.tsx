@@ -309,6 +309,11 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                   <ShareButton
                     title={venue.displayName}
                     url={`/${locale}/venues/${venue.id}`}
+                    text={[
+                      `📍 ${venue.cityLabel}｜${venue.displayName}`,
+                      venue.description?.slice(0, 100) || '',
+                      'via JazzNode — The Jazz Scene, Connected.',
+                    ].filter(Boolean).join('\n')}
                     variant="icon"
                     glass
                   />

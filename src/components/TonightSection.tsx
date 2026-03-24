@@ -82,6 +82,11 @@ function TonightCard({ event, locale, index }: { event: TonightEvent; locale: st
           <ShareButton
             title={event.title}
             url={`/${locale}/events/${event.id}`}
+            text={[
+              event.title,
+              `📅 ${event.relative_label} · ${event.time_display}${event.venue_name ? ` · 📍 ${event.venue_name}` : ''}`,
+              'via JazzNode — The Jazz Scene, Connected.',
+            ].filter(Boolean).join('\n')}
             variant="icon"
           />
           <BookmarkButton itemId={event.id} />

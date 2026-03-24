@@ -465,6 +465,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
                 <ShareButton
                   title={artist.displayName}
                   url={`/${locale}/artists/${artist.id}`}
+                  text={[
+                    `${artist.displayName}${artist.primaryInstrument ? ` — ${instLabel(artist.primaryInstrument)}` : ''}`,
+                    artist.bio?.slice(0, 100) || '',
+                    'via JazzNode — The Jazz Scene, Connected.',
+                  ].filter(Boolean).join('\n')}
                   variant="icon"
                 />
                 <FollowButton itemType="artist" itemId={artist.id} />
