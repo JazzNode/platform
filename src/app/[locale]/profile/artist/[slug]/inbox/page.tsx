@@ -59,6 +59,7 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
   const [sending, setSending] = useState(false);
   const [fetching, setFetching] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isComposingRef = useRef(false);
 
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -474,7 +475,14 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
                           type="text"
                           value={newMessage}
                           onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                          onCompositionStart={() => { isComposingRef.current = true; }}
+                          onCompositionEnd={() => { isComposingRef.current = false; }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current) {
+                              e.preventDefault();
+                              handleSend();
+                            }
+                          }}
                           placeholder={t('typeMessage')}
                           className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
                         />

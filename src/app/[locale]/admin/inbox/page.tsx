@@ -131,6 +131,7 @@ export default function AdminInboxPage() {
   const [guestContacts, setGuestContacts] = useState<GuestContact[]>([]);
   const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isComposingRef = useRef(false);
 
   // Fetch notifications + Realtime subscription
   useEffect(() => {
@@ -610,7 +611,14 @@ export default function AdminInboxPage() {
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                        onCompositionStart={() => { isComposingRef.current = true; }}
+                        onCompositionEnd={() => { isComposingRef.current = false; }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current) {
+                            e.preventDefault();
+                            handleSend();
+                          }
+                        }}
                         placeholder={t('typeReply')}
                         className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
                       />

@@ -100,6 +100,7 @@ export default function FanInboxPage() {
   const [sending, setSending] = useState(false);
   const [fetching, setFetching] = useState(true);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const isComposingRef = useRef(false);
 
   // "+" menu state
   const [showNewMenu, setShowNewMenu] = useState(false);
@@ -1041,7 +1042,14 @@ export default function FanInboxPage() {
                     <div className="p-3 border-t border-[var(--border)]">
                       <div className="flex gap-2">
                         <input type="text" value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
+                          onCompositionStart={() => { isComposingRef.current = true; }}
+                          onCompositionEnd={() => { isComposingRef.current = false; }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current) {
+                              e.preventDefault();
+                              handleSend();
+                            }
+                          }}
                           placeholder={t('typeMessage')}
                           className="flex-1 bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-2.5 text-sm text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-emerald-400/50 transition-colors"
                         />
