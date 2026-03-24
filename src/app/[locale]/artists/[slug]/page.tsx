@@ -27,6 +27,9 @@ import ShareButton from '@/components/ShareButton';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import TierGate from '@/components/TierGate';
 import VerifiedBadge from '@/components/VerifiedBadge';
+import FeaturedWall from '@/components/FeaturedWall';
+import CollaborationGraph from '@/components/CollaborationGraph';
+import type { GraphNode, GraphLink } from '@/components/CollaborationGraph';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -209,14 +212,75 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       coAppearances.set(aid, (coAppearances.get(aid) || 0) + 1);
     }
   }
-  const topCollaborators = [...coAppearances.entries()]
-    .sort((a, b) => b[1] - a[1])
+  const GRAPH_MAX = 30;
+  const allCollaboratorsSorted = [...coAppearances.entries()]
+    .sort((a, b) => b[1] - a[1]);
+  const topCollaborators = allCollaboratorsSorted
     .slice(0, 5)
     .map(([id, count]) => {
       const a = artists.find((x) => x.id === id);
       return a ? { id, count, fields: a.fields } : null;
     })
     .filter(Boolean) as { id: string; count: number; fields: typeof f }[];
+
+  // ── Collaboration Graph data (top N collaborators + cross-connections) ──
+  const graphCollaborators = allCollaboratorsSorted
+    .slice(0, GRAPH_MAX)
+    .map(([id, count]) => {
+      const a = artists.find((x) => x.id === id);
+      return a ? { id, count, fields: a.fields } : null;
+    })
+    .filter(Boolean) as { id: string; count: number; fields: typeof f }[];
+
+  const graphNodeIds = new Set([artist.id, ...graphCollaborators.map((c) => c.id)]);
+
+  // Build cross-connections: for each event, find pairs of graph-node artists
+  const graphLinks: { source: string; target: string; weight: number }[] = [];
+  const linkWeightMap = new Map<string, number>();
+  // Center → collaborator links
+  for (const c of graphCollaborators) {
+    const key = [artist.id, c.id].sort().join('|');
+    linkWeightMap.set(key, c.count);
+  }
+  // Cross-connections between collaborators (from shared events)
+  const eventLineups = new Map<string, string[]>();
+  for (const lineup of lineups) {
+    for (const eid of lineup.fields.event_id || []) {
+      for (const aid of lineup.fields.artist_id || []) {
+        if (!graphNodeIds.has(aid)) continue;
+        const arr = eventLineups.get(eid);
+        if (arr) { if (!arr.includes(aid)) arr.push(aid); }
+        else eventLineups.set(eid, [aid]);
+      }
+    }
+  }
+  for (const artistIds of eventLineups.values()) {
+    for (let i = 0; i < artistIds.length; i++) {
+      for (let j = i + 1; j < artistIds.length; j++) {
+        const key = [artistIds[i], artistIds[j]].sort().join('|');
+        if (!linkWeightMap.has(key)) linkWeightMap.set(key, 0);
+        linkWeightMap.set(key, linkWeightMap.get(key)! + 1);
+      }
+    }
+  }
+  for (const [key, weight] of linkWeightMap) {
+    const [src, tgt] = key.split('|');
+    graphLinks.push({ source: src, target: tgt, weight });
+  }
+
+  // Compute primary role for each graph collaborator (most frequent role in shared lineups)
+  const graphCollabRoles = new Map<string, string>();
+  for (const lineup of lineups) {
+    const eids = lineup.fields.event_id || [];
+    const aids = lineup.fields.artist_id || [];
+    if (!eids.some((eid) => artistEventIds.has(eid))) continue;
+    for (const aid of aids) {
+      if (aid === artist.id || !graphNodeIds.has(aid)) continue;
+      if (!graphCollabRoles.has(aid) && lineup.fields.role) {
+        graphCollabRoles.set(aid, lineup.fields.role);
+      }
+    }
+  }
 
   // ── Active Hubs: venues & cities ──
   const artistVenues = resolveLinks(f.venue_list, venues);
@@ -599,6 +663,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         );
       })()}
 
+      {/* ═══ Featured Performance Wall (Premium) ═══ */}
+      <TierGate entityType="artist" featureKey="featured_wall" currentTier={f.tier ?? 0}>
+        <FeaturedWall artistId={artist.id} />
+      </TierGate>
+
       {/* ═══ Members (group / big band only) ═══ */}
       {isGroupType && groupMembers.length > 0 && (
         <FadeUp>
@@ -829,6 +898,49 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Collaboration Graph */}
+              {graphCollaborators.length >= 3 && (
+                <div>
+                  <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-4">{t('collaborationGraph')}</h3>
+                  <CollaborationGraph
+                    centerArtist={{
+                      id: artist.id,
+                      name: artistDisplayName(f, locale),
+                      instrument: f.primary_instrument || null,
+                      instrumentLabel: f.primary_instrument ? instLabel(f.primary_instrument) : null,
+                      role: null,
+                      photoUrl: photoUrl(f.photo_url) || null,
+                      gigCount: allEvents.length,
+                      isCenter: true,
+                    }}
+                    collaborators={graphCollaborators.map((c) => ({
+                      id: c.id,
+                      name: artistDisplayName(c.fields, locale),
+                      instrument: c.fields.primary_instrument || null,
+                      instrumentLabel: c.fields.primary_instrument ? instLabel(c.fields.primary_instrument) : null,
+                      role: graphCollabRoles.get(c.id) || null,
+                      photoUrl: photoUrl(c.fields.photo_url) || null,
+                      gigCount: c.count,
+                    }))}
+                    links={graphLinks}
+                    locale={locale}
+                    labels={{
+                      gigs: t('gigsCount'),
+                      collaborators: t('collaborationGigsCount'),
+                      dragHint: t('collaborationGraphHint'),
+                      filterInstrument: t('filterInstrument'),
+                      filterRole: t('filterRole'),
+                      filterMinGigs: t('filterMinGigs'),
+                      filterAll: t('filterClearAll'),
+                      roleBandleader: t('asLeader'),
+                      roleSideman: t('asSideman'),
+                      roleFeaturedGuest: t('asFeaturedGuest'),
+                      roleBandMember: t('asBandMember'),
+                    }}
+                  />
                 </div>
               )}
 

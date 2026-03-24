@@ -143,6 +143,24 @@ function getNotificationUrl(
       // Admin notification — link to claims review page
       return '/admin/claims';
 
+    case 'fan_insights':
+      // Link to analytics page — fan insights panel is at the bottom
+      if (referenceType === 'artist' && referenceId) return `/profile/artist/${referenceId}/analytics`;
+      if (referenceType === 'venue' && referenceId) return `/profile/venue/${referenceId}/analytics`;
+      return '/profile/inbox';
+
+    case 'post_show_recap':
+      // Link to analytics page — post-show recaps section
+      if (referenceType === 'artist' && referenceId) return `/profile/artist/${referenceId}/analytics`;
+      if (referenceType === 'venue' && referenceId) return `/profile/venue/${referenceId}/analytics`;
+      return '/profile/inbox';
+
+    case 'weekly_digest':
+      // Link to the entity overview page
+      if (referenceType === 'artist' && referenceId) return `/profile/artist/${referenceId}`;
+      if (referenceType === 'venue' && referenceId) return `/profile/venue/${referenceId}`;
+      return '/profile/inbox';
+
     case 'system':
     case 'general':
     default:
@@ -170,6 +188,12 @@ function getNotificationActions(type: string): Array<{ action: string; title: st
       return [{ action: 'view', title: 'View Badge' }];
     case 'claim_review':
       return [{ action: 'review', title: '前往審核' }];
+    case 'fan_insights':
+      return [{ action: 'view', title: '查看報告' }];
+    case 'post_show_recap':
+      return [{ action: 'view', title: '查看回顧' }];
+    case 'weekly_digest':
+      return [{ action: 'view', title: '查看摘要' }];
     default:
       return [{ action: 'view', title: 'View' }];
   }

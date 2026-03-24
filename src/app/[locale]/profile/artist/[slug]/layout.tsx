@@ -23,6 +23,7 @@ const NAV_ITEMS = [
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
   { key: 'comments', icon: 'comments', path: '/comments' },
   { key: 'bookings', icon: 'calendar', path: '/bookings' },
+  { key: 'featuredWall', icon: 'star', path: '/featured-wall' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
   { key: 'gear', icon: 'guitar', path: '/gear' },
   { key: 'analytics', icon: 'analytics', path: '/analytics' },
@@ -86,6 +87,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="8" r="7" />
           <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+        </svg>
+      );
+    case 'star':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
         </svg>
       );
     case 'edit':

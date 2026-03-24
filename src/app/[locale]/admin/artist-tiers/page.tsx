@@ -4,8 +4,6 @@ import TierConfigTable, { type FeatureKey } from '@/components/tiers/TierConfigT
 
 /** Features listed in the tier config but not yet built in the frontend */
 const NOT_IMPLEMENTED = new Set([
-  'collaboration_graph',
-  'featured_wall',
   'epk_basic',
   'epk_full',
   'priority_search',

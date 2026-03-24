@@ -3,6 +3,8 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { getVenueWeeklyDigest, getArtistWeeklyDigest } from '@/lib/digest';
 import { buildDigestEmailHtml } from '@/lib/digest-template';
 import { sendEmail } from '@/lib/email';
+import { sendPremiumNotificationBatch } from '@/lib/premium-notifications';
+import type { PremiumNotificationParams } from '@/lib/premium-notifications';
 
 export const dynamic = 'force-dynamic';
 
@@ -155,6 +157,39 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // ── Insert inbox notifications (triggers PWA push via pg_net) ──────────
+  const notificationItems: PremiumNotificationParams[] = [];
+
+  for (const venue of venues ?? []) {
+    if (!venue.admin_user_id) continue;
+    notificationItems.push({
+      userId: venue.admin_user_id,
+      type: 'weekly_digest',
+      entityType: 'venue',
+      entityId: venue.venue_id,
+      entityName: venue.display_name,
+    });
+  }
+
+  for (const artist of artists ?? []) {
+    if (!artist.admin_user_id) continue;
+    notificationItems.push({
+      userId: artist.admin_user_id,
+      type: 'weekly_digest',
+      entityType: 'artist',
+      entityId: artist.artist_id,
+      entityName: artist.display_name,
+    });
+  }
+
+  let notifResult = { sent: 0, skipped: 0 };
+  if (!dryRun && notificationItems.length > 0) {
+    notifResult = await sendPremiumNotificationBatch(notificationItems);
+    console.log(
+      `[digest] Inbox notifications: sent=${notifResult.sent} skipped=${notifResult.skipped}`
+    );
+  }
+
   const durationMs = Date.now() - startTime;
 
   console.log(
@@ -169,6 +204,7 @@ export async function GET(request: NextRequest) {
     sent,
     failed,
     skipped,
+    notifications: notifResult,
     durationMs,
     ...(errors.length > 0 && { errors }),
   });
