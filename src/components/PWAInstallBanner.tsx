@@ -113,75 +113,95 @@ export default function PWAInstallBanner() {
 
   if (!visible) return null;
 
+  // Desktop: subtle top banner; Mobile: bottom card above tab bar
   return (
-    <div
-      className="fixed bottom-20 left-3 right-3 z-40 md:hidden animate-in slide-in-from-bottom-4 duration-500"
-    >
+    <>
+      {/* Mobile banner */}
       <div
-        className="rounded-2xl p-4 relative"
-        style={{
-          background: 'rgba(var(--theme-glow-rgb, 200, 168, 78), 0.15)',
-          backdropFilter: 'blur(28px) saturate(1.8)',
-          WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
-          border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.2)',
-          boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
-        }}
+        className="fixed bottom-20 left-3 right-3 z-40 md:hidden animate-in slide-in-from-bottom-4 duration-500"
       >
-        {/* Dismiss button */}
-        <button
-          onClick={handleDismiss}
-          className="absolute top-3 right-3 p-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
-          aria-label="Close"
+        <div
+          className="rounded-2xl p-4 relative"
+          style={{
+            background: 'rgba(var(--theme-glow-rgb, 200, 168, 78), 0.15)',
+            backdropFilter: 'blur(28px) saturate(1.8)',
+            WebkitBackdropFilter: 'blur(28px) saturate(1.8)',
+            border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.2)',
+            boxShadow: '0 -4px 30px rgba(0,0,0,0.5)',
+          }}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 6L6 18" />
-            <path d="M6 6l12 12" />
-          </svg>
-        </button>
+          <button
+            onClick={handleDismiss}
+            className="absolute top-3 right-3 p-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+            aria-label="Close"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          </button>
 
-        <div className="flex items-center gap-3">
-          {/* App icon */}
-          <img
-            src="/icons/icon-192.png"
-            alt="JazzNode"
-            width={48}
-            height={48}
-            className="w-12 h-12 rounded-xl shrink-0"
-          />
-
-          <div className="flex-1 min-w-0">
-            <p className="font-serif font-bold text-sm text-[var(--foreground)]">
-              {t('pwaInstallTitle')}
-            </p>
-            <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
-              {showIOSGuide ? t('pwaInstallIOSHint') : t('pwaInstallHint')}
-            </p>
+          <div className="flex items-center gap-3">
+            <img src="/icons/icon-192.png" alt="JazzNode" width={48} height={48} className="w-12 h-12 rounded-xl shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-serif font-bold text-sm text-[var(--foreground)]">{t('pwaInstallTitle')}</p>
+              <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
+                {showIOSGuide ? t('pwaInstallIOSHint') : t('pwaInstallHint')}
+              </p>
+            </div>
+            {deferredPrompt && (
+              <button onClick={handleInstall} className="shrink-0 px-4 py-2 rounded-xl bg-gold text-[#0A0A0A] text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-gold-bright)] transition-colors">
+                {t('pwaInstallButton')}
+              </button>
+            )}
           </div>
 
-          {/* Install button (Android only) */}
-          {deferredPrompt && (
-            <button
-              onClick={handleInstall}
-              className="shrink-0 px-4 py-2 rounded-xl bg-gold text-[#0A0A0A] text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-gold-bright)] transition-colors"
-            >
-              {t('pwaInstallButton')}
-            </button>
+          {showIOSGuide && (
+            <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
+              <span>{t('pwaInstallIOSStep1')}</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                <polyline points="16 6 12 2 8 6" />
+                <line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+              <span>{t('pwaInstallIOSStep2')}</span>
+            </div>
           )}
         </div>
-
-        {/* iOS Safari guide */}
-        {showIOSGuide && (
-          <div className="mt-3 pt-3 border-t border-[var(--border)] flex items-center gap-2 text-xs text-[var(--muted-foreground)]">
-            <span>{t('pwaInstallIOSStep1')}</span>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-              <polyline points="16 6 12 2 8 6" />
-              <line x1="12" y1="2" x2="12" y2="15" />
-            </svg>
-            <span>{t('pwaInstallIOSStep2')}</span>
-          </div>
-        )}
       </div>
-    </div>
+
+      {/* Desktop banner (Windows Chrome/Edge PWA install) */}
+      {deferredPrompt && (
+        <div className="hidden md:block fixed top-16 left-0 right-0 z-40 animate-in slide-in-from-top-2 duration-500">
+          <div className="mx-auto max-w-7xl px-6">
+            <div
+              className="flex items-center justify-between gap-4 rounded-xl px-4 py-2.5"
+              style={{
+                background: 'rgba(var(--theme-glow-rgb, 200, 168, 78), 0.08)',
+                border: '1px solid rgba(var(--theme-glow-rgb, 200, 168, 78), 0.15)',
+              }}
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <img src="/icons/icon-192.png" alt="" width={24} height={24} className="w-6 h-6 rounded-md shrink-0" />
+                <p className="text-sm text-[var(--muted-foreground)] truncate">
+                  {t('pwaInstallHint')}
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button onClick={handleInstall} className="px-3 py-1.5 rounded-lg bg-gold text-[#0A0A0A] text-xs font-bold uppercase tracking-widest hover:bg-[var(--color-gold-bright)] transition-colors">
+                  {t('pwaInstallButton')}
+                </button>
+                <button onClick={handleDismiss} className="p-1 text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors" aria-label="Close">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 6L6 18" />
+                    <path d="M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

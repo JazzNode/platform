@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { Inter } from 'next/font/google';
+import { Inter, Space_Grotesk } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { getActiveRegionCodes } from '@/lib/supabase';
@@ -32,6 +32,12 @@ import IntroOverlay from '@/components/animations/IntroOverlay';
 import '@/app/globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+  weight: ['400', '500', '700'],
+  display: 'swap',
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://jazznode.com';
 
@@ -76,7 +82,6 @@ export const metadata: Metadata = {
 export const viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
   viewportFit: 'cover' as const,
   themeColor: '#0A0A0A',
 };
@@ -96,7 +101,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased noise-overlay`}>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} min-h-screen bg-[var(--background)] text-[var(--foreground)] antialiased noise-overlay`}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider>
             <SearchProvider locale={locale}>
