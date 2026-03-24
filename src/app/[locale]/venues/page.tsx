@@ -98,6 +98,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
       jazzFrequency: f.jazz_frequency || null,
       jazzFrequencyLabel: f.jazz_frequency ? (jazzFreqLabel[f.jazz_frequency] || f.jazz_frequency) : null,
       description: localized(f as Record<string, unknown>, 'description', locale) || null,
+      descriptionShort: localized(f as Record<string, unknown>, 'description_short', locale) || null,
       hasUpcomingJam: venuesWithUpcomingJam.has(venue.id),
       jamBadgeLabel: t('jamThisWeek'),
       tier: f.tier || 0,

@@ -23,6 +23,7 @@ interface SerializedVenue {
   jazzFrequency: string | null;
   jazzFrequencyLabel: string | null;
   description: string | null;
+  descriptionShort: string | null;
   hasUpcomingJam?: boolean;
   jamBadgeLabel?: string;
   tier: number;
@@ -311,9 +312,7 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
                     url={`/${locale}/venues/${venue.id}`}
                     text={[
                       `📍 ${venue.cityLabel}｜${venue.displayName}`,
-                      venue.description && venue.description.length > 150
-                        ? venue.description.slice(0, 150).replace(/[，,、\s]+$/, '') + '…'
-                        : venue.description || '',
+                      venue.descriptionShort || venue.description || '',
                       'via JazzNode — The Jazz Scene, Connected.',
                     ].filter(Boolean).join('\n')}
                     variant="icon"

@@ -158,7 +158,7 @@ function buildDescriptionPrompt(content: string, sourceLocale: Locale, entityTyp
     .join('\n');
 
   let shortSection = '';
-  if (entityType === 'event') {
+  if (entityType === 'event' || entityType === 'venue') {
     const shortTargets = LOCALES.map((l) => {
       switch (l) {
         case 'zh': return `- description_short_zh: 繁體中文摘要，150-200 字元。`;

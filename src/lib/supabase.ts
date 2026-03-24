@@ -70,6 +70,12 @@ export interface Venue {
   description_ko?: string;
   description_th?: string;
   description_id?: string;
+  description_short_zh?: string;
+  description_short_en?: string;
+  description_short_ja?: string;
+  description_short_ko?: string;
+  description_short_th?: string;
+  description_short_id?: string;
   friendly_en?: boolean;
   friendly_zh?: boolean;
   friendly_ja?: boolean;
@@ -278,6 +284,12 @@ interface VenueRow {
   description_ko: string | null;
   description_th: string | null;
   description_id: string | null;
+  description_short_zh: string | null;
+  description_short_en: string | null;
+  description_short_ja: string | null;
+  description_short_ko: string | null;
+  description_short_th: string | null;
+  description_short_id: string | null;
   friendly_en: boolean;
   friendly_zh: boolean;
   friendly_ja: boolean;

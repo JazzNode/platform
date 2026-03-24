@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid field prefix' }, { status: 400 });
     }
 
-    const needShort = !(entityType === 'venue' && fieldPrefix === 'description');
+    const needShort = true;
 
     // Empty content = clear all related fields (admin god-mode)
     if (!content) {
