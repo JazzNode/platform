@@ -27,6 +27,7 @@ const DEFAULT_ARTIST: TierFeatures = {
   teaching_section: 1, gear_showcase: 1, epk_basic: 1, analytics_basic: 1, inbox: 1,
   broadcasts: 2, featured_wall: 2, available_for_hire: 2,
   analytics_advanced: 2, epk_full: 2, gear_unlimited: 2, priority_search: 2,
+  fan_insights: 2, post_show_recap: 2, weekly_digest: 2,
   custom_domain: 3, custom_theme: 3, broadcasts_unlimited: 3,
   booking_requests: 3, epk_branded_pdf: 3, spotlight: 3, data_export: 3,
 };
@@ -35,6 +36,8 @@ const DEFAULT_VENUE: TierFeatures = {
   edit_profile: 1, verified_badge: 1, photos: 1, description: 1, inbox: 1,
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
   artist_discovery: 2, broadcasts: 2, priority_search: 2,
+  fan_insights: 2, post_show_recap: 2, artist_recommendations: 2,
+  weekly_digest: 2,
   custom_domain: 3, custom_theme: 3, ticketing: 3, broadcasts_unlimited: 3,
   booking_management: 3, revenue_analytics: 3, multi_location: 3, ical_api: 3,
 };
@@ -158,6 +161,9 @@ function buildArtistSection(
           { name: t('artistAvailableForHire'), desc: t('artistAvailableForHireDesc'), tiers: tierRow(features, 'available_for_hire', visible) },
           { name: t('artistAnalyticsAdvanced'), desc: t('artistAnalyticsAdvancedDesc'), tiers: tierRow(features, 'analytics_advanced', visible) },
           { name: t('artistPrioritySearch'), desc: t('artistPrioritySearchDesc'), tiers: tierRow(features, 'priority_search', visible) },
+          { name: t('artistFanInsights'), desc: t('artistFanInsightsDesc'), tiers: tierRow(features, 'fan_insights', visible) },
+          { name: t('artistPostShowRecap'), desc: t('artistPostShowRecapDesc'), tiers: tierRow(features, 'post_show_recap', visible) },
+          { name: t('artistWeeklyDigest'), desc: t('artistWeeklyDigestDesc'), tiers: tierRow(features, 'weekly_digest', visible) },
         ],
       },
       {
@@ -236,6 +242,10 @@ function buildVenueSection(
           { name: t('venueAnalyticsAdvanced'), desc: t('venueAnalyticsAdvancedDesc'), tiers: tierRow(features, 'analytics_advanced', visible) },
           { name: t('venueBroadcasts'), desc: t('venueBroadcastsDesc'), tiers: broadcastRow },
           { name: t('venuePrioritySearch'), desc: t('venuePrioritySearchDesc'), tiers: tierRow(features, 'priority_search', visible) },
+          { name: t('venueFanInsights'), desc: t('venueFanInsightsDesc'), tiers: tierRow(features, 'fan_insights', visible) },
+          { name: t('venuePostShowRecap'), desc: t('venuePostShowRecapDesc'), tiers: tierRow(features, 'post_show_recap', visible) },
+          { name: t('venueArtistRecommendations'), desc: t('venueArtistRecommendationsDesc'), tiers: tierRow(features, 'artist_recommendations', visible) },
+          { name: t('venueWeeklyDigest'), desc: t('venueWeeklyDigestDesc'), tiers: tierRow(features, 'weekly_digest', visible) },
         ],
       },
       {

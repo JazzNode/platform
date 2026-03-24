@@ -7,6 +7,8 @@ import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { useTheme } from '@/components/ThemeProvider';
+import PostShowRecap from '@/components/PostShowRecap';
+import FanInsightsPanel from '@/components/FanInsightsPanel';
 
 export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
@@ -211,6 +213,79 @@ export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug
                   <span className="text-[var(--muted-foreground)]">{[42, 28, 15, 9][i]}</span>
                 </div>
               ))}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
+              <div className="text-center">
+                <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
+                <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                  {t('upgradePremium')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </FadeUp>
+      )}
+
+      {/* Post-Show Recaps (Tier 2+ only) */}
+      {effectiveTier >= 2 && slug && (
+        <PostShowRecap entityId={slug} entityType="artist" />
+      )}
+
+      {/* Post-Show Recap Teaser (Tier < 2) */}
+      {effectiveTier < 2 && (
+        <FadeUp>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
+            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">
+              Post-Show Recaps
+            </h2>
+            <div className="blur-[6px] select-none pointer-events-none space-y-3">
+              {['Page View Lift: +34%', 'New Followers: 12', 'Cities Reached: 8'].map((s) => (
+                <div key={s} className="flex justify-between text-sm">
+                  <span>{s}</span>
+                </div>
+              ))}
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
+              <div className="text-center">
+                <p className="text-sm font-semibold mb-2">{t('unlockInsights')}</p>
+                <button className="px-6 py-2.5 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity">
+                  {t('upgradePremium')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </FadeUp>
+      )}
+
+      {/* Fan Insights Report (Tier 2+) or Blurred Teaser */}
+      {effectiveTier >= 2 ? (
+        <FanInsightsPanel
+          entityType="artist"
+          entityId={slug}
+          translations={{
+            fanInsights: t('fanInsights'),
+            fanGrowth: t('fanGrowth'),
+            topCities: t('topCities'),
+            bestEvents: t('bestEvents'),
+            peakHours: t('peakHours'),
+            newFollowers: t('newFollowers'),
+            views: t('views'),
+            noData: t('noData'),
+            noEventsData: t('noEventsData'),
+          }}
+        />
+      ) : (
+        <FadeUp>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 relative overflow-hidden">
+            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-4">
+              {t('fanInsights')}
+            </h2>
+            <div className="blur-[6px] select-none pointer-events-none">
+              <div className="grid grid-cols-2 gap-4">
+                {['Fan Growth', 'Top Cities', 'Best Events', 'Peak Hours'].map((s) => (
+                  <div key={s} className="h-32 bg-[var(--muted)] rounded-xl" />
+                ))}
+              </div>
             </div>
             <div className="absolute inset-0 bg-gradient-to-t from-[var(--card)] via-[var(--card)]/80 to-transparent flex items-end justify-center pb-8">
               <div className="text-center">

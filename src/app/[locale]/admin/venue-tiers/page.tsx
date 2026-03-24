@@ -30,6 +30,10 @@ interface FeatureKey {
 const NOT_IMPLEMENTED = new Set([
   'backline',
   'priority_search',
+  'fan_insights',
+  'post_show_recap',
+  'artist_recommendations',
+  'weekly_digest',
   'custom_domain',
   'custom_theme',
   'ticketing',
@@ -59,6 +63,10 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', descKey: 'vf_analyticsAdvancedDesc', categoryKey: 'vc_premium' },
   { key: 'broadcasts', labelKey: 'vf_broadcasts', descKey: 'vf_broadcastsDesc', categoryKey: 'vc_premium' },
   { key: 'priority_search', labelKey: 'vf_prioritySearch', descKey: 'vf_prioritySearchDesc', categoryKey: 'vc_premium' },
+  { key: 'fan_insights', labelKey: 'vf_fanInsights', descKey: 'vf_fanInsightsDesc', categoryKey: 'vc_premium' },
+  { key: 'post_show_recap', labelKey: 'vf_postShowRecap', descKey: 'vf_postShowRecapDesc', categoryKey: 'vc_premium' },
+  { key: 'artist_recommendations', labelKey: 'vf_artistRecommendations', descKey: 'vf_artistRecommendationsDesc', categoryKey: 'vc_premium' },
+  { key: 'weekly_digest', labelKey: 'vf_weeklyDigest', descKey: 'vf_weeklyDigestDesc', categoryKey: 'vc_premium' },
   // Tier 3 — Elite (business engine)
   { key: 'custom_domain', labelKey: 'vf_customDomain', descKey: 'vf_customDomainDesc', categoryKey: 'vc_elite' },
   { key: 'custom_theme', labelKey: 'vf_customTheme', descKey: 'vf_customThemeDesc', categoryKey: 'vc_elite' },
