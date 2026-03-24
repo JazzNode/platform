@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 
+/** Premium (tier 2) gets 3 broadcasts per calendar month; Elite (tier 3+) is unlimited */
+const MONTHLY_BROADCAST_LIMIT = 3;
+
 /**
  * POST /api/broadcasts/send
  * Creates a broadcast and inserts messages into each fan's conversation.
@@ -45,6 +48,37 @@ export async function POST(request: NextRequest) {
   }
 
   const adminClient = createAdminClient();
+
+  // ── Enforce monthly broadcast limit for non-Elite tiers ──
+  const tierTable = isVenue ? 'venues' : 'artists';
+  const tierIdField = isVenue ? 'venue_id' : 'artist_id';
+  const { data: entityRow } = await adminClient
+    .from(tierTable)
+    .select('tier')
+    .eq(tierIdField, targetId)
+    .single();
+
+  const entityTier = entityRow?.tier ?? 0;
+
+  // Tier 3 (Elite) = unlimited; below that, enforce monthly cap
+  if (entityTier < 3 && !isAdmin) {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+    const broadcastCol = isVenue ? 'venue_id' : 'artist_id';
+
+    const { count } = await adminClient
+      .from('broadcasts')
+      .select('id', { count: 'exact', head: true })
+      .eq(broadcastCol, targetId)
+      .gte('created_at', monthStart);
+
+    if ((count ?? 0) >= MONTHLY_BROADCAST_LIMIT) {
+      return NextResponse.json(
+        { error: 'Monthly broadcast limit reached', limit: MONTHLY_BROADCAST_LIMIT, used: count },
+        { status: 429 },
+      );
+    }
+  }
 
   // 1. Create broadcast record
   const broadcastData: Record<string, unknown> = {

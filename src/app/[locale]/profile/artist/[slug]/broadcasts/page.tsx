@@ -39,6 +39,7 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
   const [body, setBody] = useState('');
   const [channel, setChannel] = useState('inbox');
   const [sending, setSending] = useState(false);
+  const [limitError, setLimitError] = useState(false);
 
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
@@ -119,6 +120,12 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
 
       const data = await res.json();
 
+      if (res.status === 429) {
+        setLimitError(true);
+        setSending(false);
+        return;
+      }
+
       if (res.ok && data.broadcastId) {
         setBroadcasts((prev) => [
           {
@@ -155,6 +162,15 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
 
   const effectiveTier = previewArtistTier ?? tier;
   const broadcastMinTier = minTier('artist', 'broadcasts');
+  const isElite = effectiveTier >= 3;
+  const MONTHLY_LIMIT = 3;
+
+  // Count broadcasts sent this calendar month
+  const nowDate = new Date();
+  const monthStart = new Date(nowDate.getFullYear(), nowDate.getMonth(), 1);
+  const monthlyUsed = broadcasts.filter((b) => b.created_at && new Date(b.created_at) >= monthStart).length;
+  const monthlyRemaining = isElite ? Infinity : Math.max(0, MONTHLY_LIMIT - monthlyUsed);
+  const limitReached = !isElite && monthlyRemaining <= 0;
 
   // Tier gate — uses dynamic config
   if (!isUnlocked('artist', 'broadcasts', effectiveTier, adminModeEnabled)) {
@@ -191,16 +207,33 @@ export default function BroadcastsPage({ params }: { params: Promise<{ slug: str
     <div className="space-y-6">
       <FadeUp>
         <div className="flex items-center justify-between">
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('broadcastsTitle')}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('broadcastsTitle')}</h1>
+            {!isElite && (
+              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                limitReached
+                  ? 'bg-red-500/15 text-red-400'
+                  : 'bg-[var(--color-gold)]/15 text-[var(--color-gold)]'
+              }`}>
+                {t('monthlyRemaining', { remaining: monthlyRemaining, limit: MONTHLY_LIMIT })}
+              </span>
+            )}
+          </div>
           {!composing && (
             <button
               onClick={() => setComposing(true)}
-              className="px-4 py-2 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+              disabled={limitReached}
+              className="px-4 py-2 rounded-xl bg-[var(--color-gold)] text-[#0A0A0A] font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {t('newBroadcast')}
             </button>
           )}
         </div>
+        {(limitReached || limitError) && (
+          <p className="text-xs text-red-400 mt-2">
+            {t('broadcastLimitReached')}
+          </p>
+        )}
       </FadeUp>
 
       {/* Compose Form */}

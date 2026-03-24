@@ -22,6 +22,7 @@ const TIER_BG = [
 interface FeatureKey {
   key: string;
   labelKey: string;
+  descKey?: string;
   categoryKey: string;
 }
 
@@ -40,32 +41,32 @@ const NOT_IMPLEMENTED = new Set([
 
 const VENUE_FEATURES: FeatureKey[] = [
   // Tier 0 — Fan-facing (always visible)
-  { key: 'public_listing', labelKey: 'vf_publicListing', categoryKey: 'vc_fanFacing' },
-  { key: 'search_listing', labelKey: 'vf_searchListing', categoryKey: 'vc_fanFacing' },
-  { key: 'map_pin', labelKey: 'vf_mapPin', categoryKey: 'vc_fanFacing' },
-  { key: 'event_showcase', labelKey: 'vf_eventShowcase', categoryKey: 'vc_fanFacing' },
-  { key: 'venue_tags', labelKey: 'vf_venueTags', categoryKey: 'vc_fanFacing' },
+  { key: 'public_listing', labelKey: 'vf_publicListing', descKey: 'vf_publicListingDesc', categoryKey: 'vc_fanFacing' },
+  { key: 'search_listing', labelKey: 'vf_searchListing', descKey: 'vf_searchListingDesc', categoryKey: 'vc_fanFacing' },
+  { key: 'map_pin', labelKey: 'vf_mapPin', descKey: 'vf_mapPinDesc', categoryKey: 'vc_fanFacing' },
+  { key: 'event_showcase', labelKey: 'vf_eventShowcase', descKey: 'vf_eventShowcaseDesc', categoryKey: 'vc_fanFacing' },
+  { key: 'venue_tags', labelKey: 'vf_venueTags', descKey: 'vf_venueTagsDesc', categoryKey: 'vc_fanFacing' },
   // Tier 1 — Claimed (edit rights + identity)
-  { key: 'edit_profile', labelKey: 'vf_editProfile', categoryKey: 'vc_claimed' },
-  { key: 'verified_badge', labelKey: 'vf_verifiedBadge', categoryKey: 'vc_claimed' },
-  { key: 'photos', labelKey: 'vf_photos', categoryKey: 'vc_claimed' },
+  { key: 'edit_profile', labelKey: 'vf_editProfile', descKey: 'vf_editProfileDesc', categoryKey: 'vc_claimed' },
+  { key: 'verified_badge', labelKey: 'vf_verifiedBadge', descKey: 'vf_verifiedBadgeDesc', categoryKey: 'vc_claimed' },
+  { key: 'photos', labelKey: 'vf_photos', descKey: 'vf_photosDesc', categoryKey: 'vc_claimed' },
   { key: 'description', labelKey: 'vf_description', categoryKey: 'vc_claimed' },
-  { key: 'inbox', labelKey: 'vf_inbox', categoryKey: 'vc_claimed' },
+  { key: 'inbox', labelKey: 'vf_inbox', descKey: 'vf_inboxDesc', categoryKey: 'vc_claimed' },
   // Tier 2 — Premium (operational tools)
-  { key: 'schedule_manager', labelKey: 'vf_scheduleManager', categoryKey: 'vc_premium' },
-  { key: 'backline', labelKey: 'vf_backline', categoryKey: 'vc_premium' },
-  { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', categoryKey: 'vc_premium' },
-  { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', categoryKey: 'vc_premium' },
-  { key: 'broadcasts', labelKey: 'vf_broadcasts', categoryKey: 'vc_premium' },
-  { key: 'priority_search', labelKey: 'vf_prioritySearch', categoryKey: 'vc_premium' },
+  { key: 'schedule_manager', labelKey: 'vf_scheduleManager', descKey: 'vf_scheduleManagerDesc', categoryKey: 'vc_premium' },
+  { key: 'backline', labelKey: 'vf_backline', descKey: 'vf_backlineDesc', categoryKey: 'vc_premium' },
+  { key: 'analytics_basic', labelKey: 'vf_analyticsBasic', descKey: 'vf_analyticsBasicDesc', categoryKey: 'vc_premium' },
+  { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', descKey: 'vf_analyticsAdvancedDesc', categoryKey: 'vc_premium' },
+  { key: 'broadcasts', labelKey: 'vf_broadcasts', descKey: 'vf_broadcastsDesc', categoryKey: 'vc_premium' },
+  { key: 'priority_search', labelKey: 'vf_prioritySearch', descKey: 'vf_prioritySearchDesc', categoryKey: 'vc_premium' },
   // Tier 3 — Elite (business engine)
-  { key: 'custom_domain', labelKey: 'vf_customDomain', categoryKey: 'vc_elite' },
-  { key: 'custom_theme', labelKey: 'vf_customTheme', categoryKey: 'vc_elite' },
-  { key: 'ticketing', labelKey: 'vf_ticketing', categoryKey: 'vc_elite' },
+  { key: 'custom_domain', labelKey: 'vf_customDomain', descKey: 'vf_customDomainDesc', categoryKey: 'vc_elite' },
+  { key: 'custom_theme', labelKey: 'vf_customTheme', descKey: 'vf_customThemeDesc', categoryKey: 'vc_elite' },
+  { key: 'ticketing', labelKey: 'vf_ticketing', descKey: 'vf_ticketingDesc', categoryKey: 'vc_elite' },
   { key: 'broadcasts_unlimited', labelKey: 'vf_broadcastsUnlimited', categoryKey: 'vc_elite' },
-  { key: 'revenue_analytics', labelKey: 'vf_revenueAnalytics', categoryKey: 'vc_elite' },
-  { key: 'multi_location', labelKey: 'vf_multiLocation', categoryKey: 'vc_elite' },
-  { key: 'ical_api', labelKey: 'vf_icalApi', categoryKey: 'vc_elite' },
+  { key: 'revenue_analytics', labelKey: 'vf_revenueAnalytics', descKey: 'vf_revenueAnalyticsDesc', categoryKey: 'vc_elite' },
+  { key: 'multi_location', labelKey: 'vf_multiLocation', descKey: 'vf_multiLocationDesc', categoryKey: 'vc_elite' },
+  { key: 'ical_api', labelKey: 'vf_icalApi', descKey: 'vf_icalApiDesc', categoryKey: 'vc_elite' },
 ];
 
 export default function VenueTiersPage() {
@@ -263,18 +264,23 @@ export default function VenueTiersPage() {
                       key={feat.key}
                       className={`${disabled ? 'opacity-40' : ''} ${notImpl ? 'opacity-60' : ''} ${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
                     >
-                      <td className="py-3 px-4 text-sm text-[var(--foreground)]">
-                        <span className={disabled ? 'line-through' : ''}>{t(feat.labelKey)}</span>
-                        {disabled && (
-                          <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-red-500/15 text-red-400 border border-red-500/20">
-                            {t('hidden')}
-                          </span>
-                        )}
-                        {notImpl && (
-                          <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
-                            <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 4l7.53 13H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
-                            {t('notImplemented')}
-                          </span>
+                      <td className="py-3 px-4">
+                        <div className="text-sm text-[var(--foreground)]">
+                          <span className={disabled ? 'line-through' : ''}>{t(feat.labelKey)}</span>
+                          {disabled && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-red-500/15 text-red-400 border border-red-500/20">
+                              {t('hidden')}
+                            </span>
+                          )}
+                          {notImpl && (
+                            <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider font-semibold bg-yellow-500/15 text-yellow-400 border border-yellow-500/20">
+                              <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2zm0 4l7.53 13H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z"/></svg>
+                              {t('notImplemented')}
+                            </span>
+                          )}
+                        </div>
+                        {feat.descKey && (
+                          <div className="text-xs text-zinc-500 mt-0.5 leading-relaxed">{t(feat.descKey)}</div>
                         )}
                       </td>
                       {TIER_NAMES.map((_, tierIdx) => {

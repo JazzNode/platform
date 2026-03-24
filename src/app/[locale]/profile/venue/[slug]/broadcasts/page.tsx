@@ -40,6 +40,7 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
   const [body, setBody] = useState('');
   const [channel, setChannel] = useState('inbox');
   const [sending, setSending] = useState(false);
+  const [limitError, setLimitError] = useState(false);
 
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
@@ -120,6 +121,12 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
 
       const data = await res.json();
 
+      if (res.status === 429) {
+        setLimitError(true);
+        setSending(false);
+        return;
+      }
+
       if (res.ok && data.broadcastId) {
         setBroadcasts((prev) => [
           {
@@ -156,6 +163,15 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
 
   const effectiveTier = previewVenueTier ?? tier;
   const broadcastMinTier = minTier('venue', 'broadcasts');
+  const isElite = effectiveTier >= 3;
+  const MONTHLY_LIMIT = 3;
+
+  // Count broadcasts sent this calendar month
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const monthlyUsed = broadcasts.filter((b) => b.created_at && new Date(b.created_at) >= monthStart).length;
+  const monthlyRemaining = isElite ? Infinity : Math.max(0, MONTHLY_LIMIT - monthlyUsed);
+  const limitReached = !isElite && monthlyRemaining <= 0;
 
   // Tier gate
   if (!isUnlocked('venue', 'broadcasts', effectiveTier, adminModeEnabled)) {
@@ -192,16 +208,33 @@ export default function VenueBroadcastsPage({ params }: { params: Promise<{ slug
     <div className="space-y-6">
       <FadeUp>
         <div className="flex items-center justify-between">
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('broadcastsTitle')}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('broadcastsTitle')}</h1>
+            {!isElite && (
+              <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                limitReached
+                  ? 'bg-red-500/15 text-red-400'
+                  : 'bg-emerald-500/15 text-emerald-400'
+              }`}>
+                {tBroadcast('monthlyRemaining', { remaining: monthlyRemaining, limit: MONTHLY_LIMIT })}
+              </span>
+            )}
+          </div>
           {!composing && (
             <button
               onClick={() => setComposing(true)}
-              className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity"
+              disabled={limitReached}
+              className="px-4 py-2 rounded-xl bg-emerald-500 text-white font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
             >
               {tBroadcast('newBroadcast')}
             </button>
           )}
         </div>
+        {(limitReached || limitError) && (
+          <p className="text-xs text-red-400 mt-2">
+            {tBroadcast('broadcastLimitReached')}
+          </p>
+        )}
       </FadeUp>
 
       {/* Compose Form */}

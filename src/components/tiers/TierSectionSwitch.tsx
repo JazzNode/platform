@@ -6,6 +6,7 @@ import { useAdmin } from '@/components/AdminProvider';
 /* ─── Types ─── */
 interface Feature {
   name: string;
+  desc?: string;
   tiers: (boolean | string)[];
 }
 
@@ -80,7 +81,12 @@ function TierTable({
                   key={feat.name}
                   className={`${fi % 2 === 0 ? 'bg-[var(--card)]/30' : ''} hover:bg-[var(--card)]/60 transition-colors`}
                 >
-                  <td className="py-3 px-4 text-sm text-[var(--foreground)]">{feat.name}</td>
+                  <td className="py-3 px-4">
+                    <div className="text-sm text-[var(--foreground)]">{feat.name}</div>
+                    {feat.desc && (
+                      <div className="text-xs text-zinc-500 mt-0.5 leading-relaxed">{feat.desc}</div>
+                    )}
+                  </td>
                   {feat.tiers.map((val, ti) => (
                     <td
                       key={ti}
