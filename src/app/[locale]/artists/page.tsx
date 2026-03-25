@@ -175,6 +175,7 @@ export default async function ArtistsPage({ params, searchParams }: { params: Pr
         noArtists: t('noArtists'),
         artistFootprint: t('artistFootprint'),
         allVenues: t('allVenues'),
+        followedFirst: t('followedFirst'),
       }}
     />
   );

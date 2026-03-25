@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useFilterParams } from '@/hooks/useFilterParams';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -91,6 +91,7 @@ interface Props {
     pastCount: string;
     noEvents: string;
     toggleLink: string;
+    followedFirst: string;
   };
 }
 
@@ -99,7 +100,13 @@ interface Props {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function EventsClient({ events, todayEvents = [], cities, venues, locale, showPast, regionLabels, worldMapLabel, initialFilters, labels }: Props) {
-  const { isFollowing } = useFollows();
+  const { isFollowing, hasFollowsOfType } = useFollows();
+  const hasEventFollows = hasFollowsOfType('event');
+  const [followedFirst, setFollowedFirst] = useState(false);
+
+  useEffect(() => {
+    if (hasEventFollows) setFollowedFirst(true);
+  }, [hasEventFollows]);
   const { region: globalRegion } = useRegion();
   const [hasInteracted, setHasInteracted] = useState(false);
 
@@ -228,7 +235,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
 
   // Filter events
   const filteredEvents = useMemo(() => {
-    return events.filter((e) => {
+    const result = events.filter((e) => {
       // Location filter
       if (selectedVenues.size > 0) {
         if (e.venue_id == null || !selectedVenues.has(e.venue_id)) return false;
@@ -247,12 +254,20 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
       }
       return true;
     });
-  }, [events, selectedCities, selectedVenues, selectedCategory]);
+    if (followedFirst) {
+      return [...result].sort((a, b) => {
+        const aF = isFollowing('event', a.id) ? 0 : 1;
+        const bF = isFollowing('event', b.id) ? 0 : 1;
+        return aF - bF;
+      });
+    }
+    return result;
+  }, [events, selectedCities, selectedVenues, selectedCategory, followedFirst, isFollowing]);
 
   // Key for re-triggering animations on filter change
   const filterKey = useMemo(() => {
-    return `${activeRegion}_${selectedCity}_${[...selectedVenues].sort().join(',')}_${selectedCategory}`;
-  }, [activeRegion, selectedCity, selectedVenues, selectedCategory]);
+    return `${activeRegion}_${selectedCity}_${[...selectedVenues].sort().join(',')}_${selectedCategory}_${followedFirst}`;
+  }, [activeRegion, selectedCity, selectedVenues, selectedCategory, followedFirst]);
 
   // City lookup by record ID
   const cityById = useMemo(() => {
@@ -299,6 +314,26 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
         {/* Geographic hierarchy: World Map │ Region › Cities */}
         <FadeUpItem delay={100}>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
+          {/* My List toggle */}
+          {hasEventFollows && (
+            <>
+              <button
+                onClick={() => setFollowedFirst((p) => !p)}
+                className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
+                  followedFirst
+                    ? 'bg-[rgba(var(--theme-glow-rgb),0.18)] border-[rgba(var(--theme-glow-rgb),0.5)] text-[var(--foreground)]'
+                    : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+                }`}
+              >
+                <span className="inline-flex items-center gap-1.5">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill={followedFirst ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
+                  {labels.followedFirst}
+                </span>
+              </button>
+              <span className="text-gold/30 text-xs select-none mx-0.5">│</span>
+            </>
+          )}
+
           {/* World Map pill */}
           <button
             onClick={handleWorldMapClick}

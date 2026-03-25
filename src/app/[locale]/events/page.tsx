@@ -200,6 +200,7 @@ export default async function EventsPage({ params, searchParams }: { params: Pro
         pastCount: t('pastCount'),
         noEvents: t('noEvents'),
         toggleLink: showPast ? `← ${t('events')}` : `${t('pastEvents')} →`,
+        followedFirst: t('followedFirst'),
       }}
     />
   );

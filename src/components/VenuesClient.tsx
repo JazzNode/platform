@@ -55,6 +55,7 @@ interface Props {
     venues: string;
     allCities: string;
     noVenues: string;
+    followedFirst: string;
   };
 }
 
@@ -117,7 +118,14 @@ function CardCarousel({ images, alt }: { images: string[]; alt: string }) {
 const pillHitArea = 'relative after:absolute after:inset-x-0 after:inset-y-[-6px] after:content-[\'\'] after:min-h-[44px] after:top-1/2 after:-translate-y-1/2';
 
 export default function VenuesClient({ venues, cities, locale, regionLabels, worldMapLabel, badgeNameMap = {}, initialFilters, labels }: Props) {
-  const { isFollowing } = useFollows();
+  const { isFollowing, hasFollowsOfType } = useFollows();
+  const hasVenueFollows = hasFollowsOfType('venue');
+  const [followedFirst, setFollowedFirst] = useState(false);
+
+  // Auto-enable when user has venue follows (runs once after hydration)
+  useEffect(() => {
+    if (hasVenueFollows) setFollowedFirst(true);
+  }, [hasVenueFollows]);
   const { region: globalRegion } = useRegion();
   const [hasInteracted, setHasInteracted] = useState(!!initialFilters);
   const [userRegion, setUserRegion] = useState<string | null>(() => {
@@ -189,13 +197,20 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   }, []);
 
   const filteredVenues = useMemo(() => {
-    if (selectedCities.size === 0) return venues;
-    return venues.filter((v) => v.cityRecordId && selectedCities.has(v.cityRecordId));
-  }, [venues, selectedCities]);
+    let result = selectedCities.size === 0 ? venues : venues.filter((v) => v.cityRecordId && selectedCities.has(v.cityRecordId));
+    if (followedFirst) {
+      result = [...result].sort((a, b) => {
+        const aF = isFollowing('venue', a.id) ? 0 : 1;
+        const bF = isFollowing('venue', b.id) ? 0 : 1;
+        return aF - bF;
+      });
+    }
+    return result;
+  }, [venues, selectedCities, followedFirst, isFollowing]);
 
   const filterKey = useMemo(() => {
-    return `${activeRegion}_${selectedCity}`;
-  }, [activeRegion, selectedCity]);
+    return `${activeRegion}_${selectedCity}_${followedFirst}`;
+  }, [activeRegion, selectedCity, followedFirst]);
 
   return (
     <div className="space-y-12">
@@ -212,6 +227,27 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
       <div className="space-y-3">
         <FadeUpItem delay={100}>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-3">
+          {/* My List toggle — only visible when user has venue follows */}
+          {hasVenueFollows && (
+            <button
+              onClick={() => setFollowedFirst((p) => !p)}
+              className={`${pillHitArea} px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light mr-1 ${
+                followedFirst
+                  ? 'bg-[rgba(var(--theme-glow-rgb),0.18)] border-[rgba(var(--theme-glow-rgb),0.5)] text-[var(--foreground)]'
+                  : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
+              }`}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill={followedFirst ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
+                {labels.followedFirst}
+              </span>
+            </button>
+          )}
+
+          {/* Separator between My List and geo pills */}
+          {hasVenueFollows && (
+            <span className="text-gold/30 text-xs select-none mx-0.5">│</span>
+          )}
           {/* World Map pill */}
           <button
             onClick={handleWorldMapClick}

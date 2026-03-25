@@ -9,6 +9,7 @@ type TargetType = 'artist' | 'venue' | 'event' | 'user';
 interface FollowsContextType {
   isFollowing: (type: TargetType, id: string) => boolean;
   toggleFollow: (type: TargetType, id: string) => Promise<void>;
+  hasFollowsOfType: (type: TargetType) => boolean;
   loading: boolean;
   /** Increments when the jazz cat easter egg should fire */
   catEggTrigger: number;
@@ -52,6 +53,11 @@ export default function FollowsProvider({ children }: { children: React.ReactNod
 
   const isFollowing = useCallback(
     (type: TargetType, id: string) => keys.has(`${type}:${id}`),
+    [keys],
+  );
+
+  const hasFollowsOfType = useCallback(
+    (type: TargetType) => Array.from(keys).some((k) => k.startsWith(`${type}:`)),
     [keys],
   );
 
@@ -112,7 +118,7 @@ export default function FollowsProvider({ children }: { children: React.ReactNod
   const hasAnyFollows = keys.size > 0;
 
   return (
-    <FollowsContext.Provider value={{ isFollowing, toggleFollow, loading, catEggTrigger, hasAnyFollows }}>
+    <FollowsContext.Provider value={{ isFollowing, toggleFollow, hasFollowsOfType, loading, catEggTrigger, hasAnyFollows }}>
       {children}
     </FollowsContext.Provider>
   );

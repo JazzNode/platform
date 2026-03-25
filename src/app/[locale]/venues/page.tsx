@@ -142,6 +142,7 @@ export default async function VenuesPage({ params, searchParams }: { params: Pro
         venues: t('venues'),
         allCities: t('allCities'),
         noVenues: t('noVenues'),
+        followedFirst: t('followedFirst'),
       }}
     />
   );
