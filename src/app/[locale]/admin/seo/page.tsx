@@ -31,6 +31,18 @@ interface SeoData {
   devices: { device: string; impressions: number; clicks: number; avg_ctr: number }[];
   pageTypes: { page_type: string; impressions: number; clicks: number; avg_position: number }[];
   opportunities: { page: string; query: string; impressions: number; clicks: number; ctr: number; avg_position: number }[];
+  unclaimedArtists: {
+    artist_id: string;
+    display_name: string | null;
+    name_en: string | null;
+    name_local: string | null;
+    photo_url: string | null;
+    country_code: string | null;
+    total_impressions: number;
+    total_clicks: number;
+    avg_position: number;
+    top_query: string;
+  }[];
   lastSync: { synced_date: string; rows_upserted: number; created_at: string } | null;
 }
 
@@ -568,6 +580,66 @@ export default function AdminSeoPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </Section>
+      )}
+
+      {/* Unclaimed Artists with Search Visibility */}
+      {data.unclaimedArtists.length > 0 && (
+        <Section title={t('seoUnclaimedTitle')}>
+          <p className="text-xs text-[var(--muted-foreground)] -mt-3 mb-4">{t('seoUnclaimedDesc')}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {data.unclaimedArtists.map((artist) => {
+              const name = artist.display_name || artist.name_en || artist.name_local || artist.artist_id;
+              return (
+                <a
+                  key={artist.artist_id}
+                  href={`/${locale}/artists/${artist.artist_id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/40 transition-all hover:bg-[var(--muted)]/30"
+                >
+                  {/* Avatar */}
+                  <div className="w-10 h-10 rounded-full bg-[var(--muted)] overflow-hidden shrink-0">
+                    {artist.photo_url ? (
+                      <img src={artist.photo_url} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[var(--muted-foreground)] text-sm font-bold">
+                        {name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate group-hover:text-[var(--color-gold)] transition-colors">{name}</p>
+                    {artist.top_query && (
+                      <p className="text-[10px] text-[var(--muted-foreground)] truncate mt-0.5">
+                        &ldquo;{artist.top_query}&rdquo;
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-[10px] text-[var(--muted-foreground)] tabular-nums">
+                        {Number(artist.total_impressions).toLocaleString()} imp
+                      </span>
+                      {Number(artist.total_clicks) > 0 && (
+                        <span className="text-[10px] text-[var(--color-gold)] tabular-nums">
+                          {Number(artist.total_clicks)} clicks
+                        </span>
+                      )}
+                      <span className="text-[10px] text-[var(--muted-foreground)] tabular-nums">
+                        pos {artist.avg_position.toFixed(1)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Unclaimed badge */}
+                  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-medium shrink-0 uppercase tracking-wider">
+                    {t('seoUnclaimed')}
+                  </span>
+                </a>
+              );
+            })}
           </div>
         </Section>
       )}

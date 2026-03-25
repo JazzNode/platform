@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
     deviceBreakdown,
     pageTypeBreakdown,
     highImpLowCtr,
+    unclaimedArtists,
     lastSync,
   ] = await Promise.all([
     // Current period totals
@@ -68,6 +69,9 @@ export async function GET(request: NextRequest) {
 
     // High impression, low CTR pages (optimization opportunities)
     supabase.rpc('gsc_high_imp_low_ctr', { start_date: currentSince, end_date: currentEnd, row_limit: 10 }),
+
+    // High impression unclaimed artists (business development leads)
+    supabase.rpc('gsc_unclaimed_artists', { start_date: currentSince, end_date: currentEnd, row_limit: 15 }),
 
     // Last sync log
     supabase.from('gsc_sync_logs').select('*').order('created_at', { ascending: false }).limit(1),
@@ -110,6 +114,7 @@ export async function GET(request: NextRequest) {
     devices: deviceBreakdown.data || [],
     pageTypes: pageTypeBreakdown.data || [],
     opportunities: highImpLowCtr.data || [],
+    unclaimedArtists: unclaimedArtists.data || [],
     lastSync: (lastSync.data || [])[0] || null,
   });
 }
