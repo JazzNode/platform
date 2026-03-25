@@ -3,8 +3,8 @@ import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect, notFound } from 'next/navigation';
-import { getEvents, getVenues, getArtists, getLineups, resolveLinks, buildMap, type Artist } from '@/lib/supabase';
-import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, deriveCity, formatPriceBadge, normalizeInstrumentKey, relativeEventDate, isEventLive } from '@/lib/helpers';
+import { getEvents, getVenues, getArtists, getLineups, getCities, resolveLinks, buildMap, type Artist } from '@/lib/supabase';
+import { displayName, artistDisplayName, eventTitle, eventSubtitle, formatDate, formatTime, photoUrl, localized, formatPriceBadge, normalizeInstrumentKey, relativeEventDate, isEventLive } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import RecordNav from '@/components/RecordNav';
 import BookmarkButton from '@/components/BookmarkButton';
@@ -65,8 +65,8 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const tInst = await getTranslations('instruments');
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
 
-  const [events, venues, artists, lineups] = await Promise.all([
-    getEvents(), getVenues(), getArtists(), getLineups(),
+  const [events, venues, artists, lineups, cities] = await Promise.all([
+    getEvents(), getVenues(), getArtists(), getLineups(), getCities(),
   ]);
   const event = events.find((e) => e.id === slug);
 
@@ -79,6 +79,16 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
   const venueMap = buildMap(venues);
   const artistMap = buildMap(artists);
   const venue = resolveLinks(f.venue_id, venueMap)[0];
+
+  // Resolve city name from venue's city_id (reliable across all locales/countries)
+  const cityName = (() => {
+    const cityId = venue?.fields.city_id?.[0];
+    if (!cityId) return undefined;
+    const city = cities.find((c) => c.id === cityId);
+    if (!city) return undefined;
+    const localeKey = `name_${locale}` as keyof typeof city.fields;
+    return (city.fields[localeKey] as string) || city.fields.name_local || city.fields.name_en;
+  })();
 
   // Fetch bookmark (want-to-go) count
   let bookmarkCount = 0;
@@ -266,10 +276,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           HERO — Mobile: compact horizontal / Desktop: side-by-side
          ═══════════════════════════════════════════════ */}
       <FadeUp>
-      <div className="flex flex-col lg:flex-row gap-8">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
         {/* ── Left column: Poster + Quick facts (mobile: horizontal, desktop: poster full) ── */}
-        <div className="lg:w-[380px] shrink-0">
+        <div className="lg:w-[420px] shrink-0">
           {/* Mobile: poster + key info side by side */}
           <div className="flex gap-4 lg:hidden">
             <EventPosterUpload
@@ -320,7 +330,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         </div>
 
         {/* ── Right column: Title, details, actions ── */}
-        <div className="flex-1 min-w-0 space-y-5">
+        <div className="flex-1 min-w-0 space-y-6">
 
           {/* Desktop: relative date badge */}
           <div className="hidden lg:block">
@@ -389,17 +399,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           )}
 
           {/* ─── Quick Facts (Desktop: horizontal badges) ─── */}
-          <div className="hidden lg:flex items-center gap-4 text-sm">
-            <span className="inline-flex items-center gap-1.5 text-[var(--foreground)]">
+          <div className="hidden lg:flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <span className="inline-flex items-center gap-1.5 text-[var(--foreground)] whitespace-nowrap">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)]"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
               {formatTime(f.start_at, tz)}{f.end_at && ` — ${formatTime(f.end_at, tz)}`}
             </span>
             {priceShort && priceFull && (
               <PriceInfo short={priceShort} full={priceFull} />
             )}
-            {venue && deriveCity(venue.fields.address_local || venue.fields.address_en) && (
-              <span className="text-[var(--muted-foreground)]">
-                {deriveCity(venue.fields.address_local || venue.fields.address_en)}
+            {cityName && (
+              <span className="text-[var(--muted-foreground)] whitespace-nowrap">
+                {cityName}
               </span>
             )}
           </div>
@@ -463,15 +473,14 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             </div>
           )}
 
-          {/* ─── Primary CTA: Navigation (mobile) / Tickets (desktop) ─── */}
-          <div className="space-y-3">
-            {/* Mobile: Navigation is primary */}
+          {/* ─── Mobile CTAs ─── */}
+          <div className="lg:hidden space-y-3">
             {mapsDirectionsUrl && (
               <a
                 href={mapsDirectionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="lg:hidden flex items-center justify-center gap-2 w-full py-3.5 text-sm font-bold uppercase tracking-widest rounded-xl bg-gold text-[#0A0A0A] hover:bg-gold-bright transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-3.5 text-sm font-bold uppercase tracking-widest rounded-xl bg-gold text-[#0A0A0A] hover:bg-gold-bright transition-colors"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
@@ -480,26 +489,23 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 {t('getDirections')}
               </a>
             )}
-
-            {/* Desktop: Tickets is primary */}
             {f.source_url && (
               <a href={f.source_url} target="_blank" rel="noopener noreferrer"
-                className="hidden lg:inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-gold-bright transition-colors btn-magnetic">
-                <span>{t('ticketLink')} ↗</span>
-              </a>
-            )}
-
-            {/* Ticket link on mobile (secondary style) */}
-            {f.source_url && (
-              <a href={f.source_url} target="_blank" rel="noopener noreferrer"
-                className="lg:hidden flex items-center justify-center gap-2 w-full py-3 text-sm font-bold uppercase tracking-widest rounded-xl border-2 border-gold text-gold hover:bg-gold/10 transition-colors">
+                className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold uppercase tracking-widest rounded-xl border-2 border-gold text-gold hover:bg-gold/10 transition-colors">
                 {t('ticketLink')} ↗
               </a>
             )}
           </div>
 
-          {/* ─── Secondary actions row ─── */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-4">
+          {/* ─── Desktop: Ticket + secondary actions in one row ─── */}
+          <div className="hidden lg:flex flex-wrap items-center gap-3">
+            {f.source_url && (
+              <a href={f.source_url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-gold-bright transition-colors btn-magnetic">
+                <span>{t('ticketLink')} ↗</span>
+              </a>
+            )}
+            <span className="w-px h-6 bg-[var(--border)]" />
             {f.start_at && (
               <AddToCalendar
                 title={eventTitle(f, locale)}
@@ -525,13 +531,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               variant="full"
               label={t('share')}
             />
-            {/* Desktop: directions as secondary */}
             {mapsDirectionsUrl && (
               <a
                 href={mapsDirectionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
@@ -540,6 +545,35 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 <span>{t('getDirections')}</span>
               </a>
             )}
+          </div>
+
+          {/* ─── Mobile secondary actions ─── */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-4 lg:hidden">
+            {f.start_at && (
+              <AddToCalendar
+                title={eventTitle(f, locale)}
+                startAt={f.start_at}
+                endAt={f.end_at}
+                timezone={tz}
+                venueName={venue ? displayName(venue.fields) : undefined}
+                address={venue?.fields.address_local || venue?.fields.address_en || undefined}
+                description={descShort || desc || undefined}
+                sourceUrl={f.source_url}
+                variant="full"
+                label={t('addToCalendar')}
+              />
+            )}
+            <ShareButton
+              title={eventTitle(f, locale)}
+              url={`/${locale}/events/${slug}`}
+              text={[
+                eventTitle(f, locale),
+                `📅 ${f.start_at ? formatDate(f.start_at, locale, tz) : ''}${venue ? ` · 📍 ${displayName(venue.fields)}` : ''}`,
+                'via JazzNode — The Jazz Scene, Connected.',
+              ].filter(Boolean).join('\n')}
+              variant="full"
+              label={t('share')}
+            />
           </div>
         </div>
       </div>

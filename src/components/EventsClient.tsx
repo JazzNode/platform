@@ -266,6 +266,21 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
     return result;
   }, [events, selectedCities, selectedVenues, selectedCategory, followedFirst, isFollowing]);
 
+  // Filter today's events with the same location/category filters
+  const filteredTodayEvents = useMemo(() => {
+    return todayEvents.filter((e) => {
+      if (selectedVenues.size > 0) {
+        if (e.venue_id == null || !selectedVenues.has(e.venue_id)) return false;
+      } else if (selectedCities.size > 0) {
+        if (e.city_record_id == null || !selectedCities.has(e.city_record_id)) return false;
+      }
+      if (selectedCategory === 'jam') return e.tags.includes('jam session');
+      if (selectedCategory === 'vocal') return e.tags.includes('vocals');
+      if (selectedCategory === 'matinee') return e.tags.includes('matinee');
+      return true;
+    });
+  }, [todayEvents, selectedCities, selectedVenues, selectedCategory]);
+
   // Key for re-triggering animations on filter change
   const filterKey = useMemo(() => {
     return `${activeRegion}_${selectedCity}_${[...selectedVenues].sort().join(',')}_${selectedCategory}_${followedFirst}`;
@@ -473,7 +488,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
       </div>
 
       {/* ─── Today's Shows ─── */}
-      {todayEvents.length > 0 && !showPast && (
+      {filteredTodayEvents.length > 0 && !showPast && (
         <section>
           <FadeUp>
             <div className="mb-8 border-b border-[var(--border)] pb-4">
@@ -481,7 +496,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
             </div>
           </FadeUp>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {todayEvents.map((event, i) => {
+            {filteredTodayEvents.map((event, i) => {
               const bookmarked = isFollowing('event', event.id);
               return (
                 <FadeUpItem key={event.id} delay={(i % 3) * 60} data-flip-id={`today-${event.id}`}>
