@@ -10,6 +10,7 @@ import { useAdmin } from '@/components/AdminProvider';
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
   { key: 'analytics', icon: 'trend', path: '/analytics' },
+  { key: 'seo', icon: 'search', path: '/seo' },
   { key: 'newEvents', icon: 'sparkle', path: '/new-events' },
   { key: 'inbox', icon: 'bell', path: '/inbox' },
   { key: 'comments', icon: 'comments', path: '/comments' },
@@ -35,6 +36,12 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      );
+    case 'search':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       );
     case 'shield':

@@ -15,6 +15,10 @@
     {
       "path": "/api/notify/fan-insights",
       "schedule": "0 10 1 * *"
+    },
+    {
+      "path": "/api/cron/gsc-sync",
+      "schedule": "0 6 * * *"
     }
   ]
 }
