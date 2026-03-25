@@ -174,13 +174,24 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
         name: artistDisplayName(artist.fields, locale),
       })),
     }),
-    ...(f.price_info != null && {
-      offers: {
-        '@type': 'Offer',
-        ...(venue?.fields.currency && { priceCurrency: venue.fields.currency }),
-        price: f.price_info,
-        availability: 'https://schema.org/InStock',
-        ...(f.source_url && { url: f.source_url }),
+    offers: {
+      '@type': 'Offer',
+      ...(venue?.fields.currency && { priceCurrency: venue.fields.currency }),
+      // Google requires price as a number; extract digits from price_info string (e.g. "¥3000" → 3000)
+      price: f.price_info ? Number(f.price_info.replace(/[^\d.]/g, '')) || 0 : 0,
+      availability: f.lifecycle_status === 'cancelled'
+        ? 'https://schema.org/SoldOut'
+        : 'https://schema.org/InStock',
+      ...(f.source_url && { url: f.source_url }),
+      // validFrom: when the event record was created (proxy for ticket availability start)
+      ...(f.created_at && { validFrom: f.created_at }),
+    },
+    // organizer: use venue as the organizing entity
+    ...(venue && {
+      organizer: {
+        '@type': 'Organization',
+        name: displayName(venue.fields),
+        ...(venue.fields.website_url && { url: venue.fields.website_url }),
       },
     }),
   };
