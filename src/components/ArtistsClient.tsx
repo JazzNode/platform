@@ -292,15 +292,23 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
             <>
               <button
                 onClick={() => setFollowedFirst((p) => !p)}
-                className={`px-3 py-1.5 rounded-full text-xs uppercase tracking-widest transition-all duration-300 border font-serif font-light ${
-                  followedFirst
-                    ? 'bg-[rgba(var(--theme-glow-rgb),0.18)] border-[rgba(var(--theme-glow-rgb),0.5)] text-[var(--foreground)]'
-                    : 'bg-transparent border-[rgba(240,237,230,0.12)] text-[var(--muted-foreground)] hover:border-[rgba(240,237,230,0.3)]'
-                }`}
+                className="inline-flex items-center gap-2 group/toggle cursor-pointer"
+                role="switch"
+                aria-checked={followedFirst}
               >
-                <span className="inline-flex items-center gap-1.5">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill={followedFirst ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-all duration-300"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" /></svg>
+                <span className={`text-xs uppercase tracking-widest font-serif font-light transition-colors duration-300 ${followedFirst ? 'text-[var(--foreground)]' : 'text-[var(--muted-foreground)]'}`}>
                   {labels.followedFirst}
+                </span>
+                <span
+                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors duration-300 ${
+                    followedFirst ? 'bg-gold' : 'bg-[rgba(240,237,230,0.12)]'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm transition-transform duration-300 ${
+                      followedFirst ? 'translate-x-[18px]' : 'translate-x-[3px]'
+                    }`}
+                  />
                 </span>
               </button>
               <span className="text-gold/30 text-xs select-none self-center mx-0.5">│</span>
