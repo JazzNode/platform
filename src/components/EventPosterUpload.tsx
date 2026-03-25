@@ -9,9 +9,10 @@ interface Props {
   eventId: string;
   eventTitle: string;
   currentPosterUrl: string | null;
+  className?: string;
 }
 
-export default function EventPosterUpload({ eventId, eventTitle, currentPosterUrl }: Props) {
+export default function EventPosterUpload({ eventId, eventTitle, currentPosterUrl, className }: Props) {
   const { canEdit, handleUnauthorized } = useCanEdit('event', eventId);
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -82,7 +83,7 @@ export default function EventPosterUpload({ eventId, eventTitle, currentPosterUr
   if (!canEdit && !displayUrl) return null;
 
   return (
-    <div className="w-full lg:w-[400px] shrink-0">
+    <div className={className || "w-full lg:w-[400px] shrink-0"}>
       <div
         className={`overflow-hidden rounded-2xl relative ${canEdit ? 'cursor-pointer group/poster' : ''}`}
         onClick={handleClick}

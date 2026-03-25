@@ -14,6 +14,7 @@ import EditableName from '@/components/EditableName';
 import EventPosterUpload from '@/components/EventPosterUpload';
 import AddToCalendar from '@/components/AddToCalendar';
 import ShareButton from '@/components/ShareButton';
+import PriceInfo from '@/components/PriceInfo';
 import { createClient as createServerSupabase } from '@/utils/supabase/server';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -206,40 +207,140 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     ],
   };
 
+  // ─── Price: short for glance, full for details ───
+  const priceFull = formatPriceBadge(venue?.fields.currency, f.price_info) || null;
+  const priceShort = (() => {
+    if (!priceFull) return null;
+    // Try to extract "NT$500" / "¥3000" / "$20" / "Free" etc. from longer strings
+    const match = priceFull.match(/^((?:NT\$|¥|US?\$|S\$|RM|HK\$|฿|Rp\.?\s?|₩)?\s?[\d,]+(?:\.\d+)?|Free|免費|無料|무료|ฟรี|Gratis)/i);
+    return match ? match[0] : priceFull.slice(0, 30) + (priceFull.length > 30 ? '…' : '');
+  })();
+
+  // ─── Relative date for visitor-friendly display ───
+  const relDate = relativeEventDate(f.start_at, locale, tz);
+  const mapsDirectionsUrl = venue?.fields.lat && venue?.fields.lng
+    ? `https://www.google.com/maps/dir/?api=1&destination=${venue.fields.lat},${venue.fields.lng}`
+    : null;
+  const mapsSearchUrl = venue?.fields.lat && venue?.fields.lng
+    ? (venue.fields.place_id
+        ? `https://www.google.com/maps/place/?q=place_id:${venue.fields.place_id}`
+        : `https://www.google.com/maps/search/?api=1&query=${venue.fields.lat},${venue.fields.lng}`)
+    : null;
+  const appleMapsUrl = venue?.fields.lat && venue?.fields.lng
+    ? `https://maps.apple.com/?ll=${venue.fields.lat},${venue.fields.lng}&q=${encodeURIComponent(displayName(venue?.fields || {}))}`
+    : null;
+
+  // ─── Same city events (computed once, used in both mobile & desktop) ───
+  const sameCityEvents = venue ? (() => {
+    const currentCityId = venue.fields.city_id?.[0];
+    if (!currentCityId) return [];
+    const otherVenueIds = new Set(
+      venues
+        .filter((v) => v.id !== venue.id && v.fields.city_id?.[0] === currentCityId)
+        .map((v) => v.id)
+    );
+    if (otherVenueIds.size === 0) return [];
+    const now = new Date().toISOString();
+    return events
+      .filter((e) => {
+        const eVenue = resolveLinks(e.fields.venue_id, venueMap)[0];
+        return eVenue && otherVenueIds.has(eVenue.id) && e.fields.start_at && e.fields.start_at >= now;
+      })
+      .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
+      .slice(0, 6);
+  })() : [];
+
   return (
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       {/* Back link */}
-      <Link href={`/${locale}/events`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
+      <Link href={`/${locale}/events`} className="mb-6 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
       <FavoriteHighlight itemType="event" itemId={event.id}>
-      <div className="space-y-12">
-      {/* Hero section */}
+      <div className="space-y-10">
+
+      {/* ═══════════════════════════════════════════════
+          HERO — Mobile: compact horizontal / Desktop: side-by-side
+         ═══════════════════════════════════════════════ */}
       <FadeUp>
-      <div className="flex flex-col lg:flex-row gap-10">
-        {/* Poster — only on detail page (admin can upload/change) */}
-        <EventPosterUpload
-          eventId={event.id}
-          eventTitle={eventTitle(f, locale)}
-          currentPosterUrl={f.poster_url || null}
-        />
+      <div className="flex flex-col lg:flex-row gap-8">
 
-        {/* Info */}
-        <div className="flex-1 space-y-6">
-          {/* LIVE badge */}
-          {isEventLive(f.start_at, f.end_at) && (
-            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-              <span className="w-2 h-2 rounded-full bg-red-400" />
-              {t('happeningNow')}
+        {/* ── Left column: Poster + Quick facts (mobile: horizontal, desktop: poster full) ── */}
+        <div className="lg:w-[380px] shrink-0">
+          {/* Mobile: poster + key info side by side */}
+          <div className="flex gap-4 lg:hidden">
+            <EventPosterUpload
+              eventId={event.id}
+              eventTitle={eventTitle(f, locale)}
+              currentPosterUrl={f.poster_url || null}
+              className="!w-[130px] !min-h-[130px] !max-h-[180px] shrink-0"
+            />
+            <div className="flex-1 min-w-0 flex flex-col justify-center gap-2">
+              {/* Relative date badge */}
+              {relDate.label && (
+                <div className={`inline-flex items-center gap-1.5 self-start px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-widest ${
+                  isEventLive(f.start_at, f.end_at)
+                    ? 'bg-red-500/20 border border-red-500/40 text-red-400 animate-pulse'
+                    : relDate.isTonight
+                      ? 'bg-gold/15 border border-gold/40 text-gold'
+                      : 'bg-[var(--card)] border border-[var(--border)] text-[var(--muted-foreground)]'
+                }`}>
+                  {isEventLive(f.start_at, f.end_at) && <span className="w-1.5 h-1.5 rounded-full bg-red-400" />}
+                  {isEventLive(f.start_at, f.end_at) ? t('happeningNow') : relDate.label}
+                </div>
+              )}
+              {/* Time */}
+              <p className="text-lg font-bold text-[var(--foreground)]">
+                {formatTime(f.start_at, tz)}{f.end_at && ` — ${formatTime(f.end_at, tz)}`}
+              </p>
+              {/* Price */}
+              {priceShort && priceFull && (
+                <PriceInfo short={priceShort} full={priceFull} className="text-sm" />
+              )}
+              {/* Venue name */}
+              {venue && (
+                <Link href={`/${locale}/venues/${venue.id}`} className="text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors truncate">
+                  📍 {displayName(venue.fields)}
+                </Link>
+              )}
             </div>
-          )}
+          </div>
 
-          {/* Title */}
+          {/* Desktop: full poster */}
+          <div className="hidden lg:block">
+            <EventPosterUpload
+              eventId={event.id}
+              eventTitle={eventTitle(f, locale)}
+              currentPosterUrl={f.poster_url || null}
+            />
+          </div>
+        </div>
+
+        {/* ── Right column: Title, details, actions ── */}
+        <div className="flex-1 min-w-0 space-y-5">
+
+          {/* Desktop: relative date badge */}
+          <div className="hidden lg:block">
+            {relDate.label && (
+              <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest ${
+                isEventLive(f.start_at, f.end_at)
+                  ? 'bg-red-500/20 border border-red-500/40 text-red-400 animate-pulse'
+                  : relDate.isTonight
+                    ? 'bg-gold/15 border border-gold/40 text-gold'
+                    : 'bg-[var(--card)] border border-[var(--border)] text-[var(--muted-foreground)]'
+              }`}>
+                {isEventLive(f.start_at, f.end_at) && <span className="w-2 h-2 rounded-full bg-red-400" />}
+                {isEventLive(f.start_at, f.end_at) ? t('happeningNow') : relDate.label}
+              </div>
+            )}
+          </div>
+
+          {/* Title + Bookmark */}
           <div className="flex items-start justify-between gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1.5 min-w-0">
               <EditableName
                 entityType="event"
                 entityId={event.id}
@@ -249,7 +350,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                   { field: 'title_local', label: 'title_local', value: f.title_local || '' },
                   { field: 'title_en', label: 'title_en', value: f.title_en || '' },
                 ]}
-                className="font-serif text-4xl sm:text-5xl font-bold leading-tight"
+                className="font-serif text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight"
                 tag="h1"
               />
               {eventSubtitle(f) && (
@@ -262,7 +363,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                     { field: 'title_local', label: 'title_local', value: f.title_local || '' },
                     { field: 'title_en', label: 'title_en', value: f.title_en || '' },
                   ]}
-                  className="text-xl text-[var(--muted-foreground)]"
+                  className="text-base lg:text-lg text-[var(--muted-foreground)]"
                   tag="p"
                 />
               )}
@@ -279,7 +380,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Primary artist */}
           {primaryArtist && (
-            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-lg text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
+            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-base text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
               <span className="text-gold">♪</span> {artistDisplayName(primaryArtist.fields, locale)}
               {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' && (
                 <span className="text-sm capitalize">· {primaryArtist.fields.type}</span>
@@ -287,51 +388,118 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             </Link>
           )}
 
-          {/* Price badge */}
-          {f.price_info && (
-            <span className="inline-block text-sm text-[var(--foreground)] bg-[var(--card)] px-4 py-2 rounded-xl border border-[var(--border)] ml-4">
-              {formatPriceBadge(venue?.fields.currency, f.price_info)}
+          {/* ─── Quick Facts (Desktop: horizontal badges) ─── */}
+          <div className="hidden lg:flex items-center gap-4 text-sm">
+            <span className="inline-flex items-center gap-1.5 text-[var(--foreground)]">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)]"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              {formatTime(f.start_at, tz)}{f.end_at && ` — ${formatTime(f.end_at, tz)}`}
             </span>
-          )}
-
-          {/* ─── Event Details Block ─── */}
-          <div className="bg-[var(--card)] rounded-2xl p-5 border border-[var(--border)] space-y-3 text-sm mt-4">
-            {/* City */}
+            {priceShort && priceFull && (
+              <PriceInfo short={priceShort} full={priceFull} />
+            )}
             {venue && deriveCity(venue.fields.address_local || venue.fields.address_en) && (
-              <div className="flex gap-3">
-                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventCity')}</span>
-                <span className="text-[var(--foreground)]">{deriveCity(venue.fields.address_local || venue.fields.address_en)}</span>
-              </div>
-            )}
-            <div className="flex gap-3">
-              <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventDate')}</span>
-              <span className="text-[var(--foreground)]">{formatDate(f.start_at, locale, tz)}</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventTime')}</span>
-              <span className="text-[var(--foreground)]">
-                {formatTime(f.start_at, tz)}
-                {f.end_at && ` — ${formatTime(f.end_at, tz)}`}
+              <span className="text-[var(--muted-foreground)]">
+                {deriveCity(venue.fields.address_local || venue.fields.address_en)}
               </span>
-            </div>
-            {venue && (
-              <div className="flex gap-3">
-                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventVenue')}</span>
-                <Link href={`/${locale}/venues/${venue.id}`} className="text-gold hover:text-gold-bright transition-colors link-lift">
-                  {displayName(venue.fields)}
-                </Link>
-              </div>
-            )}
-            {(venue?.fields.address_local || venue?.fields.address_en) && (
-              <div className="flex gap-3">
-                <span className="text-[var(--muted-foreground)] w-20 shrink-0">{t('eventAddress')}</span>
-                <span className="text-[#C4BFB3]">{venue.fields.address_local || venue.fields.address_en}</span>
-              </div>
             )}
           </div>
 
-          {/* Action buttons row: Add to Calendar + Share + Directions */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-6">
+          {/* ─── Venue + Address card (clickable address) ─── */}
+          <div className="bg-[var(--card)] rounded-2xl p-4 border border-[var(--border)]">
+            <div className="flex items-start gap-3">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-gold shrink-0 mt-0.5">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
+                <circle cx="12" cy="9" r="2.5" />
+              </svg>
+              <div className="flex-1 min-w-0">
+                {venue && (
+                  <Link href={`/${locale}/venues/${venue.id}`} className="font-medium text-[var(--foreground)] hover:text-gold transition-colors">
+                    {displayName(venue.fields)}
+                  </Link>
+                )}
+                {(venue?.fields.address_local || venue?.fields.address_en) && (
+                  <a
+                    href={mapsSearchUrl || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors mt-0.5"
+                  >
+                    {venue.fields.address_local || venue.fields.address_en}
+                  </a>
+                )}
+                {/* Date row — visible on mobile (desktop shows in quick facts) */}
+                <p className="text-xs text-[var(--muted-foreground)] mt-2 lg:hidden">
+                  {formatDate(f.start_at, locale, tz)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ─── Map preview (mobile: full width, desktop: hidden — shown in sidebar) ─── */}
+          {venue?.fields.lat && venue?.fields.lng && (
+            <div className="lg:hidden">
+              <a
+                href={mapsDirectionsUrl || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block rounded-2xl overflow-hidden border border-[var(--border)] h-[160px] relative bg-[#1A1A1A]"
+              >
+                {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                  <iframe
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, filter: 'grayscale(100%) invert(92%) contrast(83%) opacity(80%)', pointerEvents: 'none' }}
+                    loading="lazy"
+                    src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${venue.fields.lat},${venue.fields.lng}&zoom=15`}
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-[var(--muted-foreground)] text-sm">{t('openInMaps')}</span>
+                  </div>
+                )}
+                {/* Tap overlay */}
+                <div className="absolute inset-0" />
+              </a>
+            </div>
+          )}
+
+          {/* ─── Primary CTA: Navigation (mobile) / Tickets (desktop) ─── */}
+          <div className="space-y-3">
+            {/* Mobile: Navigation is primary */}
+            {mapsDirectionsUrl && (
+              <a
+                href={mapsDirectionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lg:hidden flex items-center justify-center gap-2 w-full py-3.5 text-sm font-bold uppercase tracking-widest rounded-xl bg-gold text-[#0A0A0A] hover:bg-gold-bright transition-colors"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
+                  <circle cx="12" cy="9" r="2.5" />
+                </svg>
+                {t('getDirections')}
+              </a>
+            )}
+
+            {/* Desktop: Tickets is primary */}
+            {f.source_url && (
+              <a href={f.source_url} target="_blank" rel="noopener noreferrer"
+                className="hidden lg:inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-gold-bright transition-colors btn-magnetic">
+                <span>{t('ticketLink')} ↗</span>
+              </a>
+            )}
+
+            {/* Ticket link on mobile (secondary style) */}
+            {f.source_url && (
+              <a href={f.source_url} target="_blank" rel="noopener noreferrer"
+                className="lg:hidden flex items-center justify-center gap-2 w-full py-3 text-sm font-bold uppercase tracking-widest rounded-xl border-2 border-gold text-gold hover:bg-gold/10 transition-colors">
+                {t('ticketLink')} ↗
+              </a>
+            )}
+          </div>
+
+          {/* ─── Secondary actions row ─── */}
+          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-4">
             {f.start_at && (
               <AddToCalendar
                 title={eventTitle(f, locale)}
@@ -357,12 +525,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               variant="full"
               label={t('share')}
             />
-            {venue?.fields.lat && venue?.fields.lng && (
+            {/* Desktop: directions as secondary */}
+            {mapsDirectionsUrl && (
               <a
-                href={`https://www.google.com/maps/dir/?api=1&destination=${venue.fields.lat},${venue.fields.lng}`}
+                href={mapsDirectionsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+                className="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
@@ -372,137 +541,215 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               </a>
             )}
           </div>
-
-          {/* Description */}
-          <EditableContent
-            entityType="event"
-            entityId={event.id}
-            fieldPrefix="description"
-            locale={locale}
-            content={desc || descShort}
-            contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
-            wrapperClassName="border-t border-[var(--border)] pt-6"
-          />
-
-          {/* Ticket button — below description */}
-          {f.source_url && (
-            <a href={f.source_url} target="_blank" rel="noopener noreferrer"
-              className="btn-magnetic inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest">
-              <span>{t('ticketLink')} ↗</span>
-            </a>
-          )}
         </div>
       </div>
       </FadeUp>
 
-      {/* ─── Lineup ─── */}
-      {lineupArtists.length > 0 && (
-        <FadeUp>
-        <section className="border-t border-[var(--border)] pt-12">
-          <h2 className="font-serif text-2xl font-bold mb-8">{t('lineup')}</h2>
-          <div className="space-y-6">
-            {lineupArtists.map(({ artist, instruments, role }) => {
-              const bioShort = localized(artist.fields as Record<string, unknown>, 'bio_short', locale);
-              return (
-                <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
-                  <div className="flex items-center gap-4">
-                    {/* Artist avatar */}
-                    {photoUrl(artist.fields.photo_url) ? (
-                      <Image
-                        src={photoUrl(artist.fields.photo_url)!}
-                        alt={artistDisplayName(artist.fields, locale)}
-                        width={72} height={72}
-                        className="w-18 h-18 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
-                        sizes="72px"
-                      />
-                    ) : (
-                      <div className="w-18 h-18 rounded-xl bg-[var(--bg)] flex items-center justify-center text-xl shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
-                        ♪
+      {/* ═══════════════════════════════════════════════
+          BODY — Mobile: linear / Desktop: two-column
+         ═══════════════════════════════════════════════ */}
+      <div className="flex flex-col lg:flex-row gap-10">
+
+        {/* ── Main content column ── */}
+        <div className="flex-1 min-w-0 space-y-10">
+
+          {/* Description */}
+          {(desc || descShort) && (
+            <FadeUp>
+            <section>
+              <h2 className="font-serif text-xl font-bold mb-4">{t('aboutThisEvent')}</h2>
+              <EditableContent
+                entityType="event"
+                entityId={event.id}
+                fieldPrefix="description"
+                locale={locale}
+                content={desc || descShort}
+                contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
+              />
+            </section>
+            </FadeUp>
+          )}
+
+          {/* ─── Lineup ─── */}
+          {lineupArtists.length > 0 && (
+            <FadeUp>
+            <section className="border-t border-[var(--border)] pt-10">
+              <h2 className="font-serif text-xl font-bold mb-6">{t('lineup')}</h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {lineupArtists.map(({ artist, instruments, role }) => {
+                  const bioShort = localized(artist.fields as Record<string, unknown>, 'bio_short', locale);
+                  return (
+                    <Link key={artist.id} href={`/${locale}/artists/${artist.id}`} className="block bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] card-hover group">
+                      <div className="flex items-center gap-3">
+                        {photoUrl(artist.fields.photo_url) ? (
+                          <Image
+                            src={photoUrl(artist.fields.photo_url)!}
+                            alt={artistDisplayName(artist.fields, locale)}
+                            width={56} height={56}
+                            className="w-14 h-14 rounded-xl object-cover shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300"
+                            sizes="56px"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-xl bg-[var(--bg)] flex items-center justify-center text-lg shrink-0 border border-[var(--border)] group-hover:border-gold/40 transition-colors duration-300">
+                            ♪
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 truncate">
+                            {artistDisplayName(artist.fields, locale)}
+                          </h3>
+                          <p className="text-xs uppercase tracking-widest text-gold mt-0.5">
+                            {role === 'ensemble'
+                              ? (artist.fields.type === 'big band' ? 'BIG BAND' : 'GROUP')
+                              : instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}
+                          </p>
+                        </div>
                       </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300">
-                        {artistDisplayName(artist.fields, locale)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+            </FadeUp>
+          )}
+
+          {/* Prev / Next Navigation */}
+          <RecordNav
+            prevHref={prevEvent ? `/${locale}/events/${prevEvent.id}` : null}
+            prevTitle={prevEvent ? eventTitle(prevEvent.fields, locale) : null}
+            nextHref={nextEvent ? `/${locale}/events/${nextEvent.id}` : null}
+            nextTitle={nextEvent ? eventTitle(nextEvent.fields, locale) : null}
+            prevLabel={t('prevEvent')}
+            nextLabel={t('nextEvent')}
+          />
+
+          {/* Same city events — mobile only (desktop shows in sidebar) */}
+          {sameCityEvents.length > 0 && (
+            <FadeUp>
+            <section className="border-t border-[var(--border)] pt-10 lg:hidden">
+              <h2 className="font-serif text-xl font-bold mb-6">{t('sameCityEvents')}</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {sameCityEvents.map((related) => {
+                  const rtz = related.fields.timezone || 'Asia/Taipei';
+                  const rVenue = resolveLinks(related.fields.venue_id, venueMap)[0];
+                  return (
+                    <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[var(--card)] p-4 rounded-2xl border border-[var(--border)] card-hover group">
+                      <div className="text-xs uppercase tracking-widest text-gold mb-1.5">
+                        {formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
+                      </div>
+                      <h3 className="font-serif text-sm font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                        {eventTitle(related.fields, locale)}
                       </h3>
-                      <p className="text-xs uppercase tracking-widest text-gold mt-1">
-                        {role === 'ensemble'
-                          ? (artist.fields.type === 'big band' ? 'BIG BAND' : 'GROUP')
-                          : instruments.length > 0 ? instruments.map(i => instLabel(i)).join(', ') : role || (artist.fields.primary_instrument ? instLabel(artist.fields.primary_instrument) : '')}
-                      </p>
-                      {bioShort && (
-                        <p className="text-xs text-[var(--muted-foreground)] mt-3 leading-relaxed line-clamp-3">
-                          {bioShort}
-                        </p>
+                      {rVenue && (
+                        <p className="text-xs text-[var(--muted-foreground)] mt-1.5">↗ {displayName(rVenue.fields)}</p>
                       )}
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-        </FadeUp>
-      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+            </FadeUp>
+          )}
+        </div>
 
-      {/* ─── Prev / Next Navigation ─── */}
-      <RecordNav
-        prevHref={prevEvent ? `/${locale}/events/${prevEvent.id}` : null}
-        prevTitle={prevEvent ? eventTitle(prevEvent.fields, locale) : null}
-        nextHref={nextEvent ? `/${locale}/events/${nextEvent.id}` : null}
-        nextTitle={nextEvent ? eventTitle(nextEvent.fields, locale) : null}
-        prevLabel={t('prevEvent')}
-        nextLabel={t('nextEvent')}
-      />
+        {/* ── Desktop sidebar ── */}
+        <aside className="hidden lg:block lg:w-[340px] shrink-0 space-y-8">
 
-      {/* ─── Same city, other venues ─── */}
-      {venue && (() => {
-        const currentCityId = venue.fields.city_id?.[0];
-        if (!currentCityId) return null;
-        // Find other venues in same city
-        const otherVenueIds = new Set(
-          venues
-            .filter((v) => v.id !== venue.id && v.fields.city_id?.[0] === currentCityId)
-            .map((v) => v.id)
-        );
-        if (otherVenueIds.size === 0) return null;
-        const now = new Date().toISOString();
-        const sameCityEvents = events
-          .filter((e) => {
-            const eVenue = resolveLinks(e.fields.venue_id, venueMap)[0];
-            return eVenue && otherVenueIds.has(eVenue.id) && e.fields.start_at && e.fields.start_at >= now;
-          })
-          .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''))
-          .slice(0, 6);
-        if (sameCityEvents.length === 0) return null;
-        return (
-          <FadeUp>
-          <section className="border-t border-[var(--border)] pt-12">
-            <h2 className="font-serif text-2xl font-bold mb-8">
-              {t('sameCityEvents')}
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {sameCityEvents.map((related) => {
-                const rtz = related.fields.timezone || 'Asia/Taipei';
-                const rVenue = resolveLinks(related.fields.venue_id, venueMap)[0];
-                return (
-                  <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[var(--card)] p-5 rounded-2xl border border-[var(--border)] card-hover group">
-                    <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                      {formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
-                    </div>
-                    <h3 className="font-serif text-base font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                      {eventTitle(related.fields, locale)}
-                    </h3>
-                    {rVenue && (
-                      <p className="text-xs text-[var(--muted-foreground)] mt-2">↗ {displayName(rVenue.fields)}</p>
-                    )}
-                  </Link>
-                );
-              })}
+          {/* Venue info card */}
+          {venue && (
+            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 space-y-4">
+              <h3 className="font-serif text-base font-bold">{t('eventVenue')}</h3>
+              <Link href={`/${locale}/venues/${venue.id}`} className="block text-gold hover:text-gold-bright transition-colors font-medium">
+                {displayName(venue.fields)}
+              </Link>
+              {(venue.fields.address_local || venue.fields.address_en) && (
+                <a
+                  href={mapsSearchUrl || '#'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors"
+                >
+                  {venue.fields.address_local || venue.fields.address_en}
+                </a>
+              )}
+              {venue.fields.phone && (
+                <a href={`tel:${venue.fields.phone}`} className="flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+                  {venue.fields.phone}
+                </a>
+              )}
+              {venue.fields.website_url && (
+                <a href={venue.fields.website_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10Z"/></svg>
+                  {venue.fields.website_url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}
+                </a>
+              )}
             </div>
-          </section>
-          </FadeUp>
-        );
-      })()}
+          )}
+
+          {/* Map — desktop sidebar */}
+          {venue?.fields.lat && venue?.fields.lng && (
+            <div className="rounded-2xl overflow-hidden border border-[var(--border)] h-[220px] relative bg-[#1A1A1A]">
+              {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ? (
+                <iframe
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0, filter: 'grayscale(100%) invert(92%) contrast(83%) opacity(80%)' }}
+                  loading="lazy"
+                  allowFullScreen
+                  src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&q=${venue.fields.lat},${venue.fields.lng}&zoom=15`}
+                />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <a href={appleMapsUrl || '#'} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors text-sm">
+                    {t('openInMaps')}
+                  </a>
+                </div>
+              )}
+              <div className="absolute bottom-0 inset-x-0 flex gap-2 p-2">
+                {mapsSearchUrl && (
+                  <a href={mapsSearchUrl} target="_blank" rel="noreferrer" className="text-[10px] px-3 py-1.5 rounded-lg bg-[var(--card)]/90 backdrop-blur border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold transition-colors">
+                    Google Maps
+                  </a>
+                )}
+                {appleMapsUrl && (
+                  <a href={appleMapsUrl} target="_blank" rel="noreferrer" className="text-[10px] px-3 py-1.5 rounded-lg bg-[var(--card)]/90 backdrop-blur border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold transition-colors">
+                    Apple Maps
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Same city events — desktop sidebar */}
+          {sameCityEvents.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="font-serif text-base font-bold">{t('sameCityEvents')}</h3>
+              <div className="space-y-3">
+                {sameCityEvents.map((related) => {
+                  const rtz = related.fields.timezone || 'Asia/Taipei';
+                  const rVenue = resolveLinks(related.fields.venue_id, venueMap)[0];
+                  const rRel = relativeEventDate(related.fields.start_at, locale, rtz);
+                  return (
+                    <Link key={related.id} href={`/${locale}/events/${related.id}`} className="block bg-[var(--card)] p-3.5 rounded-xl border border-[var(--border)] card-hover group">
+                      <div className="text-[10px] uppercase tracking-widest text-gold mb-1">
+                        {rRel.isTonight || rRel.isTomorrow ? rRel.label : formatDate(related.fields.start_at, locale, rtz)} · {formatTime(related.fields.start_at, rtz)}
+                      </div>
+                      <h4 className="font-serif text-sm font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
+                        {eventTitle(related.fields, locale)}
+                      </h4>
+                      {rVenue && (
+                        <p className="text-[11px] text-[var(--muted-foreground)] mt-1">↗ {displayName(rVenue.fields)}</p>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </aside>
+      </div>
+
       </div>
       </FavoriteHighlight>
     </div>
