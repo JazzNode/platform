@@ -231,11 +231,11 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <FavoriteHighlight itemType="venue" itemId={venue.id}>
       <Link href={`/${locale}/venues`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
-      <FavoriteHighlight itemType="venue" itemId={venue.id}>
       <div className="space-y-12">
 
       {/* Status Banner */}

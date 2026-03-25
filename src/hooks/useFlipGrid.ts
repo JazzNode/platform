@@ -42,6 +42,12 @@ export function useFlipGrid<T extends HTMLElement>() {
 
     for (const el of items) {
       const id = el.dataset.flipId!;
+
+      // Skip elements still entering via FadeUpItem (opacity 0).
+      // Prevents FLIP from snapshotting the pre-visible position and
+      // firing a second animation that fights the entrance transition.
+      if (el.style.opacity === '0') continue;
+
       const rect = el.getBoundingClientRect();
       next.set(id, { x: rect.left, y: rect.top });
 

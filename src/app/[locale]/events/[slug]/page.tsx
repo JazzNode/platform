@@ -264,12 +264,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <FavoriteHighlight itemType="event" itemId={event.id}>
       {/* Back link */}
       <Link href={`/${locale}/events`} className="mb-6 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
 
-      <FavoriteHighlight itemType="event" itemId={event.id}>
       <div className="space-y-10">
 
       {/* ═══════════════════════════════════════════════
