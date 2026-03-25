@@ -57,11 +57,11 @@ export default function PriceInfo({ short, full, className }: Props) {
 
       {/* Expandable full price details */}
       <div
-        className={`overflow-hidden transition-all duration-200 ease-out ${
-          open ? 'max-h-[300px] opacity-100 mt-2' : 'max-h-0 opacity-0'
+        className={`absolute top-full left-0 z-10 min-w-[200px] transition-all duration-200 ease-out ${
+          open ? 'opacity-100 mt-2' : 'opacity-0 pointer-events-none'
         }`}
       >
-        <div className="text-xs text-[var(--muted-foreground)] leading-relaxed whitespace-pre-line bg-[var(--card)] border border-[var(--border)] rounded-xl p-3">
+        <div className="text-xs text-[var(--muted-foreground)] leading-relaxed whitespace-pre-line bg-[var(--card)] border border-[var(--border)] rounded-xl p-3 shadow-lg">
           {full}
         </div>
       </div>
