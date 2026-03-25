@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useFilterParams } from '@/hooks/useFilterParams';
+import { useFlipGrid } from '@/hooks/useFlipGrid';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
@@ -103,6 +104,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
   const { isFollowing, hasFollowsOfType } = useFollows();
   const hasEventFollows = hasFollowsOfType('event');
   const [followedFirst, setFollowedFirst] = useState(false);
+  const flipGridRef = useFlipGrid<HTMLDivElement>();
 
   useEffect(() => {
     if (hasEventFollows) setFollowedFirst(true);
@@ -482,7 +484,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
             {todayEvents.map((event, i) => {
               const bookmarked = isFollowing('event', event.id);
               return (
-                <FadeUpItem key={event.id} delay={(i % 3) * 60}>
+                <FadeUpItem key={event.id} delay={(i % 3) * 60} data-flip-id={`today-${event.id}`}>
                   <Link
                     href={`/${locale}/events/${event.id}`}
                     className="block p-6 rounded-2xl border card-hover group h-full relative"
@@ -555,7 +557,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
         </section>
       )}
 
-      <div key={filterKey}>
+      <div ref={flipGridRef}>
         {filteredEvents.length === 0 && (
           <FadeUp>
             <p className="text-[var(--muted-foreground)]">{labels.noEvents}</p>
@@ -589,7 +591,7 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
                 {monthEvents.map((event, i) => {
                   const bookmarked = isFollowing('event', event.id);
                   return (
-                  <FadeUpItem key={event.id} delay={(i % 3) * 60}>
+                  <FadeUpItem key={event.id} delay={(i % 3) * 60} data-flip-id={event.id}>
                   <Link
                     href={`/${locale}/events/${event.id}`}
                     className="block p-6 rounded-2xl border card-hover group h-full relative"

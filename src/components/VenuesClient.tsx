@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useFilterParams } from '@/hooks/useFilterParams';
+import { useFlipGrid } from '@/hooks/useFlipGrid';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -121,6 +122,8 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
   const { isFollowing, hasFollowsOfType } = useFollows();
   const hasVenueFollows = hasFollowsOfType('venue');
   const [followedFirst, setFollowedFirst] = useState(false);
+
+  const flipGridRef = useFlipGrid<HTMLDivElement>();
 
   // Auto-enable when user has venue follows (runs once after hydration)
   useEffect(() => {
@@ -327,18 +330,18 @@ export default function VenuesClient({ venues, cities, locale, regionLabels, wor
         </FadeUpItem>
       </div>
 
-      <div key={filterKey}>
+      <div>
         {filteredVenues.length === 0 && (
           <FadeUp>
             <p className="text-[var(--muted-foreground)]">{labels.noVenues}</p>
           </FadeUp>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div ref={flipGridRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredVenues.map((venue, i) => {
               const followed = isFollowing('venue', venue.id);
               return (
-              <FadeUpItem key={venue.id} delay={(i % 3) * 60}>
+              <FadeUpItem key={venue.id} delay={(i % 3) * 60} data-flip-id={venue.id}>
               <Link
                 href={`/${locale}/venues/${venue.id}`}
                 className="block p-6 rounded-2xl border card-hover group relative h-full"

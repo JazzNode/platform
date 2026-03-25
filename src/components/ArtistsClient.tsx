@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { useFilterParams } from '@/hooks/useFilterParams';
+import { useFlipGrid } from '@/hooks/useFlipGrid';
 import Image from 'next/image';
 import Link from 'next/link';
 import FadeUp from '@/components/animations/FadeUp';
@@ -86,6 +87,7 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
   const { isFollowing, hasFollowsOfType } = useFollows();
   const hasArtistFollows = hasFollowsOfType('artist');
   const [followedFirst, setFollowedFirst] = useState(false);
+  const flipGridRef = useFlipGrid<HTMLDivElement>();
 
   useEffect(() => {
     if (hasArtistFollows) setFollowedFirst(true);
@@ -489,11 +491,11 @@ export default function ArtistsClient({ artists, instruments, instrumentNames = 
         <p className="text-[var(--muted-foreground)]">{labels.noArtists}</p>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div ref={flipGridRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredArtists.map((artist, i) => {
             const followed = isFollowing('artist', artist.id);
             return (
-            <FadeUpItem key={artist.id} delay={(i % 4) * 60}>
+            <FadeUpItem key={artist.id} delay={(i % 4) * 60} data-flip-id={artist.id}>
             <Link
               href={`/${locale}/artists/${artist.id}`}
               className="block p-5 rounded-2xl border card-hover group h-full relative"

@@ -10,11 +10,12 @@ export default function FadeUpItem({
   children,
   className = '',
   delay = 0,
+  ...rest
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;  // stagger delay in ms (e.g. index * 60)
-}) {
+} & React.HTMLAttributes<HTMLDivElement>) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
 
@@ -45,6 +46,7 @@ export default function FadeUpItem({
     <div
       ref={ref}
       className={className}
+      {...rest}
       style={{
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(24px)',
