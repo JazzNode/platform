@@ -266,9 +266,9 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
     return result;
   }, [events, selectedCities, selectedVenues, selectedCategory, followedFirst, isFollowing]);
 
-  // Filter today's events with the same location/category filters
+  // Filter today's events with the same location/category filters + followed-first sorting
   const filteredTodayEvents = useMemo(() => {
-    return todayEvents.filter((e) => {
+    const result = todayEvents.filter((e) => {
       if (selectedVenues.size > 0) {
         if (e.venue_id == null || !selectedVenues.has(e.venue_id)) return false;
       } else if (selectedCities.size > 0) {
@@ -279,7 +279,15 @@ export default function EventsClient({ events, todayEvents = [], cities, venues,
       if (selectedCategory === 'matinee') return e.tags.includes('matinee');
       return true;
     });
-  }, [todayEvents, selectedCities, selectedVenues, selectedCategory]);
+    if (followedFirst) {
+      return [...result].sort((a, b) => {
+        const aF = isFollowing('event', a.id) ? 0 : 1;
+        const bF = isFollowing('event', b.id) ? 0 : 1;
+        return aF - bF;
+      });
+    }
+    return result;
+  }, [todayEvents, selectedCities, selectedVenues, selectedCategory, followedFirst, isFollowing]);
 
   // Key for re-triggering animations on filter change
   const filterKey = useMemo(() => {
