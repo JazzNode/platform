@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
     pageTypeBreakdown,
     highImpLowCtr,
     unclaimedArtists,
+    contentExpansion,
     lastSync,
   ] = await Promise.all([
     // Current period totals
@@ -72,6 +73,9 @@ export async function GET(request: NextRequest) {
 
     // High impression unclaimed artists (business development leads)
     supabase.rpc('gsc_unclaimed_artists', { start_date: currentSince, end_date: currentEnd, row_limit: 15 }),
+
+    // Content expansion: page_type × country cross-analysis
+    supabase.rpc('gsc_content_expansion', { start_date: currentSince, end_date: currentEnd }),
 
     // Last sync log
     supabase.from('gsc_sync_logs').select('*').order('created_at', { ascending: false }).limit(1),
@@ -115,6 +119,7 @@ export async function GET(request: NextRequest) {
     pageTypes: pageTypeBreakdown.data || [],
     opportunities: highImpLowCtr.data || [],
     unclaimedArtists: unclaimedArtists.data || [],
+    contentExpansion: contentExpansion.data || [],
     lastSync: (lastSync.data || [])[0] || null,
   });
 }

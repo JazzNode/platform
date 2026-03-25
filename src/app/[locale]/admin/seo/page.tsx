@@ -43,6 +43,15 @@ interface SeoData {
     avg_position: number;
     top_query: string;
   }[];
+  contentExpansion: {
+    page_type: string;
+    country: string;
+    impressions: number;
+    clicks: number;
+    avg_ctr: number;
+    avg_position: number;
+    page_count: number;
+  }[];
   lastSync: { synced_date: string; rows_upserted: number; created_at: string } | null;
 }
 
@@ -167,6 +176,183 @@ const TYPE_COLORS: Record<string, string> = {
   magazine: '#6B8CA8',
   other: '#666',
 };
+
+// --- Content Expansion Analysis ---
+function ContentExpansionSection({ data, t }: {
+  data: SeoData['contentExpansion'];
+  t: ReturnType<typeof useTranslations>;
+}) {
+  // Group by page_type, then list countries under each
+  const grouped = useMemo(() => {
+    const map = new Map<string, {
+      totalImpressions: number;
+      totalClicks: number;
+      countries: typeof data;
+    }>();
+    for (const row of data) {
+      const existing = map.get(row.page_type) || { totalImpressions: 0, totalClicks: 0, countries: [] };
+      existing.totalImpressions += Number(row.impressions);
+      existing.totalClicks += Number(row.clicks);
+      existing.countries.push(row);
+      map.set(row.page_type, existing);
+    }
+    // Sort by total impressions desc
+    return Array.from(map.entries())
+      .sort(([, a], [, b]) => b.totalImpressions - a.totalImpressions)
+      .map(([type, val]) => ({
+        type,
+        label: PAGE_TYPE_LABELS[type] || type,
+        color: TYPE_COLORS[type] || '#666',
+        ...val,
+        countries: val.countries.sort((a, b) => Number(b.impressions) - Number(a.impressions)),
+      }));
+  }, [data]);
+
+  // Find "opportunity" rows: high impressions but low page count (demand > supply)
+  const opportunities = useMemo(() => {
+    // Get global average pages-per-impression ratio
+    const totalPages = data.reduce((s, r) => s + Number(r.page_count), 0);
+    const totalImp = data.reduce((s, r) => s + Number(r.impressions), 0);
+    if (totalImp === 0) return [];
+    const avgRatio = totalPages / totalImp;
+
+    return data
+      .filter((r) => Number(r.impressions) >= 2)
+      .map((r) => {
+        const ratio = Number(r.page_count) / Number(r.impressions);
+        const demandScore = Number(r.impressions) * (avgRatio / Math.max(ratio, 0.001));
+        return { ...r, demandScore };
+      })
+      .sort((a, b) => b.demandScore - a.demandScore)
+      .slice(0, 8);
+  }, [data]);
+
+  return (
+    <Section title={t('seoExpansionTitle')}>
+      <p className="text-xs text-[var(--muted-foreground)] -mt-3 mb-5">{t('seoExpansionDesc')}</p>
+
+      {/* Page Type Summary Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        {grouped.map((g) => (
+          <div
+            key={g.type}
+            className="rounded-xl border border-[var(--border)] p-4 hover:border-[var(--color-gold)]/30 transition-colors"
+          >
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: g.color }} />
+              <span className="text-xs font-semibold">{g.label}</span>
+            </div>
+            <p className="text-lg font-bold tabular-nums">{g.totalImpressions.toLocaleString()}</p>
+            <p className="text-[10px] text-[var(--muted-foreground)]">
+              {g.totalClicks.toLocaleString()} clicks &middot; {g.countries.length} {t('seoExpansionCountries')}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Opportunity Table: High demand, low coverage */}
+      {opportunities.length > 0 && (
+        <>
+          <h3 className="text-[11px] uppercase tracking-widest text-[var(--muted-foreground)] font-bold mb-3 flex items-center gap-2">
+            <svg className="w-3.5 h-3.5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg>
+            {t('seoExpansionOpportunities')}
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] border-b border-[var(--border)]">
+                  <th className="text-left pb-3 font-medium">Type</th>
+                  <th className="text-left pb-3 font-medium">{t('seoExpansionCountry')}</th>
+                  <th className="text-right pb-3 font-medium w-20">{t('seoImp')}</th>
+                  <th className="text-right pb-3 font-medium w-16">{t('seoClk')}</th>
+                  <th className="text-right pb-3 font-medium w-16">{t('seoExpansionPages')}</th>
+                  <th className="text-right pb-3 font-medium w-16">Pos</th>
+                  <th className="text-right pb-3 font-medium w-20">{t('seoExpansionDemand')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {opportunities.map((o, i) => {
+                  const typeColor = TYPE_COLORS[o.page_type] || '#666';
+                  const demandLevel = o.demandScore > 10 ? 'high' : o.demandScore > 3 ? 'mid' : 'low';
+                  return (
+                    <tr key={i} className="border-b border-[var(--border)]/50 hover:bg-[var(--muted)]/30 transition-colors">
+                      <td className="py-2.5 pr-3">
+                        <span
+                          className="text-[10px] px-1.5 py-0.5 rounded-full font-medium"
+                          style={{ backgroundColor: typeColor + '20', color: typeColor }}
+                        >
+                          {PAGE_TYPE_LABELS[o.page_type] || o.page_type}
+                        </span>
+                      </td>
+                      <td className="pr-3">
+                        <span className="text-xs">{COUNTRY_NAMES[o.country] || o.country.toUpperCase()}</span>
+                      </td>
+                      <td className="text-right tabular-nums text-[var(--muted-foreground)]">{Number(o.impressions).toLocaleString()}</td>
+                      <td className="text-right tabular-nums">{Number(o.clicks).toLocaleString()}</td>
+                      <td className="text-right tabular-nums text-[var(--muted-foreground)]">{Number(o.page_count)}</td>
+                      <td className="text-right tabular-nums text-[var(--muted-foreground)]">{o.avg_position.toFixed(1)}</td>
+                      <td className="text-right">
+                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                          demandLevel === 'high'
+                            ? 'bg-emerald-500/15 text-emerald-400'
+                            : demandLevel === 'mid'
+                            ? 'bg-amber-500/15 text-amber-400'
+                            : 'bg-[var(--muted)] text-[var(--muted-foreground)]'
+                        }`}>
+                          {demandLevel === 'high' ? t('seoExpansionHigh') : demandLevel === 'mid' ? t('seoExpansionMid') : t('seoExpansionLow')}
+                        </span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+
+      {/* Full Heatmap: page_type × country */}
+      <details className="mt-5 group">
+        <summary className="text-[11px] uppercase tracking-widest text-[var(--muted-foreground)] font-bold cursor-pointer hover:text-[var(--foreground)] transition-colors flex items-center gap-1.5">
+          <svg className="w-3 h-3 transition-transform group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          {t('seoExpansionFullBreakdown')}
+        </summary>
+        <div className="mt-3 space-y-4">
+          {grouped.map((g) => (
+            <div key={g.type}>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: g.color }} />
+                <span className="text-xs font-semibold">{g.label}</span>
+                <span className="text-[10px] text-[var(--muted-foreground)]">{g.totalImpressions.toLocaleString()} imp</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {g.countries.map((c) => {
+                  const pct = Math.max(0.15, Number(c.impressions) / Math.max(g.totalImpressions, 1));
+                  return (
+                    <div
+                      key={c.country}
+                      className="px-2 py-1 rounded-lg border border-[var(--border)] text-[10px] hover:border-[var(--color-gold)]/40 transition-colors"
+                      title={`${Number(c.impressions)} imp, ${Number(c.clicks)} clicks, ${Number(c.page_count)} pages, pos ${c.avg_position.toFixed(1)}`}
+                      style={{ opacity: 0.4 + pct * 0.6 }}
+                    >
+                      <span className="font-medium">{COUNTRY_NAMES[c.country] || c.country.toUpperCase()}</span>
+                      <span className="text-[var(--muted-foreground)] ml-1 tabular-nums">{Number(c.impressions)}</span>
+                      <span className="text-[var(--muted-foreground)] ml-1 tabular-nums">({Number(c.page_count)}p)</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </details>
+    </Section>
+  );
+}
 
 export default function AdminSeoPage() {
   const t = useTranslations('adminHQ');
@@ -642,6 +828,11 @@ export default function AdminSeoPage() {
             })}
           </div>
         </Section>
+      )}
+
+      {/* Content Expansion Analysis: page_type × country */}
+      {data.contentExpansion.length > 0 && (
+        <ContentExpansionSection data={data.contentExpansion} t={t} />
       )}
     </div>
   );
