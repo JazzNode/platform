@@ -125,7 +125,7 @@ interface SimLink extends d3.SimulationLinkDatum<SimNode> {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Filter Chip — unified muted gold style                             */
+/*  Filter Chip — neutral grayscale style                              */
 /* ------------------------------------------------------------------ */
 
 function Chip({
@@ -144,10 +144,10 @@ function Chip({
       type="button"
       onClick={onClick}
       className={[
-        'inline-flex items-center justify-center gap-1.5 px-2.5 h-7 rounded-lg text-[11px] leading-none transition-all border whitespace-nowrap',
+        'inline-flex items-center justify-center gap-1.5 px-2.5 h-7 rounded-lg text-[11px] leading-none transition-all border whitespace-nowrap link-lift',
         active
-          ? 'border-[var(--color-gold)]/40 text-[var(--color-gold)] bg-[var(--color-gold)]/8'
-          : 'border-[var(--border)] text-[var(--muted-foreground)] opacity-50 hover:opacity-75',
+          ? 'border-white/20 text-white/80 bg-white/5 hover:border-white/40'
+          : 'border-[var(--border)] text-[var(--muted-foreground)] opacity-50 hover:opacity-75 hover:border-white/15',
       ].join(' ')}
     >
       {dot && (
@@ -329,9 +329,53 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
     bigMerge.append('feMergeNode').attr('in', 'blur');
     bigMerge.append('feMergeNode').attr('in', 'SourceGraphic');
 
+    // ── Cosmic background ──
+
+    // Radial gradient for deep-space vignette
+    const bgGrad = defs.append('radialGradient').attr('id', 'cg-space-bg');
+    bgGrad.append('stop').attr('offset', '0%').attr('stop-color', '#0e0d0b');
+    bgGrad.append('stop').attr('offset', '60%').attr('stop-color', '#0a0908');
+    bgGrad.append('stop').attr('offset', '100%').attr('stop-color', '#060605');
+    svg.append('rect').attr('width', width).attr('height', height).attr('fill', 'url(#cg-space-bg)');
+
+    // Tiny star field
+    const starGroup = svg.append('g').attr('class', 'stars');
+    const starCount = Math.floor(width * height / 2400);
+    for (let i = 0; i < starCount; i++) {
+      const sx = Math.random() * width;
+      const sy = Math.random() * height;
+      const sr = Math.random() * 0.8 + 0.2;
+      const so = Math.random() * 0.4 + 0.08;
+      starGroup.append('circle')
+        .attr('cx', sx).attr('cy', sy).attr('r', sr)
+        .attr('fill', '#fff').attr('opacity', so);
+    }
+
+    // A few slightly brighter "distant stars"
+    for (let i = 0; i < Math.floor(starCount / 8); i++) {
+      const sx = Math.random() * width;
+      const sy = Math.random() * height;
+      starGroup.append('circle')
+        .attr('cx', sx).attr('cy', sy).attr('r', Math.random() * 0.5 + 0.8)
+        .attr('fill', Math.random() > 0.5 ? '#C8A84E' : '#8aa8c8')
+        .attr('opacity', Math.random() * 0.25 + 0.1);
+    }
+
+    // Planet-style radial gradient for nodes
+    const planetGrad = defs.append('radialGradient').attr('id', 'cg-planet-sheen')
+      .attr('cx', '35%').attr('cy', '30%').attr('r', '65%');
+    planetGrad.append('stop').attr('offset', '0%').attr('stop-color', 'rgba(255,255,255,0.25)');
+    planetGrad.append('stop').attr('offset', '50%').attr('stop-color', 'rgba(255,255,255,0.04)');
+    planetGrad.append('stop').attr('offset', '100%').attr('stop-color', 'rgba(0,0,0,0.2)');
+
     const g = svg.append('g');
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.4, 3])
+      .filter((event) => {
+        // Allow pinch (ctrlKey on trackpad) but block regular scroll wheel
+        if (event.type === 'wheel') return event.ctrlKey;
+        return !event.button; // allow drag, touch, etc.
+      })
       .on('zoom', (e) => g.attr('transform', e.transform));
     svg.call(zoom);
 
@@ -383,6 +427,21 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
           }),
       );
 
+    // Subtle orbit rings around center (decorative, in g so they pan/zoom)
+    const centerNode = nodes.find((n) => n.isCenter);
+    if (centerNode) {
+      const orbitG = g.append('g').attr('class', 'orbits');
+      [90, 150, 220].forEach((r, i) => {
+        orbitG.append('circle')
+          .attr('cx', width / 2).attr('cy', height / 2)
+          .attr('r', r)
+          .attr('fill', 'none')
+          .attr('stroke', 'rgba(200, 168, 78, 0.04)')
+          .attr('stroke-width', 0.5)
+          .attr('stroke-dasharray', i === 1 ? '2 6' : 'none');
+      });
+    }
+
     // Center outer ring
     nodeSel
       .filter((d) => !!d.isCenter)
@@ -399,11 +458,18 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       .append('circle')
       .attr('r', (d) => getRadius(d, maxGigs))
       .attr('fill', (d) => getColor(d))
-      .attr('fill-opacity', (d) => (d.isCenter ? 1 : 0.8))
+      .attr('fill-opacity', (d) => (d.isCenter ? 1 : 0.85))
       .attr('stroke', (d) => getColor(d))
       .attr('stroke-width', (d) => (d.isCenter ? 2 : 1))
       .attr('stroke-opacity', (d) => (d.isCenter ? 0.6 : 0.25))
       .attr('filter', (d) => (d.isCenter ? 'url(#cg-glow-big)' : 'url(#cg-glow)'));
+
+    // Planet sheen overlay (gives 3D planet feel)
+    nodeSel
+      .append('circle')
+      .attr('r', (d) => getRadius(d, maxGigs))
+      .attr('fill', 'url(#cg-planet-sheen)')
+      .attr('pointer-events', 'none');
 
     // Labels
     nodeSel
@@ -433,6 +499,7 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
 
         const color = getColor(d);
         linkSel
+          .transition().duration(200)
           .attr('stroke', (l) =>
             (l.source as SimNode).id === d.id || (l.target as SimNode).id === d.id
               ? color
@@ -446,11 +513,13 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
 
         nodeSel
           .select('circle:last-of-type')
+          .transition().duration(200)
           .attr('fill-opacity', (n) =>
             n.id === d.id || connectedIds.has(n.id) ? 1 : 0.15,
           );
         nodeSel
           .select('text')
+          .transition().duration(200)
           .attr('fill-opacity', (n) =>
             n.id === d.id || connectedIds.has(n.id) ? 1 : 0.2,
           );
@@ -472,10 +541,15 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       })
       .on('mouseleave', () => {
         linkSel
+          .transition().duration(300)
           .attr('stroke', 'rgba(200, 168, 78, 0.12)')
           .attr('stroke-opacity', (d) => 0.15 + (d.weight / maxWeight) * 0.5);
-        nodeSel.select('circle:last-of-type').attr('fill-opacity', (d) => (d.isCenter ? 1 : 0.8));
-        nodeSel.select('text').attr('fill-opacity', 1);
+        nodeSel.select('circle:last-of-type')
+          .transition().duration(300)
+          .attr('fill-opacity', (d) => (d.isCenter ? 1 : 0.8));
+        nodeSel.select('text')
+          .transition().duration(300)
+          .attr('fill-opacity', 1);
         setTooltip(null);
       });
 
@@ -539,17 +613,17 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
 
         {/* Min gigs — step buttons */}
         {maxGigCount > 2 && (
-          <div className="inline-flex items-center h-7 rounded-lg border border-[var(--border)] overflow-hidden">
+          <div className="inline-flex items-center h-7 rounded-lg border border-[var(--border)] overflow-hidden hover:border-white/20 transition-all">
             {Array.from({ length: Math.min(maxGigCount, 5) }, (_, i) => i + 1).map((n) => (
               <button
                 key={n}
                 type="button"
                 onClick={() => setMinGigs(minGigs === n ? 1 : n)}
                 className={[
-                  'px-2 h-full text-[11px] leading-none tabular-nums transition-colors',
+                  'px-2 h-full text-[11px] leading-none tabular-nums transition-all',
                   minGigs >= n
-                    ? 'text-[var(--color-gold)] bg-[var(--color-gold)]/8'
-                    : 'text-[var(--muted-foreground)] opacity-40 hover:opacity-70',
+                    ? 'text-white/80 bg-white/5 hover:bg-white/10'
+                    : 'text-[var(--muted-foreground)] opacity-40 hover:opacity-70 hover:bg-white/3',
                   n > 1 ? 'border-l border-[var(--border)]' : '',
                 ].join(' ')}
               >
@@ -564,7 +638,7 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
           <button
             type="button"
             onClick={clearFilters}
-            className="ml-auto h-7 px-2.5 rounded-lg text-[11px] leading-none border border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/30 transition-colors"
+            className="ml-auto h-7 px-2.5 rounded-lg text-[11px] leading-none border border-[var(--border)] text-[var(--muted-foreground)] hover:text-white/80 hover:border-white/20 transition-all link-lift"
           >
             {labels.filterAll}
           </button>
@@ -574,14 +648,14 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       {/* ── Graph ── */}
       <svg
         ref={svgRef}
-        className="w-full rounded-xl border border-[var(--border)] bg-[var(--background)]"
+        className="w-full rounded-xl border border-[var(--border)]"
         style={{ minHeight: 360 }}
       />
 
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="absolute pointer-events-none z-10 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm shadow-lg backdrop-blur-sm"
+          className="absolute pointer-events-none z-10 rounded-xl border border-[var(--border)] bg-[var(--card)] px-4 py-3 text-sm shadow-lg backdrop-blur-sm animate-in fade-in duration-200"
           style={{
             left: tooltip.x + 16,
             top: tooltip.y - 12,
