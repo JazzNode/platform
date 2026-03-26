@@ -164,6 +164,17 @@
     "venueStats": "Data Tempat",
     "totalGigs": "Total Pertunjukan",
     "capacitySeats": "kursi",
+    "nextShow": "Pertunjukan Berikutnya",
+    "viewDetails": "Lihat Detail",
+    "aboutVenue": "Tentang Tempat",
+    "residentArtists": "Artis Unggulan",
+    "practicalInfo": "Info Praktis",
+    "stayConnected": "Tetap Terhubung",
+    "stayConnectedDesc": "Ikuti tempat ini untuk mendapat notifikasi tentang pertunjukan dan pengumuman.",
+    "contactInfo": "Kontak",
+    "paymentMethods": "Pembayaran",
+    "languageFriendly": "Bahasa",
+    "venueCapacity": "Kapasitas",
     "jazzNightly": "Setiap Malam",
     "jazzWeekends": "Akhir Pekan",
     "jazzOccasional": "Pertunjukan Tidak Tetap",
@@ -197,7 +208,22 @@
     "noNewEvents": "Tidak ada acara yang baru ditambahkan.",
     "newEventsPageDescription": "Jelajahi acara jazz yang baru ditambahkan.",
     "today": "Hari ini",
-    "yesterday": "Kemarin"
+    "yesterday": "Kemarin",
+    "acceptingStudentsLabel": "Menerima Murid",
+    "followers": "pengikut",
+    "performances": "pertunjukan",
+    "collaborators": "kolaborator",
+    "yearsActive": "tahun aktif",
+    "aboutSection": "Tentang",
+    "seeMore": "...lihat lainnya",
+    "seeLess": "tutup",
+    "quickFacts": "Info Singkat",
+    "similarArtists": "Artis Serupa",
+    "profileCompleteness": "Kelengkapan",
+    "addMissing": "Lengkapi profil",
+    "tickets": "Tiket",
+    "availableForHire": "Tersedia untuk Dipekerjakan",
+    "downloadEpk": "Unduh EPK"
   },
   "auth": {
     "signIn": "Masuk",
@@ -1087,7 +1113,6 @@
     "referrerSources": "Sumber Rujukan",
     "cityDistribution": "Distribusi Kota",
     "noData": "Tidak ada data untuk periode ini.",
-    "downloadEpk": "Unduh EPK",
     "customDomainTeaser": "Domain Kustom — Segera Hadir",
     "submitInquiry": "Kirim Permintaan",
     "inquiryName": "Nama Anda",
@@ -1108,7 +1133,8 @@
     "views": "tayangan",
     "noEventsData": "Tidak ada data acara untuk periode ini.",
     "monthlyRemaining": "{remaining}/{limit} sisa bulan ini",
-    "broadcastLimitReached": "Anda telah mencapai batas siaran bulanan. Upgrade ke Elite untuk siaran tak terbatas."
+    "broadcastLimitReached": "Anda telah mencapai batas siaran bulanan. Upgrade ke Elite untuk siaran tak terbatas.",
+    "shoutouts": "Pujian"
   },
   "tiers": {
     "metaTitle": "Paket & Tier",
@@ -1314,5 +1340,45 @@
       "admin": "JazzNode HQ",
       "hint": "Ganti identitas"
     }
+  },
+  "shoutouts": {
+    "sectionTitle": "Pujian",
+    "writeShoutout": "Tinggalkan Pujian",
+    "textPlaceholder": "Tulis pujian Anda...",
+    "submitShoutout": "Kirim Pujian",
+    "deleteShoutout": "Hapus",
+    "pinShoutout": "Sematkan",
+    "unpinShoutout": "Lepas Sematan",
+    "maxPinsReached": "Maksimal 3 pin",
+    "whatPeopleSay": "Kata Orang",
+    "peopleSay": "orang merekomendasikan",
+    "noShoutouts": "Belum ada pujian",
+    "beFirst": "Jadilah yang pertama memberikan pujian",
+    "tags": {
+      "great_musicianship": "Kemampuan Musik Hebat",
+      "amazing_live": "Penampilan Live Luar Biasa",
+      "great_collaborator": "Kolaborator Hebat",
+      "creative": "Kreatif & Orisinal",
+      "great_teacher": "Guru Luar Biasa",
+      "inspiring": "Menginspirasi",
+      "professional": "Profesional",
+      "reliable": "Dapat Diandalkan",
+      "beautiful_tone": "Nada Suara Indah"
+    }
+  },
+  "messaging": {
+    "intentSelectorTitle": "Ingin membicarakan apa?",
+    "intentSelectorSubtitle": "Pilih topik untuk memulai percakapan dengan {artistName}",
+    "intentBooking": "Saya ingin memesan Anda",
+    "intentLesson": "Saya tertarik les",
+    "intentCollaboration": "Mari berkolaborasi",
+    "intentGeneral": "Hanya menyapa",
+    "bookingPrefill": "Halo {artistName}! Saya ingin mengundang Anda tampil.\n\nJenis acara:\nTanggal:\nTempat:\nAnggaran:\nDetail:",
+    "lessonPrefill": "Halo {artistName}! Saya tertarik les.\n\nLevel:\nInstrumen:\nJadwal (online/offline):",
+    "collaborationPrefill": "Halo {artistName}! Saya ingin berkolaborasi.\n\nJenis proyek:\nTimeline:\nDetail:",
+    "cancel": "Batal",
+    "intentTagBooking": "Booking",
+    "intentTagLesson": "Les",
+    "intentTagCollab": "Kolaborasi"
   }
 }

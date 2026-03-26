@@ -16,6 +16,7 @@ export interface GraphNode {
   photoUrl: string | null;
   gigCount: number;
   isCenter?: boolean;
+  nodeType?: 'artist' | 'venue'; // venue nodes render as rounded squares
 }
 
 export interface GraphLink {
@@ -39,6 +40,7 @@ interface Props {
     filterAll: string;
     typePerson: string;
     typeGroup: string;
+    typeVenue?: string;
   };
 }
 
@@ -80,19 +82,23 @@ const INSTRUMENT_COLORS: Record<string, string> = {
 
 const DEFAULT_COLOR = '#888';
 const CENTER_COLOR = '#C8A84E';
+const VENUE_COLOR = '#3a3a3a'; // subtle dark gray — slightly brighter than space bg
+const VENUE_GLOW_COLOR = 'rgba(120, 120, 120, 0.12)'; // very subtle gray halo
 
 function instrumentKey(inst: string | null): string {
   if (!inst) return '';
   return inst.toLowerCase().replace(/[\s-]/g, '_');
 }
 
-function getColor(node: GraphNode): string {
+function getColor(node: GraphNode | SimNode): string {
   if (node.isCenter) return CENTER_COLOR;
+  if (node.nodeType === 'venue') return VENUE_COLOR;
   return INSTRUMENT_COLORS[instrumentKey(node.instrument)] || DEFAULT_COLOR;
 }
 
-function getRadius(node: GraphNode, maxGigs: number): number {
+function getRadius(node: GraphNode | SimNode, maxGigs: number): number {
   if (node.isCenter) return 26;
+  if (node.nodeType === 'venue') return Math.max(8, 8 + (node.gigCount / maxGigs) * 12);
   return Math.max(6, 6 + (node.gigCount / maxGigs) * 16);
 }
 
@@ -118,6 +124,7 @@ interface SimNode extends d3.SimulationNodeDatum {
   photoUrl: string | null;
   gigCount: number;
   isCenter?: boolean;
+  nodeType?: 'artist' | 'venue';
 }
 
 interface SimLink extends d3.SimulationLinkDatum<SimNode> {
@@ -202,17 +209,20 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
     return [...seen.values()];
   }, [collaborators]);
 
-  // ── Derived: has both persons and groups? ──
+  // ── Derived: has type variety (persons, groups, venues)? ──
   const hasTypeVariety = useMemo(() => {
-    let hasPerson = false;
-    let hasGroup = false;
+    let types = 0;
+    let hasPerson = false, hasGroup = false, hasVenue = false;
     for (const c of collaborators) {
-      if (c.artistType === 'person') hasPerson = true;
-      else if (c.artistType === 'group' || c.artistType === 'big band') hasGroup = true;
-      if (hasPerson && hasGroup) return true;
+      if (c.nodeType === 'venue') { if (!hasVenue) { hasVenue = true; types++; } }
+      else if (c.artistType === 'person') { if (!hasPerson) { hasPerson = true; types++; } }
+      else if (c.artistType === 'group' || c.artistType === 'big band') { if (!hasGroup) { hasGroup = true; types++; } }
+      if (types >= 2) return true;
     }
     return false;
   }, [collaborators]);
+
+  const hasVenues = useMemo(() => collaborators.some((c) => c.nodeType === 'venue'), [collaborators]);
 
   // ── Derived: gig range ──
   const maxGigCount = useMemo(
@@ -230,11 +240,11 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
         const color = INSTRUMENT_COLORS[instrumentKey(c.instrument)] || DEFAULT_COLOR;
         if (!activeInstruments.has(color)) continue;
       }
-      // type filter (person vs group)
+      // type filter (person vs group vs venue)
       if (activeType !== null) {
-        const isGroup = c.artistType === 'group' || c.artistType === 'big band';
-        if (activeType === 'person' && isGroup) continue;
-        if (activeType === 'group' && !isGroup) continue;
+        if (activeType === 'venue') { if (c.nodeType !== 'venue') continue; }
+        else if (activeType === 'person') { if (c.nodeType === 'venue' || c.artistType !== 'person') continue; }
+        else if (activeType === 'group') { if (c.nodeType === 'venue' || (c.artistType !== 'group' && c.artistType !== 'big band')) continue; }
       }
       // min gigs filter
       if (c.gigCount < minGigs) continue;
@@ -296,7 +306,7 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
 
     const container = containerRef.current;
     const width = container.clientWidth;
-    const height = Math.min(500, Math.max(360, width * 0.55));
+    const height = Math.max(360, Math.round(width * 0.6));
 
     const svg = d3.select(svgRef.current);
     svg.selectAll('*').remove();
@@ -453,8 +463,10 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       .attr('stroke-opacity', 0.25)
       .attr('filter', 'url(#cg-glow-big)');
 
-    // Main circles
+    // Main shapes — circles for artists, rounded rects for venues
+    // Artist circles
     nodeSel
+      .filter((d) => d.nodeType !== 'venue')
       .append('circle')
       .attr('r', (d) => getRadius(d, maxGigs))
       .attr('fill', (d) => getColor(d))
@@ -464,8 +476,41 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       .attr('stroke-opacity', (d) => (d.isCenter ? 0.6 : 0.25))
       .attr('filter', (d) => (d.isCenter ? 'url(#cg-glow-big)' : 'url(#cg-glow)'));
 
-    // Planet sheen overlay (gives 3D planet feel)
+    // Venue diamonds — dark body with subtle gray halo
+    // Outer glow ring
     nodeSel
+      .filter((d) => d.nodeType === 'venue')
+      .append('rect')
+      .attr('width', (d) => getRadius(d, maxGigs) * 2.4)
+      .attr('height', (d) => getRadius(d, maxGigs) * 2.4)
+      .attr('x', (d) => -getRadius(d, maxGigs) * 1.2)
+      .attr('y', (d) => -getRadius(d, maxGigs) * 1.2)
+      .attr('rx', 3)
+      .attr('ry', 3)
+      .attr('transform', 'rotate(45)')
+      .attr('fill', 'none')
+      .attr('stroke', VENUE_GLOW_COLOR)
+      .attr('stroke-width', 1.5)
+      .attr('filter', 'url(#cg-glow-big)');
+    // Inner body
+    nodeSel
+      .filter((d) => d.nodeType === 'venue')
+      .append('rect')
+      .attr('width', (d) => getRadius(d, maxGigs) * 1.6)
+      .attr('height', (d) => getRadius(d, maxGigs) * 1.6)
+      .attr('x', (d) => -getRadius(d, maxGigs) * 0.8)
+      .attr('y', (d) => -getRadius(d, maxGigs) * 0.8)
+      .attr('rx', 3)
+      .attr('ry', 3)
+      .attr('transform', 'rotate(45)')
+      .attr('fill', VENUE_COLOR)
+      .attr('fill-opacity', 0.85)
+      .attr('stroke', 'rgba(150, 150, 150, 0.2)')
+      .attr('stroke-width', 1);
+
+    // Planet sheen overlay (artists only — skip venues)
+    nodeSel
+      .filter((d) => d.nodeType !== 'venue')
       .append('circle')
       .attr('r', (d) => getRadius(d, maxGigs))
       .attr('fill', 'url(#cg-planet-sheen)')
@@ -594,7 +639,7 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
           <span className="w-px h-4 bg-[var(--border)] mx-0.5" />
         )}
 
-        {/* Person / Group toggle */}
+        {/* Person / Group / Venue toggle */}
         {hasTypeVariety && (
           <>
             <Chip active={activeType === 'person'} onClick={() => toggleType('person')}>
@@ -603,6 +648,11 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
             <Chip active={activeType === 'group'} onClick={() => toggleType('group')}>
               {labels.typeGroup}
             </Chip>
+            {hasVenues && (
+              <Chip active={activeType === 'venue'} onClick={() => toggleType('venue')}>
+                {labels.typeVenue || 'Venues'}
+              </Chip>
+            )}
           </>
         )}
 
@@ -649,7 +699,7 @@ export default function CollaborationGraph({ centerArtist, collaborators, links,
       <svg
         ref={svgRef}
         className="w-full rounded-xl border border-[var(--border)]"
-        style={{ minHeight: 360 }}
+        style={{ minHeight: 320 }}
       />
 
       {/* Tooltip */}

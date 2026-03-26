@@ -15,6 +15,7 @@ import FollowButton from '@/components/FollowButton';
 import ClaimButton from '@/components/ClaimButton';
 import UnclaimedNotice from '@/components/UnclaimedNotice';
 import BadgeDock from '@/components/BadgeDock';
+import HeroBadgeIcons from '@/components/HeroBadgeIcons';
 import BadgeCategorySection from '@/components/BadgeCategorySection';
 import type { BadgeProgress } from '@/lib/badges';
 import MessageArtistButton from '@/components/MessageArtistButton';
@@ -22,14 +23,15 @@ import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
 import RecordNav from '@/components/RecordNav';
 import PageViewTracker from '@/components/PageViewTracker';
-import HireMeButton from '@/components/HireMeButton';
 import ShareButton from '@/components/ShareButton';
+import ProfileCompleteness from '@/components/ProfileCompleteness';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import TierGate from '@/components/TierGate';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import FeaturedWall from '@/components/FeaturedWall';
 import CollaborationGraph from '@/components/CollaborationGraph';
 import type { GraphNode, GraphLink } from '@/components/CollaborationGraph';
+import ArtistShoutoutsSection from '@/components/ArtistShoutoutsSection';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -368,6 +370,21 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const hasNetwork = hasVersatility || topCollaborators.length > 0;
   const hasHubs = artistVenues.length > 0 || artistCities.length > 0;
 
+  // ── Similar Artists ──
+  const similarArtists = artists
+    .filter((a) => {
+      if (a.id === artist.id) return false;
+      if (a.fields.type !== 'person' && f.type === 'person') return false;
+      return a.fields.primary_instrument === f.primary_instrument || a.fields.country_code === f.country_code;
+    })
+    .sort((a, b) => {
+      // Prioritize same instrument + same country
+      const aScore = (a.fields.primary_instrument === f.primary_instrument ? 2 : 0) + (a.fields.country_code === f.country_code ? 1 : 0);
+      const bScore = (b.fields.primary_instrument === f.primary_instrument ? 2 : 0) + (b.fields.country_code === f.country_code ? 1 : 0);
+      return bScore - aScore;
+    })
+    .slice(0, 8);
+
   // ─── JSON-LD structured data (schema.org) ───
   const localeToInLanguage: Record<string, string> = {
     en: 'en', zh: 'zh-Hant', ja: 'ja', ko: 'ko', th: 'th', id: 'id',
@@ -418,108 +435,176 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       </Link>
 
       <div className="space-y-12">
-      {/* ═══ Profile ═══ */}
+      {/* ═══ Hero Cover + Profile ═══ */}
       <FadeUp>
-        <div className="flex flex-col md:flex-row gap-10 items-start">
-          {/* Photo */}
-          <ArtistPhotoUpload
-            artistId={artist.id}
-            artistName={artistDisplayName(f, locale)}
-            currentPhotoUrl={photoUrl(f.photo_url)}
-            size="md"
-          />
+        {/* Cover gradient */}
+        <div className="relative h-48 md:h-56 rounded-2xl overflow-hidden bg-gradient-to-br from-[#1a1510] via-[#12110e] to-[var(--background)]">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(200,168,78,0.06),transparent_60%)]" />
+        </div>
 
-          <div className="flex-1 space-y-5">
+        {/* Profile row */}
+        <div className="-mt-16 px-2 sm:px-6 relative z-10">
+          <div className="flex flex-col md:flex-row gap-5 md:gap-8 items-start">
+            {/* Photo */}
             <div>
-              <div className="inline-flex items-start gap-1">
-                <EditableName
-                  entityType="artist"
-                  entityId={artist.id}
-                  field={artistDisplayNameField(f, locale)}
-                  value={artistDisplayName(f, locale)}
-                  fieldOptions={[
-                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
-                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
-                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
-                  ]}
-                  className="font-serif text-4xl sm:text-5xl font-bold"
-                  tag="h1"
-                />
-                {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(artistDisplayName(f, locale)) ? 'mt-1 sm:mt-1.5' : 'mt-0'}`} />}
+              <ArtistPhotoUpload
+                artistId={artist.id}
+                artistName={artistDisplayName(f, locale)}
+                currentPhotoUrl={photoUrl(f.photo_url)}
+                size="md"
+              />
+            </div>
+
+            {/* Identity */}
+            <div className="flex-1 space-y-3 pt-1 md:pt-8 min-w-0">
+              {/* Name */}
+              <div>
+                <div className="inline-flex items-start gap-1">
+                  <EditableName
+                    entityType="artist"
+                    entityId={artist.id}
+                    field={artistDisplayNameField(f, locale)}
+                    value={artistDisplayName(f, locale)}
+                    fieldOptions={[
+                      { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                      { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                      { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                    ]}
+                    className="font-serif text-4xl sm:text-5xl font-bold"
+                    tag="h1"
+                  />
+                  {f.tier != null && f.tier >= 1 && <VerifiedBadge label={t('claimed')} className={`!top-0 !ml-0 ${/[a-z]$/.test(artistDisplayName(f, locale)) ? 'mt-1 sm:mt-1.5' : 'mt-0'}`} />}
+                </div>
+                {f.name_en && f.name_local && f.name_en !== f.name_local && (
+                  <EditableName
+                    entityType="artist"
+                    entityId={artist.id}
+                    field="name_en"
+                    value={f.name_en}
+                    fieldOptions={[
+                      { field: 'name_local', label: 'name_local', value: f.name_local || '' },
+                      { field: 'name_en', label: 'name_en', value: f.name_en || '' },
+                      { field: 'display_name', label: 'display_name', value: f.display_name || '' },
+                    ]}
+                    className="mt-1 text-xl text-[var(--muted-foreground)]"
+                    tag="p"
+                  />
+                )}
               </div>
-              {f.name_en && f.name_local && f.name_en !== f.name_local && (
-                <EditableName
-                  entityType="artist"
-                  entityId={artist.id}
-                  field="name_en"
-                  value={f.name_en}
-                  fieldOptions={[
-                    { field: 'name_local', label: 'name_local', value: f.name_local || '' },
-                    { field: 'name_en', label: 'name_en', value: f.name_en || '' },
-                    { field: 'display_name', label: 'display_name', value: f.display_name || '' },
-                  ]}
-                  className="mt-1 text-xl text-[var(--muted-foreground)]"
-                  tag="p"
-                />
-              )}
-            </div>
 
-            {/* Tags + Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
-              <EditableInstruments
-                entityId={artist.id}
-                primaryInstrument={f.primary_instrument}
-                instrumentList={f.instrument_list}
-                primaryInstrumentLabel={f.primary_instrument ? instLabel(f.primary_instrument) : undefined}
-              />
-              {f.type && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
-                  {f.type === 'person' ? t('musicians') : f.type === 'big band' ? t('bigBands') : t('groups')}
-                </span>
-              )}
-              {f.country_code && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl border border-[rgba(240,237,230,0.1)] text-[var(--muted-foreground)]">
-                  {f.country_code}
-                </span>
-              )}
-              {f.is_master && (
-                <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
-                  Master
-                </span>
-              )}
-              <TierGate entityType="artist" featureKey="verified_badge" currentTier={f.tier ?? 0}>
-                {f.verification_status === 'Verified' && (
-                  <span className="text-xs uppercase tracking-widest px-3 py-1.5 rounded-xl bg-gold text-[#0A0A0A] font-bold">
-                    &#10003; {t('verified')}
-                  </span>
+              {/* Headline: instrument · type · country */}
+              <p className="text-sm text-[var(--muted-foreground)] flex flex-wrap items-center gap-1">
+                {f.primary_instrument && (
+                  <>
+                    <EditableInstruments
+                      entityId={artist.id}
+                      primaryInstrument={f.primary_instrument}
+                      instrumentList={f.instrument_list}
+                      primaryInstrumentLabel={f.primary_instrument ? instLabel(f.primary_instrument) : undefined}
+                    />
+                  </>
                 )}
-              </TierGate>
-              <span className="text-[var(--muted-foreground)]/30 select-none">|</span>
-              <TierGate entityType="artist" featureKey="available_for_hire" currentTier={f.tier ?? 0}>
-                {f.available_for_hire && (
-                  <HireMeButton artistId={artist.id} artistName={artistDisplayName(f, locale)} />
+                {f.type && (
+                  <>
+                    <span className="text-[var(--muted-foreground)]/30">·</span>
+                    <span className="text-xs uppercase tracking-widest">
+                      {f.type === 'person' ? t('musicians') : f.type === 'big band' ? t('bigBands') : t('groups')}
+                    </span>
+                  </>
                 )}
-              </TierGate>
-              <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}
-                fallback={<MessageArtistButton artistId={artist.id} claimed={false} />}>
-                <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} />
-              </TierGate>
-              <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
-              <FollowButton itemType="artist" itemId={artist.id} variant="full" followerCount={followerCount} />
-              <ShareButton
-                title={artistDisplayName(f, locale)}
-                url={`/${locale}/artists/${slug}`}
-                text={[
-                  `${artistDisplayName(f, locale)}${f.primary_instrument ? ` — ${instLabel(f.primary_instrument)}` : ''}`,
-                  localized(f as Record<string, unknown>, 'bio', locale)?.slice(0, 100) || localized(f as Record<string, unknown>, 'bio_short', locale)?.slice(0, 100) || '',
-                  'via JazzNode — The Jazz Scene, Connected.',
-                ].filter(Boolean).join('\n')}
-                variant="compact"
-                label={t('share')}
+                {f.country_code && (
+                  <>
+                    <span className="text-[var(--muted-foreground)]/30">·</span>
+                    <span className="text-xs uppercase tracking-widest">{f.country_code}</span>
+                  </>
+                )}
+                {f.is_master && (
+                  <>
+                    <span className="text-[var(--muted-foreground)]/30">·</span>
+                    <span className="text-xs uppercase tracking-widest text-gold font-bold">Master</span>
+                  </>
+                )}
+              </p>
+
+              {/* Badge icons + Status badges — client component for SVG rendering */}
+              <HeroBadgeIcons
+                badges={artistBadgeProgress.filter((b) => b.earned).map((b) => ({ badge_id: b.badge_id, name: b.name }))}
+                availableForHire={!!f.available_for_hire}
+                acceptingStudents={!!f.accepting_students}
+                hireLabel={t('availableForHire')}
+                studentsLabel={t('acceptingStudentsLabel')}
               />
             </div>
+          </div>
 
-            {/* Data source notice */}
+          {/* Stats bar */}
+          <div className="flex gap-6 sm:gap-10 mt-5 px-1">
+            <div>
+              <div className="text-lg font-bold">{followerCount}</div>
+              <div className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">{t('followers')}</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold">{allEvents.length}</div>
+              <div className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">{t('performances')}</div>
+            </div>
+            {coAppearances.size > 0 && (
+              <div>
+                <div className="text-lg font-bold">{coAppearances.size}</div>
+                <div className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">{t('collaborators')}</div>
+              </div>
+            )}
+            {(() => {
+              const oldestEvent = allEvents[allEvents.length - 1];
+              if (!oldestEvent?.fields.start_at) return null;
+              const years = new Date().getFullYear() - new Date(oldestEvent.fields.start_at).getFullYear();
+              if (years < 1) return null;
+              return (
+                <div>
+                  <div className="text-lg font-bold">{years}</div>
+                  <div className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)]">{t('yearsActive')}</div>
+                </div>
+              );
+            })()}
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex flex-wrap items-center gap-2 mt-4 px-1">
+            <FollowButton itemType="artist" itemId={artist.id} variant="full" followerCount={followerCount} />
+            <TierGate entityType="artist" featureKey="inbox" currentTier={f.tier ?? 0}
+              fallback={<MessageArtistButton artistId={artist.id} claimed={false} availableForHire={!!f.available_for_hire} acceptingStudents={!!f.accepting_students} artistName={artistDisplayName(f, locale)} />}>
+              <MessageArtistButton artistId={artist.id} claimed={!!f.tier && f.tier >= 1} availableForHire={!!f.available_for_hire} acceptingStudents={!!f.accepting_students} artistName={artistDisplayName(f, locale)} />
+            </TierGate>
+            <ClaimButton targetType="artist" targetId={artist.id} targetName={artistDisplayName(f, locale)} />
+            <ShareButton
+              title={artistDisplayName(f, locale)}
+              url={`/${locale}/artists/${slug}`}
+              text={[
+                `${artistDisplayName(f, locale)}${f.primary_instrument ? ` — ${instLabel(f.primary_instrument)}` : ''}`,
+                localized(f as Record<string, unknown>, 'bio', locale)?.slice(0, 100) || localized(f as Record<string, unknown>, 'bio_short', locale)?.slice(0, 100) || '',
+                'via JazzNode — The Jazz Scene, Connected.',
+              ].filter(Boolean).join('\n')}
+              variant="compact"
+              label={t('share')}
+            />
+            {/* EPK Download */}
+            <TierGate entityType="artist" featureKey="epk_basic" currentTier={f.tier ?? 0}>
+              <a
+                href={`/api/artist/epk?artistId=${artist.id}`}
+                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest px-3 py-2 rounded-full border border-[var(--border)] text-[var(--muted-foreground)] hover:border-gold/30 hover:text-gold transition-colors"
+                title={t('downloadEpk')}
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                EPK
+              </a>
+            </TierGate>
+          </div>
+
+          {/* Data source notice */}
+          <div className="mt-3 px-1">
             {f.data_source === 'user' ? (
               <p className="text-xs text-gold/70 flex items-center gap-1.5">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
@@ -531,27 +616,60 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
             {f.data_source === 'admin' && f.updated_by && (
               <AdminEditedByBadge updatedBy={f.updated_by} />
             )}
+          </div>
 
-            {/* Bio */}
-            <EditableContent
-              entityType="artist"
-              entityId={artist.id}
-              fieldPrefix="bio"
-              locale={locale}
-              content={bioFull}
-              shortContent={bioShort}
-              contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
-              shortContentClassName="text-[var(--foreground)] font-medium text-lg leading-relaxed"
-              wrapperClassName="border-t border-[var(--border)] pt-5"
-            />
-            {!bioFull && desc && (
-              <div className="border-t border-[var(--border)] pt-5">
-                <p className="text-[#C4BFB3] leading-relaxed">{desc}</p>
-              </div>
-            )}
+          {/* Profile completeness (owner only) */}
+          <ProfileCompleteness
+            artistId={artist.id}
+            hasPhoto={!!photoUrl(f.photo_url)}
+            hasBio={!!(bioFull || bioShort)}
+            hasSocialLinks={!!(f.website_url || f.spotify_url || f.youtube_url || f.instagram || f.facebook_url)}
+            hasInstruments={!!(f.primary_instrument || (f.instrument_list && f.instrument_list.length > 0))}
+            hasTeaching={!!f.accepting_students}
+            hasGear={artistGear.length > 0}
+          />
+        </div>
+      </FadeUp>
 
-            {/* Social Icons — admin-editable, with placeholder for unclaimed */}
-            <TierGate entityType="artist" featureKey="social_links" currentTier={f.tier ?? 0}>
+      {/* ═══ About ═══ */}
+      <FadeUp>
+        <section className="border-t border-[var(--border)] pt-10">
+          <h2 className="font-serif text-2xl font-bold mb-5">{t('aboutSection')}</h2>
+
+          {/* Bio with see more */}
+          <EditableContent
+            entityType="artist"
+            entityId={artist.id}
+            fieldPrefix="bio"
+            locale={locale}
+            content={bioFull}
+            shortContent={bioShort}
+            contentClassName="text-[#C4BFB3] leading-relaxed whitespace-pre-line"
+            shortContentClassName="text-[var(--foreground)] font-medium text-lg leading-relaxed"
+          />
+          {!bioFull && desc && (
+            <p className="text-[#C4BFB3] leading-relaxed mt-3">{desc}</p>
+          )}
+
+          {/* Quick Facts */}
+          {(f.instrument_list?.length > 0 || f.country_code) && (
+            <div className="flex flex-wrap gap-2 mt-5">
+              {(f.instrument_list || []).map((inst: string) => (
+                <span key={inst} className="text-xs px-3 py-1.5 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
+                  {instLabel(inst)}
+                </span>
+              ))}
+              {f.country_code && (
+                <span className="text-xs px-3 py-1.5 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
+                  {f.country_code}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Social links */}
+          <TierGate entityType="artist" featureKey="social_links" currentTier={f.tier ?? 0}>
+            <div className="mt-5">
               <EditableSocialLinks
                 entityType="artist"
                 entityId={artist.id}
@@ -564,9 +682,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   facebook_url: f.facebook_url,
                 }}
               />
-            </TierGate>
-          </div>
-        </div>
+            </div>
+          </TierGate>
+        </section>
       </FadeUp>
 
       {/* ═══ Media Showcase: Spotify + YouTube ═══ */}
@@ -668,57 +786,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         <FeaturedWall artistId={artist.id} />
       </TierGate>
 
-      {/* ═══ Members (group / big band only) ═══ */}
-      {isGroupType && groupMembers.length > 0 && (
-        <FadeUp>
-          <section className="border-t border-[var(--border)] pt-12">
-            <h2 className="font-serif text-2xl font-bold mb-8">{t('members')}</h2>
-            <div className="space-y-2">
-              {groupMembers.map((member) => (
-                <Link
-                  key={member.id}
-                  href={`/${locale}/artists/${member.id}`}
-                  className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--card)] transition-colors group"
-                >
-                  {photoUrl(member.fields.photo_url) ? (
-                    <Image
-                      src={photoUrl(member.fields.photo_url)!}
-                      alt={artistDisplayName(member.fields, locale)}
-                      width={36} height={36}
-                      className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
-                      sizes="36px"
-                    />
-                  ) : (
-                    <div className="w-9 h-9 rounded-full bg-[var(--card)] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">
-                      ♪
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <span className="text-sm font-medium group-hover:text-gold transition-colors truncate block">
-                      {artistDisplayName(member.fields, locale)}
-                    </span>
-                    {member.instruments.length > 0 && (
-                      <span className="text-xs text-[var(--muted-foreground)]">
-                        {member.instruments.map((i) => instLabel(i)).join(', ')}
-                      </span>
-                    )}
-                  </div>
-                  {member.role === 'bandleader' && (
-                    <span className="text-xs px-2 py-0.5 rounded-lg bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 shrink-0">
-                      {t('bandleader')}
-                    </span>
-                  )}
-                  {member.fields.primary_instrument && member.instruments.length === 0 && (
-                    <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] shrink-0">
-                      {instLabel(member.fields.primary_instrument)}
-                    </span>
-                  )}
-                </Link>
-              ))}
-            </div>
-          </section>
-        </FadeUp>
-      )}
+      {/* Members section removed — info is in the collaboration graph */}
 
       {/* ═══ Upcoming Gigs ═══ */}
       {upcomingEvents.length > 0 && (
@@ -728,7 +796,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               <span className="pulse-dot" />
               {t('upcomingGigs')}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="space-y-3">
               {upcomingEvents.slice(0, 6).map((event, i) => {
                 const tz = event.fields.timezone || 'Asia/Taipei';
                 const venue = resolveLinks(event.fields.venue_id, venues)[0];
@@ -739,45 +807,43 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   .filter(Boolean)
                   .filter((a) => a.id !== artist.id)
                   .map((a) => artistDisplayName(a.fields, locale));
-                const eventTags = resolveLinks(event.fields.tag_list, tagMap)
-                  .map((tag) => tag.fields.name)
-                  .filter(Boolean) as string[];
+                const startDate = event.fields.start_at ? new Date(event.fields.start_at) : null;
+                const month = startDate ? startDate.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale, { month: 'short', timeZone: tz }) : '';
+                const dayParts = startDate ? new Intl.DateTimeFormat(locale === 'zh' ? 'zh-TW' : locale, { day: 'numeric', timeZone: tz }).formatToParts(startDate) : [];
+                const day = dayParts.find(p => p.type === 'day')?.value || '';
+                const dow = startDate ? startDate.toLocaleDateString(locale === 'zh' ? 'zh-TW' : locale, { weekday: 'short', timeZone: tz }) : '';
 
                 return (
-                  <FadeUpItem key={event.id} delay={(i % 3) * 60}>
-                  <Link href={`/${locale}/events/${event.id}`} className="block bg-[var(--card)] p-6 rounded-2xl border border-[var(--border)] card-hover group h-full">
-                    {venue && (
-                      <p className="text-[10px] uppercase tracking-widest text-[var(--muted-foreground)] mb-1">{displayName(venue.fields)}</p>
-                    )}
-                    <div className="text-xs uppercase tracking-widest text-gold mb-2">
-                      {eventTags.includes('matinee') && '☀️ '}{formatDate(event.fields.start_at, locale, tz)} · {formatTime(event.fields.start_at, tz)}
-                    </div>
-                    <h3 className="font-serif text-lg font-bold group-hover:text-gold transition-colors duration-300 leading-tight">
-                      {eventTitle(event.fields, locale)}
-                    </h3>
-                    {sidemen.length > 0 && (
-                      <p className="text-xs text-[var(--muted-foreground)] mt-2">
-                        w/ {sidemen.join(', ')}
-                      </p>
-                    )}
-                    {eventTags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mt-3">
-                        {eventTags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-full bg-gold/8 text-gold/70 border border-gold/15"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                  <FadeUpItem key={event.id} delay={(i % 6) * 40}>
+                    <Link
+                      href={`/${locale}/events/${event.id}`}
+                      className="flex items-center gap-4 p-4 rounded-2xl border border-[var(--border)] hover:border-gold/20 transition-colors group"
+                    >
+                      {/* Date block */}
+                      <div className="text-center shrink-0 w-14">
+                        <div className="text-[10px] uppercase tracking-widest text-gold font-semibold">{month}</div>
+                        <div className="text-2xl font-bold font-serif leading-tight">{day}</div>
+                        <div className="text-[10px] text-[var(--muted-foreground)]">{dow}</div>
                       </div>
-                    )}
-                    {event.fields.source_url && (
-                      <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-gold group-hover:text-gold-bright transition-colors">
-                        {t('getTickets')} ↗
-                      </span>
-                    )}
-                  </Link>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-serif font-bold group-hover:text-gold transition-colors duration-300 truncate">
+                          {eventTitle(event.fields, locale)}
+                        </h3>
+                        {venue && (
+                          <p className="text-xs text-[var(--muted-foreground)] mt-0.5">{displayName(venue.fields)}</p>
+                        )}
+                        {sidemen.length > 0 && (
+                          <p className="text-xs text-[var(--muted-foreground)]/60 mt-0.5">w/ {sidemen.join(', ')}</p>
+                        )}
+                      </div>
+                      {/* Ticket */}
+                      {event.fields.source_url && (
+                        <span className="shrink-0 text-xs font-bold uppercase tracking-widest text-gold px-3 py-1.5 rounded-full border border-gold/20 group-hover:border-gold/40 transition-colors">
+                          {t('tickets')} ↗
+                        </span>
+                      )}
+                    </Link>
                   </FadeUpItem>
                 );
               })}
@@ -824,87 +890,17 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         </FadeUp>
       )}
 
-      {/* ═══ Jazz Network ═══ */}
-      {hasNetwork && (
+      {/* ═══ Jazz Network (graph 2:1 collaborators on desktop, stacked on mobile) ═══ */}
+      {(graphCollaborators.length >= 3 || topCollaborators.length > 0) && (
         <FadeUp>
           <section className="border-t border-[var(--border)] pt-12">
             <h2 className="font-serif text-2xl font-bold mb-8">{t('jazzNetwork')}</h2>
 
-            <div className="space-y-8">
-              {/* Versatility: Leader / Sideman */}
-              {hasVersatility && (
-                <div className="space-y-4">
-                  {leaderProjects.length > 0 && (
-                    <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asLeader')}</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {leaderProjects.map((p) => (
-                          <Link
-                            key={p.id}
-                            href={`/${locale}/artists/${p.id}`}
-                            className="text-sm px-3 py-1.5 rounded-xl bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20 hover:border-[var(--color-gold)]/40 transition-colors link-lift"
-                          >
-                            {artistDisplayName(p.fields, locale)}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {sidemanProjects.length > 0 && (
-                    <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asSideman')}</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {sidemanProjects.map((p) => (
-                          <Link
-                            key={p.id}
-                            href={`/${locale}/artists/${p.id}`}
-                            className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
-                          >
-                            {artistDisplayName(p.fields, locale)}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {featuredGuestProjects.length > 0 && (
-                    <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asFeaturedGuest')}</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {featuredGuestProjects.map((p) => (
-                          <Link
-                            key={p.id}
-                            href={`/${locale}/artists/${p.id}`}
-                            className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
-                          >
-                            {artistDisplayName(p.fields, locale)}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {bandMemberProjects.length > 0 && (
-                    <div>
-                      <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">{t('asBandMember')}</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {bandMemberProjects.map((p) => (
-                          <Link
-                            key={p.id}
-                            href={`/${locale}/artists/${p.id}`}
-                            className="text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
-                          >
-                            {artistDisplayName(p.fields, locale)}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Collaboration Graph */}
+            {/* Filter bar is inside CollaborationGraph; we split layout so cards align to SVG top */}
+            <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+              {/* Left: Collaboration Graph — fills remaining space */}
               {graphCollaborators.length >= 3 && (
-                <div>
-                  <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-4">{t('collaborationGraph')}</h3>
+                <div className="flex-1 min-w-0">
                   <CollaborationGraph
                     centerArtist={{
                       id: artist.id,
@@ -916,16 +912,35 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       gigCount: allEvents.length,
                       isCenter: true,
                     }}
-                    collaborators={graphCollaborators.map((c) => ({
-                      id: c.id,
-                      name: artistDisplayName(c.fields, locale),
-                      instrument: c.fields.primary_instrument || null,
-                      instrumentLabel: c.fields.primary_instrument ? instLabel(c.fields.primary_instrument) : null,
-                      artistType: c.fields.type || null,
-                      photoUrl: photoUrl(c.fields.photo_url) || null,
-                      gigCount: c.count,
-                    }))}
-                    links={graphLinks}
+                    collaborators={[
+                      ...graphCollaborators.map((c) => ({
+                        id: c.id,
+                        name: artistDisplayName(c.fields, locale),
+                        instrument: c.fields.primary_instrument || null,
+                        instrumentLabel: c.fields.primary_instrument ? instLabel(c.fields.primary_instrument) : null,
+                        artistType: c.fields.type || null,
+                        photoUrl: photoUrl(c.fields.photo_url) || null,
+                        gigCount: c.count,
+                      })),
+                      ...venuesWithCounts.slice(0, 6).map((v) => ({
+                        id: `venue-${v.id}`,
+                        name: displayName(v.fields),
+                        instrument: null,
+                        instrumentLabel: null,
+                        artistType: null,
+                        photoUrl: null,
+                        gigCount: v.gigCount,
+                        nodeType: 'venue' as const,
+                      })),
+                    ]}
+                    links={[
+                      ...graphLinks,
+                      ...venuesWithCounts.slice(0, 6).map((v) => ({
+                        source: artist.id,
+                        target: `venue-${v.id}`,
+                        weight: v.gigCount,
+                      })),
+                    ]}
                     locale={locale}
                     labels={{
                       gigs: t('gigsCount'),
@@ -937,108 +952,55 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                       filterAll: t('filterClearAll'),
                       typePerson: t('filterTypePerson'),
                       typeGroup: t('filterTypeGroup'),
+                      typeVenue: t('venues'),
                     }}
                   />
                 </div>
               )}
 
-              {/* Frequent Collaborators */}
+              {/* Right: Frequent Collaborators — card style, aligned to graph SVG top */}
               {topCollaborators.length > 0 && (
-                <div>
-                  <h3 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-4">{t('frequentCollaborators')}</h3>
-                  <div className="space-y-2">
-                    {topCollaborators.map((collab) => (
-                      <Link
-                        key={collab.id}
-                        href={`/${locale}/artists/${collab.id}`}
-                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-[var(--card)] transition-colors group"
-                      >
-                        {/* Avatar */}
-                        {photoUrl(collab.fields.photo_url) ? (
-                          <Image
-                            src={photoUrl(collab.fields.photo_url)!}
-                            alt={artistDisplayName(collab.fields, locale)}
-                            width={36} height={36}
-                            className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]"
-                            sizes="36px"
-                          />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full bg-[var(--card)] flex items-center justify-center text-sm shrink-0 border border-[var(--border)]">
-                            ♪
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <span className="text-sm font-medium group-hover:text-gold transition-colors truncate block">
-                            {artistDisplayName(collab.fields, locale)}
-                          </span>
-                          <span className="text-xs text-[var(--muted-foreground)]">
-                            {collab.count} {t('gigsCount')}
-                          </span>
-                        </div>
-                        {collab.fields.primary_instrument && (
-                          <span className="text-xs px-2 py-0.5 rounded-lg border border-[var(--border)] text-[var(--muted-foreground)] shrink-0">
-                            {instLabel(collab.fields.primary_instrument)}
-                          </span>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        </FadeUp>
-      )}
-
-      {/* ═══ Active Hubs ═══ */}
-      {hasHubs && (
-        <FadeUp>
-          <section className="border-t border-[var(--border)] pt-12">
-            <h2 className="font-serif text-2xl font-bold mb-8 flex items-center gap-3">
-              {t('activeHubs')}
-              {isGlobetrotter && (
-                <span className="text-xs font-normal uppercase tracking-widest px-3 py-1 rounded-xl bg-[var(--color-gold)]/10 text-[var(--color-gold)] border border-[var(--color-gold)]/20">
-                  {t('globetrotter')}
-                </span>
-              )}
-            </h2>
-
-            <div className="space-y-4">
-              {/* Venues */}
-              {venuesWithCounts.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {venuesWithCounts.slice(0, 8).map((v) => (
+                <div className="lg:w-80 lg:shrink-0 lg:pt-10 space-y-2">
+                  {topCollaborators.map((collab) => (
                     <Link
-                      key={v.id}
-                      href={`/${locale}/venues/${v.id}`}
-                      className="flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border border-[var(--border)] text-[#C4BFB3] hover:text-[var(--color-gold)] hover:border-[var(--color-gold)]/20 transition-colors link-lift"
+                      key={collab.id}
+                      href={`/${locale}/artists/${collab.id}`}
+                      className="flex items-center gap-3 p-3.5 rounded-xl bg-[var(--card)] border border-[var(--border)] hover:border-gold/20 transition-colors group"
                     >
-                      <span>{displayName(v.fields)}</span>
-                      {v.gigCount > 0 && (
-                        <span className="text-xs text-[var(--muted-foreground)]">x{v.gigCount}</span>
+                      {photoUrl(collab.fields.photo_url) ? (
+                        <Image
+                          src={photoUrl(collab.fields.photo_url)!}
+                          alt={artistDisplayName(collab.fields, locale)}
+                          width={40} height={40}
+                          className="w-10 h-10 rounded-full object-cover shrink-0 border border-[var(--border)]"
+                          sizes="40px"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-[var(--border)] flex items-center justify-center text-sm shrink-0">
+                          ♪
+                        </div>
                       )}
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm font-semibold group-hover:text-gold transition-colors truncate block">
+                          {artistDisplayName(collab.fields, locale)}
+                        </span>
+                        <span className="text-xs text-[var(--muted-foreground)]">
+                          {collab.fields.primary_instrument ? instLabel(collab.fields.primary_instrument) : ''}
+                        </span>
+                      </div>
+                      <span className="text-xs text-gold shrink-0">
+                        {collab.count} {t('gigsCount')}
+                      </span>
                     </Link>
                   ))}
                 </div>
               )}
-
-              {/* Cities */}
-              {artistCities.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {artistCities.map((c) => (
-                    <span
-                      key={c.id}
-                      className="text-xs px-3 py-1.5 rounded-xl bg-[var(--card)] text-[var(--muted-foreground)] border border-[var(--border)]"
-                    >
-                      {cityName(c.fields, locale)}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </section>
         </FadeUp>
       )}
+
+      {/* Active Hubs removed — venues are now in the collaboration graph */}
 
       {/* ═══ Teaching Section ═══ */}
       <TierGate entityType="artist" featureKey="teaching_section" currentTier={f.tier ?? 0}>
@@ -1102,10 +1064,57 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
       )}
       </TierGate>
 
+      {/* ═══ Shoutouts ═══ */}
+      <FadeUp>
+        <section className="border-t border-[var(--border)] pt-12">
+          <ArtistShoutoutsSection artistId={artist.id} />
+        </section>
+      </FadeUp>
+
+      {/* ═══ Similar Artists ═══ */}
+      {similarArtists.length > 0 && (
+        <FadeUp>
+          <section className="border-t border-[var(--border)] pt-12">
+            <h2 className="font-serif text-2xl font-bold mb-6">{t('similarArtists')}</h2>
+            <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+              {similarArtists.map((sa) => (
+                <Link
+                  key={sa.id}
+                  href={`/${locale}/artists/${sa.id}`}
+                  className="shrink-0 w-28 text-center group"
+                >
+                  {photoUrl(sa.fields.photo_url) ? (
+                    <Image
+                      src={photoUrl(sa.fields.photo_url)!}
+                      alt={artistDisplayName(sa.fields, locale)}
+                      width={64} height={64}
+                      className="w-16 h-16 rounded-full object-cover mx-auto border border-[var(--border)] group-hover:border-gold/30 transition-colors"
+                      sizes="64px"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-[var(--card)] border border-[var(--border)] mx-auto flex items-center justify-center text-lg group-hover:border-gold/30 transition-colors">
+                      ♪
+                    </div>
+                  )}
+                  <p className="text-xs font-medium mt-2 truncate group-hover:text-gold transition-colors">
+                    {artistDisplayName(sa.fields, locale)}
+                  </p>
+                  {sa.fields.primary_instrument && (
+                    <p className="text-[10px] text-[var(--muted-foreground)] truncate">
+                      {instLabel(sa.fields.primary_instrument)}
+                    </p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </section>
+        </FadeUp>
+      )}
+
       {/* ═══ Badges ═══ */}
       {artistBadgeProgress.length > 0 && (
         <FadeUp>
-          <section className="pt-4">
+          <section className="pt-4" id="badges-section">
             <BadgeCategorySection
               title={t('badgesCategoryRecognition')}
               categoryKey="recognition"

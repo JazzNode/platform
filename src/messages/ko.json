@@ -164,6 +164,17 @@
     "venueStats": "공연장 데이터",
     "totalGigs": "총 공연",
     "capacitySeats": "석",
+    "nextShow": "다음 공연",
+    "viewDetails": "자세히 보기",
+    "aboutVenue": "공연장 소개",
+    "residentArtists": "주요 아티스트",
+    "practicalInfo": "기본 정보",
+    "stayConnected": "소식 받기",
+    "stayConnectedDesc": "팔로우하고 공연 소식과 알림을 받으세요.",
+    "contactInfo": "연락처",
+    "paymentMethods": "결제 수단",
+    "languageFriendly": "지원 언어",
+    "venueCapacity": "수용 인원",
     "jazzNightly": "매일 밤",
     "jazzWeekends": "주말 중심",
     "jazzOccasional": "비정기 공연",
@@ -197,7 +208,22 @@
     "noNewEvents": "최근 추가된 이벤트가 없습니다.",
     "newEventsPageDescription": "최근 추가된 재즈 이벤트를 확인하세요.",
     "today": "오늘",
-    "yesterday": "어제"
+    "yesterday": "어제",
+    "acceptingStudentsLabel": "학생 모집 중",
+    "followers": "팔로워",
+    "performances": "공연",
+    "collaborators": "협력자",
+    "yearsActive": "년 활동",
+    "aboutSection": "소개",
+    "seeMore": "...더 보기",
+    "seeLess": "접기",
+    "quickFacts": "기본 정보",
+    "similarArtists": "유사 아티스트",
+    "profileCompleteness": "완성도",
+    "addMissing": "프로필 완성",
+    "tickets": "티켓",
+    "availableForHire": "섭외 가능",
+    "downloadEpk": "EPK 다운로드"
   },
   "auth": {
     "signIn": "로그인",
@@ -1087,7 +1113,6 @@
     "referrerSources": "유입 경로",
     "cityDistribution": "도시 분포",
     "noData": "이 기간의 데이터가 없습니다.",
-    "downloadEpk": "EPK 다운로드",
     "customDomainTeaser": "커스텀 도메인 — 출시 예정",
     "submitInquiry": "문의 제출",
     "inquiryName": "이름",
@@ -1108,7 +1133,8 @@
     "views": "조회",
     "noEventsData": "해당 기간의 이벤트 데이터가 없습니다.",
     "monthlyRemaining": "이번 달 {remaining}/{limit} 남음",
-    "broadcastLimitReached": "월간 브로드캐스트 한도에 도달했습니다. 무제한 브로드캐스트를 위해 엘리트로 업그레이드하세요."
+    "broadcastLimitReached": "월간 브로드캐스트 한도에 도달했습니다. 무제한 브로드캐스트를 위해 엘리트로 업그레이드하세요.",
+    "shoutouts": "추천"
   },
   "tiers": {
     "metaTitle": "플랜 & 티어",
@@ -1314,5 +1340,45 @@
       "admin": "JazzNode HQ",
       "hint": "신분 전환"
     }
+  },
+  "shoutouts": {
+    "sectionTitle": "추천",
+    "writeShoutout": "추천 남기기",
+    "textPlaceholder": "추천을 작성하세요...",
+    "submitShoutout": "추천 게시",
+    "deleteShoutout": "삭제",
+    "pinShoutout": "고정",
+    "unpinShoutout": "고정 해제",
+    "maxPinsReached": "최대 3개까지 고정 가능",
+    "whatPeopleSay": "사람들의 평가",
+    "peopleSay": "명이 추천",
+    "noShoutouts": "아직 추천이 없습니다",
+    "beFirst": "첫 번째 추천을 남겨보세요",
+    "tags": {
+      "great_musicianship": "뛰어난 음악성",
+      "amazing_live": "라이브 최고",
+      "great_collaborator": "좋은 협력자",
+      "creative": "창의적",
+      "great_teacher": "훌륭한 선생님",
+      "inspiring": "영감을 주는",
+      "professional": "프로페셔널",
+      "reliable": "믿을 수 있는",
+      "beautiful_tone": "아름다운 음색"
+    }
+  },
+  "messaging": {
+    "intentSelectorTitle": "무엇에 대해 이야기할까요?",
+    "intentSelectorSubtitle": "{artistName}과의 대화 주제를 선택하세요",
+    "intentBooking": "공연을 의뢰하고 싶어요",
+    "intentLesson": "레슨에 관심이 있어요",
+    "intentCollaboration": "함께 작업해요",
+    "intentGeneral": "인사만 할게요",
+    "bookingPrefill": "안녕하세요 {artistName}님! 공연을 의뢰하고 싶습니다.\n\n이벤트 유형:\n날짜:\n장소:\n예산:\n상세:",
+    "lessonPrefill": "안녕하세요 {artistName}님! 레슨에 관심이 있습니다.\n\n수준:\n악기:\n선호 일정(온라인/대면):",
+    "collaborationPrefill": "안녕하세요 {artistName}님! 함께 작업하고 싶습니다.\n\n프로젝트 유형:\n기간:\n상세:",
+    "cancel": "취소",
+    "intentTagBooking": "섭외",
+    "intentTagLesson": "레슨",
+    "intentTagCollab": "협업"
   }
 }

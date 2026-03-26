@@ -164,6 +164,17 @@
     "venueStats": "ข้อมูลสถานที่",
     "totalGigs": "การแสดงทั้งหมด",
     "capacitySeats": "ที่นั่ง",
+    "nextShow": "การแสดงถัดไป",
+    "viewDetails": "ดูรายละเอียด",
+    "aboutVenue": "เกี่ยวกับสถานที่",
+    "residentArtists": "ศิลปินประจำ",
+    "practicalInfo": "ข้อมูลทั่วไป",
+    "stayConnected": "ติดตามข่าวสาร",
+    "stayConnectedDesc": "ติดตามสถานที่นี้เพื่อรับการแจ้งเตือนเกี่ยวกับการแสดงและข่าวสาร",
+    "contactInfo": "ติดต่อ",
+    "paymentMethods": "การชำระเงิน",
+    "languageFriendly": "ภาษาที่รองรับ",
+    "venueCapacity": "ความจุ",
     "jazzNightly": "ทุกคืน",
     "jazzWeekends": "สุดสัปดาห์",
     "jazzOccasional": "แสดงไม่ประจำ",
@@ -197,7 +208,22 @@
     "noNewEvents": "ไม่มีกิจกรรมที่เพิ่มใหม่",
     "newEventsPageDescription": "เรียกดูกิจกรรมแจ๊สที่เพิ่มเข้ามาล่าสุด",
     "today": "วันนี้",
-    "yesterday": "เมื่อวาน"
+    "yesterday": "เมื่อวาน",
+    "acceptingStudentsLabel": "รับสอน",
+    "followers": "ผู้ติดตาม",
+    "performances": "การแสดง",
+    "collaborators": "ผู้ร่วมงาน",
+    "yearsActive": "ปีที่ทำงาน",
+    "aboutSection": "เกี่ยวกับ",
+    "seeMore": "...ดูเพิ่มเติม",
+    "seeLess": "ย่อ",
+    "quickFacts": "ข้อมูลเบื้องต้น",
+    "similarArtists": "ศิลปินที่คล้ายกัน",
+    "profileCompleteness": "ความสมบูรณ์",
+    "addMissing": "กรอกข้อมูล",
+    "tickets": "ตั๋ว",
+    "availableForHire": "รับงาน",
+    "downloadEpk": "ดาวน์โหลด EPK"
   },
   "auth": {
     "signIn": "เข้าสู่ระบบ",
@@ -1087,7 +1113,6 @@
     "referrerSources": "แหล่งที่มา",
     "cityDistribution": "การกระจายตามเมือง",
     "noData": "ไม่มีข้อมูลในช่วงนี้",
-    "downloadEpk": "ดาวน์โหลด EPK",
     "customDomainTeaser": "โดเมนส่วนตัว — เร็ว ๆ นี้",
     "submitInquiry": "ส่งคำขอ",
     "inquiryName": "ชื่อของคุณ",
@@ -1108,7 +1133,8 @@
     "views": "การเข้าชม",
     "noEventsData": "ไม่มีข้อมูลกิจกรรมในช่วงเวลานี้",
     "monthlyRemaining": "เหลือ {remaining}/{limit} ครั้งเดือนนี้",
-    "broadcastLimitReached": "คุณถึงขีดจำกัดการส่งประกาศรายเดือนแล้ว อัปเกรดเป็นอีลีทเพื่อส่งได้ไม่จำกัด"
+    "broadcastLimitReached": "คุณถึงขีดจำกัดการส่งประกาศรายเดือนแล้ว อัปเกรดเป็นอีลีทเพื่อส่งได้ไม่จำกัด",
+    "shoutouts": "คำชื่นชม"
   },
   "tiers": {
     "metaTitle": "แพลนและระดับ",
@@ -1314,5 +1340,45 @@
       "admin": "JazzNode HQ",
       "hint": "เปลี่ยนตัวตน"
     }
+  },
+  "shoutouts": {
+    "sectionTitle": "คำชื่นชม",
+    "writeShoutout": "เขียนคำชื่นชม",
+    "textPlaceholder": "เขียนคำชื่นชมของคุณ...",
+    "submitShoutout": "โพสต์คำชื่นชม",
+    "deleteShoutout": "ลบ",
+    "pinShoutout": "ปักหมุด",
+    "unpinShoutout": "เลิกปักหมุด",
+    "maxPinsReached": "ปักหมุดได้สูงสุด 3 รายการ",
+    "whatPeopleSay": "ผู้คนพูดว่า",
+    "peopleSay": "คนแนะนำ",
+    "noShoutouts": "ยังไม่มีคำชื่นชม",
+    "beFirst": "เป็นคนแรกที่เขียนคำชื่นชม",
+    "tags": {
+      "great_musicianship": "ฝีมือเยี่ยม",
+      "amazing_live": "ไลฟ์สุดเจ๋ง",
+      "great_collaborator": "ร่วมงานง่าย",
+      "creative": "สร้างสรรค์",
+      "great_teacher": "สอนเก่ง",
+      "inspiring": "สร้างแรงบันดาลใจ",
+      "professional": "มืออาชีพ",
+      "reliable": "ไว้ใจได้",
+      "beautiful_tone": "เสียงสวย"
+    }
+  },
+  "messaging": {
+    "intentSelectorTitle": "อยากคุยเรื่องอะไร?",
+    "intentSelectorSubtitle": "เลือกหัวข้อเพื่อเริ่มบทสนทนากับ {artistName}",
+    "intentBooking": "อยากจ้างแสดง",
+    "intentLesson": "สนใจเรียน",
+    "intentCollaboration": "มาร่วมงานกัน",
+    "intentGeneral": "แค่ทักทาย",
+    "bookingPrefill": "สวัสดี {artistName}! อยากเชิญมาแสดง\n\nประเภทงาน:\nวันที่:\nสถานที่:\nงบประมาณ:\nรายละเอียด:",
+    "lessonPrefill": "สวัสดี {artistName}! สนใจเรียน\n\nระดับ:\nเครื่องดนตรี:\nเวลาที่สะดวก (ออนไลน์/ตัวต่อตัว):",
+    "collaborationPrefill": "สวัสดี {artistName}! อยากร่วมงาน\n\nประเภทโปรเจกต์:\nไทม์ไลน์:\nรายละเอียด:",
+    "cancel": "ยกเลิก",
+    "intentTagBooking": "จ้างงาน",
+    "intentTagLesson": "เรียน",
+    "intentTagCollab": "ร่วมงาน"
   }
 }

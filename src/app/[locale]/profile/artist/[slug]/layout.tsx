@@ -22,7 +22,8 @@ const NAV_ITEMS = [
   { key: 'badges', icon: 'badges', path: '/badges' },
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
   { key: 'comments', icon: 'comments', path: '/comments' },
-  { key: 'bookings', icon: 'calendar', path: '/bookings' },
+  { key: 'shoutouts', icon: 'shoutouts', path: '/shoutouts' },
+  // { key: 'bookings', icon: 'calendar', path: '/bookings' }, // Deprecated: use messaging with intent_type instead
   { key: 'featuredWall', icon: 'star', path: '/featured-wall' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
   { key: 'gear', icon: 'guitar', path: '/gear' },
@@ -73,6 +74,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+        </svg>
+      );
+    case 'shoutouts':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M22 2L11 13" />
+          <path d="M22 2l-7 20-4-9-9-4 20-7z" />
         </svg>
       );
     case 'analytics':

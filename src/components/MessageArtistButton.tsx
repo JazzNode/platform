@@ -4,17 +4,28 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
+import MessageIntentSelector from '@/components/MessageIntentSelector';
 
 interface MessageArtistButtonProps {
   artistId: string;
   claimed?: boolean;
+  availableForHire?: boolean;
+  acceptingStudents?: boolean;
+  artistName?: string;
 }
 
-export default function MessageArtistButton({ artistId, claimed }: MessageArtistButtonProps) {
+export default function MessageArtistButton({
+  artistId,
+  claimed,
+  availableForHire = false,
+  acceptingStudents = false,
+  artistName = '',
+}: MessageArtistButtonProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const { user, setShowAuthModal } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [showIntentSelector, setShowIntentSelector] = useState(false);
 
   const handleClick = useCallback(async () => {
     if (!claimed) return;
@@ -27,7 +38,7 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
     try {
       const supabase = createClient();
 
-      // Find or create artist_fan conversation
+      // Find existing artist_fan conversation
       const { data: existing } = await supabase
         .from('conversations')
         .select('id')
@@ -37,9 +48,29 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
         .maybeSingle();
 
       if (existing) {
+        // Existing conversation — go directly to inbox
         window.location.href = `/${locale}/profile/inbox?convo=${existing.id}`;
         return;
       }
+
+      // No existing conversation — show intent selector
+      setLoading(false);
+      setShowIntentSelector(true);
+    } catch {
+      setLoading(false);
+      // Fallback: navigate to inbox on error
+      window.location.href = `/${locale}/profile/inbox`;
+    }
+  }, [claimed, user, artistId, locale, setShowAuthModal]);
+
+  const handleIntentSelect = useCallback(async (intentType: string | null, prefillMessage: string) => {
+    if (!user) return;
+
+    setShowIntentSelector(false);
+    setLoading(true);
+
+    try {
+      const supabase = createClient();
 
       // Create new conversation
       const { data: newConvo, error } = await supabase
@@ -52,13 +83,10 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
         .select('id')
         .single();
 
-      if (newConvo) {
-        window.location.href = `/${locale}/profile/inbox?convo=${newConvo.id}`;
-        return;
-      }
+      let convoId = newConvo?.id;
 
       // Insert failed (e.g. unique constraint) — retry finding it
-      if (error) {
+      if (error && !convoId) {
         const { data: retry } = await supabase
           .from('conversations')
           .select('id')
@@ -66,19 +94,28 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
           .eq('artist_id', artistId)
           .eq('fan_user_id', user.id)
           .maybeSingle();
-        if (retry) {
-          window.location.href = `/${locale}/profile/inbox?convo=${retry.id}`;
-          return;
-        }
+        convoId = retry?.id;
       }
 
-      // Fallback: navigate to inbox even if conversation creation failed
-      window.location.href = `/${locale}/profile/inbox`;
+      // Create first message with intent_type if we have a conversation
+      if (convoId && prefillMessage) {
+        await supabase.from('messages').insert({
+          conversation_id: convoId,
+          sender_id: user.id,
+          body: prefillMessage,
+          ...(intentType ? { intent_type: intentType } : {}),
+        });
+      }
+
+      if (convoId) {
+        window.location.href = `/${locale}/profile/inbox?convo=${convoId}`;
+      } else {
+        window.location.href = `/${locale}/profile/inbox`;
+      }
     } catch {
-      // Fallback: navigate to inbox on error
       window.location.href = `/${locale}/profile/inbox`;
     }
-  }, [claimed, user, artistId, locale, setShowAuthModal]);
+  }, [user, artistId, locale]);
 
   const icon = (
     <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -126,18 +163,29 @@ export default function MessageArtistButton({ artistId, claimed }: MessageArtist
   }
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading}
-      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-400/20 transition-colors disabled:opacity-50"
-      title={t('messageArtist')}
-    >
-      {loading ? (
-        <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
-      ) : (
-        icon
-      )}
-      <span className="hidden sm:inline">{t('messageArtist')}</span>
-    </button>
+    <>
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-emerald-400/30 bg-emerald-400/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-400/20 transition-colors disabled:opacity-50"
+        title={t('messageArtist')}
+      >
+        {loading ? (
+          <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+        ) : (
+          icon
+        )}
+        <span className="hidden sm:inline">{t('messageArtist')}</span>
+      </button>
+
+      <MessageIntentSelector
+        artistName={artistName}
+        availableForHire={availableForHire}
+        acceptingStudents={acceptingStudents}
+        isOpen={showIntentSelector}
+        onSelect={handleIntentSelect}
+        onClose={() => setShowIntentSelector(false)}
+      />
+    </>
   );
 }

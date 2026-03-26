@@ -1,3 +1,4 @@
+/** @deprecated Use messaging with intent_type instead. Kept for historical data access only. */
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { verifyArtistClaimToken } from '@/lib/artist-auth';

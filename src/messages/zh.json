@@ -164,6 +164,17 @@
     "venueStats": "場地數據",
     "totalGigs": "累計演出",
     "capacitySeats": "個座位",
+    "nextShow": "近期演出",
+    "viewDetails": "了解更多",
+    "aboutVenue": "關於場地",
+    "residentArtists": "精選藝人",
+    "practicalInfo": "實用資訊",
+    "stayConnected": "保持聯繫",
+    "stayConnectedDesc": "追蹤場地，即時收到演出通知與最新消息。",
+    "contactInfo": "聯絡方式",
+    "paymentMethods": "付款方式",
+    "languageFriendly": "語言友善",
+    "venueCapacity": "容納人數",
     "jazzNightly": "每晚演出",
     "jazzWeekends": "週末為主",
     "jazzOccasional": "不定期演出",
@@ -197,7 +208,22 @@
     "noNewEvents": "近期沒有新增活動。",
     "newEventsPageDescription": "瀏覽近期爬蟲新增的爵士演出場次。",
     "today": "今天",
-    "yesterday": "昨天"
+    "yesterday": "昨天",
+    "acceptingStudentsLabel": "招收學生",
+    "followers": "追蹤者",
+    "performances": "演出",
+    "collaborators": "合作者",
+    "yearsActive": "年資歷",
+    "aboutSection": "關於",
+    "seeMore": "...顯示更多",
+    "seeLess": "收合",
+    "quickFacts": "快速了解",
+    "similarArtists": "類似藝人",
+    "profileCompleteness": "完成度",
+    "addMissing": "完善資料",
+    "tickets": "購票",
+    "availableForHire": "開放邀約",
+    "downloadEpk": "下載 EPK"
   },
   "auth": {
     "signIn": "登入",
@@ -1089,7 +1115,6 @@
     "referrerSources": "流量來源",
     "cityDistribution": "城市分布",
     "noData": "此期間無資料。",
-    "downloadEpk": "下載 EPK",
     "customDomainTeaser": "自訂網域 — 即將推出",
     "submitInquiry": "提交邀約",
     "inquiryName": "你的名字",
@@ -1108,7 +1133,8 @@
     "peakHours": "互動尖峰時段",
     "newFollowers": "新增追蹤者",
     "views": "次瀏覽",
-    "noEventsData": "此期間無演出資料。"
+    "noEventsData": "此期間無演出資料。",
+    "shoutouts": "推薦"
   },
   "tiers": {
     "metaTitle": "方案與等級",
@@ -1314,5 +1340,45 @@
       "admin": "JazzNode HQ",
       "hint": "可切換身份"
     }
+  },
+  "shoutouts": {
+    "sectionTitle": "來自音樂圈的推薦",
+    "writeShoutout": "留下推薦",
+    "textPlaceholder": "分享你的推薦或合作經驗...",
+    "submitShoutout": "發佈推薦",
+    "deleteShoutout": "刪除",
+    "pinShoutout": "置頂",
+    "unpinShoutout": "取消置頂",
+    "maxPinsReached": "最多置頂 3 則",
+    "whatPeopleSay": "音樂人怎麼說",
+    "peopleSay": "人推薦",
+    "noShoutouts": "還沒有推薦",
+    "beFirst": "成為第一個留下推薦的人",
+    "tags": {
+      "great_musicianship": "音樂性很強",
+      "amazing_live": "現場超棒",
+      "great_collaborator": "好合作夥伴",
+      "creative": "創意十足",
+      "great_teacher": "好老師",
+      "inspiring": "很受啟發",
+      "professional": "很專業",
+      "reliable": "很可靠",
+      "beautiful_tone": "音色超好聽"
+    }
+  },
+  "messaging": {
+    "intentSelectorTitle": "想聊什麼呢？",
+    "intentSelectorSubtitle": "選擇一個主題開始與 {artistName} 的對話",
+    "intentBooking": "我想邀請你演出",
+    "intentLesson": "我想上課",
+    "intentCollaboration": "一起合作吧",
+    "intentGeneral": "打個招呼",
+    "bookingPrefill": "嗨 {artistName}！我想邀請你演出。\n\n活動類型：\n日期：\n場地：\n預算範圍：\n詳情：",
+    "lessonPrefill": "嗨 {artistName}！我對上課很有興趣。\n\n程度：\n樂器：\n偏好時間（線上/實體）：",
+    "collaborationPrefill": "嗨 {artistName}！我想跟你合作。\n\n合作類型：\n時間：\n詳情：",
+    "cancel": "取消",
+    "intentTagBooking": "演出邀約",
+    "intentTagLesson": "課程",
+    "intentTagCollab": "合作"
   }
 }

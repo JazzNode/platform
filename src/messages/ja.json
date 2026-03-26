@@ -164,6 +164,17 @@
     "venueStats": "会場データ",
     "totalGigs": "公演累計",
     "capacitySeats": "席",
+    "nextShow": "次の公演",
+    "viewDetails": "詳しく見る",
+    "aboutVenue": "会場について",
+    "residentArtists": "注目アーティスト",
+    "practicalInfo": "基本情報",
+    "stayConnected": "つながりを保つ",
+    "stayConnectedDesc": "フォローして、公演情報やお知らせを受け取りましょう。",
+    "contactInfo": "連絡先",
+    "paymentMethods": "決済方法",
+    "languageFriendly": "対応言語",
+    "venueCapacity": "収容人数",
     "jazzNightly": "毎晩",
     "jazzWeekends": "週末中心",
     "jazzOccasional": "不定期開催",
@@ -197,7 +208,22 @@
     "noNewEvents": "最近追加されたイベントはありません。",
     "newEventsPageDescription": "最近追加されたジャズイベントを閲覧。",
     "today": "今日",
-    "yesterday": "昨日"
+    "yesterday": "昨日",
+    "acceptingStudentsLabel": "生徒募集中",
+    "followers": "フォロワー",
+    "performances": "公演",
+    "collaborators": "コラボレーター",
+    "yearsActive": "年の活動",
+    "aboutSection": "紹介",
+    "seeMore": "...もっと見る",
+    "seeLess": "閉じる",
+    "quickFacts": "基本情報",
+    "similarArtists": "類似アーティスト",
+    "profileCompleteness": "完成度",
+    "addMissing": "プロフィールを完成",
+    "tickets": "チケット",
+    "availableForHire": "仕事依頼可能",
+    "downloadEpk": "EPKをダウンロード"
   },
   "auth": {
     "signIn": "ログイン",
@@ -1087,7 +1113,6 @@
     "referrerSources": "リファラー",
     "cityDistribution": "都市分布",
     "noData": "この期間のデータはありません。",
-    "downloadEpk": "EPKをダウンロード",
     "customDomainTeaser": "カスタムドメイン — 近日公開",
     "submitInquiry": "依頼を送信",
     "inquiryName": "お名前",
@@ -1108,7 +1133,8 @@
     "views": "閲覧数",
     "noEventsData": "この期間のイベントデータはありません。",
     "monthlyRemaining": "今月残り{remaining}/{limit}回",
-    "broadcastLimitReached": "月間ブロードキャスト上限に達しました。エリートにアップグレードすると無制限に送信できます。"
+    "broadcastLimitReached": "月間ブロードキャスト上限に達しました。エリートにアップグレードすると無制限に送信できます。",
+    "shoutouts": "推薦"
   },
   "tiers": {
     "metaTitle": "プラン＆ティア",
@@ -1314,5 +1340,45 @@
       "admin": "JazzNode HQ",
       "hint": "身分を切替"
     }
+  },
+  "shoutouts": {
+    "sectionTitle": "推薦",
+    "writeShoutout": "推薦を残す",
+    "textPlaceholder": "推薦を書いてください...",
+    "submitShoutout": "推薦を投稿",
+    "deleteShoutout": "削除",
+    "pinShoutout": "ピン留め",
+    "unpinShoutout": "ピン留め解除",
+    "maxPinsReached": "ピン留めは最大3件です",
+    "whatPeopleSay": "みんなの声",
+    "peopleSay": "人が推薦",
+    "noShoutouts": "まだ推薦はありません",
+    "beFirst": "最初の推薦を残しましょう",
+    "tags": {
+      "great_musicianship": "素晴らしい演奏力",
+      "amazing_live": "ライブが最高",
+      "great_collaborator": "最高のコラボレーター",
+      "creative": "クリエイティブ",
+      "great_teacher": "素晴らしい先生",
+      "inspiring": "インスピレーション",
+      "professional": "プロフェッショナル",
+      "reliable": "信頼できる",
+      "beautiful_tone": "美しい音色"
+    }
+  },
+  "messaging": {
+    "intentSelectorTitle": "何について話しましょうか？",
+    "intentSelectorSubtitle": "{artistName}との会話のトピックを選んでください",
+    "intentBooking": "ブッキングしたい",
+    "intentLesson": "レッスンに興味があります",
+    "intentCollaboration": "コラボしませんか",
+    "intentGeneral": "挨拶だけ",
+    "bookingPrefill": "こんにちは{artistName}さん！出演をお願いしたいです。\n\nイベントタイプ：\n日程：\n会場：\n予算：\n詳細：",
+    "lessonPrefill": "こんにちは{artistName}さん！レッスンに興味があります。\n\nレベル：\n楽器：\n希望スケジュール（オンライン/対面）：",
+    "collaborationPrefill": "こんにちは{artistName}さん！コラボしたいです。\n\nプロジェクトタイプ：\nタイムライン：\n詳細：",
+    "cancel": "キャンセル",
+    "intentTagBooking": "ブッキング",
+    "intentTagLesson": "レッスン",
+    "intentTagCollab": "コラボ"
   }
 }
