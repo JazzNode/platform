@@ -14,6 +14,7 @@ import {
   VenueHero,
   VenueFeaturedEvent,
   VenueUpcomingEvents,
+  VenueAnnouncements,
   VenueAbout,
   VenueGallery,
   VenueArtists,
@@ -358,6 +359,11 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             </section>
           </FadeUp>
         )}
+
+        {/* ═══ 3b. ANNOUNCEMENTS ═══ */}
+        <FadeUp>
+          <VenueAnnouncements venueId={venue.id} t={t} />
+        </FadeUp>
 
         {/* ═══ 4. ABOUT + STATS + BADGES ═══ */}
         <FadeUp>

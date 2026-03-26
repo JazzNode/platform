@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { key: 'inbox', icon: 'inbox', path: '/inbox' },
   { key: 'comments', icon: 'comments', path: '/comments' },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
+  { key: 'announcements', icon: 'announcement', path: '/announcements' },
   { key: 'backline', icon: 'backline', path: '/backline' },
   { key: 'analytics', icon: 'analytics', path: '/analytics' },
   { key: 'edit', icon: 'edit', path: '/edit' },
@@ -94,6 +95,15 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
           <circle cx="8.5" cy="8.5" r="1.5" />
           <polyline points="21 15 16 10 5 21" />
+        </svg>
+      );
+    case 'announcement':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 4v6a6 6 0 0 1-6 6H7" />
+          <path d="M7 16l-4-4 4-4" />
+          <circle cx="19" cy="4" r="2" />
+          <path d="M21 20c0-3.87-3.13-7-7-7" />
         </svg>
       );
     case 'edit':

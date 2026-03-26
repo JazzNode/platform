@@ -59,7 +59,7 @@ const DEFAULT_VENUE: TierFeatures = {
   edit_profile: 1, verified_badge: 1, photos: 1, description: 1, inbox: 1,
   // Tier 2 (Premium) — operational tools
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
-  broadcasts: 2, priority_search: 2,
+  broadcasts: 2, announcements: 2, priority_search: 2,
   fan_insights: 2, post_show_recap: 2, artist_recommendations: 2,
   weekly_digest: 2,
   // Tier 3 (Elite) — business engine
