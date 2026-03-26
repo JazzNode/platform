@@ -652,7 +652,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           )}
 
           {/* Quick Facts */}
-          {(f.instrument_list?.length > 0 || f.country_code) && (
+          {((f.instrument_list?.length ?? 0) > 0 || f.country_code) && (
             <div className="flex flex-wrap gap-2 mt-5">
               {(f.instrument_list || []).map((inst: string) => (
                 <span key={inst} className="text-xs px-3 py-1.5 rounded-xl border border-[var(--border)] text-[var(--muted-foreground)]">
