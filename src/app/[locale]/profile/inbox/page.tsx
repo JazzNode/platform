@@ -10,6 +10,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import SourceBadge from '@/components/inbox/SourceBadge';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
 import FilterChips, { type FilterType } from '@/components/inbox/FilterChips';
+import NotificationList from '@/components/inbox/NotificationList';
 
 type Tab = 'messages' | 'notifications';
 
@@ -766,7 +767,36 @@ export default function FanInboxPage() {
     const supabase = createClient();
     await supabase.from('notifications').update({ read_at: new Date().toISOString() }).eq('id', id);
     setNotifications((prev) => prev.map((n) => n.id === id ? { ...n, read_at: new Date().toISOString() } : n));
+    window.dispatchEvent(new Event('inbox:read'));
   }, [user]);
+
+  const markAllNotifsRead = useCallback(async () => {
+    if (!user) return;
+    const supabase = createClient();
+    const unreadIds = notifications.filter((n) => !n.read_at).map((n) => n.id);
+    if (unreadIds.length === 0) return;
+    await supabase.from('notifications').update({ read_at: new Date().toISOString() }).in('id', unreadIds);
+    setNotifications((prev) => prev.map((n) => ({ ...n, read_at: n.read_at || new Date().toISOString() })));
+    window.dispatchEvent(new Event('inbox:read'));
+  }, [user, notifications]);
+
+  const deleteNotifications = useCallback(async (ids: string[]) => {
+    if (!user || ids.length === 0) return;
+    const supabase = createClient();
+    await supabase.from('notifications').delete().in('id', ids);
+    setNotifications((prev) => prev.filter((n) => !ids.includes(n.id)));
+    window.dispatchEvent(new Event('inbox:read'));
+  }, [user]);
+
+  const deleteAllNotifications = useCallback(async () => {
+    if (!user) return;
+    const supabase = createClient();
+    const allIds = notifications.map((n) => n.id);
+    if (allIds.length === 0) return;
+    await supabase.from('notifications').delete().in('id', allIds);
+    setNotifications([]);
+    window.dispatchEvent(new Event('inbox:read'));
+  }, [user, notifications]);
 
   if (loading || !user) {
     return (
@@ -1075,36 +1105,28 @@ export default function FanInboxPage() {
       {/* Notifications Tab */}
       {tab === 'notifications' && (
         <FadeUp>
-          <div className="space-y-3">
-            {notifsLoading ? (
-              <div className="py-12 text-center">
-                <div className="w-6 h-6 border-2 border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin mx-auto" />
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 text-center">
-                <p className="text-sm text-[var(--muted-foreground)]">{t('fanInboxNoNotifications')}</p>
-              </div>
-            ) : (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl divide-y divide-[var(--border)]">
-                {notifications.map((notif) => (
-                  <div key={notif.id}
-                    className={`px-5 py-4 transition-colors ${!notif.read_at ? 'bg-emerald-400/[0.02] cursor-pointer' : ''}`}
-                    onClick={() => !notif.read_at && markNotifRead(notif.id)}>
-                    <div className="flex items-start gap-3">
-                      {!notif.read_at && <span className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 shrink-0" />}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold">{notif.title}</p>
-                        {notif.body && <p className="text-sm text-[var(--muted-foreground)] mt-0.5">{notif.body}</p>}
-                        <p className="text-xs text-[var(--muted-foreground)]/50 mt-1">
-                          {new Date(notif.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <NotificationList
+            notifications={notifications}
+            loading={notifsLoading}
+            accent="emerald"
+            labels={{
+              noNotifications: t('fanInboxNoNotifications'),
+              markAllRead: t('markAllRead'),
+              deleteSelected: t('deleteSelected'),
+              deleteAll: t('deleteAll'),
+              selectAll: t('selectMode'),
+              deselectAll: t('deselectAll'),
+              selected: t('nSelected'),
+              confirmDeleteTitle: t('confirmDeleteTitle'),
+              confirmDeleteBody: t('confirmDeleteBody'),
+              confirmYes: t('confirmYes'),
+              cancel: t('cancel'),
+            }}
+            onMarkRead={markNotifRead}
+            onMarkAllRead={markAllNotifsRead}
+            onDelete={deleteNotifications}
+            onDeleteAll={deleteAllNotifications}
+          />
         </FadeUp>
       )}
     </div>

@@ -7,6 +7,7 @@ import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
+import NotificationList from '@/components/inbox/NotificationList';
 
 type Tab = 'messages' | 'notifications';
 
@@ -299,6 +300,24 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
     window.dispatchEvent(new Event('inbox:read'));
   }, [user, slug, notifications]);
 
+  const deleteNotifications = useCallback(async (ids: string[]) => {
+    if (!user || ids.length === 0) return;
+    const supabase = createClient();
+    await supabase.from('notifications').delete().in('id', ids);
+    setNotifications((prev) => prev.filter((n) => !ids.includes(n.id)));
+    window.dispatchEvent(new Event('inbox:read'));
+  }, [user]);
+
+  const deleteAllNotifications = useCallback(async () => {
+    if (!user) return;
+    const supabase = createClient();
+    const allIds = notifications.map((n) => n.id);
+    if (allIds.length === 0) return;
+    await supabase.from('notifications').delete().in('id', allIds);
+    setNotifications([]);
+    window.dispatchEvent(new Event('inbox:read'));
+  }, [user, notifications]);
+
   if (loading || fetching) {
     return (
       <div className="py-24 text-center">
@@ -516,43 +535,28 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
       {/* Notifications Tab */}
       {tab === 'notifications' && (
         <FadeUp>
-          <div className="space-y-3">
-            {unreadNotifs > 0 && (
-              <div className="flex justify-end">
-                <button onClick={markAllNotifsRead} className="text-xs text-[var(--color-gold)] hover:underline">
-                  {t('markAllRead')}
-                </button>
-              </div>
-            )}
-            {notifsLoading ? (
-              <div className="py-12 text-center">
-                <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 text-center">
-                <p className="text-sm text-[var(--muted-foreground)]">{t('noNotifications')}</p>
-              </div>
-            ) : (
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl divide-y divide-[var(--border)]">
-                {notifications.map((notif) => (
-                  <div key={notif.id}
-                    className={`px-5 py-4 transition-colors ${!notif.read_at ? 'bg-[var(--color-gold)]/[0.02] cursor-pointer' : ''}`}
-                    onClick={() => !notif.read_at && markNotifRead(notif.id)}>
-                    <div className="flex items-start gap-3">
-                      {!notif.read_at && <span className="w-2 h-2 rounded-full bg-[var(--color-gold)] mt-1.5 shrink-0" />}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold">{notif.title}</p>
-                        {notif.body && <p className="text-sm text-[var(--muted-foreground)] mt-0.5">{notif.body}</p>}
-                        <p className="text-xs text-[var(--muted-foreground)]/50 mt-1">
-                          {new Date(notif.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <NotificationList
+            notifications={notifications}
+            loading={notifsLoading}
+            accent="gold"
+            labels={{
+              noNotifications: t('noNotifications'),
+              markAllRead: t('markAllRead'),
+              deleteSelected: t('deleteSelected'),
+              deleteAll: t('deleteAll'),
+              selectAll: t('selectMode'),
+              deselectAll: t('deselectAll'),
+              selected: t('nSelected'),
+              confirmDeleteTitle: t('confirmDeleteTitle'),
+              confirmDeleteBody: t('confirmDeleteBody'),
+              confirmYes: t('confirmYes'),
+              cancel: t('cancel'),
+            }}
+            onMarkRead={markNotifRead}
+            onMarkAllRead={markAllNotifsRead}
+            onDelete={deleteNotifications}
+            onDeleteAll={deleteAllNotifications}
+          />
         </FadeUp>
       )}
     </div>

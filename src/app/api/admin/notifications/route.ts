@@ -80,3 +80,32 @@ export async function PATCH(request: NextRequest) {
 
   return NextResponse.json({ ok: true });
 }
+
+/**
+ * DELETE /api/admin/notifications — Delete notifications
+ */
+export async function DELETE(request: NextRequest) {
+  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
+  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+  const body = await request.json();
+  const { ids, deleteAll } = body as { ids?: string[]; deleteAll?: boolean };
+
+  const supabase = createAdminClient();
+
+  if (deleteAll) {
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId)
+      .in('type', HQ_NOTIFICATION_TYPES);
+  } else if (ids && ids.length > 0) {
+    await supabase
+      .from('notifications')
+      .delete()
+      .in('id', ids)
+      .eq('user_id', userId);
+  }
+
+  return NextResponse.json({ ok: true });
+}

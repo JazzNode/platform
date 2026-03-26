@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
+import NotificationList from '@/components/inbox/NotificationList';
 
 type Tab = 'messages' | 'notifications';
 
@@ -302,6 +303,31 @@ export default function AdminInboxPage() {
     setUnreadCount((prev) => Math.max(0, prev - 1));
   };
 
+  // Delete notifications
+  const deleteNotifications = async (ids: string[]) => {
+    if (!token || ids.length === 0) return;
+    await fetch('/api/admin/notifications', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids }),
+    });
+    const deletedUnread = notifications.filter((n) => ids.includes(n.id) && !n.read_at).length;
+    setNotifications((prev) => prev.filter((n) => !ids.includes(n.id)));
+    setUnreadCount((prev) => Math.max(0, prev - deletedUnread));
+  };
+
+  // Delete all notifications
+  const deleteAllNotifications = async () => {
+    if (!token) return;
+    await fetch('/api/admin/notifications', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ deleteAll: true }),
+    });
+    setNotifications([]);
+    setUnreadCount(0);
+  };
+
   // Send message as admin
   const handleSend = useCallback(async () => {
     if (!newMessage.trim() || !selectedConvo || !token || sending) return;
@@ -369,56 +395,29 @@ export default function AdminInboxPage() {
 
       {/* Notifications Tab */}
       {tab === 'notifications' && (
-        <div className="space-y-4">
-          {unreadCount > 0 && (
-            <div className="flex justify-end">
-              <button
-                onClick={markAllRead}
-                className="text-xs text-[var(--color-gold)] hover:underline uppercase tracking-widest"
-              >
-                {t('markAllRead')}
-              </button>
-            </div>
-          )}
-
-          {loadingNotifs ? (
-            <div className="py-12 text-center">
-              <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
-            </div>
-          ) : notifications.length === 0 ? (
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 text-center">
-              <p className="text-sm text-[var(--muted-foreground)]">{t('noNotifications')}</p>
-            </div>
-          ) : (
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl divide-y divide-[var(--border)]">
-              {notifications.map((notif) => (
-                <div
-                  key={notif.id}
-                  className={`px-5 py-4 transition-colors ${
-                    !notif.read_at ? 'bg-[var(--color-gold)]/[0.02] cursor-pointer' : ''
-                  }`}
-                  onClick={() => !notif.read_at && markRead(notif.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    {!notif.read_at && <span className="w-2 h-2 rounded-full bg-[var(--color-gold)] mt-1.5 shrink-0" />}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold">{notif.title}</p>
-                        <TypeBadge type={notif.type} />
-                      </div>
-                      {notif.body && (
-                        <p className="text-sm text-[var(--muted-foreground)] mt-0.5">{notif.body}</p>
-                      )}
-                      <p className="text-xs text-[var(--muted-foreground)]/50 mt-1">
-                        {new Date(notif.created_at).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <NotificationList
+          notifications={notifications}
+          loading={loadingNotifs}
+          accent="gold"
+          labels={{
+            noNotifications: t('noNotifications'),
+            markAllRead: t('markAllRead'),
+            deleteSelected: t('deleteSelected'),
+            deleteAll: t('deleteAll'),
+            selectAll: t('selectMode'),
+            deselectAll: t('deselectAll'),
+            selected: t('nSelected'),
+            confirmDeleteTitle: t('confirmDeleteTitle'),
+            confirmDeleteBody: t('confirmDeleteBody'),
+            confirmYes: t('confirmYes'),
+            cancel: t('cancel'),
+          }}
+          renderBadge={(notif) => <TypeBadge type={notif.type} />}
+          onMarkRead={markRead}
+          onMarkAllRead={markAllRead}
+          onDelete={deleteNotifications}
+          onDeleteAll={deleteAllNotifications}
+        />
       )}
 
       {/* Messages Tab */}
