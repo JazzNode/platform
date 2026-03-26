@@ -106,7 +106,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
           </svg>
         )}
       </span>
-      <span className="uppercase tracking-widest text-xs relative">{active ? t('bookmarked') : t('bookmark')}</span>
+      <span className="uppercase tracking-widest relative">{active ? t('bookmarked') : t('bookmark')}</span>
     </button>
   );
 }
