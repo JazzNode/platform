@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Badge 位置比較 — JazzNode</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+  :root { --gold: #C8A84E; --bg: #0a0a0a; --card: #111; --border: #1e1e1e; --text: #e5e5e5; --muted: #888; --dim: #555; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; padding: 24px; }
+
+  h1 { text-align: center; color: var(--gold); font-size: 22px; margin-bottom: 4px; }
+  .sub { text-align: center; color: var(--muted); font-size: 12px; margin-bottom: 40px; }
+
+  .options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1300px; margin: 0 auto; }
+  .option { position: relative; }
+  .option-label { text-align: center; margin-bottom: 12px; }
+  .option-label h3 { font-size: 14px; color: #fff; }
+  .option-label p { font-size: 11px; color: var(--muted); }
+  .option-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
+  .tag-1 { background: #4ade8022; color: #4ade80; }
+  .tag-2 { background: #60a5fa22; color: #60a5fa; }
+  .tag-3 { background: #a78bfa22; color: #a78bfa; }
+
+  /* Mock card */
+  .mock { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+  /* Cover */
+  .cover { height: 100px; background: linear-gradient(135deg, #1a1510, #12110e, var(--bg)); position: relative; }
+  .cover::after { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 30% 50%, rgba(200,168,78,0.06), transparent 60%); }
+
+  /* Profile row */
+  .profile-row { display: flex; gap: 16px; align-items: flex-start; padding: 0 20px; margin-top: -32px; position: relative; z-index: 2; }
+  .avatar { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #2a2015, #1a1510); border: 3px solid var(--bg); box-shadow: 0 0 0 1px rgba(200,168,78,0.15); display: flex; align-items: center; justify-content: center; font-size: 28px; color: var(--gold); flex-shrink: 0; }
+  .identity { flex: 1; padding-top: 36px; min-width: 0; }
+  .name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; }
+  .name-en { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .headline { font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .headline .dot { color: var(--dim); }
+
+  /* Status badges */
+  .status-row { display: flex; gap: 6px; margin-top: 6px; }
+  .status-pill { font-size: 10px; padding: 3px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px; }
+  .status-hire { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); color: #4ade80; }
+  .status-teach { background: rgba(96,165,250,0.08); border: 1px solid rgba(96,165,250,0.2); color: #60a5fa; }
+
+  /* Stats */
+  .stats { display: flex; gap: 16px; margin-top: 8px; }
+  .stat-num { font-size: 14px; font-weight: 700; }
+  .stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+
+  /* Actions */
+  .actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .btn { font-size: 10px; padding: 5px 12px; border-radius: 16px; border: 1px solid var(--border); color: var(--muted); background: transparent; }
+
+  /* Badge row */
+  .badge-row { display: flex; gap: 4px; flex-wrap: wrap; }
+  .badge-icon { width: 24px; height: 24px; border-radius: 6px; background: var(--card); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: all 0.2s; position: relative; }
+  .badge-icon:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .badge-icon.earned { border-color: rgba(200,168,78,0.25); }
+  .badge-icon.unearned { opacity: 0.3; }
+
+  /* Highlight zone */
+  .highlight-zone { position: relative; }
+  .highlight-zone::before {
+    content: '';
+    position: absolute;
+    inset: -4px -6px;
+    border: 2px dashed var(--gold);
+    border-radius: 8px;
+    opacity: 0.4;
+  }
+  .highlight-arrow {
+    position: absolute;
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: var(--gold);
+    white-space: nowrap;
+  }
+
+  /* Divider */
+  .mock-divider { height: 1px; background: var(--border); margin: 12px 20px; }
+
+  /* About placeholder */
+  .about { padding: 0 20px 16px; }
+  .about h2 { font-family: 'Playfair Display', serif; font-size: 16px; margin-bottom: 6px; }
+  .about p { font-size: 11px; color: #999; line-height: 1.5; }
+
+  /* Under avatar badges */
+  .under-avatar { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+
+  @media (max-width: 900px) { .options { grid-template-columns: 1fr; max-width: 400px; } }
+</style>
+</head>
+<body>
+
+<h1>Badge Icons 位置比較</h1>
+<p class="sub">三種方案的桌面端示意圖 — hover 效果相同（字卡風格 + 浮起動畫）</p>
+
+<div class="options">
+
+  <!-- ═══ OPTION 1: Under Avatar ═══ -->
+  <div class="option">
+    <div class="option-label">
+      <span class="option-tag tag-1">方案 A</span>
+      <h3>頭像正下方</h3>
+      <p>像個人勳章展示櫃</p>
+    </div>
+    <div class="mock">
+      <div class="cover"></div>
+      <div class="profile-row">
+        <div class="under-avatar">
+          <div class="avatar">🎸</div>
+          <div class="highlight-zone">
+            <div class="badge-row">
+              <div class="badge-icon earned">🏠</div>
+              <div class="badge-icon earned">🔥</div>
+              <div class="badge-icon earned">🌍</div>
+              <div class="badge-icon earned">❤️</div>
+              <div class="badge-icon earned">🎤</div>
+            </div>
+          </div>
+        </div>
+        <div class="identity">
+          <div class="name">劉育嘉</div>
+          <div class="name-en">Yu Jia</div>
+          <div class="headline">
+            <span>🎸 貝斯</span>
+            <span class="dot">·</span>
+            <span>音樂家</span>
+            <span class="dot">·</span>
+            <span>TW</span>
+          </div>
+          <div class="status-row">
+            <span class="status-pill status-hire"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> 可接案</span>
+          </div>
+          <div class="stats">
+            <div><div class="stat-num">1</div><div class="stat-label">追蹤者</div></div>
+            <div><div class="stat-num">6</div><div class="stat-label">演出</div></div>
+            <div><div class="stat-num">18</div><div class="stat-label">合作者</div></div>
+          </div>
+          <div class="actions">
+            <span class="btn">追蹤</span>
+            <span class="btn">傳訊息</span>
+            <span class="btn">認領</span>
+            <span class="btn">分享</span>
+          </div>
+        </div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="about">
+        <h2>關於</h2>
+        <p>劉育嘉是活躍於國際的實力派貝斯手，曾獲台北爵士新秀冠軍...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OPTION 2: Below Stats ═══ -->
+  <div class="option">
+    <div class="option-label">
+      <span class="option-tag tag-2">方案 B</span>
+      <h3>Stats 列下方</h3>
+      <p>成就概覽區，跟數字串在一起</p>
+    </div>
+    <div class="mock">
+      <div class="cover"></div>
+      <div class="profile-row">
+        <div class="avatar">🎸</div>
+        <div class="identity">
+          <div class="name">劉育嘉</div>
+          <div class="name-en">Yu Jia</div>
+          <div class="headline">
+            <span>🎸 貝斯</span>
+            <span class="dot">·</span>
+            <span>音樂家</span>
+            <span class="dot">·</span>
+            <span>TW</span>
+          </div>
+          <div class="status-row">
+            <span class="status-pill status-hire"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> 可接案</span>
+          </div>
+          <div class="stats">
+            <div><div class="stat-num">1</div><div class="stat-label">追蹤者</div></div>
+            <div><div class="stat-num">6</div><div class="stat-label">演出</div></div>
+            <div><div class="stat-num">18</div><div class="stat-label">合作者</div></div>
+          </div>
+          <div class="highlight-zone" style="margin-top:8px;">
+            <div class="badge-row">
+              <div class="badge-icon earned">🏠</div>
+              <div class="badge-icon earned">🔥</div>
+              <div class="badge-icon earned">🌍</div>
+              <div class="badge-icon earned">❤️</div>
+              <div class="badge-icon earned">🎤</div>
+            </div>
+          </div>
+          <div class="actions">
+            <span class="btn">追蹤</span>
+            <span class="btn">傳訊息</span>
+            <span class="btn">認領</span>
+            <span class="btn">分享</span>
+          </div>
+        </div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="about">
+        <h2>關於</h2>
+        <p>劉育嘉是活躍於國際的實力派貝斯手，曾獲台北爵士新秀冠軍...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ OPTION 3: Inline with Headline ═══ -->
+  <div class="option">
+    <div class="option-label">
+      <span class="option-tag tag-3">方案 C</span>
+      <h3>名字右邊 / Headline 同行</h3>
+      <p>最緊湊，但可能太擠</p>
+    </div>
+    <div class="mock">
+      <div class="cover"></div>
+      <div class="profile-row">
+        <div class="avatar">🎸</div>
+        <div class="identity">
+          <div class="name" style="display:flex; align-items:center; gap:8px;">
+            劉育嘉
+          </div>
+          <div class="name-en">Yu Jia</div>
+          <div class="headline">
+            <span>🎸 貝斯</span>
+            <span class="dot">·</span>
+            <span>音樂家</span>
+            <span class="dot">·</span>
+            <span>TW</span>
+            <span class="dot">·</span>
+            <span class="highlight-zone" style="display:inline-flex;">
+              <span class="badge-row" style="gap:3px;">
+                <span class="badge-icon earned" style="width:20px;height:20px;font-size:10px;">🏠</span>
+                <span class="badge-icon earned" style="width:20px;height:20px;font-size:10px;">🔥</span>
+                <span class="badge-icon earned" style="width:20px;height:20px;font-size:10px;">🌍</span>
+                <span class="badge-icon earned" style="width:20px;height:20px;font-size:10px;">❤️</span>
+                <span class="badge-icon earned" style="width:20px;height:20px;font-size:10px;">🎤</span>
+              </span>
+            </span>
+          </div>
+          <div class="status-row">
+            <span class="status-pill status-hire"><span style="width:5px;height:5px;border-radius:50%;background:#4ade80"></span> 可接案</span>
+          </div>
+          <div class="stats">
+            <div><div class="stat-num">1</div><div class="stat-label">追蹤者</div></div>
+            <div><div class="stat-num">6</div><div class="stat-label">演出</div></div>
+            <div><div class="stat-num">18</div><div class="stat-label">合作者</div></div>
+          </div>
+          <div class="actions">
+            <span class="btn">追蹤</span>
+            <span class="btn">傳訊息</span>
+            <span class="btn">認領</span>
+            <span class="btn">分享</span>
+          </div>
+        </div>
+      </div>
+      <div class="mock-divider"></div>
+      <div class="about">
+        <h2>關於</h2>
+        <p>劉育嘉是活躍於國際的實力派貝斯手，曾獲台北爵士新秀冠軍...</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width:1300px; margin:32px auto 0; padding:16px 20px; background:#141414; border:1px solid var(--border); border-radius:10px;">
+  <h3 style="color:var(--gold); font-size:13px; margin-bottom:6px;">💡 我的建議</h3>
+  <p style="font-size:12px; color:var(--muted); line-height:1.6;">
+    <strong style="color:#fff;">方案 A（頭像下方）</strong>最像「個人勳章展示」，視覺上最有收藏感。電腦端在頭像下面一排，手機端也會自然堆疊在頭像下面。<br>
+    <strong style="color:#fff;">方案 B（Stats 下方）</strong>最整齊，但跟數字混在一起可能被忽略。<br>
+    <strong style="color:#fff;">方案 C（Headline 同行）</strong>最緊湊，但 badges 多的時候會 wrap 到第二行，手機端容易太擠。
+  </p>
+</div>
+
+<div style="text-align:center; padding:32px 0; color:#333; font-size:10px;">Badge Placement Options · Internal · Mar 2026</div>
+
+</body>
+</html>

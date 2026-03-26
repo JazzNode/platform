@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>藝人推薦系統設計 — JazzNode</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+  :root { --gold: #C8A84E; --bg: #0a0a0a; --card: #111; --border: #1e1e1e; --border-light: #2a2a2a; --text: #e5e5e5; --muted: #888; --dim: #555; --green: #4ade80; --blue: #60a5fa; --purple: #a78bfa; --r: 10px; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; line-height:1.7; }
+  .container { max-width:840px; margin:0 auto; padding:40px 24px 80px; }
+  h1 { font-size:26px; font-weight:700; color:var(--gold); margin-bottom:4px; }
+  .sub { color:var(--muted); font-size:13px; margin-bottom:40px; }
+  h2 { font-size:18px; font-weight:700; margin-top:40px; margin-bottom:14px; padding-bottom:6px; border-bottom:2px solid var(--border); }
+  h3 { font-size:15px; font-weight:600; margin-top:20px; margin-bottom:8px; color:#fff; }
+  h4 { font-size:13px; font-weight:600; margin-top:14px; margin-bottom:4px; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+  p, li { font-size:14px; color:var(--text); margin-bottom:8px; }
+  ul { padding-left:20px; }
+  strong { color:#fff; }
+  code { background:#1a1a1a; padding:2px 6px; border-radius:4px; font-size:12px; color:var(--gold); }
+
+  .verdict { background:#141414; border:1px solid var(--gold); border-radius:var(--r); padding:20px 24px; margin:16px 0; }
+  .verdict h3 { color:var(--gold); margin-top:0; }
+  .insight { background:#1a1a0a; border-left:3px solid var(--gold); padding:14px 18px; margin:14px 0; border-radius:0 var(--r) var(--r) 0; }
+  .insight p { margin:0; font-size:13px; }
+
+  table { width:100%; border-collapse:collapse; font-size:13px; margin:12px 0; }
+  th { background:#141414; color:var(--gold); padding:8px 12px; text-align:left; border-bottom:2px solid var(--border); }
+  td { padding:8px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+
+  .tag-demo { display:inline-flex; align-items:center; gap:4px; font-size:12px; padding:4px 10px; background:var(--card); border:1px solid var(--border); border-radius:16px; margin:2px 4px 2px 0; }
+
+  /* ── Mockup styling ── */
+  .mockup-frame { background:#0e0e0e; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:16px 0; }
+  .mockup-header { padding:10px 16px; background:#141414; border-bottom:1px solid var(--border); font-size:11px; color:var(--dim); display:flex; justify-content:space-between; }
+  .mockup-body { padding:20px; }
+  .mockup-label { font-size:10px; color:var(--gold); background:var(--gold)11; padding:2px 6px; border-radius:3px; }
+
+  .shoutout-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:16px; margin-bottom:10px; position:relative; }
+  .shoutout-card.pinned { border-color: var(--gold)44; background: #11100e; }
+  .shoutout-card.pinned::before { content:'📌 Pinned'; position:absolute; top:8px; right:10px; font-size:10px; color:var(--gold); }
+  .shoutout-author { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .shoutout-avatar { width:36px; height:36px; border-radius:50%; background:var(--border); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .shoutout-name { font-size:13px; font-weight:600; color:#fff; }
+  .shoutout-meta { font-size:11px; color:var(--muted); }
+  .shoutout-role { display:inline-block; font-size:10px; font-weight:600; padding:1px 6px; border-radius:3px; margin-left:4px; }
+  .role-artist { background:var(--purple)22; color:var(--purple); }
+  .role-venue { background:var(--green)22; color:var(--green); }
+  .role-member { background:#ffffff11; color:var(--muted); }
+  .shoutout-text { font-size:13px; line-height:1.6; color:var(--text); }
+  .shoutout-tags { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+
+  .form-mock { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:16px; }
+  .form-prompt { font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .form-textarea { width:100%; height:60px; background:#1a1a1a; border:1px solid var(--border); border-radius:6px; padding:10px; color:var(--text); font-size:13px; resize:none; font-family:inherit; }
+  .form-tags { display:flex; flex-wrap:wrap; gap:4px; margin:10px 0; }
+  .form-actions { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+  .btn-sm { padding:6px 16px; border-radius:6px; font-size:12px; font-weight:600; border:none; cursor:pointer; }
+  .btn-gold { background:var(--gold); color:#000; }
+  .btn-ghost { background:transparent; color:var(--muted); border:1px solid var(--border); }
+
+  .badge-card { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:12px 16px; margin:6px 0; }
+  .badge-icon { font-size:24px; flex-shrink:0; }
+  .badge-name { font-size:13px; font-weight:600; color:#fff; }
+  .badge-desc { font-size:11px; color:var(--muted); }
+  .badge-target { font-size:10px; color:var(--dim); }
+
+  .flow-step { display:flex; gap:12px; margin:8px 0; }
+  .flow-num { width:24px; height:24px; border-radius:50%; background:var(--gold)22; color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:2px; }
+  .flow-content { flex:1; }
+
+  .compare-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:12px 0; }
+  .compare-card { background:var(--card); border:1px solid var(--border); border-radius:var(--r); padding:14px 16px; }
+  .compare-card h4 { margin-top:0; }
+
+  @media(max-width:640px) { .compare-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🎤 藝人推薦系統設計</h1>
+<p class="sub">以場地留言系統為基礎，打造「推薦牆」— 整合社交證明、藝人策展、徽章激勵</p>
+
+<!-- ═══════════════════════════════ -->
+<h2>一、核心概念</h2>
+
+<div class="verdict">
+  <h3>你的直覺完全正確 — 複用場地留言架構 + 重新定位</h3>
+  <p>場地留言的完整架構（Provider → Form → List → Tags → Roles → Notifications → Dashboard）都可以複用。關鍵是改變<strong>定位和語氣</strong>：從「評價 / Review」變成「推薦 / Shoutout」，讓整個區塊的氛圍是正面的、鼓勵的。</p>
+</div>
+
+<h3>命名方案</h3>
+
+<table>
+  <thead><tr><th>語言</th><th>區塊標題</th><th>按鈕文字</th><th>表單提示</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>English</strong></td>
+      <td><strong>Shoutouts</strong></td>
+      <td>Leave a Shoutout</td>
+      <td>"Say something nice about [Artist]..."</td>
+    </tr>
+    <tr>
+      <td><strong>繁體中文</strong></td>
+      <td><strong>來自音樂圈的推薦</strong></td>
+      <td>留下推薦</td>
+      <td>「分享你對 [藝人名] 的推薦...」</td>
+    </tr>
+    <tr>
+      <td><strong>日本語</strong></td>
+      <td><strong>ミュージシャンの声</strong></td>
+      <td>推薦を書く</td>
+      <td>「[アーティスト名] への推薦を…」</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="insight">
+  <p>💡 <strong>為什麼選「Shoutouts」而不是「Reviews」或「Recommendations」？</strong><br>
+  「Shoutout」在音樂圈是自然用語，意思是「公開的讚美/致敬」。它暗示正面、簡短、自發的推薦，不像 Review 可能帶有負面評價，也不像 Recommendation 那樣正式。中文用「來自音樂圈的推薦」則強調社群歸屬感。</p>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>二、場地留言 vs 藝人推薦 — 差異對照</h2>
+
+<div class="compare-grid">
+  <div class="compare-card">
+    <h4>🏠 場地留言（現有）</h4>
+    <ul>
+      <li>任何人可留言，可正面可負面</li>
+      <li>Tags 是場地屬性（音響、飲料、交通...）</li>
+      <li>場地無法「置頂」留言</li>
+      <li>所有留言平等顯示</li>
+      <li>有回覆功能</li>
+      <li>可匿名</li>
+    </ul>
+  </div>
+  <div class="compare-card">
+    <h4>🎤 藝人推薦（新設計）</h4>
+    <ul>
+      <li>任何人可推薦，<strong>語氣引導為正面</strong></li>
+      <li>Tags 是藝人特質（音樂性、現場、合作、教學...）</li>
+      <li>藝人可「📌 置頂」最多 3 則推薦</li>
+      <li><strong>藝人/場地推薦優先排序</strong></li>
+      <li>有回覆功能（藝人可回覆感謝）</li>
+      <li>可匿名（但推薦通常不匿名）</li>
+    </ul>
+  </div>
+</div>
+
+<h3>新增的功能差異</h3>
+<table>
+  <thead><tr><th>功能</th><th>場地留言</th><th>藝人推薦</th></tr></thead>
+  <tbody>
+    <tr><td>置頂 / Pin</td><td>❌</td><td>✅ 藝人可置頂最多 3 則</td></tr>
+    <tr><td>排序邏輯</td><td>純時間倒序</td><td>📌 Pinned → 🎵 藝人/場地 → 👤 一般 → 時間倒序</td></tr>
+    <tr><td>表單語氣</td><td>中性（「Leave a comment」）</td><td>正面引導（「Say something nice...」）</td></tr>
+    <tr><td>Tags</td><td>場地屬性 8 個</td><td>藝人特質 8 個（見下方）</td></tr>
+    <tr><td>sender_role</td><td>member / venue_manager / artist / admin</td><td>相同架構，完全複用</td></tr>
+    <tr><td>藝人頁面顯示</td><td>—</td><td>Pinned 顯示在「What People Say」區<br>全部顯示在底部「Shoutouts」區</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>三、推薦 Tags 設計</h2>
+
+<p>替換場地的 8 個 tags，設計 8 個針對藝人特質的標籤：</p>
+
+<div style="margin:12px 0;">
+  <span class="tag-demo">🎵 Great Musicianship</span>
+  <span class="tag-demo">🔥 Amazing Live</span>
+  <span class="tag-demo">🤝 Great Collaborator</span>
+  <span class="tag-demo">💡 Creative & Original</span>
+  <span class="tag-demo">🎓 Excellent Teacher</span>
+  <span class="tag-demo">✨ Inspiring</span>
+  <span class="tag-demo">🎯 Professional</span>
+  <span class="tag-demo">💪 Reliable</span>
+</div>
+
+<table>
+  <thead><tr><th>Tag Key</th><th>EN</th><th>ZH</th><th>意義</th></tr></thead>
+  <tbody>
+    <tr><td><code>great_musicianship</code></td><td>🎵 Great Musicianship</td><td>🎵 音樂性很強</td><td>演奏技巧/音樂性</td></tr>
+    <tr><td><code>amazing_live</code></td><td>🔥 Amazing Live</td><td>🔥 現場超棒</td><td>現場演出體驗</td></tr>
+    <tr><td><code>great_collaborator</code></td><td>🤝 Great Collaborator</td><td>🤝 好合作夥伴</td><td>合作默契好</td></tr>
+    <tr><td><code>creative</code></td><td>💡 Creative & Original</td><td>💡 創意十足</td><td>獨特風格</td></tr>
+    <tr><td><code>great_teacher</code></td><td>🎓 Excellent Teacher</td><td>🎓 好老師</td><td>教學能力（學生可留）</td></tr>
+    <tr><td><code>inspiring</code></td><td>✨ Inspiring</td><td>✨ 很受啟發</td><td>看完演出受到啟發</td></tr>
+    <tr><td><code>professional</code></td><td>🎯 Professional</td><td>🎯 很專業</td><td>準時、溝通好、專業</td></tr>
+    <tr><td><code>reliable</code></td><td>💪 Reliable</td><td>💪 很可靠</td><td>場地/合作者專用</td></tr>
+  </tbody>
+</table>
+
+<div class="insight">
+  <p>💡 <strong>Tags 的雙重用途：</strong>除了顯示在推薦卡片上，還可以<strong>聚合成藝人的「特質標籤雲」</strong>。例如：如果有 12 個人都選了「🔥 Amazing Live」，藝人頁面頂部就可以顯示「🔥 12 people say: Amazing Live」，這就是 LinkedIn Skills 的概念。</p>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>四、顯示邏輯 — 兩層展示</h2>
+
+<h3>Layer 1：藝人頁面「What People Say」區（精選）</h3>
+<p>位於 About 和 Media 之間，<strong>只顯示藝人置頂的推薦</strong>（最多 3 則），以引言格式呈現：</p>
+
+<div class="mockup-frame">
+  <div class="mockup-header">
+    <span>Artist Page · What People Say Section</span>
+    <span class="mockup-label">藝人 Pinned 的推薦</span>
+  </div>
+  <div class="mockup-body">
+    <div class="shoutout-card pinned" style="border-left:3px solid var(--gold);">
+      <div class="shoutout-text" style="font-family:'Playfair Display',serif; font-style:italic; font-size:14px; line-height:1.6;">
+        "Sarah's trio brought an incredible energy to our venue. The audience loved her take on Monk's compositions — fresh, modern, but deeply respectful."
+      </div>
+      <div class="shoutout-author" style="margin-top:12px; margin-bottom:0;">
+        <div class="shoutout-avatar">🏠</div>
+        <div>
+          <div class="shoutout-name">Blue Note Taipei <span class="shoutout-role role-venue">Venue</span></div>
+          <div class="shoutout-meta">12 performances hosted · 2 months ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="shoutout-card pinned" style="border-left:3px solid var(--purple);">
+      <div class="shoutout-text" style="font-family:'Playfair Display',serif; font-style:italic; font-size:14px; line-height:1.6;">
+        "One of the most musical pianists I've played with. Her comping is incredibly supportive and her solos always tell a story."
+      </div>
+      <div class="shoutout-author" style="margin-top:12px; margin-bottom:0;">
+        <div class="shoutout-avatar">🎸</div>
+        <div>
+          <div class="shoutout-name">Ken Tanaka <span class="shoutout-role role-artist">Artist</span></div>
+          <div class="shoutout-meta">Bass · Collaborated 15 times · 3 weeks ago</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:14px;">
+      <span style="font-size:12px; color:var(--gold); cursor:pointer;">See all 18 shoutouts ›</span>
+    </div>
+  </div>
+</div>
+
+<h3>Layer 2：底部「Shoutouts」區（完整列表 + 表單）</h3>
+<p>完整的推薦區，包含留言表單和所有推薦。排序：📌 Pinned → 🎵 Artist/Venue → 👤 Member → 時間倒序</p>
+
+<div class="mockup-frame">
+  <div class="mockup-header">
+    <span>Artist Page · Shoutouts Section (Bottom)</span>
+    <span class="mockup-label">完整推薦列表 + 留言表單</span>
+  </div>
+  <div class="mockup-body">
+
+    <!-- Aggregated tags -->
+    <div style="margin-bottom:16px;">
+      <div style="font-size:13px; color:var(--muted); margin-bottom:8px;">People describe Sarah as:</div>
+      <span class="tag-demo" style="border-color:var(--gold)44;">🎵 Great Musicianship <strong style="color:var(--gold); margin-left:2px;">×12</strong></span>
+      <span class="tag-demo" style="border-color:var(--gold)44;">🔥 Amazing Live <strong style="color:var(--gold); margin-left:2px;">×9</strong></span>
+      <span class="tag-demo">🤝 Great Collaborator ×7</span>
+      <span class="tag-demo">🎓 Excellent Teacher ×4</span>
+      <span class="tag-demo">💡 Creative ×3</span>
+    </div>
+
+    <!-- Form -->
+    <div class="form-mock" style="margin-bottom:16px;">
+      <div class="form-prompt">✍️ Say something nice about Sarah Chen...</div>
+      <textarea class="form-textarea" placeholder="分享你的推薦或合作經驗..."></textarea>
+      <div class="form-tags">
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">🎵 Musicianship</span>
+        <span class="tag-demo" style="border-color:var(--gold); cursor:pointer;">🔥 Amazing Live</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">🤝 Collaborator</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">💡 Creative</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">🎓 Teacher</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">✨ Inspiring</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">🎯 Professional</span>
+        <span class="tag-demo" style="opacity:0.6; cursor:pointer;">💪 Reliable</span>
+      </div>
+      <div class="form-actions">
+        <div style="font-size:11px; color:var(--dim);">
+          Posting as: <strong style="color:var(--purple);">David Lin · Artist</strong> ▾
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="btn-sm btn-ghost">Cancel</button>
+          <button class="btn-sm btn-gold">Post Shoutout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shoutout list -->
+    <div class="shoutout-card pinned">
+      <div class="shoutout-author">
+        <div class="shoutout-avatar">🏠</div>
+        <div>
+          <div class="shoutout-name">Blue Note Taipei <span class="shoutout-role role-venue">Venue</span></div>
+          <div class="shoutout-meta">12 performances hosted · 2 months ago</div>
+        </div>
+      </div>
+      <div class="shoutout-text">"Sarah's trio brought an incredible energy to our venue. The audience loved her take on Monk's compositions — fresh, modern, but deeply respectful."</div>
+      <div class="shoutout-tags">
+        <span class="tag-demo" style="font-size:11px;">🎵 Musicianship</span>
+        <span class="tag-demo" style="font-size:11px;">🔥 Amazing Live</span>
+      </div>
+    </div>
+
+    <div class="shoutout-card">
+      <div class="shoutout-author">
+        <div class="shoutout-avatar">🎷</div>
+        <div>
+          <div class="shoutout-name">David Lin <span class="shoutout-role role-artist">Artist</span></div>
+          <div class="shoutout-meta">Saxophone · Collaborated 8 times · 1 week ago</div>
+        </div>
+      </div>
+      <div class="shoutout-text">"Playing with Sarah is always a joy. She listens deeply and always serves the music. Every session with her trio pushes me to be better."</div>
+      <div class="shoutout-tags">
+        <span class="tag-demo" style="font-size:11px;">🤝 Collaborator</span>
+        <span class="tag-demo" style="font-size:11px;">✨ Inspiring</span>
+      </div>
+    </div>
+
+    <div class="shoutout-card">
+      <div class="shoutout-author">
+        <div class="shoutout-avatar">👤</div>
+        <div>
+          <div class="shoutout-name">jazz_fan_tw <span class="shoutout-role role-member">Member</span></div>
+          <div class="shoutout-meta">3 days ago</div>
+        </div>
+      </div>
+      <div class="shoutout-text">"上週在 Blue Note 看到她的三重奏，真的很感動。每首曲子都有故事，互動也很好，會跟觀眾聊天分享曲子的背景。"</div>
+      <div class="shoutout-tags">
+        <span class="tag-demo" style="font-size:11px;">🔥 Amazing Live</span>
+        <span class="tag-demo" style="font-size:11px;">✨ Inspiring</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>五、置頂（Pin）機制</h2>
+
+<table>
+  <thead><tr><th>規則</th><th>說明</th></tr></thead>
+  <tbody>
+    <tr><td><strong>誰可以 Pin</strong></td><td>只有 Claimed 藝人本人（tier ≥ 1）</td></tr>
+    <tr><td><strong>最多幾則</strong></td><td>3 則（足夠顯示在「What People Say」區）</td></tr>
+    <tr><td><strong>Pin 的位置</strong></td><td>「What People Say」精選區 + Shoutouts 列表最頂部</td></tr>
+    <tr><td><strong>Pin UI</strong></td><td>Dashboard 的推薦管理頁，每則推薦旁有 📌 按鈕</td></tr>
+    <tr><td><strong>取消 Pin</strong></td><td>隨時可取消，推薦回到一般排序</td></tr>
+    <tr><td><strong>是否 tier-gate</strong></td><td>建議所有 Claimed 都可以 Pin — Pin 是鼓勵大家經營頁面的工具</td></tr>
+  </tbody>
+</table>
+
+<div class="insight">
+  <p>💡 <strong>Pin 是「藝人頁面即 EPK」策略的關鍵。</strong>藝人可以策展自己的推薦，挑選最有代表性的展示在頁面最顯眼位置。這等於給了他們自由編輯 EPK 「推薦語」區塊的能力，不需要我們做任何自訂排版。</p>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>六、徽章激勵機制</h2>
+
+<h3>給留推薦的人（User Badges）</h3>
+
+<div class="badge-card">
+  <div class="badge-icon">📣</div>
+  <div>
+    <div class="badge-name">First Shoutout</div>
+    <div class="badge-desc">留下了第一則藝人推薦</div>
+    <div class="badge-target">條件：留下 1 則推薦</div>
+  </div>
+</div>
+
+<div class="badge-card">
+  <div class="badge-icon">📢</div>
+  <div>
+    <div class="badge-name">Scene Supporter</div>
+    <div class="badge-desc">積極推薦音樂圈的藝人</div>
+    <div class="badge-target">條件：給 5 位不同藝人留下推薦</div>
+  </div>
+</div>
+
+<div class="badge-card">
+  <div class="badge-icon">🌟</div>
+  <div>
+    <div class="badge-name">Tastemaker</div>
+    <div class="badge-desc">你的推薦被藝人置頂了！</div>
+    <div class="badge-target">條件：有 1 則推薦被藝人 Pin</div>
+  </div>
+</div>
+
+<h3>給被推薦的藝人（Artist Badges）</h3>
+
+<div class="badge-card">
+  <div class="badge-icon">❤️</div>
+  <div>
+    <div class="badge-name">Crowd Favorite</div>
+    <div class="badge-desc">受到大家的喜愛與推薦</div>
+    <div class="badge-target">條件：收到 5+ 則推薦</div>
+  </div>
+</div>
+
+<div class="badge-card">
+  <div class="badge-icon">🤝</div>
+  <div>
+    <div class="badge-name">Peer Respected</div>
+    <div class="badge-desc">受到其他藝人的認可與推薦</div>
+    <div class="badge-target">條件：收到 3+ 則來自其他藝人的推薦</div>
+  </div>
+</div>
+
+<div class="badge-card">
+  <div class="badge-icon">🏠</div>
+  <div>
+    <div class="badge-name">Venue's Choice</div>
+    <div class="badge-desc">深受場地喜愛與推薦</div>
+    <div class="badge-target">條件：收到 3+ 家不同場地的推薦</div>
+  </div>
+</div>
+
+<div class="insight">
+  <p>💡 <strong>「Tastemaker」徽章是最聰明的設計。</strong>當使用者的推薦被藝人 Pin 時，使用者會收到通知 + 獲得徽章。這個雙重獎勵會<strong>大幅鼓勵人們留下高品質推薦</strong>，因為他們知道寫得好可能會被置頂。</p>
+</div>
+
+<h3>觸發通知設計</h3>
+<table>
+  <thead><tr><th>事件</th><th>通知對象</th><th>通知內容</th></tr></thead>
+  <tbody>
+    <tr><td>有人留了推薦</td><td>被推薦的藝人</td><td>「David Lin left a shoutout on your profile 🎤」</td></tr>
+    <tr><td>藝人 Pin 了推薦</td><td>推薦的作者</td><td>「Sarah Chen pinned your shoutout! 📌 You earned the Tastemaker badge 🌟」</td></tr>
+    <tr><td>藝人回覆推薦</td><td>推薦的作者</td><td>「Sarah Chen replied to your shoutout 💬」</td></tr>
+    <tr><td>獲得徽章</td><td>獲得者</td><td>「You earned the Scene Supporter badge! 📢」</td></tr>
+  </tbody>
+</table>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>七、資料庫設計</h2>
+
+<h3>新表：<code>artist_shoutouts</code></h3>
+
+<pre style="background:#141414; border:1px solid var(--border); border-radius:var(--r); padding:16px; font-size:12px; overflow-x:auto; color:var(--text); line-height:1.5;">
+<span style="color:var(--gold)">CREATE TABLE</span> artist_shoutouts (
+  id           uuid <span style="color:var(--gold)">PRIMARY KEY DEFAULT</span> gen_random_uuid(),
+  artist_id    text <span style="color:var(--gold)">NOT NULL</span>,         <span style="color:var(--dim)">-- 被推薦的藝人</span>
+  user_id      uuid <span style="color:var(--gold)">NOT NULL REFERENCES</span> profiles(id),
+
+  <span style="color:var(--dim)">-- 內容</span>
+  text         varchar(500),              <span style="color:var(--dim)">-- 推薦文字（同 venue_comments 上限）</span>
+  tags         text[] <span style="color:var(--gold)">DEFAULT</span> '{}',    <span style="color:var(--dim)">-- 特質標籤</span>
+  image_url    text,                      <span style="color:var(--dim)">-- 可選附圖</span>
+
+  <span style="color:var(--dim)">-- 身份（複用場地留言的 sender_role 模式）</span>
+  sender_role      text,                  <span style="color:var(--dim)">-- null=member, 'artist', 'venue_manager', 'admin'</span>
+  sender_artist_id text,                  <span style="color:var(--dim)">-- 如果以藝人身份留推薦</span>
+  sender_venue_id  text,                  <span style="color:var(--dim)">-- 如果以場地身份留推薦（NEW）</span>
+
+  <span style="color:var(--dim)">-- 置頂</span>
+  is_pinned    boolean <span style="color:var(--gold)">DEFAULT</span> false,
+  pin_order    smallint,                  <span style="color:var(--dim)">-- 1, 2, 3</span>
+
+  <span style="color:var(--dim)">-- 選項</span>
+  is_anonymous boolean <span style="color:var(--gold)">DEFAULT</span> false,
+
+  created_at   timestamptz <span style="color:var(--gold)">DEFAULT</span> now(),
+  updated_at   timestamptz <span style="color:var(--gold)">DEFAULT</span> now()
+);
+
+<span style="color:var(--dim)">-- 索引</span>
+<span style="color:var(--gold)">CREATE INDEX</span> idx_artist_shoutouts_artist <span style="color:var(--gold)">ON</span> artist_shoutouts(artist_id);
+<span style="color:var(--gold)">CREATE INDEX</span> idx_artist_shoutouts_user   <span style="color:var(--gold)">ON</span> artist_shoutouts(user_id);
+
+<span style="color:var(--dim)">-- 回覆表（完全複用 venue_comment_replies 結構）</span>
+<span style="color:var(--gold)">CREATE TABLE</span> artist_shoutout_replies (
+  id           uuid <span style="color:var(--gold)">PRIMARY KEY DEFAULT</span> gen_random_uuid(),
+  shoutout_id  uuid <span style="color:var(--gold)">NOT NULL REFERENCES</span> artist_shoutouts(id) <span style="color:var(--gold)">ON DELETE CASCADE</span>,
+  user_id      uuid <span style="color:var(--gold)">NOT NULL REFERENCES</span> profiles(id),
+  sender_role  text,
+  body         varchar(500),
+  created_at   timestamptz <span style="color:var(--gold)">DEFAULT</span> now()
+);</pre>
+
+<div class="insight">
+  <p>💡 <strong>為什麼不合併成一個通用 comments 表？</strong><br>
+  1. 場地留言已上線穩定運行，改動有風險<br>
+  2. 藝人推薦有獨有欄位（<code>is_pinned</code>、<code>pin_order</code>、<code>sender_venue_id</code>）<br>
+  3. 語氣和 tags 完全不同<br>
+  4. RLS 規則不同<br>
+  但<strong>前端元件可以高度複用</strong> — Provider / Form / List 的架構相同，只是 props 和 config 不同。</p>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>八、前端元件複用計畫</h2>
+
+<table>
+  <thead><tr><th>場地元件</th><th>藝人元件</th><th>複用方式</th></tr></thead>
+  <tbody>
+    <tr><td><code>VenueCommentsProvider</code></td><td><code>ArtistShoutoutsProvider</code></td><td>複製 + 改 table name / sorting 邏輯</td></tr>
+    <tr><td><code>VenueCommentForm</code></td><td><code>ArtistShoutoutForm</code></td><td>複製 + 改 tags / placeholder / 按鈕文字</td></tr>
+    <tr><td><code>VenueCommentList</code></td><td><code>ArtistShoutoutList</code></td><td>複製 + 加 Pin 排序 / Pin 按鈕（owner only）</td></tr>
+    <tr><td><code>DashboardCommentsTab</code></td><td><code>DashboardShoutoutsTab</code></td><td>複製 + 加 Pin 管理 UI</td></tr>
+    <tr><td>API: <code>/api/venue/comment</code></td><td>API: <code>/api/artist/shoutout</code></td><td>複製 + 改表名 / 通知 / Pin 操作</td></tr>
+  </tbody>
+</table>
+
+<p>估計<strong>70% 的程式碼可以直接複製修改</strong>，新增 30%（Pin 邏輯 + 排序 + 徽章 + 聚合 tags 顯示）。</p>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>九、鼓勵留推薦的設計手法</h2>
+
+<p>除了徽章，還有幾個 UX 手法可以鼓勵更多人留推薦：</p>
+
+<div class="flow-step">
+  <div class="flow-num">1</div>
+  <div class="flow-content">
+    <h3>「演出後提醒」推送</h3>
+    <p>藝人演出結束 24 小時後，向有追蹤該藝人且參加了該場演出的粉絲發送通知：<br>
+    「你昨晚在 Blue Note 看了 Sarah Chen 的演出，想留個推薦嗎？ 🎤」</p>
+    <p style="font-size:12px; color:var(--dim);">DB 支援：<code>lineups</code> + <code>follows</code> + <code>events.start_at</code> 就可以算出來</p>
+  </div>
+</div>
+
+<div class="flow-step">
+  <div class="flow-num">2</div>
+  <div class="flow-content">
+    <h3>「空推薦牆」引導</h3>
+    <p>如果藝人頁面還沒有推薦，顯示空狀態引導：<br>
+    「Be the first to leave a shoutout for Sarah Chen ✨」<br>
+    搭配一個大的 CTA 按鈕，降低門檻。</p>
+  </div>
+</div>
+
+<div class="flow-step">
+  <div class="flow-num">3</div>
+  <div class="flow-content">
+    <h3>「Tag-only 快速推薦」</h3>
+    <p>允許<strong>只選 tags 不寫文字</strong>。有些人不善於文字表達，但願意點一下「🔥 Amazing Live」。<br>
+    這些 tag-only 推薦不會出現在列表中，但會<strong>計入聚合統計</strong>（「12 people say: Amazing Live」）。</p>
+  </div>
+</div>
+
+<div class="flow-step">
+  <div class="flow-num">4</div>
+  <div class="flow-content">
+    <h3>「合作者主動邀請」</h3>
+    <p>在 Dashboard 提供「邀請合作者留推薦」功能：<br>
+    藝人可以選擇常合作的人，系統發送一則友善的邀請通知。<br>
+    這能快速從 0 建立起推薦基礎。</p>
+    <p style="font-size:12px; color:var(--dim);">DB 支援：top collaborators 已從 <code>lineups</code> 計算好了</p>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════ -->
+<h2>十、開發優先順序</h2>
+
+<table>
+  <thead><tr><th>Phase</th><th>內容</th><th>開發量</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Phase 1</strong></td>
+      <td>DB migration + 基礎 CRUD API + Shoutout 表單 + 列表<br><small style="color:var(--dim)">複用場地留言 70% code</small></td>
+      <td style="color:#d97706;">中（3-4 天）</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 2</strong></td>
+      <td>Pin 機制 + Dashboard 管理 + 排序邏輯 + 通知</td>
+      <td style="color:#d97706;">中（2-3 天）</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 3</strong></td>
+      <td>聚合 Tags 統計 + 「What People Say」精選區</td>
+      <td style="color:#16a34a;">低（1-2 天）</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 4</strong></td>
+      <td>徽章系統（6 個新 badges）+ Tag-only 快速推薦</td>
+      <td style="color:#16a34a;">低（1-2 天）</td>
+    </tr>
+    <tr>
+      <td><strong>Phase 5</strong></td>
+      <td>演出後提醒推送 + 合作者邀請功能</td>
+      <td style="color:#d97706;">中（2 天）</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="color:var(--muted); font-size:13px; margin-top:12px;"><strong>總計約 9-13 個工作天</strong>，如果場地留言系統穩定的話可以更快。Phase 1+2 上線後就能開始收集推薦了。</p>
+
+
+<div style="margin-top:48px; padding:20px; background:#141414; border:1px solid var(--border); border-radius:var(--r);">
+  <h3 style="color:var(--gold); font-size:14px; margin-bottom:8px;">📋 總結</h3>
+  <p style="font-size:13px; color:var(--muted); line-height:1.8;">
+    <strong style="color:#fff;">✅ 整合場地留言架構</strong> — 70% 程式碼複用，大幅降低開發成本<br>
+    <strong style="color:#fff;">✅ 「Shoutouts / 來自音樂圈的推薦」</strong> — 正面語氣引導，不是 Review<br>
+    <strong style="color:#fff;">✅ 藝人策展（Pin）</strong> — 最多 3 則，展示在頁面精華位置<br>
+    <strong style="color:#fff;">✅ 排序優先</strong> — 藝人/場地推薦自動排前面<br>
+    <strong style="color:#fff;">✅ 聚合 Tags</strong> — 變成 LinkedIn 式技能背書統計<br>
+    <strong style="color:#fff;">✅ 6 個新徽章</strong> — 「Tastemaker」是最強激勵（被 Pin = 被認可）<br>
+    <strong style="color:#fff;">✅ Tag-only 快速推薦</strong> — 降低門檻，累積數據<br>
+    <strong style="color:#fff;">✅ 演出後推送</strong> — 最佳時機觸發推薦
+  </p>
+</div>
+
+<div style="text-align:center; padding:40px 0 0; color:#333; font-size:11px;">
+  JazzNode Artist Shoutouts System Design · Internal Document · Mar 2026
+</div>
+
+</div>
+</body>
+</html>

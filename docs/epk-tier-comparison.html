@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EPK 三階段設計比較 — JazzNode</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0a; color: #e5e5e5; font-family: -apple-system, 'Helvetica Neue', sans-serif; padding: 40px 20px; }
+
+  h1 { text-align: center; font-size: 32px; color: #C8A84E; margin-bottom: 8px; }
+  .page-subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 48px; }
+
+  /* ── Comparison Table ── */
+  .comparison { max-width: 1200px; margin: 0 auto 64px; }
+  .comparison h2 { color: #C8A84E; font-size: 20px; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { background: #1a1a1a; color: #C8A84E; padding: 12px 16px; text-align: left; border-bottom: 2px solid #333; }
+  th:not(:first-child) { text-align: center; width: 180px; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1a1a1a; }
+  td:not(:first-child) { text-align: center; }
+  tr:hover { background: #111; }
+  .feature-group { background: #141414; color: #C8A84E; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
+  .feature-group td { padding: 8px 16px; border-bottom: 1px solid #222; }
+  .check { color: #4ade80; font-size: 16px; }
+  .cross { color: #555; font-size: 14px; }
+  .limit { color: #C8A84E; font-size: 11px; }
+  .new-badge { background: #C8A84E22; color: #C8A84E; font-size: 9px; padding: 2px 6px; border-radius: 3px; margin-left: 6px; }
+  .tier-label { font-size: 11px; color: #888; display: block; }
+
+  /* ── EPK Mockups ── */
+  .mockups { max-width: 1400px; margin: 0 auto; }
+  .mockups > h2 { color: #C8A84E; font-size: 20px; margin-bottom: 24px; text-align: center; }
+  .mockup-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+  .epk-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.4); position: relative; }
+  .epk-tier-tag { position: absolute; top: 16px; right: 16px; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; z-index: 2; }
+  .tier1-tag { background: #e8e8e8; color: #666; }
+  .tier2-tag { background: #C8A84E; color: #0a0a0a; }
+  .tier3-tag { background: #0a0a0a; color: #C8A84E; border: 1px solid #C8A84E; }
+
+  /* ── EPK Page Styling ── */
+  .epk-page { padding: 32px 28px 60px; color: #1a1a1a; font-size: 12px; line-height: 1.6; min-height: 700px; position: relative; }
+
+  /* Tier 1: Simple white */
+  .epk-basic { background: #fff; }
+  .epk-basic .epk-header { border-bottom: 2px solid #ccc; padding-bottom: 16px; margin-bottom: 20px; }
+  .epk-basic .epk-name { font-size: 22px; font-weight: 700; color: #333; }
+  .epk-basic .epk-subtitle { font-size: 11px; color: #999; }
+  .epk-basic .section-title { font-size: 11px; font-weight: 600; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; margin-top: 16px; }
+
+  /* Tier 2: Gold accents */
+  .epk-full { background: #fff; }
+  .epk-full .epk-header { border-bottom: 2px solid #C8A84E; padding-bottom: 16px; margin-bottom: 20px; }
+  .epk-full .epk-name { font-size: 22px; font-weight: 700; color: #1a1a1a; }
+  .epk-full .epk-subtitle { font-size: 11px; color: #999; }
+  .epk-full .premium-badge { display: inline-block; background: #C8A84E; color: #fff; font-size: 9px; padding: 2px 8px; border-radius: 3px; margin-left: 8px; vertical-align: middle; }
+  .epk-full .section-title { font-size: 11px; font-weight: 600; color: #C8A84E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; margin-top: 16px; }
+  .epk-full .stats-bar { display: flex; gap: 16px; background: #faf8f2; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; }
+  .epk-full .stat { text-align: center; flex: 1; }
+  .epk-full .stat-num { font-size: 16px; font-weight: 700; color: #C8A84E; }
+  .epk-full .stat-label { font-size: 9px; color: #999; }
+
+  /* Tier 3: Dark luxury */
+  .epk-branded { background: #0a0a0a; color: #e5e5e5; }
+  .epk-branded .epk-hero { height: 120px; background: linear-gradient(135deg, #1a1510 0%, #2a2015 50%, #0a0a0a 100%); display: flex; align-items: flex-end; padding: 0 28px 16px; margin: -32px -28px 20px; position: relative; }
+  .epk-branded .epk-hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='28' fill='none' stroke='%23C8A84E' stroke-width='0.3' opacity='0.15'/%3E%3C/svg%3E") repeat; }
+  .epk-branded .artist-photo { width: 56px; height: 56px; border-radius: 50%; background: #C8A84E33; border: 2px solid #C8A84E; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #C8A84E; z-index: 1; margin-right: 12px; flex-shrink: 0; }
+  .epk-branded .hero-text { z-index: 1; }
+  .epk-branded .epk-name { font-size: 22px; font-weight: 700; color: #fff; }
+  .epk-branded .epk-subtitle { font-size: 11px; color: #C8A84E; }
+  .epk-branded .section-title { font-size: 11px; font-weight: 600; color: #C8A84E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; margin-top: 16px; }
+  .epk-branded .stats-bar { display: flex; gap: 12px; background: #141414; padding: 10px 14px; border-radius: 6px; margin-bottom: 16px; border: 1px solid #222; }
+  .epk-branded .stat { text-align: center; flex: 1; }
+  .epk-branded .stat-num { font-size: 16px; font-weight: 700; color: #C8A84E; }
+  .epk-branded .stat-label { font-size: 9px; color: #666; }
+  .epk-branded .media-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 8px; }
+  .epk-branded .media-item { background: #1a1a1a; border-radius: 4px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #555; border: 1px solid #222; }
+  .epk-branded .qr-section { display: flex; align-items: center; gap: 12px; background: #141414; padding: 12px; border-radius: 6px; border: 1px solid #222; }
+  .epk-branded .qr-box { width: 48px; height: 48px; background: #fff; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .epk-branded .qr-grid { display: grid; grid-template-columns: repeat(5,1fr); grid-template-rows: repeat(5,1fr); width: 36px; height: 36px; gap: 1px; }
+  .epk-branded .qr-cell { background: #0a0a0a; border-radius: 1px; }
+  .epk-branded .qr-cell.w { background: #fff; }
+
+  /* ── Shared EPK elements ── */
+  .epk-text { font-size: 11px; color: inherit; opacity: 0.8; line-height: 1.5; }
+  .epk-link-row { display: flex; gap: 8px; margin-bottom: 4px; font-size: 11px; }
+  .epk-link-label { color: #999; width: 70px; flex-shrink: 0; }
+  .epk-link-url { color: #C8A84E; text-decoration: none; }
+  .epk-event-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #eee; font-size: 11px; }
+  .epk-branded .epk-event-row { border-bottom-color: #1a1a1a; }
+  .epk-event-title { flex: 1; }
+  .epk-event-date { color: #999; font-size: 10px; }
+  .gear-row { margin-bottom: 5px; }
+  .gear-name { font-size: 11px; font-weight: 600; }
+  .gear-detail { font-size: 10px; color: #999; }
+
+  .epk-footer { position: absolute; bottom: 16px; left: 28px; right: 28px; border-top: 1px solid #eee; padding-top: 8px; display: flex; justify-content: space-between; font-size: 9px; color: #bbb; }
+  .epk-branded .epk-footer { border-top-color: #222; color: #444; }
+  .watermark { color: #ddd; font-size: 9px; }
+  .epk-branded .watermark { display: none; }
+
+  .no-content { color: #ccc; font-style: italic; font-size: 10px; }
+  .epk-branded .no-content { color: #444; }
+
+  .blur-overlay { position: relative; }
+  .blur-overlay::after { content: '🔒 Premium'; position: absolute; inset: 0; background: rgba(255,255,255,0.85); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #999; border-radius: 4px; }
+  .epk-branded .blur-overlay::after { background: rgba(10,10,10,0.85); color: #555; }
+
+  /* ── Labels under mockups ── */
+  .mockup-label { text-align: center; margin-top: 16px; }
+  .mockup-label h3 { color: #e5e5e5; font-size: 16px; }
+  .mockup-label p { color: #888; font-size: 12px; margin-top: 4px; }
+
+  /* ── Design Notes ── */
+  .design-notes { max-width: 1200px; margin: 64px auto 0; }
+  .design-notes h2 { color: #C8A84E; font-size: 20px; margin-bottom: 16px; }
+  .note-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .note-card { background: #141414; border: 1px solid #222; border-radius: 8px; padding: 20px; }
+  .note-card h3 { color: #e5e5e5; font-size: 14px; margin-bottom: 8px; }
+  .note-card ul { list-style: none; }
+  .note-card li { font-size: 12px; color: #999; padding: 4px 0; padding-left: 16px; position: relative; }
+  .note-card li::before { content: '→'; position: absolute; left: 0; color: #C8A84E; }
+  .note-card .highlight { color: #C8A84E; }
+
+  @media (max-width: 1024px) {
+    .mockup-grid, .note-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+
+<h1>🎷 藝人電子宣傳單 (EPK) — 三階段設計</h1>
+<p class="page-subtitle">Tier 1 Claimed → Tier 2 Premium → Tier 3 Elite 功能差異比較</p>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COMPARISON TABLE                           -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="comparison">
+  <h2>功能比較表</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>功能</th>
+        <th>Tier 1 · Claimed<br><span class="tier-label">免費認領</span></th>
+        <th>Tier 2 · Premium<br><span class="tier-label">每月付費</span></th>
+        <th>Tier 3 · Elite<br><span class="tier-label">品牌方案</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 基礎內容 -->
+      <tr class="feature-group"><td colspan="4">基礎內容</td></tr>
+      <tr><td>藝人名稱 / 樂器 / 國家</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>個人簡介 (Bio)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>社群連結 (Website / Spotify / IG / YT)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>近期演出 (Upcoming Events)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>勳章 / 成就 (Badges)</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>教學資訊</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+
+      <!-- Premium 內容 -->
+      <tr class="feature-group"><td colspan="4">進階內容</td></tr>
+      <tr><td>「Premium Artist」標章</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>器材展示 (Gear & Equipment)</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>可接案資訊 (Available for Hire)</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>精選演出牆 (Featured Performances)</td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>粉絲數據摘要 (頁面瀏覽 / 粉絲數 / 來源)<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+
+      <!-- 版面設計 -->
+      <tr class="feature-group"><td colspan="4">版面與品牌</td></tr>
+      <tr><td>版面風格</td><td><span class="limit">基本白底</span></td><td><span class="limit">金色主題</span></td><td><span class="limit">深色奢華 / 自訂色</span></td></tr>
+      <tr><td>藝人頭像 / Logo<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>Hero 區塊（封面視覺）<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>媒體素材區（專輯封面 / 劇照）<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>媒體引言 / 推薦語<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>Booking QR Code<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+      <tr><td>自訂品牌色彩<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+
+      <!-- 浮水印與歸屬 -->
+      <tr class="feature-group"><td colspan="4">品牌歸屬</td></tr>
+      <tr><td>Footer 顯示</td><td><span class="limit">Generated by JazzNode</span></td><td><span class="limit">JazzNode (小字)</span></td><td><span class="limit">可完全移除 ✨</span></td></tr>
+      <tr><td>自訂 Footer 文字<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="cross">✕</td><td class="check">✓</td></tr>
+
+      <!-- 匯出 -->
+      <tr class="feature-group"><td colspan="4">匯出與分享</td></tr>
+      <tr><td>PDF 下載</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>公開分享連結（Web EPK）<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td>EPK 瀏覽次數追蹤<span class="new-badge">NEW</span></td><td class="cross">✕</td><td class="check">✓</td><td class="check">✓</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- EPK MOCKUPS                                -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="mockups">
+  <h2>三階段 EPK PDF 示意圖</h2>
+  <div class="mockup-grid">
+
+    <!-- ─── TIER 1: BASIC ─── -->
+    <div>
+      <div class="epk-card">
+        <span class="epk-tier-tag tier1-tag">CLAIMED</span>
+        <div class="epk-page epk-basic">
+          <div class="epk-header">
+            <div class="epk-name">Sarah Chen</div>
+            <div class="epk-subtitle">Piano · Taiwan 🇹🇼</div>
+          </div>
+
+          <div class="section-title">Biography</div>
+          <p class="epk-text">A Taipei-based jazz pianist blending traditional jazz harmony with contemporary Asian influences. Graduate of Berklee College of Music, performing across Asia-Pacific since 2018.</p>
+
+          <div class="section-title">Achievements</div>
+          <p class="epk-text" style="color:#C8A84E;">★ Rising Star 2024 &nbsp; ★ 50+ Performances</p>
+
+          <div class="section-title">Links</div>
+          <div class="epk-link-row"><span class="epk-link-label">Website</span><span class="epk-link-url">sarahchenmusic.com</span></div>
+          <div class="epk-link-row"><span class="epk-link-label">Spotify</span><span class="epk-link-url">open.spotify.com/sarah</span></div>
+          <div class="epk-link-row"><span class="epk-link-label">Instagram</span><span class="epk-link-url">@sarahchenjazz</span></div>
+
+          <div class="section-title">Upcoming Performances</div>
+          <div class="epk-event-row"><span class="epk-event-title">Blue Note Taipei — Trio Night</span><span class="epk-event-date">Apr 12, 2026</span></div>
+          <div class="epk-event-row"><span class="epk-event-title">Taichung Jazz Festival</span><span class="epk-event-date">May 3, 2026</span></div>
+          <div class="epk-event-row"><span class="epk-event-title">Kaohsiung Summer Jazz</span><span class="epk-event-date">Jun 15, 2026</span></div>
+
+          <div class="section-title">Teaching</div>
+          <p class="epk-text">Accepting students for private jazz piano lessons. Focus on improvisation and harmony.</p>
+          <div class="epk-link-row"><span class="epk-link-label">Lesson rates</span><span style="font-size:11px;">NT$1,500–2,500 / hr</span></div>
+
+          <!-- Locked sections -->
+          <div class="section-title" style="margin-top:20px; color:#ccc;">Gear & Equipment</div>
+          <div class="blur-overlay" style="height:40px; background:#f5f5f5; border-radius:4px;"></div>
+
+          <div class="epk-footer">
+            <span>Electronic Press Kit · Sarah Chen</span>
+            <span class="watermark">Generated by JazzNode · Mar 25, 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-label">
+        <h3>Tier 1 · 基本版</h3>
+        <p>自動產生、白底簡潔、附 JazzNode 浮水印</p>
+      </div>
+    </div>
+
+    <!-- ─── TIER 2: FULL ─── -->
+    <div>
+      <div class="epk-card">
+        <span class="epk-tier-tag tier2-tag">PREMIUM</span>
+        <div class="epk-page epk-full">
+          <div class="epk-header">
+            <div class="epk-name">Sarah Chen <span class="premium-badge">★ PREMIUM</span></div>
+            <div class="epk-subtitle">Piano · Taiwan 🇹🇼 · Available for Hire</div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="stats-bar">
+            <div class="stat"><div class="stat-num">2,340</div><div class="stat-label">月瀏覽次數</div></div>
+            <div class="stat"><div class="stat-num">186</div><div class="stat-label">粉絲數</div></div>
+            <div class="stat"><div class="stat-num">58</div><div class="stat-label">歷史演出</div></div>
+            <div class="stat"><div class="stat-num">4.8★</div><div class="stat-label">場地評價</div></div>
+          </div>
+
+          <div class="section-title">Biography</div>
+          <p class="epk-text">A Taipei-based jazz pianist blending traditional jazz harmony with contemporary Asian influences. Graduate of Berklee College of Music, performing across Asia-Pacific since 2018.</p>
+
+          <div class="section-title">Featured Performances</div>
+          <div class="epk-event-row"><span class="epk-event-title">🏆 Taipei Jazz Festival 2025 — Main Stage</span><span class="epk-event-date">Oct 12, 2025</span></div>
+          <div class="epk-event-row"><span class="epk-event-title">🏆 Tokyo Blue Note — Guest Artist</span><span class="epk-event-date">Aug 5, 2025</span></div>
+
+          <div class="section-title">Upcoming Performances</div>
+          <div class="epk-event-row"><span class="epk-event-title">Blue Note Taipei — Trio Night</span><span class="epk-event-date">Apr 12, 2026</span></div>
+          <div class="epk-event-row"><span class="epk-event-title">Taichung Jazz Festival</span><span class="epk-event-date">May 3, 2026</span></div>
+
+          <div class="section-title">Gear & Equipment</div>
+          <div class="gear-row"><span class="gear-name">Yamaha CFX</span><span class="gear-detail"> · Concert Grand Piano</span></div>
+          <div class="gear-row"><span class="gear-name">Nord Stage 4</span><span class="gear-detail"> · Nord · 88-Key Stage Keyboard</span></div>
+          <div class="gear-row"><span class="gear-name">Shure SM58</span><span class="gear-detail"> · Shure · Dynamic Microphone</span></div>
+
+          <div class="section-title">Available for Hire</div>
+          <p class="epk-text">Available for private events, corporate functions, and jazz club bookings across Asia-Pacific. Solo, duo, or trio formats.</p>
+
+          <div class="section-title">Links</div>
+          <div class="epk-link-row"><span class="epk-link-label">Website</span><span class="epk-link-url">sarahchenmusic.com</span></div>
+          <div class="epk-link-row"><span class="epk-link-label">Spotify</span><span class="epk-link-url">open.spotify.com/sarah</span></div>
+
+          <div class="epk-footer">
+            <span>Electronic Press Kit · Sarah Chen</span>
+            <span class="watermark">JazzNode · Mar 25, 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-label">
+        <h3>Tier 2 · 完整版</h3>
+        <p>金色主題、數據摘要、器材 & 接案、精選演出</p>
+      </div>
+    </div>
+
+    <!-- ─── TIER 3: BRANDED ─── -->
+    <div>
+      <div class="epk-card">
+        <span class="epk-tier-tag tier3-tag">ELITE</span>
+        <div class="epk-page epk-branded">
+
+          <!-- Hero Banner -->
+          <div class="epk-hero">
+            <div class="artist-photo">S</div>
+            <div class="hero-text">
+              <div class="epk-name">Sarah Chen</div>
+              <div class="epk-subtitle">Piano · Taiwan · Premium Artist</div>
+            </div>
+          </div>
+
+          <!-- Stats Bar -->
+          <div class="stats-bar">
+            <div class="stat"><div class="stat-num">2,340</div><div class="stat-label">月瀏覽</div></div>
+            <div class="stat"><div class="stat-num">186</div><div class="stat-label">粉絲</div></div>
+            <div class="stat"><div class="stat-num">58</div><div class="stat-label">演出</div></div>
+            <div class="stat"><div class="stat-num">4.8★</div><div class="stat-label">評價</div></div>
+          </div>
+
+          <div class="section-title">Biography</div>
+          <p class="epk-text">A Taipei-based jazz pianist blending traditional jazz harmony with contemporary Asian influences. Graduate of Berklee College of Music.</p>
+
+          <div class="section-title">Press & Reviews</div>
+          <p class="epk-text" style="font-style:italic; border-left: 2px solid #C8A84E; padding-left: 10px; margin-bottom: 6px;">"One of the most compelling new voices in Asian jazz." — Jazz Times</p>
+          <p class="epk-text" style="font-style:italic; border-left: 2px solid #C8A84E; padding-left: 10px;">"Her trio performance was the highlight of the festival." — Taipei Times</p>
+
+          <div class="section-title">Media</div>
+          <div class="media-grid">
+            <div class="media-item">🎵 Album 1</div>
+            <div class="media-item">🎵 Album 2</div>
+            <div class="media-item">📸 Press Photo</div>
+          </div>
+
+          <div class="section-title">Featured Performances</div>
+          <div class="epk-event-row"><span class="epk-event-title">🏆 Taipei Jazz Festival — Main Stage</span><span class="epk-event-date">Oct '25</span></div>
+          <div class="epk-event-row"><span class="epk-event-title">🏆 Tokyo Blue Note — Guest</span><span class="epk-event-date">Aug '25</span></div>
+
+          <div class="section-title">Gear & Equipment</div>
+          <div class="gear-row"><span class="gear-name" style="color:#e5e5e5;">Yamaha CFX</span><span class="gear-detail"> · Concert Grand</span></div>
+          <div class="gear-row"><span class="gear-name" style="color:#e5e5e5;">Nord Stage 4</span><span class="gear-detail"> · 88-Key Keyboard</span></div>
+
+          <!-- Booking QR -->
+          <div class="section-title">Booking</div>
+          <div class="qr-section">
+            <div class="qr-box">
+              <div class="qr-grid">
+                <div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell w"></div><div class="qr-cell"></div>
+                <div class="qr-cell"></div><div class="qr-cell w"></div><div class="qr-cell w"></div><div class="qr-cell w"></div><div class="qr-cell"></div>
+                <div class="qr-cell w"></div><div class="qr-cell"></div><div class="qr-cell w"></div><div class="qr-cell"></div><div class="qr-cell w"></div>
+                <div class="qr-cell"></div><div class="qr-cell w"></div><div class="qr-cell w"></div><div class="qr-cell w"></div><div class="qr-cell"></div>
+                <div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell"></div><div class="qr-cell w"></div><div class="qr-cell"></div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size:11px; color:#e5e5e5; font-weight:600;">Scan to Book</div>
+              <div style="font-size:10px; color:#666; margin-top:2px;">sarahchenmusic.com/booking</div>
+              <div style="font-size:10px; color:#666;">booking@sarahchenmusic.com</div>
+            </div>
+          </div>
+
+          <div class="epk-footer">
+            <span>© 2026 Sarah Chen Music</span>
+            <span style="color:#333;">sarahchenmusic.com</span>
+          </div>
+        </div>
+      </div>
+      <div class="mockup-label">
+        <h3>Tier 3 · 品牌版</h3>
+        <p>深色奢華、Hero 封面、媒體素材、QR Code、白標</p>
+      </div>
+    </div>
+
+  </div><!-- /mockup-grid -->
+</div><!-- /mockups -->
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- DESIGN NOTES                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="design-notes">
+  <h2>設計筆記</h2>
+  <div class="note-grid">
+    <div class="note-card">
+      <h3>🏷️ Tier 1 — Claimed (免費)</h3>
+      <ul>
+        <li>自動從 profile 資料產生，<span class="highlight">零設定</span></li>
+        <li>白底灰字，乾淨但<span class="highlight">樸素</span>，讓人想升級</li>
+        <li>進階區塊顯示「🔒 Premium」模糊遮罩</li>
+        <li>Footer 固定顯示 <span class="highlight">Generated by JazzNode</span></li>
+        <li>PDF 下載只在 Dashboard 可用</li>
+        <li>無公開分享連結</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3>⭐ Tier 2 — Premium (付費)</h3>
+      <ul>
+        <li><span class="highlight">金色主題</span>提升質感、Premium 標章</li>
+        <li>新增<span class="highlight">數據摘要列</span>：瀏覽數、粉絲、演出、評價</li>
+        <li>解鎖<span class="highlight">器材展示</span>與<span class="highlight">接案資訊</span></li>
+        <li>可加入<span class="highlight">精選演出</span>（手動排序 Top 6）</li>
+        <li>提供<span class="highlight">公開分享連結</span>（Web EPK）</li>
+        <li>追蹤 EPK 瀏覽次數</li>
+        <li>Footer 僅小字 JazzNode</li>
+      </ul>
+    </div>
+    <div class="note-card">
+      <h3>👑 Tier 3 — Elite (品牌)</h3>
+      <ul>
+        <li><span class="highlight">深色奢華版面</span>或自訂品牌配色</li>
+        <li><span class="highlight">Hero 封面區</span>含藝人頭像 / Logo</li>
+        <li>新增<span class="highlight">媒體引言 / 推薦語</span>區塊</li>
+        <li>新增<span class="highlight">媒體素材區</span>（專輯封面、劇照）</li>
+        <li><span class="highlight">Booking QR Code</span> 直接掃碼聯繫</li>
+        <li>Footer 可<span class="highlight">完全白標</span>（移除 JazzNode）</li>
+        <li>自訂 Footer 文字（© Artist Name）</li>
+        <li>未來可擴展：<span class="highlight">自訂字型、多頁 PDF</span></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1200px; margin:48px auto 0; padding:20px; background:#141414; border:1px solid #222; border-radius:8px;">
+  <h3 style="color:#C8A84E; font-size:14px; margin-bottom:8px;">💡 升級誘因設計（Upsell Triggers）</h3>
+  <p style="font-size:12px; color:#999; line-height:1.8;">
+    <strong style="color:#e5e5e5;">Tier 1 → 2：</strong>基本版 EPK 中，器材與接案區塊以「🔒 解鎖 Premium」模糊遮罩呈現，讓藝人看到內容被隱藏而想升級。數據摘要列也只在 Premium 才顯示。<br>
+    <strong style="color:#e5e5e5;">Tier 2 → 3：</strong>Premium 版 EPK 的 Footer 仍帶 JazzNode 品牌，藝人頭像和媒體素材區無法使用。Elite 版提供完全白標體驗 + QR Code + 媒體引言，適合專業藝人作為正式經紀資料使用。
+  </p>
+</div>
+
+<div style="text-align:center; padding:48px 0 24px; color:#333; font-size:11px;">
+  JazzNode EPK Tier Design Reference · Internal Document · Mar 2026
+</div>
+
+</body>
+</html>
