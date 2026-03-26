@@ -89,7 +89,7 @@ export default function FollowButton({ itemType, itemId, variant = 'compact', gl
   return (
     <button
       onClick={handleClick}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
+      className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
           : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'

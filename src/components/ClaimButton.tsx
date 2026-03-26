@@ -53,7 +53,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
         <span className="inline-flex items-center rounded-xl text-xs font-medium tracking-wide bg-gold/15 text-gold border border-gold/30">
           <Link
             href={dashboardPath}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 hover:bg-gold/25 transition-colors rounded-l-xl"
+            className="inline-flex items-center gap-1.5 px-3 py-2 hover:bg-gold/25 transition-colors rounded-l-xl"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
@@ -62,7 +62,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
           </Link>
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowWithdrawConfirm(true); }}
-            className="inline-flex items-center gap-1 px-2 py-1.5 border-l border-gold/30 text-gold/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl"
+            className="inline-flex items-center gap-1 px-2 py-2 border-l border-gold/30 text-gold/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl"
             title={t('withdrawClaim')}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -115,7 +115,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     return (
       <>
         <div className="inline-flex items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide text-[var(--muted-foreground)] border border-[var(--border)]">
+          <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium tracking-wide text-[var(--muted-foreground)] border border-[var(--border)]">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 6L9 17l-5-5" />
             </svg>
@@ -123,7 +123,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
           </span>
           <button
             onClick={handleAlsoClaim}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
@@ -150,7 +150,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
   if (myStatus === 'pending') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-xl text-xs font-medium tracking-wide text-amber-400/80 border border-amber-400/20 bg-amber-400/5">
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5">
+        <span className="inline-flex items-center gap-1.5 px-3 py-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
@@ -160,7 +160,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
         <button
           onClick={handleCancel}
           disabled={cancelling}
-          className="inline-flex items-center gap-1 px-2 py-1.5 border-l border-amber-400/20 text-amber-400/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl disabled:opacity-50"
+          className="inline-flex items-center gap-1 px-2 py-2 border-l border-amber-400/20 text-amber-400/50 hover:text-red-400 hover:bg-red-400/10 transition-colors rounded-r-xl disabled:opacity-50"
           title={t('cancelClaim')}
         >
           {cancelling ? (
@@ -197,7 +197,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     <>
       <button
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
