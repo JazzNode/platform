@@ -38,28 +38,30 @@ export default function VenueStayConnected({
         </div>
 
         {/* Primary CTA: Follow */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="flex flex-col items-center gap-3">
           <FollowButton
             itemType="venue"
             itemId={venue.id}
             variant="full"
             followerCount={followerCount}
           />
-          <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}
-            fallback={null}>
-            <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} />
-          </TierGate>
-          <ShareButton
-            title={name}
-            url={`/${locale}/venues/${venue.id}`}
-            text={[
-              `📍 ${cityLabel ? `${cityLabel}｜` : ''}${name}`,
-              (localized(f as Record<string, unknown>, 'description', locale))?.slice(0, 100) || '',
-              'via JazzNode — The Jazz Scene, Connected.',
-            ].filter(Boolean).join('\n')}
-            variant="compact"
-            label={t('share')}
-          />
+          <div className="flex items-center justify-center gap-3">
+            <TierGate entityType="venue" featureKey="inbox" currentTier={f.tier ?? 0}
+              fallback={null}>
+              <MessageVenueButton venueId={venue.id} claimed={!!f.tier && f.tier >= 1} label={t('messageVenue')} />
+            </TierGate>
+            <ShareButton
+              title={name}
+              url={`/${locale}/venues/${venue.id}`}
+              text={[
+                `📍 ${cityLabel ? `${cityLabel}｜` : ''}${name}`,
+                (localized(f as Record<string, unknown>, 'description', locale))?.slice(0, 100) || '',
+                'via JazzNode — The Jazz Scene, Connected.',
+              ].filter(Boolean).join('\n')}
+              variant="compact"
+              label={t('share')}
+            />
+          </div>
         </div>
 
         {/* Social Links */}

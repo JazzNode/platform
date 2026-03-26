@@ -8,9 +8,10 @@ import { createClient } from '@/utils/supabase/client';
 interface MessageVenueButtonProps {
   venueId: string;
   claimed?: boolean;
+  label?: string;
 }
 
-export default function MessageVenueButton({ venueId, claimed }: MessageVenueButtonProps) {
+export default function MessageVenueButton({ venueId, claimed, label }: MessageVenueButtonProps) {
   const t = useTranslations('common');
   const locale = useLocale();
   const { user, setShowAuthModal } = useAuth();
@@ -137,7 +138,7 @@ export default function MessageVenueButton({ venueId, claimed }: MessageVenueBut
       ) : (
         icon
       )}
-      <span className="hidden sm:inline">{t('messageVenue')}</span>
+      <span className={label ? '' : 'hidden sm:inline'}>{label || t('messageVenue')}</span>
     </button>
   );
 }

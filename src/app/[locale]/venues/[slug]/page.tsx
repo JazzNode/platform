@@ -253,7 +253,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   };
 
   return (
-    <div>
+    <div className="overflow-x-hidden">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
