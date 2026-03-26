@@ -191,7 +191,7 @@ export default function ShareButton({ title, url, text, variant = 'icon', label 
       <button
         onClick={handleShare}
         className={isCompact
-          ? "inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium tracking-wide rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-all duration-200"
+          ? "inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-all duration-200"
           : `inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300${className ? ` ${className}` : ''}`
         }
       >

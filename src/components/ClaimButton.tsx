@@ -197,7 +197,7 @@ export default function ClaimButton({ targetType, targetId, targetName }: ClaimB
     <>
       <button
         onClick={handleClick}
-        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-medium tracking-wide transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
+        className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold uppercase tracking-widest transition-all duration-200 border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30"
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />

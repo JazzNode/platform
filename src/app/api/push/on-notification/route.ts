@@ -129,6 +129,11 @@ function getNotificationUrl(
       if (referenceType === 'venue' && referenceId) return `/venues/${referenceId}`;
       return '/profile/comments';
 
+    case 'shoutout':
+      // Link to the artist page where the shoutout was left
+      if (referenceType === 'artist' && referenceId) return `/artists/${referenceId}`;
+      return '/profile/inbox';
+
     case 'claim_status':
       return '/profile';
 
@@ -184,6 +189,8 @@ function getNotificationActions(type: string): Array<{ action: string; title: st
       return [{ action: 'view', title: 'View Profile' }];
     case 'comment_reply':
       return [{ action: 'view', title: 'View Comment' }];
+    case 'shoutout':
+      return [{ action: 'view', title: 'View Shoutout' }];
     case 'badge':
       return [{ action: 'view', title: 'View Badge' }];
     case 'claim_review':
