@@ -303,17 +303,22 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 </div>
               )}
               {/* Time */}
-              <p className="text-lg font-bold text-[var(--foreground)]">
+              <p className="text-lg font-bold text-[var(--foreground)] inline-flex items-center gap-1.5">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)] shrink-0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 {formatTime(f.start_at, tz)}{f.end_at && ` — ${formatTime(f.end_at, tz)}`}
               </p>
               {/* Price */}
               {priceShort && priceFull && (
-                <PriceInfo short={priceShort} full={priceFull} className="text-sm" />
+                <div className="inline-flex items-center gap-1.5">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)] shrink-0"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  <PriceInfo short={priceShort} full={priceFull} className="text-sm" />
+                </div>
               )}
               {/* Venue name */}
               {venue && (
-                <Link href={`/${locale}/venues/${venue.id}`} className="text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors truncate">
-                  📍 {displayName(venue.fields)}
+                <Link href={`/${locale}/venues/${venue.id}`} className="text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors truncate inline-flex items-center gap-1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gold shrink-0"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+                  {displayName(venue.fields)}
                 </Link>
               )}
             </div>
@@ -378,25 +383,37 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 />
               )}
             </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <BookmarkButton itemId={event.id} variant="full" />
-              {bookmarkCount > 0 && (
-                <span className="text-[10px] text-[var(--muted-foreground)]">
-                  {bookmarkCount} {t('wantToGo')}
-                </span>
-              )}
-            </div>
           </div>
 
-          {/* Primary artist */}
-          {primaryArtist && (
-            <Link href={`/${locale}/artists/${primaryArtist.id}`} className="inline-flex items-center gap-2 text-base text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
-              <span className="text-gold">♪</span> {artistDisplayName(primaryArtist.fields, locale)}
-              {primaryArtist.fields.type && primaryArtist.fields.type !== 'person' && (
-                <span className="text-sm capitalize">· {primaryArtist.fields.type}</span>
-              )}
-            </Link>
-          )}
+          {/* ─── Mobile: secondary actions below title ─── */}
+          <div className="flex items-center justify-between lg:hidden [&_button]:!px-4 [&_button]:!py-2 [&_button]:!text-sm [&_button]:!tracking-wide [&_button]:!normal-case [&_button]:!font-medium">
+            {f.start_at && (
+              <AddToCalendar
+                title={eventTitle(f, locale)}
+                startAt={f.start_at}
+                endAt={f.end_at}
+                timezone={tz}
+                venueName={venue ? displayName(venue.fields) : undefined}
+                address={venue?.fields.address_local || venue?.fields.address_en || undefined}
+                description={descShort || desc || undefined}
+                sourceUrl={f.source_url}
+                variant="full"
+                label={t('addToCalendar')}
+              />
+            )}
+            <ShareButton
+              title={eventTitle(f, locale)}
+              url={`/${locale}/events/${slug}`}
+              text={[
+                eventTitle(f, locale),
+                `📅 ${f.start_at ? formatDate(f.start_at, locale, tz) : ''}${venue ? ` · 📍 ${displayName(venue.fields)}` : ''}`,
+                'via JazzNode — The Jazz Scene, Connected.',
+              ].filter(Boolean).join('\n')}
+              variant="full"
+              label={t('share')}
+            />
+            <BookmarkButton itemId={event.id} variant="full" />
+          </div>
 
           {/* ─── Quick Facts (Desktop: horizontal badges) ─── */}
           <div className="hidden lg:flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -405,7 +422,10 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               {formatTime(f.start_at, tz)}{f.end_at && ` — ${formatTime(f.end_at, tz)}`}
             </span>
             {priceShort && priceFull && (
-              <PriceInfo short={priceShort} full={priceFull} />
+              <span className="inline-flex items-center gap-1.5">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--muted-foreground)]"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                <PriceInfo short={priceShort} full={priceFull} />
+              </span>
             )}
             {cityName && (
               <span className="text-[var(--muted-foreground)] whitespace-nowrap">
@@ -416,11 +436,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* ─── Venue + Address card (clickable address) ─── */}
           <div className="bg-[var(--card)] rounded-2xl p-4 border border-[var(--border)]">
-            <div className="flex items-start gap-3">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-gold shrink-0 mt-0.5">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7Z" />
-                <circle cx="12" cy="9" r="2.5" />
-              </svg>
+            <div>
               <div className="flex-1 min-w-0">
                 {venue && (
                   <Link href={`/${locale}/venues/${venue.id}`} className="font-medium text-[var(--foreground)] hover:text-gold transition-colors">
@@ -432,13 +448,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                     href={mapsSearchUrl || '#'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors mt-0.5"
+                    className="block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors mt-1"
                   >
                     {venue.fields.address_local || venue.fields.address_en}
                   </a>
                 )}
                 {/* Date row — visible on mobile (desktop shows in quick facts) */}
-                <p className="text-xs text-[var(--muted-foreground)] mt-2 lg:hidden">
+                <p className="text-sm text-[var(--muted-foreground)] mt-1 lg:hidden">
                   {formatDate(f.start_at, locale, tz)}
                 </p>
               </div>
@@ -505,6 +521,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 <span>{t('ticketLink')} ↗</span>
               </a>
             )}
+            <BookmarkButton itemId={event.id} variant="full" />
             <span className="w-px h-6 bg-[var(--border)]" />
             {f.start_at && (
               <AddToCalendar
@@ -547,34 +564,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
             )}
           </div>
 
-          {/* ─── Mobile secondary actions ─── */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border)] pt-4 lg:hidden">
-            {f.start_at && (
-              <AddToCalendar
-                title={eventTitle(f, locale)}
-                startAt={f.start_at}
-                endAt={f.end_at}
-                timezone={tz}
-                venueName={venue ? displayName(venue.fields) : undefined}
-                address={venue?.fields.address_local || venue?.fields.address_en || undefined}
-                description={descShort || desc || undefined}
-                sourceUrl={f.source_url}
-                variant="full"
-                label={t('addToCalendar')}
-              />
-            )}
-            <ShareButton
-              title={eventTitle(f, locale)}
-              url={`/${locale}/events/${slug}`}
-              text={[
-                eventTitle(f, locale),
-                `📅 ${f.start_at ? formatDate(f.start_at, locale, tz) : ''}${venue ? ` · 📍 ${displayName(venue.fields)}` : ''}`,
-                'via JazzNode — The Jazz Scene, Connected.',
-              ].filter(Boolean).join('\n')}
-              variant="full"
-              label={t('share')}
-            />
-          </div>
         </div>
       </div>
       </FadeUp>
