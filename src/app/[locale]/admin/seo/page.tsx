@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import { useTheme } from '@/components/ThemeProvider';
@@ -786,9 +787,9 @@ export default function AdminSeoPage() {
                   className="group flex items-center gap-3 p-3 rounded-xl border border-[var(--border)] hover:border-[var(--color-gold)]/40 transition-all hover:bg-[var(--muted)]/30"
                 >
                   {/* Avatar */}
-                  <div className="w-10 h-10 rounded-full bg-[var(--muted)] overflow-hidden shrink-0">
+                  <div className="relative w-10 h-10 rounded-full bg-[var(--muted)] overflow-hidden shrink-0">
                     {artist.photo_url ? (
-                      <img src={artist.photo_url} alt={name} className="w-full h-full object-cover" />
+                      <Image src={artist.photo_url} alt={name} fill className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[var(--muted-foreground)] text-sm font-bold">
                         {name.charAt(0).toUpperCase()}

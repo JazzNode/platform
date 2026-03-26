@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef, startTransition } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
@@ -880,7 +881,7 @@ export default function FanInboxPage() {
                         <button key={`${u._type || 'profile'}-${u.id}`} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url, u._type)}
                           className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--muted)] transition-colors">
                           {u.avatar_url ? (
-                            <img src={u.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                            <Image src={u.avatar_url} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                           ) : (
                             <div className="w-7 h-7 rounded-full bg-[var(--muted)] flex items-center justify-center text-xs">
                               {(u.display_name || u.username || '?').charAt(0)}
@@ -932,7 +933,7 @@ export default function FanInboxPage() {
                               </svg>
                             </div>
                           ) : convo.peer_avatar ? (
-                            <img src={convo.peer_avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                            <Image src={convo.peer_avatar} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0" />
                           ) : (
                             <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
                               {(convo.peer_name || '?').charAt(0)}

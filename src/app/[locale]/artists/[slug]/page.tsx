@@ -1042,7 +1042,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               {artistGear.map((g) => (
                 <div key={g.id} className="flex items-center gap-3 bg-[var(--card)] border border-[var(--border)] rounded-xl p-3">
                   {g.photo_url ? (
-                    <img src={g.photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    <Image src={g.photo_url} alt="" width={40} height={40} className="w-10 h-10 rounded-lg object-cover" />
                   ) : (
                     <div className="w-10 h-10 rounded-lg bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

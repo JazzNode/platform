@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useAuth } from '@/components/AuthProvider';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -142,7 +143,7 @@ export default function PWAInstallBanner() {
           </button>
 
           <div className="flex items-center gap-3">
-            <img src="/icons/icon-192.png" alt="JazzNode" width={48} height={48} className="w-12 h-12 rounded-xl shrink-0" />
+            <Image src="/icons/icon-192.png" alt="JazzNode" width={48} height={48} className="w-12 h-12 rounded-xl shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="font-serif font-bold text-sm text-[var(--foreground)]">{t('pwaInstallTitle')}</p>
               <p className="text-xs text-[var(--muted-foreground)] mt-0.5">
@@ -182,7 +183,7 @@ export default function PWAInstallBanner() {
               }}
             >
               <div className="flex items-center gap-3 min-w-0">
-                <img src="/icons/icon-192.png" alt="" width={24} height={24} className="w-6 h-6 rounded-md shrink-0" />
+                <Image src="/icons/icon-192.png" alt="" width={24} height={24} className="w-6 h-6 rounded-md shrink-0" />
                 <p className="text-sm text-[var(--muted-foreground)] truncate">
                   {t('pwaInstallHint')}
                 </p>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
@@ -196,7 +197,7 @@ export default function ArtistGearPage({ params }: { params: Promise<{ slug: str
               <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   {item.photo_url ? (
-                    <img src={item.photo_url} alt="" className="w-12 h-12 rounded-xl object-cover" />
+                    <Image src={item.photo_url} alt="" width={48} height={48} className="w-12 h-12 rounded-xl object-cover" />
                   ) : (
                     <div className="w-12 h-12 rounded-xl bg-[var(--muted)] flex items-center justify-center text-[var(--muted-foreground)]">
                       <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">

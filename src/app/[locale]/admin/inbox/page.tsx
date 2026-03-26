@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import Image from 'next/image';
 import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 
@@ -480,7 +481,7 @@ export default function AdminInboxPage() {
                       >
                         <div className="flex items-center gap-3">
                           {convo.user_avatar ? (
-                            <img src={convo.user_avatar} alt="" className="w-9 h-9 rounded-full object-cover shrink-0" />
+                            <Image src={convo.user_avatar} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0" />
                           ) : (
                             <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
                               {(convo.user_display || '?').charAt(0)}
@@ -566,7 +567,7 @@ export default function AdminInboxPage() {
                     </button>
                     <div className="flex items-center gap-2">
                       {selectedConversation.user_avatar ? (
-                        <img src={selectedConversation.user_avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                        <Image src={selectedConversation.user_avatar} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                       ) : (
                         <div className="w-7 h-7 rounded-full bg-[var(--muted)] flex items-center justify-center text-xs">
                           {(selectedConversation.user_display || '?').charAt(0)}

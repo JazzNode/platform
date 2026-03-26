@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAdmin } from '@/components/AdminProvider';
 import { useAuth } from '@/components/AuthProvider';
@@ -254,7 +255,7 @@ export default function OwnerMembersPage() {
                     <div className="flex items-center gap-4">
                       {/* Avatar */}
                       {member.avatar_url ? (
-                        <img src={member.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover shrink-0" />
+                        <Image src={member.avatar_url} alt="" width={40} height={40} className="w-10 h-10 rounded-full object-cover shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center text-sm text-[var(--muted-foreground)] shrink-0">
                           {(member.display_name || member.username || '?').charAt(0).toUpperCase()}
