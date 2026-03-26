@@ -75,7 +75,7 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
   return (
     <button
       onClick={handleClick}
-      className={`inline-flex items-center gap-2 px-4 h-[42px] rounded-xl text-sm font-medium uppercase tracking-widest transition-all duration-200 shrink-0 relative overflow-hidden ${
+      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium uppercase tracking-widest transition-all duration-200 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
           : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'

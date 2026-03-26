@@ -517,7 +517,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           <div className="hidden lg:flex flex-wrap items-center gap-3">
             {f.source_url && (
               <a href={f.source_url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-6 py-3 text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-gold-bright transition-colors btn-magnetic">
+                className="inline-flex items-center gap-2 bg-gold text-[#0A0A0A] px-4 py-2.5 text-sm font-bold uppercase tracking-widest rounded-xl hover:bg-gold-bright transition-colors btn-magnetic">
                 <span>{t('ticketLink')} ↗</span>
               </a>
             )}
