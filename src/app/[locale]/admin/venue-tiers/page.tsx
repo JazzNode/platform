@@ -35,6 +35,7 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'analytics_advanced', labelKey: 'vf_analyticsAdvanced', descKey: 'vf_analyticsAdvancedDesc', categoryKey: 'vc_premium' },
   { key: 'broadcasts', labelKey: 'vf_broadcasts', descKey: 'vf_broadcastsDesc', categoryKey: 'vc_premium' },
   { key: 'announcements', labelKey: 'vf_announcements', descKey: 'vf_announcementsDesc', categoryKey: 'vc_premium' },
+  { key: 'merchandise', labelKey: 'vf_merchandise', descKey: 'vf_merchandiseDesc', categoryKey: 'vc_premium' },
   { key: 'priority_search', labelKey: 'vf_prioritySearch', descKey: 'vf_prioritySearchDesc', categoryKey: 'vc_premium' },
   { key: 'fan_insights', labelKey: 'vf_fanInsights', descKey: 'vf_fanInsightsDesc', categoryKey: 'vc_premium' },
   { key: 'post_show_recap', labelKey: 'vf_postShowRecap', descKey: 'vf_postShowRecapDesc', categoryKey: 'vc_premium' },

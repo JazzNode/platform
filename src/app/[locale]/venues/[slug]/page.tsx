@@ -15,6 +15,7 @@ import {
   VenueFeaturedEvent,
   VenueUpcomingEvents,
   VenueAnnouncements,
+  VenueMerchandise,
   VenueAbout,
   VenueGallery,
   VenueArtists,
@@ -380,6 +381,11 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             badges={venueBadgeProgress}
             t={t}
           />
+        </FadeUp>
+
+        {/* ═══ 4c. MERCHANDISE ═══ */}
+        <FadeUp>
+          <VenueMerchandise venueId={slug} countryCode={cityFields?.country_code} t={t} />
         </FadeUp>
 
         {/* ═══ 5. PHOTO GALLERY (Bento Grid) ═══ */}
