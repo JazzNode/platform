@@ -162,9 +162,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   // Top performers
   const topPerformers = [...artistCounts.entries()]
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 12)
     .map(([id]) => artistMap.get(id))
-    .filter(Boolean) as { id: string; fields: typeof artists[number]['fields'] }[];
+    .filter((a): a is { id: string; fields: typeof artists[number]['fields'] } => !!a && a.fields.type === 'person')
+    .slice(0, 12);
 
   // Event splits: Today → Upcoming (after today) → Past
   const now = new Date().toISOString();
@@ -253,7 +253,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   };
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-clip">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <FavoriteHighlight itemType="venue" itemId={venue.id}>

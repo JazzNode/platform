@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Event as VenueEvent, Artist } from '@/lib/supabase';
-import { eventTitle, formatDate, formatTime, artistDisplayName } from '@/lib/helpers';
+import { eventTitle, formatDate, formatTime, artistDisplayName, localized } from '@/lib/helpers';
 
 interface VenueFeaturedEventProps {
   event: { id: string; fields: VenueEvent };
@@ -93,6 +93,12 @@ export default function VenueFeaturedEvent({
                   <circle cx="18" cy="16" r="3" />
                 </svg>
                 {artistDisplayName(artist.fields, locale)}
+              </p>
+            )}
+
+            {(localized(ef as Record<string, unknown>, 'description_short', locale) || localized(ef as Record<string, unknown>, 'description', locale)) && (
+              <p className="text-sm text-[var(--muted-foreground)] line-clamp-3">
+                {localized(ef as Record<string, unknown>, 'description_short', locale) || localized(ef as Record<string, unknown>, 'description', locale)}
               </p>
             )}
 

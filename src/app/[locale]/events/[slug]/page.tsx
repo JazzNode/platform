@@ -386,7 +386,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
           </div>
 
           {/* ─── Mobile: secondary actions below title ─── */}
-          <div className="flex items-center justify-between lg:hidden [&_button]:!px-4 [&_button]:!py-2 [&_button]:!text-sm [&_button]:!tracking-wide [&_button]:!normal-case [&_button]:!font-medium">
+          <div className="flex items-center justify-between lg:hidden">
             {f.start_at && (
               <AddToCalendar
                 title={eventTitle(f, locale)}
@@ -399,6 +399,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 sourceUrl={f.source_url}
                 variant="full"
                 label={t('addToCalendar')}
+                className="!px-4 !py-2 !text-sm !tracking-wide !normal-case !font-medium"
               />
             )}
             <ShareButton
@@ -411,8 +412,9 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
               ].filter(Boolean).join('\n')}
               variant="full"
               label={t('share')}
+              className="!px-4 !py-2 !text-sm !tracking-wide !normal-case !font-medium"
             />
-            <BookmarkButton itemId={event.id} variant="full" />
+            <BookmarkButton itemId={event.id} variant="full" className="!px-4 !py-2 !text-sm !tracking-wide !normal-case !font-medium" />
           </div>
 
           {/* ─── Quick Facts (Desktop: horizontal badges) ─── */}
@@ -680,7 +682,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
 
           {/* Venue info card */}
           {venue && (
-            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-5 space-y-4">
+            <div className="bg-[var(--card)] rounded-2xl border border-[var(--border)] p-4 space-y-4">
               <h3 className="font-serif text-base font-bold">{t('eventVenue')}</h3>
               <Link href={`/${locale}/venues/${venue.id}`} className="block text-gold hover:text-gold-bright transition-colors font-medium">
                 {displayName(venue.fields)}
@@ -724,7 +726,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ lo
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <a href={appleMapsUrl || '#'} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-xl border border-gold/30 text-gold hover:bg-gold/10 transition-colors text-sm">
+                  <a href={appleMapsUrl || '#'} target="_blank" rel="noreferrer" className="px-5 py-2.5 rounded-lg border border-gold/30 text-gold hover:bg-gold/10 transition-colors text-sm">
                     {t('openInMaps')}
                   </a>
                 </div>

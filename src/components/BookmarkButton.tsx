@@ -9,9 +9,11 @@ interface BookmarkButtonProps {
   itemId: string;
   /** compact = icon-only for cards, full = icon + text for detail pages */
   variant?: 'compact' | 'full';
+  /** Extra classes merged onto the full-variant button */
+  className?: string;
 }
 
-export default function BookmarkButton({ itemId, variant = 'compact' }: BookmarkButtonProps) {
+export default function BookmarkButton({ itemId, variant = 'compact', className }: BookmarkButtonProps) {
   const { user, setShowAuthModal } = useAuth();
   const { isFollowing, toggleFollow } = useFollows();
   const t = useTranslations('common');
@@ -75,11 +77,11 @@ export default function BookmarkButton({ itemId, variant = 'compact' }: Bookmark
   return (
     <button
       onClick={handleClick}
-      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium uppercase tracking-widest transition-all duration-200 shrink-0 relative overflow-hidden ${
+      className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium uppercase tracking-widest transition-all duration-300 shrink-0 relative overflow-hidden ${
         active
           ? 'bg-gold/15 text-gold border border-gold/30'
-          : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30'
-      }`}
+          : 'border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5'
+      }${className ? ` ${className}` : ''}`}
       style={animating ? { animation: 'fav-btn-pop 0.4s ease-out' } : undefined}
     >
       {/* Shimmer sweep on bookmark */}

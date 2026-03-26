@@ -14,6 +14,8 @@ interface Props {
   /** 'icon' = small icon button (for cards), 'full' = button with text */
   variant?: 'icon' | 'full';
   label?: string;
+  /** Extra classes merged onto the full-variant button */
+  className?: string;
 }
 
 function formatICSDate(iso: string): string {
@@ -77,7 +79,7 @@ const CalendarIcon = () => (
 );
 
 export default function AddToCalendar(props: Props) {
-  const { variant = 'full', label = 'Add to Calendar' } = props;
+  const { variant = 'full', label = 'Add to Calendar', className } = props;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -121,7 +123,7 @@ export default function AddToCalendar(props: Props) {
       ) : (
         <button
           onClick={(e) => { e.preventDefault(); e.stopPropagation(); setOpen(!open); }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+          className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300${className ? ` ${className}` : ''}`}
         >
           <CalendarIcon />
           <span>{label}</span>

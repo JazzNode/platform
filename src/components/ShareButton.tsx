@@ -10,6 +10,8 @@ interface Props {
   label?: string;
   /** Adds frosted glass backdrop — best for overlaying photos */
   glass?: boolean;
+  /** Extra classes merged onto the full-variant button */
+  className?: string;
 }
 
 const ShareIcon = ({ size = 16 }: { size?: number }) => (
@@ -111,7 +113,7 @@ function ShareMenu({ fullUrl, title, text, onCopy, copied }: {
   );
 }
 
-export default function ShareButton({ title, url, text, variant = 'icon', label = 'Share', glass = false }: Props) {
+export default function ShareButton({ title, url, text, variant = 'icon', label = 'Share', glass = false, className }: Props) {
   const [copied, setCopied] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -190,7 +192,7 @@ export default function ShareButton({ title, url, text, variant = 'icon', label 
         onClick={handleShare}
         className={isCompact
           ? "inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium tracking-wide rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/30 transition-all duration-200"
-          : "inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300"
+          : `inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium uppercase tracking-widest rounded-xl border border-[var(--border)] text-[var(--muted-foreground)] hover:text-gold hover:border-gold/40 hover:bg-gold/5 transition-all duration-300${className ? ` ${className}` : ''}`
         }
       >
         <ShareIcon size={iconSize} />
