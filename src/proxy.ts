@@ -6,6 +6,14 @@ import { NextRequest } from 'next/server';
 const intlMiddleware = createMiddleware(routing);
 
 export default async function middleware(request: NextRequest) {
+  // Redirect www → non-www (301) to consolidate SEO signals
+  const host = request.headers.get('host') ?? '';
+  if (host.startsWith('www.')) {
+    const url = request.nextUrl.clone();
+    url.host = host.replace(/^www\./, '');
+    return Response.redirect(url, 301);
+  }
+
   // Check if Supabase env vars are set (to prevent crash on Vercel if missing)
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return intlMiddleware(request);

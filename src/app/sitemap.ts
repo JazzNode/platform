@@ -72,9 +72,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Dynamic pages — use real updated_at for lastmod
-  const artistEntries = artistRows.map((r) =>
-    entry(`/artists/${encodeURIComponent(r.id)}`, 'weekly', 0.7, r.updated_at ? new Date(r.updated_at) : now),
-  );
+  // Filter out "auto-" slugs: these are auto-generated thin pages that Google
+  // consistently refuses to index, wasting crawl budget.
+  const artistEntries = artistRows
+    .filter((r) => !r.id.startsWith('auto-'))
+    .map((r) =>
+      entry(`/artists/${encodeURIComponent(r.id)}`, 'weekly', 0.7, r.updated_at ? new Date(r.updated_at) : now),
+    );
   const eventEntries = eventRows.map((r) =>
     entry(`/events/${encodeURIComponent(r.id)}`, 'weekly', 0.8, r.updated_at ? new Date(r.updated_at) : now),
   );

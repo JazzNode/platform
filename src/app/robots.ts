@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
   const privateRoutes = ['/admin/', '/profile/', '/user/'];
   const disallow = [
     '/api/',
+    '/_next/',
     ...privateRoutes,
     ...LOCALES.flatMap((loc) => privateRoutes.map((route) => `/${loc}${route}`)),
   ];
