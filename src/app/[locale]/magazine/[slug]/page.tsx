@@ -91,10 +91,27 @@ export default async function MagazineArticlePage({ params }: { params: Promise<
   const linkedArtists = (article.linked_artist_ids || []).map((id) => artistMap.get(id)).filter(Boolean);
   const linkedVenues = (article.linked_venue_ids || []).map((id) => venueMap.get(id)).filter(Boolean);
 
-  // Related articles (same category, different article)
-  const related = allArticles
-    .filter((a) => a.category === article.category && a.id !== article.id)
-    .slice(0, 3);
+  // Related articles: same category + same linked artists, deduplicated
+  const sameCategoryArticles = allArticles
+    .filter((a) => a.category === article.category && a.id !== article.id);
+
+  const sameArtistArticles = (article.linked_artist_ids?.length > 0)
+    ? allArticles.filter((a) =>
+        a.id !== article.id &&
+        a.linked_artist_ids?.some((id: string) => article.linked_artist_ids.includes(id))
+      )
+    : [];
+
+  // Merge and deduplicate: same-artist articles first (more relevant), then same-category
+  const seenIds = new Set<string>();
+  const related: typeof allArticles = [];
+  for (const a of [...sameArtistArticles, ...sameCategoryArticles]) {
+    if (!seenIds.has(a.id)) {
+      seenIds.add(a.id);
+      related.push(a);
+    }
+    if (related.length >= 3) break;
+  }
 
   // JSON-LD for SEO
   const jsonLd = {

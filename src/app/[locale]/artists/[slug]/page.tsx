@@ -27,11 +27,13 @@ import ShareButton from '@/components/ShareButton';
 import ProfileCompleteness from '@/components/ProfileCompleteness';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import TierGate from '@/components/TierGate';
+import EpkDownloadButton from '@/components/EpkDownloadButton';
 import VerifiedBadge from '@/components/VerifiedBadge';
 import FeaturedWall from '@/components/FeaturedWall';
 import CollaborationGraph from '@/components/CollaborationGraph';
 import type { GraphNode, GraphLink } from '@/components/CollaborationGraph';
 import ArtistShoutoutsSection from '@/components/ArtistShoutoutsSection';
+import ArtistMagazineSection from '@/components/ArtistMagazineSection';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug: rawSlug } = await params;
@@ -586,20 +588,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               variant="compact"
               label={t('share')}
             />
-            {/* EPK Download */}
+            {/* EPK Download — public, with optional contact form for guests */}
             <TierGate entityType="artist" featureKey="epk_basic" currentTier={f.tier ?? 0}>
-              <a
-                href={`/api/artist/epk?artistId=${artist.id}`}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest px-3 py-2 rounded-full border border-[var(--border)] text-[var(--muted-foreground)] hover:border-gold/30 hover:text-gold transition-colors"
-                title={t('downloadEpk')}
-              >
-                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                EPK
-              </a>
+              <EpkDownloadButton artistId={artist.id} />
             </TierGate>
           </div>
 
@@ -1070,6 +1061,9 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           <ArtistShoutoutsSection artistId={artist.id} />
         </section>
       </FadeUp>
+
+      {/* ═══ Featured In (Magazine Articles) ═══ */}
+      <ArtistMagazineSection artistId={artist.id} />
 
       {/* ═══ Similar Artists ═══ */}
       {similarArtists.length > 0 && (

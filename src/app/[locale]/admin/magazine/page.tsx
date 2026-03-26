@@ -87,6 +87,15 @@ export default function MagazinePage() {
   const [venueSearch, setVenueSearch] = useState('');
   const [searchResults, setSearchResults] = useState<{ artists: { id: string; name: string }[]; venues: { id: string; name: string }[] }>({ artists: [], venues: [] });
 
+  // Recommendations panel
+  const [recommendations, setRecommendations] = useState<{
+    artistId: string; name: string; photoUrl: string | null; tier: number; score: number;
+    followerCount: number; shoutoutCount: number; recentGigs: number; existingArticles: number;
+    instruments: string[]; topReason: string;
+  }[]>([]);
+  const [showRecs, setShowRecs] = useState(false);
+  const [recsLoading, setRecsLoading] = useState(false);
+
   // ---------- Fetch ----------
 
   useEffect(() => {
@@ -119,6 +128,53 @@ export default function MagazinePage() {
       })
       .catch(() => {});
   }, []);
+
+  // ---------- Recommendations ----------
+
+  const fetchRecommendations = async () => {
+    setRecsLoading(true);
+    try {
+      const freshToken = await getFreshToken();
+      if (!freshToken) { handleUnauthorized(); return; }
+      const res = await fetch('/api/admin/magazine/recommendations', {
+        headers: { Authorization: `Bearer ${freshToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRecommendations(data.recommendations || []);
+      }
+    } catch (err) {
+      console.error('Failed to fetch recommendations:', err);
+    }
+    setRecsLoading(false);
+  };
+
+  const handleCreateFeature = async (artistId: string, artistName: string) => {
+    const freshToken = await getFreshToken();
+    if (!freshToken) { handleUnauthorized(); return; }
+    const slug = `feature-${artistName.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 40)}-${Date.now()}`;
+    try {
+      const res = await fetch('/api/admin/magazine', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${freshToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          slug,
+          source_lang: 'zh',
+          category: 'artist-feature',
+          linked_artist_ids: [artistId],
+        }),
+      });
+      if (res.status === 401) { handleUnauthorized(); return; }
+      if (!res.ok) { alert(`Create failed: ${res.statusText}`); return; }
+      const data = await res.json();
+      if (data.article) {
+        setArticles((prev) => [data.article, ...prev]);
+        setEditing(data.article);
+      }
+    } catch (err) {
+      console.error('Failed to create feature:', err);
+    }
+  };
 
   // ---------- Helpers ----------
 
@@ -721,6 +777,74 @@ export default function MagazinePage() {
         >
           {t('magNewArticle')}
         </button>
+      </div>
+
+      {/* Recommended Artists Panel */}
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl overflow-hidden">
+        <button
+          onClick={() => {
+            setShowRecs(!showRecs);
+            if (!showRecs && recommendations.length === 0) fetchRecommendations();
+          }}
+          className="w-full flex items-center justify-between px-5 py-3.5 text-left hover:bg-[var(--muted)]/30 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-base">✨</span>
+            <span className="text-sm font-bold uppercase tracking-widest">{t('magRecommendedArtists')}</span>
+          </div>
+          <svg className={`w-4 h-4 text-[var(--muted-foreground)] transition-transform ${showRecs ? 'rotate-180' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+        </button>
+        {showRecs && (
+          <div className="px-5 pb-5">
+            {recsLoading ? (
+              <div className="py-6 text-center">
+                <div className="w-5 h-5 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+              </div>
+            ) : recommendations.length === 0 ? (
+              <p className="text-sm text-[var(--muted-foreground)] py-4">{t('magNoRecommendations')}</p>
+            ) : (
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1">
+                {recommendations.slice(0, 10).map((rec) => (
+                  <div
+                    key={rec.artistId}
+                    className="flex-shrink-0 w-48 bg-[var(--background)] border border-[var(--border)] rounded-xl p-3 space-y-2"
+                  >
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--muted)] flex-shrink-0">
+                        {rec.photoUrl ? (
+                          <Image src={rec.photoUrl} alt={rec.name} width={32} height={32} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-xs font-bold text-[var(--muted-foreground)]">
+                            {rec.name.charAt(0)}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs font-semibold truncate">{rec.name}</p>
+                        <p className="text-[10px] text-[var(--muted-foreground)]">
+                          {rec.tier >= 2 ? '⭐ Pro' : 'Claimed'} · {rec.score}pts
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--color-gold)]/10 text-[var(--color-gold)]">{rec.topReason}</span>
+                    </div>
+                    <div className="text-[10px] text-[var(--muted-foreground)] space-y-0.5">
+                      <div>👥 {rec.followerCount} fans · 📣 {rec.shoutoutCount} shoutouts</div>
+                      <div>🎵 {rec.recentGigs} gigs (90d) · 📰 {rec.existingArticles} articles</div>
+                    </div>
+                    <button
+                      onClick={() => handleCreateFeature(rec.artistId, rec.name)}
+                      className="w-full px-3 py-1.5 rounded-lg bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
+                    >
+                      {t('magCreateFeature')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {articles.length === 0 ? (
