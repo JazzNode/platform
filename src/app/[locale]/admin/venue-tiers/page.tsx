@@ -40,6 +40,7 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'post_show_recap', labelKey: 'vf_postShowRecap', descKey: 'vf_postShowRecapDesc', categoryKey: 'vc_premium' },
   { key: 'artist_recommendations', labelKey: 'vf_artistRecommendations', descKey: 'vf_artistRecommendationsDesc', categoryKey: 'vc_premium' },
   { key: 'weekly_digest', labelKey: 'vf_weeklyDigest', descKey: 'vf_weeklyDigestDesc', categoryKey: 'vc_premium' },
+  { key: 'embed_calendar', labelKey: 'vf_embedCalendar', descKey: 'vf_embedCalendarDesc', categoryKey: 'vc_premium' },
   // Tier 3 — Elite (business engine)
   { key: 'custom_domain', labelKey: 'vf_customDomain', descKey: 'vf_customDomainDesc', categoryKey: 'vc_elite' },
   { key: 'custom_theme', labelKey: 'vf_customTheme', descKey: 'vf_customThemeDesc', categoryKey: 'vc_elite' },
