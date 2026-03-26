@@ -7,7 +7,8 @@ import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import NotificationList from '@/components/inbox/NotificationList';
 
-type Tab = 'messages' | 'notifications' | 'archived';
+type Tab = 'messages' | 'notifications';
+type NotifView = 'active' | 'archived';
 
 interface Notification {
   id: string;
@@ -121,6 +122,7 @@ export default function AdminInboxPage() {
   const t = useTranslations('adminHQ');
 
   const [tab, setTab] = useState<Tab>('messages');
+  const [notifView, setNotifView] = useState<NotifView>('active');
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [conversations, setConversations] = useState<HQConversation[]>([]);
@@ -394,7 +396,6 @@ export default function AdminInboxPage() {
         {([
           { key: 'messages' as Tab, label: t('inboxMessages'), badge: totalMsgUnread + guestUnread },
           { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadCount },
-          { key: 'archived' as Tab, label: t('archived'), badge: 0 },
         ]).map(({ key, label, badge }) => (
           <button
             key={key}
@@ -402,7 +403,7 @@ export default function AdminInboxPage() {
               setTab(key);
               setSelectedConvo(null);
               setSelectedGuest(null);
-              if (key === 'archived') fetchArchived();
+              if (key === 'notifications') setNotifView('active');
             }}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
               tab === key
@@ -422,57 +423,87 @@ export default function AdminInboxPage() {
 
       {/* Notifications Tab */}
       {tab === 'notifications' && (
-        <NotificationList
-          notifications={notifications}
-          loading={loadingNotifs}
-          accent="gold"
-          labels={{
-            noNotifications: t('noNotifications'),
-            markAllRead: t('markAllRead'),
-            archiveSelected: t('archiveSelected'),
-            archiveAll: t('archiveAll'),
-            selectAll: t('selectMode'),
-            deselectAll: t('deselectAll'),
-            selected: t('nSelected'),
-            confirmArchiveTitle: t('confirmArchiveTitle'),
-            confirmArchiveBody: t('confirmArchiveBody'),
-            confirmYes: t('confirmYes'),
-            cancel: t('cancel'),
-          }}
-          renderBadge={(notif) => <TypeBadge type={notif.type} />}
-          onMarkRead={markRead}
-          onMarkAllRead={markAllRead}
-          onArchive={archiveNotifications}
-          onArchiveAll={archiveAllNotifications}
-        />
-      )}
+        <div className="space-y-3">
+          {/* Sub-view toggle: Active ↔ Archived */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setNotifView('active')}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                notifView === 'active'
+                  ? 'border-[var(--color-gold)]/30 text-[var(--color-gold)] bg-[var(--color-gold)]/[0.05]'
+                  : 'border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              {t('inboxNotifications')}
+            </button>
+            <button
+              onClick={() => { setNotifView('archived'); fetchArchived(); }}
+              className={`text-xs px-3 py-1.5 rounded-lg border transition-colors inline-flex items-center gap-1.5 ${
+                notifView === 'archived'
+                  ? 'border-[var(--color-gold)]/30 text-[var(--color-gold)] bg-[var(--color-gold)]/[0.05]'
+                  : 'border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="21 8 21 21 3 21 3 8" />
+                <rect x="1" y="3" width="22" height="5" />
+                <line x1="10" y1="12" x2="14" y2="12" />
+              </svg>
+              {t('archived')}
+            </button>
+          </div>
 
-      {/* Archived Tab */}
-      {tab === 'archived' && (
-        <NotificationList
-          notifications={archivedNotifs}
-          loading={loadingArchived}
-          accent="gold"
-          isArchiveView
-          labels={{
-            noNotifications: t('noArchivedNotifications'),
-            markAllRead: t('markAllRead'),
-            archiveSelected: t('archiveSelected'),
-            archiveAll: t('archiveAll'),
-            selectAll: t('selectMode'),
-            deselectAll: t('deselectAll'),
-            selected: t('nSelected'),
-            confirmArchiveTitle: t('confirmArchiveTitle'),
-            confirmArchiveBody: t('confirmArchiveBody'),
-            confirmYes: t('confirmYes'),
-            cancel: t('cancel'),
-          }}
-          renderBadge={(notif) => <TypeBadge type={notif.type} />}
-          onMarkRead={() => {}}
-          onMarkAllRead={() => {}}
-          onArchive={() => {}}
-          onArchiveAll={() => {}}
-        />
+          {notifView === 'active' ? (
+            <NotificationList
+              notifications={notifications}
+              loading={loadingNotifs}
+              accent="gold"
+              labels={{
+                noNotifications: t('noNotifications'),
+                markAllRead: t('markAllRead'),
+                archiveSelected: t('archiveSelected'),
+                archiveAll: t('archiveAll'),
+                selectAll: t('selectMode'),
+                deselectAll: t('deselectAll'),
+                selected: t('nSelected'),
+                confirmArchiveTitle: t('confirmArchiveTitle'),
+                confirmArchiveBody: t('confirmArchiveBody'),
+                confirmYes: t('confirmYes'),
+                cancel: t('cancel'),
+              }}
+              renderBadge={(notif) => <TypeBadge type={notif.type} />}
+              onMarkRead={markRead}
+              onMarkAllRead={markAllRead}
+              onArchive={archiveNotifications}
+              onArchiveAll={archiveAllNotifications}
+            />
+          ) : (
+            <NotificationList
+              notifications={archivedNotifs}
+              loading={loadingArchived}
+              accent="gold"
+              isArchiveView
+              labels={{
+                noNotifications: t('noArchivedNotifications'),
+                markAllRead: t('markAllRead'),
+                archiveSelected: t('archiveSelected'),
+                archiveAll: t('archiveAll'),
+                selectAll: t('selectMode'),
+                deselectAll: t('deselectAll'),
+                selected: t('nSelected'),
+                confirmArchiveTitle: t('confirmArchiveTitle'),
+                confirmArchiveBody: t('confirmArchiveBody'),
+                confirmYes: t('confirmYes'),
+                cancel: t('cancel'),
+              }}
+              renderBadge={(notif) => <TypeBadge type={notif.type} />}
+              onMarkRead={() => {}}
+              onMarkAllRead={() => {}}
+              onArchive={() => {}}
+              onArchiveAll={() => {}}
+            />
+          )}
+        </div>
       )}
 
       {/* Messages Tab */}

@@ -9,7 +9,8 @@ import FadeUp from '@/components/animations/FadeUp';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
 import NotificationList from '@/components/inbox/NotificationList';
 
-type Tab = 'messages' | 'notifications' | 'archived';
+type Tab = 'messages' | 'notifications';
+type NotifView = 'active' | 'archived';
 
 interface Conversation {
   id: string;
@@ -54,6 +55,7 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
   const [tab, setTab] = useState<Tab>('messages');
+  const [notifView, setNotifView] = useState<NotifView>('active');
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConvo, setSelectedConvo] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -391,14 +393,13 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
           {([
             { key: 'messages' as Tab, label: tInbox('inboxMessages'), badge: totalUnread },
             { key: 'notifications' as Tab, label: tInbox('inboxNotifications'), badge: unreadNotifs },
-            { key: 'archived' as Tab, label: tInbox('archived'), badge: 0 },
           ]).map(({ key, label, badge }) => (
             <button
               key={key}
               onClick={() => {
                 setTab(key);
                 setSelectedConvo(null);
-                if (key === 'archived') fetchArchived();
+                if (key === 'notifications') setNotifView('active');
               }}
               className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
                 tab === key
@@ -592,57 +593,85 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
       {/* Notifications Tab */}
       {tab === 'notifications' && (
         <FadeUp>
-          <NotificationList
-            notifications={notifications}
-            loading={notifsLoading}
-            accent="emerald"
-            labels={{
-              noNotifications: tInbox('noNotifications'),
-              markAllRead: tInbox('markAllRead'),
-              archiveSelected: tInbox('archiveSelected'),
-              archiveAll: tInbox('archiveAll'),
-              selectAll: tInbox('selectMode'),
-              deselectAll: tInbox('deselectAll'),
-              selected: tInbox('nSelected'),
-              confirmArchiveTitle: tInbox('confirmArchiveTitle'),
-              confirmArchiveBody: tInbox('confirmArchiveBody'),
-              confirmYes: tInbox('confirmYes'),
-              cancel: tInbox('cancel'),
-            }}
-            onMarkRead={markNotifRead}
-            onMarkAllRead={markAllNotifsRead}
-            onArchive={archiveNotifications}
-            onArchiveAll={archiveAllNotifications}
-          />
-        </FadeUp>
-      )}
+          <div className="space-y-3">
+            {/* Sub-view toggle */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setNotifView('active')}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-colors ${
+                  notifView === 'active'
+                    ? 'border-emerald-400/30 text-emerald-400 bg-emerald-400/[0.05]'
+                    : 'border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                {tInbox('inboxNotifications')}
+              </button>
+              <button
+                onClick={() => { setNotifView('archived'); fetchArchived(); }}
+                className={`text-xs px-3 py-1.5 rounded-lg border transition-colors inline-flex items-center gap-1.5 ${
+                  notifView === 'archived'
+                    ? 'border-emerald-400/30 text-emerald-400 bg-emerald-400/[0.05]'
+                    : 'border-[var(--border)] text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="21 8 21 21 3 21 3 8" />
+                  <rect x="1" y="3" width="22" height="5" />
+                  <line x1="10" y1="12" x2="14" y2="12" />
+                </svg>
+                {tInbox('archived')}
+              </button>
+            </div>
 
-      {/* Archived Tab */}
-      {tab === 'archived' && (
-        <FadeUp>
-          <NotificationList
-            notifications={archivedNotifs}
-            loading={loadingArchived}
-            accent="emerald"
-            isArchiveView
-            labels={{
-              noNotifications: tInbox('noArchivedNotifications'),
-              markAllRead: tInbox('markAllRead'),
-              archiveSelected: tInbox('archiveSelected'),
-              archiveAll: tInbox('archiveAll'),
-              selectAll: tInbox('selectMode'),
-              deselectAll: tInbox('deselectAll'),
-              selected: tInbox('nSelected'),
-              confirmArchiveTitle: tInbox('confirmArchiveTitle'),
-              confirmArchiveBody: tInbox('confirmArchiveBody'),
-              confirmYes: tInbox('confirmYes'),
-              cancel: tInbox('cancel'),
-            }}
-            onMarkRead={() => {}}
-            onMarkAllRead={() => {}}
-            onArchive={() => {}}
-            onArchiveAll={() => {}}
-          />
+            {notifView === 'active' ? (
+              <NotificationList
+                notifications={notifications}
+                loading={notifsLoading}
+                accent="emerald"
+                labels={{
+                  noNotifications: tInbox('noNotifications'),
+                  markAllRead: tInbox('markAllRead'),
+                  archiveSelected: tInbox('archiveSelected'),
+                  archiveAll: tInbox('archiveAll'),
+                  selectAll: tInbox('selectMode'),
+                  deselectAll: tInbox('deselectAll'),
+                  selected: tInbox('nSelected'),
+                  confirmArchiveTitle: tInbox('confirmArchiveTitle'),
+                  confirmArchiveBody: tInbox('confirmArchiveBody'),
+                  confirmYes: tInbox('confirmYes'),
+                  cancel: tInbox('cancel'),
+                }}
+                onMarkRead={markNotifRead}
+                onMarkAllRead={markAllNotifsRead}
+                onArchive={archiveNotifications}
+                onArchiveAll={archiveAllNotifications}
+              />
+            ) : (
+              <NotificationList
+                notifications={archivedNotifs}
+                loading={loadingArchived}
+                accent="emerald"
+                isArchiveView
+                labels={{
+                  noNotifications: tInbox('noArchivedNotifications'),
+                  markAllRead: tInbox('markAllRead'),
+                  archiveSelected: tInbox('archiveSelected'),
+                  archiveAll: tInbox('archiveAll'),
+                  selectAll: tInbox('selectMode'),
+                  deselectAll: tInbox('deselectAll'),
+                  selected: tInbox('nSelected'),
+                  confirmArchiveTitle: tInbox('confirmArchiveTitle'),
+                  confirmArchiveBody: tInbox('confirmArchiveBody'),
+                  confirmYes: tInbox('confirmYes'),
+                  cancel: tInbox('cancel'),
+                }}
+                onMarkRead={() => {}}
+                onMarkAllRead={() => {}}
+                onArchive={() => {}}
+                onArchiveAll={() => {}}
+              />
+            )}
+          </div>
         </FadeUp>
       )}
     </div>
