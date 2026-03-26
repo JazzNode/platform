@@ -14,6 +14,14 @@ const ALLOWED_FIELDS = new Set([
   'business_hour',
   'brand_theme_id',
   'brand_accent_color',
+  'brand_font_pair',
+  'brand_hero_style',
+  'brand_hero_text_align',
+  'brand_hero_overlay_opacity',
+  'brand_cta_text',
+  'brand_sections_visible',
+  'brand_og_image_url',
+  'brand_favicon_url',
 ]);
 
 export async function POST(req: NextRequest) {

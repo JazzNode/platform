@@ -41,11 +41,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (cityLabel) ogParams.set('city', cityLabel);
   if (photo) ogParams.set('photo', photo);
   const ogUrl = `/api/og/venue?${ogParams.toString()}`;
+  const customOg = f.brand_og_image_url as string | undefined;
   return {
     title: name,
     description,
     openGraph: {
-      images: [{ url: ogUrl, width: 1200, height: 630 }],
+      images: [{ url: customOg || ogUrl, width: 1200, height: 630 }],
       description,
     },
     twitter: { card: 'summary_large_image' },
@@ -255,11 +256,46 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     ],
   };
 
+  // ── Brand customization: section visibility ──
+  const isElite = (f.tier ?? 0) >= 3;
+  const sectionsVisible = (f.brand_sections_visible as Record<string, boolean>) || {};
+  const isSectionVisible = (key: string) => {
+    if (!isElite) return true; // non-Elite always show all
+    return sectionsVisible[key] !== false; // default visible unless explicitly hidden
+  };
+
+  // ── Brand customization: Hero style ──
+  const heroStyle = isElite ? (f.brand_hero_style as string) || 'cinematic' : 'cinematic';
+  const heroTextAlign = isElite ? (f.brand_hero_text_align as string) || 'left' : 'left';
+  const heroOverlayOpacity = isElite ? (f.brand_hero_overlay_opacity as number) ?? 0.6 : 0.6;
+
+  // ── Brand customization: custom CTA text ──
+  const customCtaText = isElite ? (f.brand_cta_text as string) || null : null;
+
+  // ── Brand customization: custom OG image ──
+  const customOgImage = isElite ? (f.brand_og_image_url as string) || null : null;
+
+  // ── Brand customization: font CSS variables ──
+  const fontPairId = isElite ? (f.brand_font_pair as string) || null : null;
+  const fontStyle: React.CSSProperties = {};
+  if (fontPairId && fontPairId !== 'default') {
+    const { getFontPair } = require('@/lib/brand-fonts');
+    const pair = getFontPair(fontPairId);
+    fontStyle['--font-heading' as string] = pair.heading;
+    fontStyle['--font-body' as string] = pair.body;
+  }
+
   return (
-    <div className="overflow-x-clip">
+    <div className="overflow-x-clip" style={fontStyle}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
-      <VenueThemeScope themeId={f.brand_theme_id as string} accentColor={f.brand_accent_color as string} tier={f.tier}>
+      <VenueThemeScope
+        themeId={f.brand_theme_id as string}
+        accentColor={f.brand_accent_color as string}
+        fontPairId={f.brand_font_pair as string}
+        faviconUrl={f.brand_favicon_url as string}
+        tier={f.tier}
+      >
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
 
       {/* Status Banners */}
@@ -364,11 +400,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         )}
 
         {/* ═══ 3b. ANNOUNCEMENTS ═══ */}
-        <FadeUp>
-          <VenueAnnouncements venueId={venue.id} t={t} />
-        </FadeUp>
+        {isSectionVisible('announcements') && (
+          <FadeUp>
+            <VenueAnnouncements venueId={venue.id} t={t} />
+          </FadeUp>
+        )}
 
         {/* ═══ 4. ABOUT + STATS + BADGES ═══ */}
+        {isSectionVisible('about') && (
         <FadeUp>
           <VenueAbout
             venue={venue}
@@ -384,19 +423,24 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             t={t}
           />
         </FadeUp>
+        )}
 
         {/* ═══ 4c. MERCHANDISE ═══ */}
-        <FadeUp>
-          <VenueMerchandise venueId={slug} countryCode={cityFields?.country_code} t={t} />
-        </FadeUp>
+        {isSectionVisible('merchandise') && (
+          <FadeUp>
+            <VenueMerchandise venueId={slug} countryCode={cityFields?.country_code} t={t} />
+          </FadeUp>
+        )}
 
         {/* ═══ 5. PHOTO GALLERY (Bento Grid) ═══ */}
-        <FadeUp>
-          <VenueGallery venueId={slug} label={t('photoGallery')} />
-        </FadeUp>
+        {isSectionVisible('gallery') && (
+          <FadeUp>
+            <VenueGallery venueId={slug} label={t('photoGallery')} />
+          </FadeUp>
+        )}
 
         {/* ═══ 6. RESIDENT ARTISTS ═══ */}
-        {topPerformers.length > 0 && (
+        {isSectionVisible('artists') && topPerformers.length > 0 && (
           <FadeUp stagger={0.08}>
             <VenueArtists
               artists={topPerformers}
@@ -409,22 +453,26 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         )}
 
         {/* ═══ 7. PRACTICAL INFO ═══ */}
-        <FadeUp>
-          <VenuePracticalInfo
-            venue={venue}
-            locale={locale}
-            t={t}
-            paymentLabel={paymentLabel}
-          />
-        </FadeUp>
+        {isSectionVisible('practical') && (
+          <FadeUp>
+            <VenuePracticalInfo
+              venue={venue}
+              locale={locale}
+              t={t}
+              paymentLabel={paymentLabel}
+            />
+          </FadeUp>
+        )}
 
         {/* ═══ 8. COMMUNITY BOARD ═══ */}
-        <FadeUp>
-          <VenueCommentsSection venueId={venue.id} />
-        </FadeUp>
+        {isSectionVisible('comments') && (
+          <FadeUp>
+            <VenueCommentsSection venueId={venue.id} />
+          </FadeUp>
+        )}
 
         {/* ═══ 9. PAST EVENTS ═══ */}
-        {pastEvents.length > 0 && (
+        {isSectionVisible('past_events') && pastEvents.length > 0 && (
           <FadeUp>
             <div id="past-events" />
             <VenuePastEvents
