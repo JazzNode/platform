@@ -1,17 +1,73 @@
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { updateSession } from '@/utils/supabase/middleware';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient as createAdminSupabase } from '@supabase/supabase-js';
 
 const intlMiddleware = createMiddleware(routing);
 
+const PRIMARY_HOST = 'jazznode.com';
+const KNOWN_HOSTS = new Set([PRIMARY_HOST, 'localhost', '127.0.0.1']);
+
+/** Cache custom_domain → venue_id for 60s to avoid DB lookups on every request */
+const domainCache = new Map<string, { venueId: string | null; expiresAt: number }>();
+const CACHE_TTL = 60_000; // 60 seconds
+
+async function resolveCustomDomain(host: string): Promise<string | null> {
+  const cached = domainCache.get(host);
+  if (cached && cached.expiresAt > Date.now()) return cached.venueId;
+
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!supabaseUrl || !serviceKey) return null;
+
+    const supabase = createAdminSupabase(supabaseUrl, serviceKey);
+    const { data } = await supabase
+      .from('venues')
+      .select('venue_id')
+      .eq('custom_domain', host)
+      .eq('custom_domain_verified', true)
+      .single();
+
+    const venueId = data?.venue_id || null;
+    domainCache.set(host, { venueId, expiresAt: Date.now() + CACHE_TTL });
+    return venueId;
+  } catch {
+    domainCache.set(host, { venueId: null, expiresAt: Date.now() + CACHE_TTL });
+    return null;
+  }
+}
+
 export default async function middleware(request: NextRequest) {
+  const host = (request.headers.get('host') ?? '').replace(/:\d+$/, ''); // strip port
+
   // Redirect www → non-www (301) to consolidate SEO signals
-  const host = request.headers.get('host') ?? '';
   if (host.startsWith('www.')) {
     const url = request.nextUrl.clone();
     url.host = host.replace(/^www\./, '');
     return Response.redirect(url, 301);
+  }
+
+  // ── Custom domain routing ──
+  // If the host is not our primary domain or localhost, check if it's a venue custom domain
+  const isKnownHost = KNOWN_HOSTS.has(host) || host.endsWith(`.${PRIMARY_HOST}`) || host.endsWith('.vercel.app');
+  if (!isKnownHost) {
+    const venueId = await resolveCustomDomain(host);
+    if (venueId) {
+      // Rewrite to the venue page while preserving the custom domain in the URL bar
+      const url = request.nextUrl.clone();
+      const pathname = url.pathname;
+
+      // If visiting root or locale root, rewrite to venue page
+      if (pathname === '/' || /^\/[a-z]{2}$/.test(pathname) || /^\/[a-z]{2}\/$/.test(pathname)) {
+        const locale = pathname.match(/^\/([a-z]{2})/)?.[1] || 'en';
+        url.pathname = `/${locale}/venues/${venueId}`;
+        return NextResponse.rewrite(url);
+      }
+
+      // For other paths on custom domain, let them pass through (e.g. /api, /_next)
+    }
   }
 
   // Check if Supabase env vars are set (to prevent crash on Vercel if missing)
