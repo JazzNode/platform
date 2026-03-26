@@ -6,7 +6,6 @@ import TierConfigTable, { type FeatureKey } from '@/components/tiers/TierConfigT
 const NOT_IMPLEMENTED = new Set([
   'backline',
   'priority_search',
-  'custom_theme',
   'ticketing',
   'broadcasts_unlimited',
   'revenue_analytics',

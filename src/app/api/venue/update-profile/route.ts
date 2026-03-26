@@ -12,6 +12,8 @@ const ALLOWED_FIELDS = new Set([
   'phone',
   'contact_email',
   'business_hour',
+  'brand_theme_id',
+  'brand_accent_color',
 ]);
 
 export async function POST(req: NextRequest) {

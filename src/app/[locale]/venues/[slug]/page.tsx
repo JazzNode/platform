@@ -6,6 +6,7 @@ import { getVenues, getEvents, getArtists, getBadges, getCities, getLineups, res
 import { displayName, artistDisplayName, photoUrl, localized, cityName, eventTitle, normalizeInstrumentKey, isEventTonight } from '@/lib/helpers';
 import FadeUp from '@/components/animations/FadeUp';
 import FavoriteHighlight from '@/components/FavoriteHighlight';
+import VenueThemeScope from '@/components/VenueThemeScope';
 import AdminEditedByBadge from '@/components/AdminEditedByBadge';
 import type { BadgeProgress } from '@/lib/badges';
 import VenueCommentsSection from '@/components/VenueCommentsSection';
@@ -258,6 +259,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
     <div className="overflow-x-clip">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <VenueThemeScope themeId={f.brand_theme_id as string} accentColor={f.brand_accent_color as string} tier={f.tier}>
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
 
       {/* Status Banners */}
@@ -448,6 +450,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       </div>
       </FavoriteHighlight>
+      </VenueThemeScope>
     </div>
   );
 }
