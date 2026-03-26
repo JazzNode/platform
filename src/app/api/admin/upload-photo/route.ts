@@ -10,6 +10,7 @@ const SIZES = {
   sm: { width: 72, height: 72 },
   md: { width: 192, height: 192 },
   lg: { width: 384, height: 384 },
+  xl: { width: 640, height: 640 },
 } as const;
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -74,13 +75,14 @@ export async function POST(req: NextRequest) {
     }
 
     const results = await Promise.all(uploads);
-    const mdUrl = results.find((r) => r.size === 'md')!.url;
+    // Use lg (384px) as default — better for card displays and immersive layouts
+    const defaultUrl = results.find((r) => r.size === 'lg')!.url;
 
-    // 5. Update Supabase — set photo_url to the md-size image URL
+    // 5. Update Supabase — set photo_url to the lg-size image URL
     const sb = getSupabaseAdmin();
     const { error: updateErr } = await sb
       .from('artists')
-      .update({ photo_url: mdUrl, data_source: 'admin', updated_by: userId })
+      .update({ photo_url: defaultUrl, data_source: 'admin', updated_by: userId })
       .eq('artist_id', artistId);
 
     if (updateErr) {
@@ -95,15 +97,15 @@ export async function POST(req: NextRequest) {
       action: 'upload_photo',
       entityType: 'artist',
       entityId: artistId,
-      details: { photoUrl: mdUrl },
+      details: { photoUrl: defaultUrl },
       ipAddress: req.headers.get('x-forwarded-for'),
     });
 
-    console.log(JSON.stringify({ action: 'admin_upload_photo', actor: userId, target: artistId, status: 'success', photoUrl: mdUrl }));
+    console.log(JSON.stringify({ action: 'admin_upload_photo', actor: userId, target: artistId, status: 'success', photoUrl: defaultUrl }));
     return NextResponse.json({
       success: true,
       urls: Object.fromEntries(results.map((r) => [r.size, r.url])),
-      photoUrl: mdUrl,
+      photoUrl: defaultUrl,
     });
   } catch (err) {
     console.log(JSON.stringify({ action: 'admin_upload_photo', actor: userId, status: 'fail', error: err instanceof Error ? err.message : 'Upload failed' }));

@@ -1,0 +1,9 @@
+export { default as VenueHero } from './VenueHero';
+export { default as VenueFeaturedEvent } from './VenueFeaturedEvent';
+export { default as VenueUpcomingEvents } from './VenueUpcomingEvents';
+export { default as VenueAbout } from './VenueAbout';
+export { default as VenueGallery } from './VenueGallery';
+export { default as VenueArtists } from './VenueArtists';
+export { default as VenuePracticalInfo } from './VenuePracticalInfo';
+export { default as VenueStayConnected } from './VenueStayConnected';
+export { default as VenuePastEvents } from './VenuePastEvents';
