@@ -9,7 +9,7 @@ import FadeUp from '@/components/animations/FadeUp';
 import BroadcastBubble from '@/components/inbox/BroadcastBubble';
 import NotificationList from '@/components/inbox/NotificationList';
 
-type Tab = 'messages' | 'notifications';
+type Tab = 'messages' | 'notifications' | 'archived';
 
 interface Conversation {
   id: string;
@@ -65,6 +65,9 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
   // Notifications state
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifsLoading, setNotifsLoading] = useState(true);
+  const [archivedNotifs, setArchivedNotifs] = useState<NotificationItem[]>([]);
+  const [loadingArchived, setLoadingArchived] = useState(false);
+  const [archivedFetched, setArchivedFetched] = useState(false);
 
   useEffect(() => {
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
@@ -148,6 +151,7 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
       .eq('user_id', user.id)
       .eq('reference_type', 'artist')
       .eq('reference_id', slug)
+      .is('archived_at', null)
       .order('created_at', { ascending: false })
       .limit(50)
       .then(({ data }) => {
@@ -300,23 +304,44 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
     window.dispatchEvent(new Event('inbox:read'));
   }, [user, slug, notifications]);
 
-  const deleteNotifications = useCallback(async (ids: string[]) => {
+  const archiveNotifications = useCallback(async (ids: string[]) => {
     if (!user || ids.length === 0) return;
     const supabase = createClient();
-    await supabase.from('notifications').delete().in('id', ids);
+    await supabase.from('notifications').update({ archived_at: new Date().toISOString() }).in('id', ids);
+    const archived = notifications.filter((n) => ids.includes(n.id));
     setNotifications((prev) => prev.filter((n) => !ids.includes(n.id)));
+    setArchivedNotifs((prev) => [...archived, ...prev]);
     window.dispatchEvent(new Event('inbox:read'));
-  }, [user]);
+  }, [user, notifications]);
 
-  const deleteAllNotifications = useCallback(async () => {
+  const archiveAllNotifications = useCallback(async () => {
     if (!user) return;
     const supabase = createClient();
     const allIds = notifications.map((n) => n.id);
     if (allIds.length === 0) return;
-    await supabase.from('notifications').delete().in('id', allIds);
+    await supabase.from('notifications').update({ archived_at: new Date().toISOString() }).in('id', allIds);
+    setArchivedNotifs((prev) => [...notifications, ...prev]);
     setNotifications([]);
     window.dispatchEvent(new Event('inbox:read'));
   }, [user, notifications]);
+
+  const fetchArchived = useCallback(async () => {
+    if (!user || !slug || archivedFetched) return;
+    setLoadingArchived(true);
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('notifications')
+      .select('id, title, body, type, read_at, created_at')
+      .eq('user_id', user.id)
+      .eq('reference_type', 'artist')
+      .eq('reference_id', slug)
+      .not('archived_at', 'is', null)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    setArchivedNotifs(data || []);
+    setLoadingArchived(false);
+    setArchivedFetched(true);
+  }, [user, slug, archivedFetched]);
 
   if (loading || fetching) {
     return (
@@ -347,27 +372,32 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
       {/* Tabs */}
       <FadeUp>
         <div className="flex gap-1 bg-[var(--muted)] rounded-xl p-1">
-          {(['messages', 'notifications'] as Tab[]).map((key) => {
-            const badge = key === 'messages' ? totalUnread : unreadNotifs;
-            return (
-              <button
-                key={key}
-                onClick={() => { setTab(key); setSelectedConvo(null); }}
-                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
-                  tab === key
-                    ? 'bg-[var(--card)] text-[var(--foreground)]'
-                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
-                }`}
-              >
-                {t(key === 'messages' ? 'inboxMessages' : 'inboxNotifications')}
-                {badge > 0 && (
-                  <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
-                    {badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+          {([
+            { key: 'messages' as Tab, label: t('inboxMessages'), badge: totalUnread },
+            { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadNotifs },
+            { key: 'archived' as Tab, label: t('archived'), badge: 0 },
+          ]).map(({ key, label, badge }) => (
+            <button
+              key={key}
+              onClick={() => {
+                setTab(key);
+                setSelectedConvo(null);
+                if (key === 'archived') fetchArchived();
+              }}
+              className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
+                tab === key
+                  ? 'bg-[var(--card)] text-[var(--foreground)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
+              }`}
+            >
+              {label}
+              {badge > 0 && (
+                <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">
+                  {badge}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
       </FadeUp>
 
@@ -542,20 +572,49 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
             labels={{
               noNotifications: t('noNotifications'),
               markAllRead: t('markAllRead'),
-              deleteSelected: t('deleteSelected'),
-              deleteAll: t('deleteAll'),
+              archiveSelected: t('archiveSelected'),
+              archiveAll: t('archiveAll'),
               selectAll: t('selectMode'),
               deselectAll: t('deselectAll'),
               selected: t('nSelected'),
-              confirmDeleteTitle: t('confirmDeleteTitle'),
-              confirmDeleteBody: t('confirmDeleteBody'),
+              confirmArchiveTitle: t('confirmArchiveTitle'),
+              confirmArchiveBody: t('confirmArchiveBody'),
               confirmYes: t('confirmYes'),
               cancel: t('cancel'),
             }}
             onMarkRead={markNotifRead}
             onMarkAllRead={markAllNotifsRead}
-            onDelete={deleteNotifications}
-            onDeleteAll={deleteAllNotifications}
+            onArchive={archiveNotifications}
+            onArchiveAll={archiveAllNotifications}
+          />
+        </FadeUp>
+      )}
+
+      {/* Archived Tab */}
+      {tab === 'archived' && (
+        <FadeUp>
+          <NotificationList
+            notifications={archivedNotifs}
+            loading={loadingArchived}
+            accent="gold"
+            isArchiveView
+            labels={{
+              noNotifications: t('noArchivedNotifications'),
+              markAllRead: t('markAllRead'),
+              archiveSelected: t('archiveSelected'),
+              archiveAll: t('archiveAll'),
+              selectAll: t('selectMode'),
+              deselectAll: t('deselectAll'),
+              selected: t('nSelected'),
+              confirmArchiveTitle: t('confirmArchiveTitle'),
+              confirmArchiveBody: t('confirmArchiveBody'),
+              confirmYes: t('confirmYes'),
+              cancel: t('cancel'),
+            }}
+            onMarkRead={() => {}}
+            onMarkAllRead={() => {}}
+            onArchive={() => {}}
+            onArchiveAll={() => {}}
           />
         </FadeUp>
       )}

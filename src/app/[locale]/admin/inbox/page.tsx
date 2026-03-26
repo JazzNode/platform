@@ -7,7 +7,7 @@ import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import NotificationList from '@/components/inbox/NotificationList';
 
-type Tab = 'messages' | 'notifications';
+type Tab = 'messages' | 'notifications' | 'archived';
 
 interface Notification {
   id: string;
@@ -129,6 +129,9 @@ export default function AdminInboxPage() {
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const [loadingNotifs, setLoadingNotifs] = useState(true);
+  const [archivedNotifs, setArchivedNotifs] = useState<Notification[]>([]);
+  const [loadingArchived, setLoadingArchived] = useState(false);
+  const [archivedFetched, setArchivedFetched] = useState(false);
   const [loadingConvos, setLoadingConvos] = useState(true);
   const [guestContacts, setGuestContacts] = useState<GuestContact[]>([]);
   const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
@@ -303,30 +306,48 @@ export default function AdminInboxPage() {
     setUnreadCount((prev) => Math.max(0, prev - 1));
   };
 
-  // Delete notifications
-  const deleteNotifications = async (ids: string[]) => {
+  // Archive notifications (soft-delete)
+  const archiveNotifications = async (ids: string[]) => {
     if (!token || ids.length === 0) return;
     await fetch('/api/admin/notifications', {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify({ ids, archive: true }),
     });
-    const deletedUnread = notifications.filter((n) => ids.includes(n.id) && !n.read_at).length;
+    const archived = notifications.filter((n) => ids.includes(n.id));
+    const archivedUnread = archived.filter((n) => !n.read_at).length;
     setNotifications((prev) => prev.filter((n) => !ids.includes(n.id)));
-    setUnreadCount((prev) => Math.max(0, prev - deletedUnread));
+    setArchivedNotifs((prev) => [...archived, ...prev]);
+    setUnreadCount((prev) => Math.max(0, prev - archivedUnread));
   };
 
-  // Delete all notifications
-  const deleteAllNotifications = async () => {
+  // Archive all notifications
+  const archiveAllNotifications = async () => {
     if (!token) return;
     await fetch('/api/admin/notifications', {
-      method: 'DELETE',
+      method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ deleteAll: true }),
+      body: JSON.stringify({ archiveAll: true }),
     });
+    setArchivedNotifs((prev) => [...notifications, ...prev]);
     setNotifications([]);
     setUnreadCount(0);
   };
+
+  // Fetch archived notifications (lazy, on first tab switch)
+  const fetchArchived = useCallback(async () => {
+    if (!token || archivedFetched) return;
+    setLoadingArchived(true);
+    try {
+      const res = await fetch('/api/admin/notifications?limit=50&archived=true', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setArchivedNotifs(data.notifications || []);
+    } catch {}
+    setLoadingArchived(false);
+    setArchivedFetched(true);
+  }, [token, archivedFetched]);
 
   // Send message as admin
   const handleSend = useCallback(async () => {
@@ -373,10 +394,16 @@ export default function AdminInboxPage() {
         {([
           { key: 'messages' as Tab, label: t('inboxMessages'), badge: totalMsgUnread + guestUnread },
           { key: 'notifications' as Tab, label: t('inboxNotifications'), badge: unreadCount },
+          { key: 'archived' as Tab, label: t('archived'), badge: 0 },
         ]).map(({ key, label, badge }) => (
           <button
             key={key}
-            onClick={() => { setTab(key); setSelectedConvo(null); setSelectedGuest(null); }}
+            onClick={() => {
+              setTab(key);
+              setSelectedConvo(null);
+              setSelectedGuest(null);
+              if (key === 'archived') fetchArchived();
+            }}
             className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-colors whitespace-nowrap ${
               tab === key
                 ? 'bg-[var(--card)] text-[var(--foreground)]'
@@ -402,21 +429,49 @@ export default function AdminInboxPage() {
           labels={{
             noNotifications: t('noNotifications'),
             markAllRead: t('markAllRead'),
-            deleteSelected: t('deleteSelected'),
-            deleteAll: t('deleteAll'),
+            archiveSelected: t('archiveSelected'),
+            archiveAll: t('archiveAll'),
             selectAll: t('selectMode'),
             deselectAll: t('deselectAll'),
             selected: t('nSelected'),
-            confirmDeleteTitle: t('confirmDeleteTitle'),
-            confirmDeleteBody: t('confirmDeleteBody'),
+            confirmArchiveTitle: t('confirmArchiveTitle'),
+            confirmArchiveBody: t('confirmArchiveBody'),
             confirmYes: t('confirmYes'),
             cancel: t('cancel'),
           }}
           renderBadge={(notif) => <TypeBadge type={notif.type} />}
           onMarkRead={markRead}
           onMarkAllRead={markAllRead}
-          onDelete={deleteNotifications}
-          onDeleteAll={deleteAllNotifications}
+          onArchive={archiveNotifications}
+          onArchiveAll={archiveAllNotifications}
+        />
+      )}
+
+      {/* Archived Tab */}
+      {tab === 'archived' && (
+        <NotificationList
+          notifications={archivedNotifs}
+          loading={loadingArchived}
+          accent="gold"
+          isArchiveView
+          labels={{
+            noNotifications: t('noArchivedNotifications'),
+            markAllRead: t('markAllRead'),
+            archiveSelected: t('archiveSelected'),
+            archiveAll: t('archiveAll'),
+            selectAll: t('selectMode'),
+            deselectAll: t('deselectAll'),
+            selected: t('nSelected'),
+            confirmArchiveTitle: t('confirmArchiveTitle'),
+            confirmArchiveBody: t('confirmArchiveBody'),
+            confirmYes: t('confirmYes'),
+            cancel: t('cancel'),
+          }}
+          renderBadge={(notif) => <TypeBadge type={notif.type} />}
+          onMarkRead={() => {}}
+          onMarkAllRead={() => {}}
+          onArchive={() => {}}
+          onArchiveAll={() => {}}
         />
       )}
 

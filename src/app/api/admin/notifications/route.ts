@@ -20,11 +20,20 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient();
 
+  const archived = searchParams.get('archived') === 'true';
+
   let query = supabase
     .from('notifications')
     .select('*', { count: 'exact' })
     .eq('user_id', userId)
     .in('type', HQ_NOTIFICATION_TYPES);
+
+  // Filter by archived status
+  if (archived) {
+    query = query.not('archived_at', 'is', null);
+  } else {
+    query = query.is('archived_at', null);
+  }
 
   if (type && type !== 'all') {
     query = query.eq('type', type);
@@ -35,13 +44,14 @@ export async function GET(request: NextRequest) {
   const { data, count, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Count unread (HQ types only)
+  // Count unread (HQ types only, excluding archived)
   const { count: unreadCount } = await supabase
     .from('notifications')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', userId)
     .in('type', HQ_NOTIFICATION_TYPES)
-    .is('read_at', null);
+    .is('read_at', null)
+    .is('archived_at', null);
 
   return NextResponse.json({
     notifications: data || [],
@@ -60,49 +70,47 @@ export async function PATCH(request: NextRequest) {
   if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   const body = await request.json();
-  const { ids, markAllRead } = body as { ids?: string[]; markAllRead?: boolean };
+  const { ids, markAllRead, archive, archiveAll } = body as {
+    ids?: string[];
+    markAllRead?: boolean;
+    archive?: boolean;
+    archiveAll?: boolean;
+  };
 
   const supabase = createAdminClient();
+  const now = new Date().toISOString();
 
+  // Archive operations (soft-delete)
+  if (archiveAll) {
+    await supabase
+      .from('notifications')
+      .update({ archived_at: now })
+      .eq('user_id', userId)
+      .in('type', HQ_NOTIFICATION_TYPES)
+      .is('archived_at', null);
+    return NextResponse.json({ ok: true });
+  }
+
+  if (archive && ids && ids.length > 0) {
+    await supabase
+      .from('notifications')
+      .update({ archived_at: now })
+      .in('id', ids)
+      .eq('user_id', userId);
+    return NextResponse.json({ ok: true });
+  }
+
+  // Mark read operations
   if (markAllRead) {
     await supabase
       .from('notifications')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: now })
       .eq('user_id', userId)
       .is('read_at', null);
   } else if (ids && ids.length > 0) {
     await supabase
       .from('notifications')
-      .update({ read_at: new Date().toISOString() })
-      .in('id', ids)
-      .eq('user_id', userId);
-  }
-
-  return NextResponse.json({ ok: true });
-}
-
-/**
- * DELETE /api/admin/notifications — Delete notifications
- */
-export async function DELETE(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-
-  const body = await request.json();
-  const { ids, deleteAll } = body as { ids?: string[]; deleteAll?: boolean };
-
-  const supabase = createAdminClient();
-
-  if (deleteAll) {
-    await supabase
-      .from('notifications')
-      .delete()
-      .eq('user_id', userId)
-      .in('type', HQ_NOTIFICATION_TYPES);
-  } else if (ids && ids.length > 0) {
-    await supabase
-      .from('notifications')
-      .delete()
+      .update({ read_at: now })
       .in('id', ids)
       .eq('user_id', userId);
   }
