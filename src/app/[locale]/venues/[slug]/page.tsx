@@ -296,7 +296,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   }
 
   return (
-    <div className="overflow-x-clip" style={fontStyle}>
+    <div style={fontStyle}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <VenueThemeScope
@@ -307,6 +307,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         tier={f.tier}
       >
       <FavoriteHighlight itemType="venue" itemId={venue.id}>
+      <div className="overflow-x-clip">
 
       {/* Status Banners */}
       {f.status === 'inactive' && (
@@ -568,6 +569,7 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           />
         </FadeUp>
 
+      </div>
       </div>
       </FavoriteHighlight>
       </VenueThemeScope>
