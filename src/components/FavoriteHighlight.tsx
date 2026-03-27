@@ -20,7 +20,7 @@ export default function FavoriteHighlight({ itemType, itemId, children }: Favori
 
   return (
     <div
-      className="transition-colors duration-700"
+      className={`transition-all duration-700 ${active ? 'rounded-3xl' : ''}`}
       style={active ? {
         background: 'rgba(var(--theme-glow-rgb), 0.04)',
       } : undefined}
