@@ -694,7 +694,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                 entityType="artist"
                 entityId={artist.id}
                 artistName={artistDisplayName(f, locale)}
-                claimed={!!f.tier && f.tier >= 1}
+                claimed={f.data_source === 'user' || (!!f.tier && f.tier >= 1)}
                 fields={{
                   website_url: f.website_url,
                   spotify_url: f.spotify_url,

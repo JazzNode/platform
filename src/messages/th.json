@@ -1105,6 +1105,7 @@
     "featuredWallNotePlaceholder": "เพิ่มบันทึกเกี่ยวกับการแสดงนี้...",
     "featuredWallLocked": "วอลล์การแสดงแนะนำ — ฟีเจอร์พรีเมียม",
     "featuredWallLockedDesc": "แสดงการแสดงที่ดีที่สุดของคุณไว้ด้านบนโปรไฟล์",
+    "noResults": "ไม่พบกิจกรรมที่ตรงกัน",
     "settings": "ตั้งค่า",
     "contactArtist": "ติดต่อ",
     "contactArtistTitle": "ส่งข้อความถึง {name}",

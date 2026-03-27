@@ -1252,6 +1252,7 @@
     "featuredWallNotePlaceholder": "Add a note about this performance...",
     "featuredWallLocked": "Featured Wall — Premium Feature",
     "featuredWallLockedDesc": "Showcase your best performances at the top of your profile.",
+    "noResults": "No matching events found.",
     "settings": "Settings",
     "contactArtist": "Contact",
     "contactArtistTitle": "Message {name}",

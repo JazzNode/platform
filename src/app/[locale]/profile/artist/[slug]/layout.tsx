@@ -255,7 +255,7 @@ export default function ArtistDashboardLayout({
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{artistName}</p>
                 <p className="text-xs text-[var(--muted-foreground)]">
-                  {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+                  {effectiveTier >= 2 ? 'Premium' : 'Claimed'}
                 </p>
               </div>
             </div>
@@ -310,8 +310,8 @@ export default function ArtistDashboardLayout({
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--foreground)]">{artistName}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span className={effectiveTier === 2 ? 'text-[var(--color-gold)]' : ''}>
-                {effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+              <span className={effectiveTier >= 2 ? 'text-[var(--color-gold)]' : ''}>
+                {effectiveTier >= 2 ? 'Premium' : 'Claimed'}
               </span>
             </p>
           </div>

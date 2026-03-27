@@ -1248,6 +1248,7 @@
     "featuredWallNotePlaceholder": "為這場演出加上一段註記⋯",
     "featuredWallLocked": "精選演出牆 — Premium 專屬功能",
     "featuredWallLockedDesc": "在你的個人檔案頂部展示最精彩的演出。",
+    "noResults": "找不到符合的演出。",
     "settings": "設定",
     "contactArtist": "聯絡",
     "contactArtistTitle": "傳訊息給 {name}",
