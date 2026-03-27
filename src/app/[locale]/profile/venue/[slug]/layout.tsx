@@ -42,10 +42,10 @@ const NAV_ITEMS = [
 
 const TIER_LABELS: Record<number, string> = { 0: 'Free', 1: 'Claimed', 2: 'Premium', 3: 'Elite' };
 const TIER_COLORS: Record<number, string> = {
-  0: 'text-[var(--muted-foreground)]',
-  1: 'text-[var(--muted-foreground)]',
-  2: 'text-[var(--color-gold)]',
-  3: 'text-amber-400',
+  0: 'text-zinc-400',
+  1: 'text-blue-400',
+  2: 'text-amber-400',
+  3: 'text-purple-400',
 };
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -284,8 +284,8 @@ export default function VenueDashboardLayout({
               )}
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{venueName}</p>
-                <p className="text-xs text-[var(--muted-foreground)]">
-                  {effectiveTier === 3 ? 'Elite' : effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+                <p className={`text-xs ${TIER_COLORS[effectiveTier]}`}>
+                  {TIER_LABELS[effectiveTier] ?? 'Free'}
                 </p>
               </div>
             </div>
@@ -345,8 +345,8 @@ export default function VenueDashboardLayout({
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--foreground)]">{venueName}</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span className={effectiveTier >= 2 ? 'text-[var(--color-gold)]' : ''}>
-                {effectiveTier === 3 ? 'Elite' : effectiveTier === 2 ? 'Premium' : effectiveTier === 1 ? 'Claimed' : 'Free'}
+              <span className={TIER_COLORS[effectiveTier]}>
+                {TIER_LABELS[effectiveTier] ?? 'Free'}
               </span>
             </p>
           </div>

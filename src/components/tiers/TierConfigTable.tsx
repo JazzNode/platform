@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useAdmin } from '@/components/AdminProvider';
 import { TIER_DISABLED, ALL_TIERS, type TierFeatures } from '@/components/TierConfigProvider';
 
-const TIER_NAMES = ['Free', 'Claimed', 'Pro', 'Elite'];
+const TIER_NAMES = ['Free', 'Claimed', 'Premium', 'Elite'];
 const TIER_COLORS = [
   'text-zinc-400',
   'text-blue-400',
