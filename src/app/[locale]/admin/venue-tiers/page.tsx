@@ -7,7 +7,6 @@ const NOT_IMPLEMENTED = new Set([
   'backline',
   'priority_search',
   'ticketing',
-  'broadcasts_unlimited',
   'revenue_analytics',
   'multi_location',
 ]);
