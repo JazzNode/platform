@@ -596,14 +596,14 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               <EpkDownloadButton artistId={artist.id} />
             </TierGate>
             {/* Custom CTA — Elite only */}
-            {f.custom_cta_url && f.custom_cta_label && (f.tier ?? 0) >= 3 && (
+            {(f as Record<string, unknown>).custom_cta_url && (f as Record<string, unknown>).custom_cta_label && (f.tier ?? 0) >= 3 && (
               <a
-                href={f.custom_cta_url}
+                href={(f as Record<string, unknown>).custom_cta_url as string}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--color-gold)]/40 text-[var(--color-gold)] text-xs font-semibold uppercase tracking-widest hover:bg-[var(--color-gold)]/10 transition-colors"
               >
-                🔗 {f.custom_cta_label}
+                🔗 {(f as Record<string, unknown>).custom_cta_label as string}
               </a>
             )}
             {/* Calendar Subscribe — Elite only */}
