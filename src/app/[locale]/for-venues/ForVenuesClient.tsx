@@ -135,13 +135,42 @@ export default function ForVenuesClient({
     {
       icon: (
         <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+      ),
+      title: t('feat1Title'),
+      desc: t('feat1Desc'),
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      ),
+      title: t('feat2Title'),
+      desc: t('feat2Desc'),
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      ),
+      title: t('feat3Title'),
+      desc: t('feat3Desc'),
+    },
+    {
+      icon: (
+        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="var(--color-gold)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <line x1="2" y1="12" x2="22" y2="12" />
           <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
         </svg>
       ),
-      title: t('feat1Title'),
-      desc: t('feat1Desc'),
+      title: t('feat4Title'),
+      desc: t('feat4Desc'),
     },
     {
       icon: (
@@ -151,8 +180,8 @@ export default function ForVenuesClient({
           <line x1="12" y1="2" x2="12" y2="15" />
         </svg>
       ),
-      title: t('feat2Title'),
-      desc: t('feat2Desc'),
+      title: t('feat5Title'),
+      desc: t('feat5Desc'),
     },
     {
       icon: (
@@ -163,8 +192,8 @@ export default function ForVenuesClient({
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       ),
-      title: t('feat3Title'),
-      desc: t('feat3Desc'),
+      title: t('feat6Title'),
+      desc: t('feat6Desc'),
     },
   ];
 
@@ -303,9 +332,9 @@ export default function ForVenuesClient({
 
       {/* ═══════════ CORE FEATURES (3 cards — new messaging) ═══════════ */}
       <section className="max-w-5xl mx-auto px-4 mb-24">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {features.map((feat, i) => (
-            <FadeUpItem key={i} delay={i * 100}>
+            <FadeUpItem key={i} delay={i * 80}>
               <div className="group bg-[var(--card)] border border-[var(--border)] rounded-2xl p-8 h-full hover:border-[var(--color-gold)]/30 transition-colors duration-500">
                 <div className="w-12 h-12 rounded-xl bg-[var(--color-gold)]/8 flex items-center justify-center mb-5 group-hover:bg-[var(--color-gold)]/15 transition-colors duration-500">
                   {feat.icon}
