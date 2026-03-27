@@ -439,7 +439,14 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         {/* ═══ 3b. ANNOUNCEMENTS ═══ */}
         {isSectionVisible('announcements') && (
           <FadeUp>
-            <VenueAnnouncements venueId={venue.id} t={t} />
+            <VenueAnnouncements venueId={venue.id} labels={{
+              announcements: t('announcements'),
+              today: t('today'),
+              yesterday: t('yesterday'),
+              daysAgo: t('daysAgo'),
+              showLess: t('showLess'),
+              readMore: t('readMore'),
+            }} />
           </FadeUp>
         )}
 
@@ -465,7 +472,10 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         {/* ═══ 4c. MERCHANDISE ═══ */}
         {isSectionVisible('merchandise') && (
           <FadeUp>
-            <VenueMerchandise venueId={slug} countryCode={cityFields?.country_code} t={t} />
+            <VenueMerchandise venueId={slug} countryCode={cityFields?.country_code} labels={{
+              shopMerchandise: t('shopMerchandise'),
+              buyNow: t('buyNow'),
+            }} />
           </FadeUp>
         )}
 

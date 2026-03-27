@@ -13,10 +13,17 @@ interface Announcement {
 
 interface VenueAnnouncementsProps {
   venueId: string;
-  t: (key: string) => string;
+  labels: {
+    announcements: string;
+    today: string;
+    yesterday: string;
+    daysAgo: string;
+    showLess: string;
+    readMore: string;
+  };
 }
 
-export default function VenueAnnouncements({ venueId, t }: VenueAnnouncementsProps) {
+export default function VenueAnnouncements({ venueId, labels }: VenueAnnouncementsProps) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
@@ -48,9 +55,9 @@ export default function VenueAnnouncements({ venueId, t }: VenueAnnouncementsPro
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return t('today');
-    if (diffDays === 1) return t('yesterday');
-    if (diffDays < 7) return t('daysAgo').replace('{count}', String(diffDays));
+    if (diffDays === 0) return labels.today;
+    if (diffDays === 1) return labels.yesterday;
+    if (diffDays < 7) return labels.daysAgo.replace('{count}', String(diffDays));
     return date.toLocaleDateString();
   };
 
@@ -58,7 +65,7 @@ export default function VenueAnnouncements({ venueId, t }: VenueAnnouncementsPro
     <section>
       <div className="flex items-center gap-3 mb-6">
         <span className="text-amber-400 text-lg">📢</span>
-        <h2 className="font-serif text-xl sm:text-2xl font-bold">{t('announcements')}</h2>
+        <h2 className="font-serif text-xl sm:text-2xl font-bold">{labels.announcements}</h2>
       </div>
 
       <div className="space-y-3">
@@ -94,7 +101,7 @@ export default function VenueAnnouncements({ venueId, t }: VenueAnnouncementsPro
                   onClick={() => toggleExpand(a.id)}
                   className="text-xs text-amber-400 hover:text-amber-300 mt-2 transition-colors"
                 >
-                  {isExpanded ? t('showLess') : t('readMore')}
+                  {isExpanded ? labels.showLess : labels.readMore}
                 </button>
               )}
             </div>

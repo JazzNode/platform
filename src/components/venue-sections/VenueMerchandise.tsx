@@ -14,7 +14,10 @@ interface MerchItem {
 interface VenueMerchandiseProps {
   venueId: string;
   countryCode?: string | null;
-  t: (key: string) => string;
+  labels: {
+    shopMerchandise: string;
+    buyNow: string;
+  };
 }
 
 /** Map country code → currency + locale for Intl.NumberFormat */
@@ -48,7 +51,7 @@ function formatPrice(amount: number, countryCode?: string | null): string {
   }).format(value);
 }
 
-export default function VenueMerchandise({ venueId, countryCode, t }: VenueMerchandiseProps) {
+export default function VenueMerchandise({ venueId, countryCode, labels }: VenueMerchandiseProps) {
   const [items, setItems] = useState<MerchItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,7 +67,7 @@ export default function VenueMerchandise({ venueId, countryCode, t }: VenueMerch
   return (
     <section>
       <div className="flex items-center gap-3 mb-6">
-        <h2 className="font-serif text-xl sm:text-2xl font-bold">{t('shopMerchandise')}</h2>
+        <h2 className="font-serif text-xl sm:text-2xl font-bold">{labels.shopMerchandise}</h2>
       </div>
 
       <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
@@ -111,7 +114,7 @@ export default function VenueMerchandise({ venueId, countryCode, t }: VenueMerch
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg bg-[var(--muted)] hover:bg-[var(--border)] text-xs font-medium text-[var(--foreground)] transition-colors"
               >
-                {t('buyNow')}
+                {labels.buyNow}
                 <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
                   <polyline points="15 3 21 3 21 9" />
