@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { key: 'magazine', icon: 'magazine', path: '/magazine' },
   { key: 'released', icon: 'rocket', path: '/released' },
   { key: 'reports', icon: 'flag', path: '/reports' },
+  { key: 'financials', icon: 'dollar', path: '/financials' },
   { key: 'subscriptions', icon: 'credit', path: '/subscriptions' },
 ] as const;
 
@@ -127,6 +128,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
           <line x1="4" y1="22" x2="4" y2="15" />
+        </svg>
+      );
+    case 'dollar':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="12" y1="1" x2="12" y2="23" />
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
         </svg>
       );
     case 'credit':
