@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 // Notification types that belong to HQ admin (not personal user notifications)
@@ -9,8 +9,10 @@ const HQ_NOTIFICATION_TYPES = ['new_member', 'system', 'claim_review'];
  * GET /api/admin/notifications — Fetch HQ admin notifications only
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'moderator', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') || '';
@@ -66,8 +68,10 @@ export async function GET(request: NextRequest) {
  * PATCH /api/admin/notifications — Mark notifications as read
  */
 export async function PATCH(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'moderator', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await request.json();
   const { ids, markAllRead, archive, archiveAll } = body as {

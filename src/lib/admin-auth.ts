@@ -1,5 +1,52 @@
 import { createAdminClient } from '@/utils/supabase/admin';
 
+/** All roles that can access JazzNode HQ */
+export const HQ_ROLES = ['editor', 'moderator', 'marketing', 'admin', 'owner'] as const;
+export type HQRole = (typeof HQ_ROLES)[number];
+
+export interface HQVerifyResult {
+  isHQ: boolean;
+  role: string | null;
+  userId: string | null;
+}
+
+/**
+ * Check if a role string has permission against an allowed list.
+ */
+export function hasPermission(role: string | null, allowed: string[]): boolean {
+  return role !== null && allowed.includes(role);
+}
+
+/**
+ * Verify a Bearer token and check if the user has any HQ role.
+ * Returns the actual role string for granular permission checks.
+ */
+export async function verifyHQToken(authHeader: string | null): Promise<HQVerifyResult> {
+  if (!authHeader?.startsWith('Bearer ')) return { isHQ: false, role: null, userId: null };
+  const token = authHeader.slice(7);
+
+  try {
+    const supabase = createAdminClient();
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return { isHQ: false, role: null, userId: null };
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const role = profile?.role || null;
+    return {
+      isHQ: role !== null && (HQ_ROLES as readonly string[]).includes(role),
+      role,
+      userId: user.id,
+    };
+  } catch {
+    return { isHQ: false, role: null, userId: null };
+  }
+}
+
 interface AdminVerifyResult {
   isAdmin: boolean;
   userId: string | null;
@@ -7,34 +54,15 @@ interface AdminVerifyResult {
 
 /**
  * Verify an admin Bearer token from request headers.
- * Uses Supabase auth to identify the user, then checks profiles.role.
- * Returns isAdmin flag and userId (for audit logging).
+ * Returns isAdmin flag (true for admin or owner only).
+ * @deprecated Use verifyHQToken + hasPermission for granular checks.
  */
 export async function verifyAdminToken(authHeader: string | null): Promise<AdminVerifyResult> {
-  if (!authHeader?.startsWith('Bearer ')) return { isAdmin: false, userId: null };
-  const token = authHeader.slice(7);
-
-  try {
-    const supabase = createAdminClient();
-
-    // Verify the Supabase access token and get user
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) return { isAdmin: false, userId: null };
-
-    // Check profile role
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    return {
-      isAdmin: profile?.role === 'admin' || profile?.role === 'owner',
-      userId: user.id,
-    };
-  } catch {
-    return { isAdmin: false, userId: null };
-  }
+  const { role, userId } = await verifyHQToken(authHeader);
+  return {
+    isAdmin: role === 'admin' || role === 'owner',
+    userId,
+  };
 }
 
 interface OwnerVerifyResult {

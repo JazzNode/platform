@@ -12,10 +12,22 @@ export type ViewMode =
 const ARTIST_TIER_CYCLE: ViewMode[] = ['admin', 'artist-tier0', 'artist-tier1', 'artist-tier2', 'artist-tier3'];
 const VENUE_TIER_CYCLE: ViewMode[] = ['admin', 'venue-tier0', 'venue-tier1', 'venue-tier2', 'venue-tier3'];
 
+const HQ_ROLES = ['editor', 'moderator', 'marketing', 'admin', 'owner'];
+
 interface AdminContextType {
   isAdmin: boolean;
   /** True only for owner role — can manage admin roles */
   isOwner: boolean;
+  /** True for any HQ role (editor, moderator, marketing, admin, owner) when admin mode enabled */
+  isHQ: boolean;
+  /** True only for editor role */
+  isEditor: boolean;
+  /** True only for moderator role */
+  isModerator: boolean;
+  /** True only for marketing role */
+  isMarketing: boolean;
+  /** Raw role string from profile */
+  hqRole: string | null;
   /** Supabase access token — pass as Bearer token to admin API routes */
   token: string | null;
   /** Get a fresh (auto-refreshed) access token right before API calls */
@@ -51,6 +63,11 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
   const adminModeEnabled = viewMode === 'admin';
   const isAdmin = !!((profile?.role === 'admin' || profile?.role === 'owner') && adminModeEnabled);
   const isOwner = profile?.role === 'owner';
+  const isHQ = !!(profile?.role && HQ_ROLES.includes(profile.role) && adminModeEnabled);
+  const isEditor = profile?.role === 'editor';
+  const isModerator = profile?.role === 'moderator';
+  const isMarketing = profile?.role === 'marketing';
+  const hqRole = (profile?.role && HQ_ROLES.includes(profile.role)) ? profile.role : null;
 
   // Parse preview tiers from viewMode
   // Admin mode → max tier (all features unlocked)
@@ -109,7 +126,7 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       setShowAuthModal(true);
       return;
     }
-    if (profile?.role !== 'admin' && profile?.role !== 'owner') return;
+    if (!['admin', 'owner', 'editor'].includes(profile?.role || '')) return;
 
     setViewMode((prev) => {
       const idx = cycle.indexOf(prev);
@@ -150,6 +167,11 @@ export default function AdminProvider({ children }: { children: React.ReactNode 
       value={{
         isAdmin,
         isOwner: !!isOwner,
+        isHQ,
+        isEditor: !!isEditor,
+        isModerator: !!isModerator,
+        isMarketing: !!isMarketing,
+        hqRole,
         token,
         getFreshToken,
         adminModeEnabled,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { createAdminClient } from '@/utils/supabase/admin';
 
@@ -7,8 +7,10 @@ import { createAdminClient } from '@/utils/supabase/admin';
  * GET /api/admin/badges — Fetch all badges
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -27,8 +29,10 @@ export async function GET(request: NextRequest) {
  * Body: { badge_id, is_active?, name_en?, name_zh?, ..., description_en?, ..., criteria_target? }
  */
 export async function PUT(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await request.json();
   const { badge_id, ...updates } = body;

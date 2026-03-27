@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { uploadToR2 } from '@/lib/r2';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
@@ -13,9 +13,9 @@ const GALLERY_WIDTH = 1200;
  * FormData: file, articleId, type ("cover" | "gallery")
  */
 export async function POST(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

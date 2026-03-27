@@ -266,6 +266,13 @@ export default function DashboardCommentsTab({ mode, venueId, artistId }: Dashbo
             </span>
           </div>
 
+          {/* HQ hint for venue managers */}
+          {mode === 'venue' && (
+            <p className="text-xs text-[var(--muted-foreground)] italic">
+              {tDash('venueCommentHQHint')}
+            </p>
+          )}
+
           {/* Filter: only show for venue/artist/admin (managers who need to respond) */}
           {canReply && comments.length > 0 && (
             <div className="flex items-center gap-1 text-xs">
@@ -378,12 +385,13 @@ export default function DashboardCommentsTab({ mode, venueId, artistId }: Dashbo
                     {t('reply')}
                   </button>
                 )}
-                {isOwn && confirmDelete !== comment.id && (
+                {/* Venue managers cannot delete comments — only own comments in non-venue mode */}
+                {isOwn && mode !== 'venue' && confirmDelete !== comment.id && (
                   <button onClick={() => setConfirmDelete(comment.id)} className="text-red-400/60 hover:text-red-400 transition-colors">
                     {t('deleteComment')}
                   </button>
                 )}
-                {isOwn && confirmDelete === comment.id && (
+                {isOwn && mode !== 'venue' && confirmDelete === comment.id && (
                   <div className="flex items-center gap-2">
                     <span className="text-red-400">{t('deleteConfirm')}</span>
                     <button onClick={() => handleDeleteComment(comment.id)} className="text-red-400 font-medium hover:text-red-300">{t('confirmYes')}</button>

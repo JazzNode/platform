@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
  * GET /api/admin/members — List all members with search/filter/pagination
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role: userRole } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(userRole, ['admin', 'marketing', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const { searchParams } = new URL(request.url);
   const search = searchParams.get('search') || '';

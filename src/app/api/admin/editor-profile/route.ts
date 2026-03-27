@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
@@ -8,8 +8,10 @@ import { createAdminClient } from '@/utils/supabase/admin';
  * Used to display "edited by" attribution in admin mode.
  */
 export async function GET(req: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const userId = req.nextUrl.searchParams.get('userId');
   if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 });

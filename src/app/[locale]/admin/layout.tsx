@@ -7,20 +7,27 @@ import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 
+const HQ_ROLES = ['editor', 'moderator', 'marketing', 'admin', 'owner'];
+
+const ROLE_DISPLAY: Record<string, string> = {
+  editor: 'Editor', moderator: 'Moderator', marketing: 'Marketing', admin: 'Admin', owner: 'Owner',
+};
+
 const NAV_ITEMS = [
-  { key: 'overview', icon: 'chart', path: '' },
-  { key: 'analytics', icon: 'trend', path: '/analytics' },
-  { key: 'seo', icon: 'search', path: '/seo' },
-  { key: 'newEvents', icon: 'sparkle', path: '/new-events' },
-  { key: 'inbox', icon: 'bell', path: '/inbox' },
-  { key: 'comments', icon: 'comments', path: '/comments' },
-  { key: 'members', icon: 'users', path: '/members' },
-  { key: 'claims', icon: 'shield', path: '/claims' },
-  { key: 'artistTiers', icon: 'music', path: '/artist-tiers' },
-  { key: 'venueTiers', icon: 'house', path: '/venue-tiers' },
-  { key: 'badges', icon: 'badge', path: '/badges' },
-  { key: 'magazine', icon: 'magazine', path: '/magazine' },
-  { key: 'released', icon: 'rocket', path: '/released' },
+  { key: 'overview', icon: 'chart', path: '', roles: HQ_ROLES },
+  { key: 'analytics', icon: 'trend', path: '/analytics', roles: ['admin', 'marketing', 'owner'] },
+  { key: 'seo', icon: 'search', path: '/seo', roles: ['admin', 'marketing', 'owner'] },
+  { key: 'newEvents', icon: 'sparkle', path: '/new-events', roles: ['admin', 'editor', 'owner'] },
+  { key: 'inbox', icon: 'bell', path: '/inbox', roles: ['admin', 'editor', 'moderator', 'owner'] },
+  { key: 'comments', icon: 'comments', path: '/comments', roles: ['admin', 'editor', 'moderator', 'owner'] },
+  { key: 'members', icon: 'users', path: '/members', roles: ['admin', 'marketing', 'owner'] },
+  { key: 'claims', icon: 'shield', path: '/claims', roles: ['admin', 'editor', 'owner'] },
+  { key: 'artistTiers', icon: 'music', path: '/artist-tiers', roles: ['admin', 'owner'] },
+  { key: 'venueTiers', icon: 'house', path: '/venue-tiers', roles: ['admin', 'owner'] },
+  { key: 'badges', icon: 'badge', path: '/badges', roles: ['admin', 'owner'] },
+  { key: 'magazine', icon: 'magazine', path: '/magazine', roles: ['admin', 'editor', 'owner'] },
+  { key: 'released', icon: 'rocket', path: '/released', roles: HQ_ROLES },
+  { key: 'reports', icon: 'flag', path: '/reports', roles: ['admin', 'moderator', 'owner'] },
 ] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
@@ -120,6 +127,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
         </svg>
       );
+    case 'flag':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+          <line x1="4" y1="22" x2="4" y2="15" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -136,7 +150,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Redirect non-admin users
   useEffect(() => {
-    if (!loading && (!user || (profile?.role !== 'admin' && profile?.role !== 'owner'))) {
+    if (!loading && (!user || !profile?.role || !HQ_ROLES.includes(profile.role))) {
       router.push('/');
     }
   }, [loading, user, profile, router]);
@@ -157,7 +171,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return () => { cancelled = true; };
   }, [token]);
 
-  if (loading || !user || (profile?.role !== 'admin' && profile?.role !== 'owner')) {
+  if (loading || !user || !profile?.role || !HQ_ROLES.includes(profile.role)) {
     return (
       <div className="py-24 text-center">
         <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
@@ -166,6 +180,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const basePath = `/${locale}/admin`;
+  const userRole = profile?.role || '';
+  const visibleNavItems = NAV_ITEMS.filter(item => (item.roles as readonly string[]).includes(userRole));
 
   const isActive = (navPath: string) => {
     const fullPath = basePath + navPath;
@@ -192,14 +208,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">JazzNode HQ</p>
-                <p className="text-xs text-[var(--muted-foreground)]">Admin</p>
+                <p className="text-xs text-[var(--muted-foreground)]">{ROLE_DISPLAY[profile?.role || ''] || profile?.role}</p>
               </div>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <Link
@@ -230,11 +246,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <p className="text-xs text-[var(--muted-foreground)] truncate">
               <span className="font-semibold text-[var(--color-gold)]">JazzNode HQ</span>
               <span className="mx-1.5 opacity-40">·</span>
-              <span>Admin</span>
+              <span>{ROLE_DISPLAY[profile?.role || ''] || profile?.role}</span>
             </p>
           </div>
           <div className="flex items-center gap-2 px-4 py-1.5 overflow-x-auto no-scrollbar">
-            {NAV_ITEMS.map((item) => {
+            {visibleNavItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <Link

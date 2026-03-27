@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = 'gemini-3-flash-preview';
@@ -12,8 +12,10 @@ const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GE
  * Returns: { excerpt_en, excerpt_zh, excerpt_ja, excerpt_ko, excerpt_th, excerpt_id }
  */
 export async function POST(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   if (!GEMINI_API_KEY) {
     return NextResponse.json({ error: 'Gemini not configured' }, { status: 500 });

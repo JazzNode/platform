@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 export async function GET(req: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const supabase = createAdminClient();
   const ninetyDaysAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString();

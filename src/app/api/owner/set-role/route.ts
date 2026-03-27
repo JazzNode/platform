@@ -3,7 +3,7 @@ import { verifyOwnerToken } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { writeAuditLog } from '@/lib/audit-log';
 
-const ALLOWED_ROLES = ['member', 'artist_manager', 'venue_manager', 'admin'] as const;
+const ALLOWED_ROLES = ['member', 'artist_manager', 'venue_manager', 'editor', 'moderator', 'marketing', 'admin'] as const;
 
 /**
  * PATCH /api/owner/set-role — Owner-only: set a member's role

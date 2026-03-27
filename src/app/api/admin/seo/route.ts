@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
@@ -7,8 +7,10 @@ import { createAdminClient } from '@/utils/supabase/admin';
  * Query params: range = 7d | 14d | 28d
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'marketing', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const ALLOWED_RANGES: Record<string, number> = { '7d': 7, '14d': 14, '28d': 28 };
   const range = request.nextUrl.searchParams.get('range') || '14d';

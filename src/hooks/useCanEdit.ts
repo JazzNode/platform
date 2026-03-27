@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
  * Returns true for admins (with admin mode enabled) or claimed users.
  */
 export function useCanEdit(entityType: 'artist' | 'venue' | 'event', entityId: string) {
-  const { isAdmin, token, getFreshToken, handleUnauthorized } = useAdmin();
+  const { isAdmin, isEditor, token, getFreshToken, handleUnauthorized } = useAdmin();
   const { user, profile } = useAuth();
 
   const isClaimed = !!(
@@ -17,8 +17,9 @@ export function useCanEdit(entityType: 'artist' | 'venue' | 'event', entityId: s
   );
 
   return {
-    canEdit: isAdmin || isClaimed,
+    canEdit: isAdmin || isEditor || isClaimed,
     isAdmin,
+    isEditor,
     isClaimed,
     token,
     getFreshToken,

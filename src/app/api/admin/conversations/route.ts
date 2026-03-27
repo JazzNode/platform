@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
  * GET /api/admin/conversations — List member_hq conversations for admin
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'moderator', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const supabase = createAdminClient();
 
@@ -94,8 +96,10 @@ export async function GET(request: NextRequest) {
  * (Using POST on the conversations route with conversation_id in body)
  */
 export async function POST(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'moderator', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const { conversationId, body: msgBody } = await request.json();
   if (!conversationId || !msgBody?.trim()) {

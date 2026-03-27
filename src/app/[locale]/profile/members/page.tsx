@@ -25,12 +25,15 @@ interface Member {
   created_at: string;
 }
 
-const SETTABLE_ROLES = ['member', 'artist_manager', 'venue_manager', 'admin'] as const;
-const ROLE_OPTIONS = ['all', 'member', 'artist_manager', 'venue_manager', 'admin', 'owner'] as const;
+const SETTABLE_ROLES = ['member', 'artist_manager', 'venue_manager', 'editor', 'moderator', 'marketing', 'admin'] as const;
+const ROLE_OPTIONS = ['all', 'member', 'artist_manager', 'venue_manager', 'editor', 'moderator', 'marketing', 'admin', 'owner'] as const;
 
 const ROLE_STYLES: Record<string, string> = {
   owner: 'bg-red-400/10 text-red-400 border-red-400/20',
   admin: 'bg-purple-400/10 text-purple-400 border-purple-400/20',
+  editor: 'bg-blue-400/10 text-blue-400 border-blue-400/20',
+  moderator: 'bg-orange-400/10 text-orange-400 border-orange-400/20',
+  marketing: 'bg-pink-400/10 text-pink-400 border-pink-400/20',
   artist_manager: 'bg-[var(--color-gold)]/10 text-[var(--color-gold)] border-[var(--color-gold)]/20',
   venue_manager: 'bg-green-400/10 text-green-400 border-green-400/20',
   member: 'bg-gray-400/10 text-gray-400 border-gray-400/20',
@@ -41,6 +44,9 @@ const ROLE_LABELS: Record<string, string> = {
   member: '會員',
   artist_manager: '藝人經理',
   venue_manager: '場地經理',
+  editor: '編輯',
+  moderator: '審核員',
+  marketing: '行銷',
   admin: '管理員',
   owner: '擁有者',
 };

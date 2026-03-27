@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import sharp from 'sharp';
 import { revalidateTag } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { uploadToR2 } from '@/lib/r2';
 
@@ -18,9 +18,9 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

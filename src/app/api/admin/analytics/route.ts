@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
- * GET /api/admin/analytics — Platform trend analytics (admin only)
+ * GET /api/admin/analytics — Platform trend analytics
  * Query params: range = 7d | 28d | 90d | 365d
  */
 export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'marketing', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const ALLOWED_RANGES: Record<string, number> = { '3d': 3, '7d': 7, '28d': 28, '90d': 90, '365d': 365 };
   const range = request.nextUrl.searchParams.get('range') || '28d';

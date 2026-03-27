@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
 import { createClient } from '@supabase/supabase-js';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 
 function getSupabaseAdmin() {
@@ -16,8 +16,10 @@ function getSupabaseAdmin() {
  * List all articles (admin view — includes drafts)
  */
 export async function GET(req: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const sb = getSupabaseAdmin();
   const { data, error } = await sb
@@ -34,8 +36,10 @@ export async function GET(req: NextRequest) {
  * Create a new article
  */
 export async function POST(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await req.json();
   const { slug, title_en, title_zh, category, source_lang, author_name, body_en, body_zh, ...rest } = body;
@@ -82,8 +86,10 @@ export async function POST(req: NextRequest) {
  * Update an existing article
  */
 export async function PUT(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await req.json();
   const { id, ...fields } = body;
@@ -123,8 +129,10 @@ export async function PUT(req: NextRequest) {
  * Delete an article (hard delete)
  */
 export async function DELETE(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const { id } = await req.json();
   if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 });

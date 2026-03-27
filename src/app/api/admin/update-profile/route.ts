@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { revalidateTag } from 'next/cache';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { createAdminClient } from '@/utils/supabase/admin';
 
@@ -28,9 +28,9 @@ const ENTITY_PK: Record<string, string> = {
 };
 
 export async function POST(req: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(req.headers.get('authorization'));
-  if (!isAdmin || !userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(req.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner']) || !userId) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {

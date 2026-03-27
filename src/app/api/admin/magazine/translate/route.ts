@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 
@@ -11,8 +11,10 @@ const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
  * Returns: { title_xx, excerpt_xx, body_xx } for 5 target languages
  */
 export async function POST(request: NextRequest) {
-  const { isAdmin } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   if (!ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: 'Translation service not configured (ANTHROPIC_API_KEY)' }, { status: 500 });

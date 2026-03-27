@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from './AuthProvider';
 import { useVenueComments, type CommentReply } from './VenueCommentsProvider';
 import { useTranslations, useLocale } from 'next-intl';
 import Image from 'next/image';
 import ImageLightbox from './ImageLightbox';
+import { createClient } from '@/utils/supabase/client';
 
 /* ── Translate button (reused from inbox pattern) ── */
 
@@ -149,6 +150,170 @@ function ReplyForm({ commentId, onSubmit, onCancel, t }: {
   );
 }
 
+/* ── Report Modal ── */
+
+const REPORT_REASONS = ['spam', 'harassment', 'misinformation', 'inappropriate', 'other'] as const;
+
+function ReportModal({
+  commentId,
+  onClose,
+  t,
+}: {
+  commentId: string;
+  onClose: () => void;
+  t: ReturnType<typeof import('next-intl').useTranslations>;
+}) {
+  const [reason, setReason] = useState<string>('');
+  const [details, setDetails] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<'success' | 'duplicate' | 'error' | null>(null);
+
+  const handleSubmit = async () => {
+    if (!reason || submitting) return;
+    setSubmitting(true);
+    try {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setResult('error');
+        setSubmitting(false);
+        return;
+      }
+
+      const res = await fetch('/api/venue/comment-report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ commentId, reason, details: details.trim() || undefined }),
+      });
+
+      if (res.status === 201) {
+        setResult('success');
+        setTimeout(onClose, 1500);
+      } else if (res.status === 409) {
+        setResult('duplicate');
+        setTimeout(onClose, 1500);
+      } else {
+        setResult('error');
+      }
+    } catch {
+      setResult('error');
+    }
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div
+        className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 w-[90vw] max-w-sm space-y-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-sm font-semibold">{t('reportComment')}</h3>
+
+        {result === 'success' ? (
+          <p className="text-sm text-emerald-400">{t('reportSubmitted')}</p>
+        ) : result === 'duplicate' ? (
+          <p className="text-sm text-amber-400">{t('reportAlreadyReported')}</p>
+        ) : result === 'error' ? (
+          <p className="text-sm text-red-400">{t('reportError')}</p>
+        ) : (
+          <>
+            {/* Reason radios */}
+            <div className="space-y-2">
+              {REPORT_REASONS.map((r) => (
+                <label key={r} className="flex items-center gap-2.5 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="report-reason"
+                    value={r}
+                    checked={reason === r}
+                    onChange={() => setReason(r)}
+                    className="accent-gold w-3.5 h-3.5"
+                  />
+                  <span className={`text-sm transition-colors ${reason === r ? 'text-[var(--foreground)]' : 'text-[var(--muted-foreground)] group-hover:text-[var(--foreground)]'}`}>
+                    {t(`reportReason.${r}`)}
+                  </span>
+                </label>
+              ))}
+            </div>
+
+            {/* Details */}
+            <textarea
+              value={details}
+              onChange={(e) => setDetails(e.target.value.slice(0, 500))}
+              placeholder={t('reportDetailsPlaceholder')}
+              rows={2}
+              className="w-full rounded-lg bg-[var(--background)] border border-[var(--border)] px-3 py-2 text-sm focus:outline-none focus:border-gold/50 transition-colors placeholder:text-[var(--muted-foreground)] resize-none"
+            />
+            <div className="text-[10px] text-[var(--muted-foreground)] text-right">{details.length}/500</div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={onClose}
+                className="px-3 py-1.5 rounded-lg text-xs text-[var(--muted-foreground)] hover:text-white transition-colors"
+              >
+                {t('cancel')}
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!reason || submitting}
+                className="px-4 py-1.5 rounded-lg text-xs font-medium bg-red-500/20 text-red-400 border border-red-400/30 hover:bg-red-500/30 transition-colors disabled:opacity-40"
+              >
+                {submitting ? '...' : t('reportSubmit')}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── More menu (report dropdown) ── */
+
+function MoreMenu({ commentId, onReport, t }: { commentId: string; onReport: () => void; t: (key: string) => string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="text-[var(--muted-foreground)]/50 hover:text-[var(--foreground)] transition-colors px-1"
+        title="More"
+      >
+        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="5" r="2" />
+          <circle cx="12" cy="12" r="2" />
+          <circle cx="12" cy="19" r="2" />
+        </svg>
+      </button>
+      {open && (
+        <div className="absolute right-0 top-full mt-1 z-20 bg-[var(--card)] border border-[var(--border)] rounded-lg shadow-lg py-1 min-w-[140px]">
+          <button
+            onClick={() => { setOpen(false); onReport(); }}
+            className="w-full text-left px-3 py-1.5 text-xs text-red-400 hover:bg-red-400/10 transition-colors"
+          >
+            {t('reportComment')}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Main list ── */
 
 export default function VenueCommentList() {
@@ -160,6 +325,7 @@ export default function VenueCommentList() {
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [reportingCommentId, setReportingCommentId] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -184,6 +350,13 @@ export default function VenueCommentList() {
   return (
     <>
       {lightboxSrc && <ImageLightbox images={[lightboxSrc]} onClose={() => setLightboxSrc(null)} />}
+      {reportingCommentId && (
+        <ReportModal
+          commentId={reportingCommentId}
+          onClose={() => setReportingCommentId(null)}
+          t={t}
+        />
+      )}
 
       <div className="space-y-4 mt-6">
         {comments.map((comment) => {
@@ -301,6 +474,16 @@ export default function VenueCommentList() {
                     <button onClick={() => setConfirmDelete(null)} className="text-[var(--muted-foreground)] hover:text-white">
                       {t('cancel')}
                     </button>
+                  </div>
+                )}
+                {/* Report menu — only for logged-in users who are not the author */}
+                {user && !isOwn && (
+                  <div className="ml-auto">
+                    <MoreMenu
+                      commentId={comment.id}
+                      onReport={() => setReportingCommentId(comment.id)}
+                      t={t}
+                    />
                   </div>
                 )}
               </div>

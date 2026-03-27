@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminToken } from '@/lib/admin-auth';
+import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { writeAuditLog } from '@/lib/audit-log';
 import { createAdminClient } from '@/utils/supabase/admin';
 
@@ -38,8 +38,10 @@ export async function GET() {
  * Body: { entityType: 'artist' | 'venue', features: Record<string, number> }
  */
 export async function PUT(request: NextRequest) {
-  const { isAdmin, userId } = await verifyAdminToken(request.headers.get('authorization'));
-  if (!isAdmin) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
 
   const body = await request.json();
   const { entityType, features, visibleTiers } = body;
