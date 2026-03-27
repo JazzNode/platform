@@ -9,6 +9,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { useTheme } from '@/components/ThemeProvider';
 import PostShowRecap from '@/components/PostShowRecap';
 import FanInsightsPanel from '@/components/FanInsightsPanel';
+import SeoTrendPanel from '@/components/SeoTrendPanel';
 
 export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
@@ -297,6 +298,11 @@ export default function ArtistAnalyticsPage({ params }: { params: Promise<{ slug
             </div>
           </div>
         </FadeUp>
+      )}
+
+      {/* SEO Trends (Elite / Tier 3+ only) */}
+      {effectiveTier >= 3 && slug && (
+        <SeoTrendPanel entityId={slug} />
       )}
     </div>
   );

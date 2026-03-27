@@ -35,11 +35,13 @@ const DEFAULT_VENUE: TierFeatures = {
   public_listing: 0, search_listing: 0, map_pin: 0, event_showcase: 0, venue_tags: 0,
   edit_profile: 1, verified_badge: 1, photos: 1, description: 1, inbox: 1,
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
-  artist_discovery: 2, broadcasts: 2, priority_search: 2,
+  broadcasts: 2, announcements: 2, merchandise: 2, embed_calendar: 2, priority_search: 2,
   fan_insights: 2, post_show_recap: 2, artist_recommendations: 2,
   weekly_digest: 2,
-  custom_domain: 3, custom_theme: 3, ticketing: 3, broadcasts_unlimited: 3,
-  booking_management: 3, revenue_analytics: 3, multi_location: 3, ical_api: 3,
+  custom_domain: 3, custom_theme: 3, custom_slug: 3, custom_og: 3,
+  seo_insights: 3, monthly_ai_summary: 3, calendar_feed: 3,
+  ticketing: 3, broadcasts_unlimited: 3,
+  revenue_analytics: 3, multi_location: 3,
 };
 const ALL_TIERS = [0, 1, 2, 3];
 

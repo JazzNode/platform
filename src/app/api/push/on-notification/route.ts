@@ -166,6 +166,21 @@ function getNotificationUrl(
       if (referenceType === 'venue' && referenceId) return `/profile/venue/${referenceId}`;
       return '/profile/inbox';
 
+    case 'shoutout_pinned':
+      // Link to the artist page where the shoutout was pinned
+      if (referenceType === 'artist' && referenceId) return `/artists/${referenceId}`;
+      return '/profile/inbox';
+
+    case 'epk_download':
+      // Link to artist inbox where the download message/notification appears
+      if (referenceType === 'artist' && referenceId) return `/profile/artist/${referenceId}/inbox`;
+      return '/profile/inbox';
+
+    case 'monthly_summary':
+      // Link to artist analytics page
+      if (referenceType === 'artist' && referenceId) return `/profile/artist/${referenceId}/analytics`;
+      return '/profile/inbox';
+
     case 'system':
     case 'general':
     default:
@@ -201,6 +216,12 @@ function getNotificationActions(type: string): Array<{ action: string; title: st
       return [{ action: 'view', title: '查看回顧' }];
     case 'weekly_digest':
       return [{ action: 'view', title: '查看摘要' }];
+    case 'shoutout_pinned':
+      return [{ action: 'view', title: 'View Profile' }];
+    case 'epk_download':
+      return [{ action: 'view', title: '查看下載' }];
+    case 'monthly_summary':
+      return [{ action: 'view', title: '查看分析' }];
     default:
       return [{ action: 'view', title: 'View' }];
   }

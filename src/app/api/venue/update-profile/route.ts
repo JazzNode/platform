@@ -22,6 +22,7 @@ const ALLOWED_FIELDS = new Set([
   'brand_sections_visible',
   'brand_og_image_url',
   'brand_favicon_url',
+  'custom_slug',
 ]);
 
 export async function POST(req: NextRequest) {
@@ -40,10 +41,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const sanitized: Record<string, string | null> = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(fields)) {
-      if (ALLOWED_FIELDS.has(key)) {
-        sanitized[key] = typeof value === 'string' && value.trim() ? value.trim() : null;
+      if (!ALLOWED_FIELDS.has(key)) continue;
+      // Preserve non-string types (numbers, objects, arrays, booleans)
+      if (value === null || value === undefined) {
+        sanitized[key] = null;
+      } else if (typeof value === 'string') {
+        sanitized[key] = value.trim() || null;
+      } else {
+        sanitized[key] = value;
       }
     }
 
@@ -52,6 +59,27 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createAdminClient();
+
+    // ── Custom slug validation ──
+    if ('custom_slug' in sanitized && sanitized.custom_slug) {
+      const slug = (sanitized.custom_slug as string).toLowerCase();
+      const slugRegex = /^[a-z0-9][a-z0-9-]{1,38}[a-z0-9]$/;
+      if (!slugRegex.test(slug)) {
+        return NextResponse.json({ error: 'Invalid slug format (3-40 chars, lowercase alphanumeric + hyphens)' }, { status: 400 });
+      }
+      // Check uniqueness
+      const { data: existing } = await supabase
+        .from('venues')
+        .select('venue_id')
+        .eq('custom_slug', slug)
+        .neq('venue_id', venueId)
+        .single();
+      if (existing) {
+        return NextResponse.json({ error: 'This slug is already taken' }, { status: 409 });
+      }
+      sanitized.custom_slug = slug;
+    }
+
     const { error: updateError } = await supabase
       .from('venues')
       .update({ ...sanitized, updated_at: new Date().toISOString(), data_source: 'user', updated_by: userId })

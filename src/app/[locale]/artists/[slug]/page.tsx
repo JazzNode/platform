@@ -47,7 +47,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (artist?.fields.photo_url) ogParams.set('photo', artist.fields.photo_url);
   const bioSnippet = bio ? bio.slice(0, 120) : '';
   if (bioSnippet) ogParams.set('bio', bioSnippet);
-  const ogUrl = `/api/og/artist?${ogParams.toString()}`;
+  const defaultOgUrl = `/api/og/artist?${ogParams.toString()}`;
+  // Elite artists can override OG image
+  const ogUrl = artist?.fields.brand_og_image_url || defaultOgUrl;
   const description = bio ? bio.slice(0, 160) : undefined;
   return {
     title: name,
@@ -82,7 +84,8 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
   const [artists, events, venues, badges, lineups, cities, tags] = await Promise.all([
     getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(), getTags().catch(() => []),
   ]);
-  const artist = artists.find((a) => a.id === slug);
+  // Support vanity slug: check custom_slug first, then fall back to artist_id
+  const artist = artists.find((a) => a.id === slug) || artists.find((a) => a.fields.custom_slug === slug);
 
   if (!artist) {
     notFound();
@@ -592,6 +595,27 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
             <TierGate entityType="artist" featureKey="epk_basic" currentTier={f.tier ?? 0}>
               <EpkDownloadButton artistId={artist.id} />
             </TierGate>
+            {/* Custom CTA — Elite only */}
+            {f.custom_cta_url && f.custom_cta_label && (f.tier ?? 0) >= 3 && (
+              <a
+                href={f.custom_cta_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--color-gold)]/40 text-[var(--color-gold)] text-xs font-semibold uppercase tracking-widest hover:bg-[var(--color-gold)]/10 transition-colors"
+              >
+                🔗 {f.custom_cta_label}
+              </a>
+            )}
+            {/* Calendar Subscribe — Elite only */}
+            {(f.tier ?? 0) >= 3 && (
+              <a
+                href={`/api/artist/${artist.id}/calendar.ics`}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--border)] text-xs font-semibold uppercase tracking-widest text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:border-[var(--color-gold)]/30 transition-colors"
+                title={t('subscribeCalendar')}
+              >
+                📅 {t('subscribeCalendar')}
+              </a>
+            )}
           </div>
 
           {/* Data source notice */}
