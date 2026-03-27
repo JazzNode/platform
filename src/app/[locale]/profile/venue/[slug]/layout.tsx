@@ -31,6 +31,7 @@ const NAV_ITEMS = [
   { key: 'analytics', icon: 'analytics', path: '/analytics' },
   { key: 'embed', icon: 'code', path: '/embed' },
   { key: 'branding', icon: 'palette', path: '/branding' },
+  { key: 'team', icon: 'team', path: '/team' },
   { key: 'domain', icon: 'globe', path: '/domain' },
   { key: 'edit', icon: 'edit', path: '/edit' },
 ] as const;
@@ -123,6 +124,15 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="16 18 22 12 16 6" />
           <polyline points="8 6 2 12 8 18" />
+        </svg>
+      );
+    case 'team':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
         </svg>
       );
     case 'palette':

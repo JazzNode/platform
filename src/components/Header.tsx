@@ -427,6 +427,16 @@ export default function Header() {
               {t('artists')}
             </Link>
 
+            {/* For Venues CTA — owner only */}
+            {profile?.role === 'owner' && (
+              <Link
+                href={`/${locale}/for-venues`}
+                className="text-xs uppercase tracking-widest font-bold border border-[var(--color-gold)]/60 text-[var(--color-gold)] rounded-lg px-3 py-1.5 hover:bg-[var(--color-gold)]/10 transition-colors"
+              >
+                {t('forVenues')}
+              </Link>
+            )}
+
             {/* Search + User + Language group */}
             <div className="flex items-center gap-3 ml-auto border-l border-[var(--border)] pl-6">
             <button
