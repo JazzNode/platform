@@ -281,6 +281,17 @@ export default function Header() {
                 </span>
               )}
             </button>
+            {profile?.role === 'owner' && (
+              <button
+                onClick={() => { router.push(`/${locale}/owner`); setUserMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-red-400 hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                <span className="flex-1">SHARK HQ</span>
+              </button>
+            )}
           </div>
         )}
         <div className={hasClaimed ? 'border-t border-[var(--border)]' : ''}>

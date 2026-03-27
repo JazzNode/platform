@@ -9,3 +9,4 @@ export { default as VenueArtists } from './VenueArtists';
 export { default as VenuePracticalInfo } from './VenuePracticalInfo';
 export { default as VenueStayConnected } from './VenueStayConnected';
 export { default as VenuePastEvents } from './VenuePastEvents';
+export { default as JazzFilterToggle } from './JazzFilterToggle';

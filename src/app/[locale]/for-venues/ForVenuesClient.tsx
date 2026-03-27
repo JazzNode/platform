@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import CountUp from '@/components/animations/CountUp';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 const EASE_OUT = 'cubic-bezier(0.33, 1, 0.68, 1)';
 
@@ -73,49 +73,6 @@ function VenueHeroReveal({ children }: { children: React.ReactNode }) {
   return <div ref={ref}>{children}</div>;
 }
 
-/** Expandable feature card for "more features" section */
-function ExpandableCard({
-  icon,
-  label,
-  desc,
-  delay,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  desc: string;
-  delay: number;
-}) {
-  const [open, setOpen] = useState(false);
-
-  return (
-    <FadeUpItem delay={delay}>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        className="w-full text-left group bg-[var(--card)] border border-[var(--border)] rounded-xl p-6 hover:border-[var(--color-gold)]/20 transition-colors duration-500"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-[var(--color-gold)]/8 flex items-center justify-center shrink-0 text-[var(--color-gold)] group-hover:bg-[var(--color-gold)]/15 transition-colors duration-500">
-            {icon}
-          </div>
-          <p className="text-sm font-medium flex-1">{label}</p>
-          <svg
-            className={`w-4 h-4 text-[var(--muted-foreground)] shrink-0 transition-transform duration-300 ${open ? 'rotate-180' : ''}`}
-            viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
-        </div>
-        <div
-          className="overflow-hidden transition-all duration-300"
-          style={{ maxHeight: open ? 200 : 0, opacity: open ? 1 : 0, marginTop: open ? 12 : 0 }}
-        >
-          <p className="text-xs text-[var(--muted-foreground)] leading-relaxed">{desc}</p>
-        </div>
-      </button>
-    </FadeUpItem>
-  );
-}
 
 export default function ForVenuesClient({
   stats,
@@ -206,7 +163,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more1'),
-      desc: t('more1Desc'),
     },
     {
       icon: (
@@ -217,7 +173,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more2'),
-      desc: t('more2Desc'),
     },
     {
       icon: (
@@ -228,7 +183,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more3'),
-      desc: t('more3Desc'),
     },
     {
       icon: (
@@ -240,7 +194,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more4'),
-      desc: t('more4Desc'),
     },
     {
       icon: (
@@ -249,7 +202,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more5'),
-      desc: t('more5Desc'),
     },
     {
       icon: (
@@ -258,7 +210,6 @@ export default function ForVenuesClient({
         </svg>
       ),
       label: t('more6'),
-      desc: t('more6Desc'),
     },
   ];
 
@@ -352,9 +303,16 @@ export default function ForVenuesClient({
         <FadeUp>
           <h2 className="font-serif text-2xl sm:text-3xl font-bold text-center mb-12">{t('moreTitle')}</h2>
         </FadeUp>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {moreFeatures.map((feat, i) => (
-            <ExpandableCard key={i} icon={feat.icon} label={feat.label} desc={feat.desc} delay={i * 80} />
+            <FadeUpItem key={i} delay={i * 80}>
+              <div className="group bg-[var(--card)] border border-[var(--border)] rounded-xl p-5 text-center hover:border-[var(--color-gold)]/20 transition-colors duration-500">
+                <div className="w-10 h-10 rounded-lg bg-[var(--color-gold)]/8 flex items-center justify-center mx-auto mb-3 text-[var(--color-gold)] group-hover:bg-[var(--color-gold)]/15 transition-colors duration-500">
+                  {feat.icon}
+                </div>
+                <p className="text-sm font-medium">{feat.label}</p>
+              </div>
+            </FadeUpItem>
           ))}
         </div>
       </section>

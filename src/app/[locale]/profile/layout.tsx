@@ -15,9 +15,6 @@ const BASE_navItems = [
   { key: 'comments', icon: 'comments', path: '/comments' },
 ] as const;
 
-const OWNER_navItems = [
-  { key: 'members', icon: 'members', path: '/members' },
-] as const;
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
   const c = className || 'w-5 h-5';
@@ -118,13 +115,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   const basePath = `/${locale}/profile`;
   const displayName = profile?.display_name || user.email?.split('@')[0] || '';
   const avatarUrl = profile?.avatar_url;
-  const isProfileOwner = profile?.role === 'owner';
-
-  // Build nav items — owner gets extra "members" tab
-  const navItems = [
-    ...BASE_navItems,
-    ...(isProfileOwner ? OWNER_navItems : []),
-  ];
+  const navItems = [...BASE_navItems];
 
   const isActive = (navPath: string) => {
     const fullPath = basePath + navPath;

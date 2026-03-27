@@ -112,6 +112,8 @@ export interface Venue {
   // Data lineage
   data_source?: string;
   updated_by?: string;
+  // Multi-genre classification
+  venue_type?: string;         // jazz | multi_genre
 }
 
 export interface Artist {
@@ -216,6 +218,7 @@ export interface Event {
   popularity?: string;
   promoter_list?: string[];   // derived: from event_promoters junction
   created_at?: string;        // when the event record was created in Supabase
+  jazz_relevance?: string;    // confirmed | likely | unrelated | pending
 }
 
 export interface BadgeDef {
@@ -424,6 +427,8 @@ interface EventRow {
   data_source: string | null;
   created_by: string | null;
   updated_by: string | null;
+  // Multi-genre classification
+  jazz_relevance: string | null;
 }
 
 interface LineupRow {

@@ -23,6 +23,7 @@ import {
   VenuePracticalInfo,
   VenueStayConnected,
   VenuePastEvents,
+  JazzFilterToggle,
 } from '@/components/venue-sections';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string; slug: string }> }) {
@@ -95,8 +96,13 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   };
 
   // Events & badges
-  const venueEvents = resolveLinks(f.event_list, events)
+  const isMultiGenre = f.venue_type === 'multi_genre';
+  const allVenueEvents = resolveLinks(f.event_list, events)
     .sort((a, b) => (b.fields.start_at || '').localeCompare(a.fields.start_at || ''));
+  // For multi-genre venues, default view filters out unrelated events
+  const venueEvents = isMultiGenre
+    ? allVenueEvents.filter(e => e.fields.jazz_relevance !== 'unrelated')
+    : allVenueEvents;
   const venueBadges = resolveLinks(f.badge_list, badges);
 
   // Artist counts
@@ -174,29 +180,32 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
   // Event splits: Today → Upcoming (after today) → Past
   const now = new Date().toISOString();
 
-  // Today's events: happening today in the venue's timezone
-  const todayEvents = venueEvents
-    .filter((e) => e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei'))
-    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
-
-  // Upcoming: strictly AFTER today (exclude today's events since they're shown above)
-  const todayEventIds = new Set(todayEvents.map((e) => e.id));
-  const upcomingEvents = venueEvents
-    .filter((e) => {
-      if (todayEventIds.has(e.id)) return false; // already shown in today
-      const isUpcoming = e.fields.lifecycle_status === 'upcoming' || (!e.fields.lifecycle_status && (e.fields.start_at || '') >= now);
-      if (!isUpcoming) return false;
-      // Exclude events that are actually today (double-check)
-      if (e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei')) return false;
-      return true;
-    })
-    .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
-
-  const pastEvents = venueEvents
-    .filter((e) => {
-      if (todayEventIds.has(e.id)) return false;
+  // Helper: split events into today/upcoming/past
+  function splitEvents(evts: typeof venueEvents) {
+    const today = evts
+      .filter((e) => e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei'))
+      .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+    const todayIds = new Set(today.map((e) => e.id));
+    const upcoming = evts
+      .filter((e) => {
+        if (todayIds.has(e.id)) return false;
+        const isUp = e.fields.lifecycle_status === 'upcoming' || (!e.fields.lifecycle_status && (e.fields.start_at || '') >= now);
+        if (!isUp) return false;
+        if (e.fields.start_at && isEventTonight(e.fields.start_at, e.fields.timezone || 'Asia/Taipei')) return false;
+        return true;
+      })
+      .sort((a, b) => (a.fields.start_at || '').localeCompare(b.fields.start_at || ''));
+    const past = evts.filter((e) => {
+      if (todayIds.has(e.id)) return false;
       return e.fields.lifecycle_status === 'past' || (e.fields.lifecycle_status !== 'upcoming' && (e.fields.start_at || '') < now);
     });
+    return { today, upcoming, past };
+  }
+
+  const { today: todayEvents, upcoming: upcomingEvents, past: pastEvents } = splitEvents(venueEvents);
+
+  // For multi-genre toggle: also compute unfiltered splits
+  const allSplits = isMultiGenre ? splitEvents(allVenueEvents) : null;
 
   // Featured = first today event, or first upcoming
   const featuredEvent = todayEvents[0] || upcomingEvents[0] || null;
@@ -366,14 +375,27 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         {/* ═══ 3. UPCOMING EVENTS (after today) ═══ */}
         {remainingUpcoming.length > 0 && (
           <FadeUp stagger={0.1}>
-            <VenueUpcomingEvents
-              events={remainingUpcoming}
-              artists={artists}
-              venueId={venue.id}
-              locale={locale}
-              t={t}
-              resolveLinks={resolveLinks}
-            />
+            {isMultiGenre && allSplits ? (
+              <JazzFilterToggle
+                allEvents={isFeaturedToday ? allSplits.upcoming : allSplits.upcoming.slice(1)}
+                jazzEvents={remainingUpcoming}
+                artists={artists}
+                venueId={venue.id}
+                locale={locale}
+                t={t}
+                resolveLinks={resolveLinks}
+                section="upcoming"
+              />
+            ) : (
+              <VenueUpcomingEvents
+                events={remainingUpcoming}
+                artists={artists}
+                venueId={venue.id}
+                locale={locale}
+                t={t}
+                resolveLinks={resolveLinks}
+              />
+            )}
           </FadeUp>
         )}
 
@@ -476,13 +498,26 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         {isSectionVisible('past_events') && pastEvents.length > 0 && (
           <FadeUp>
             <div id="past-events" />
-            <VenuePastEvents
-              events={pastEvents}
-              artists={artists}
-              locale={locale}
-              t={t}
-              resolveLinks={resolveLinks}
-            />
+            {isMultiGenre && allSplits ? (
+              <JazzFilterToggle
+                allEvents={allSplits.past}
+                jazzEvents={pastEvents}
+                artists={artists}
+                venueId={venue.id}
+                locale={locale}
+                t={t}
+                resolveLinks={resolveLinks}
+                section="past"
+              />
+            ) : (
+              <VenuePastEvents
+                events={pastEvents}
+                artists={artists}
+                locale={locale}
+                t={t}
+                resolveLinks={resolveLinks}
+              />
+            )}
           </FadeUp>
         )}
 

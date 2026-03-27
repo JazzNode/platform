@@ -37,7 +37,8 @@ export default function VenueHero({
     ? f.name_en
     : '';
 
-  const quickInfoParts = [city, freqLabel].filter(Boolean);
+  const isMultiGenre = f.venue_type === 'multi_genre';
+  const quickInfoParts = [city, freqLabel, isMultiGenre ? 'Multi-genre Venue' : ''].filter(Boolean);
 
   return (
     <section className="relative -mx-4 sm:-mx-6 lg:-mx-8">
