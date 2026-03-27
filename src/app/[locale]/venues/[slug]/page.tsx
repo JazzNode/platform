@@ -377,14 +377,28 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           <FadeUp stagger={0.1}>
             {isMultiGenre && allSplits ? (
               <JazzFilterToggle
-                allEvents={isFeaturedToday ? allSplits.upcoming : allSplits.upcoming.slice(1)}
-                jazzEvents={remainingUpcoming}
-                artists={artists}
-                venueId={venue.id}
-                locale={locale}
-                t={t}
-                resolveLinks={resolveLinks}
-                section="upcoming"
+                hiddenCount={(isFeaturedToday ? allSplits.upcoming : allSplits.upcoming.slice(1)).length - remainingUpcoming.length}
+                jazzOnlyLabel={t('jazzOnlyFilter')}
+                jazzContent={
+                  <VenueUpcomingEvents
+                    events={remainingUpcoming}
+                    artists={artists}
+                    venueId={venue.id}
+                    locale={locale}
+                    t={t}
+                    resolveLinks={resolveLinks}
+                  />
+                }
+                allContent={
+                  <VenueUpcomingEvents
+                    events={isFeaturedToday ? allSplits.upcoming : allSplits.upcoming.slice(1)}
+                    artists={artists}
+                    venueId={venue.id}
+                    locale={locale}
+                    t={t}
+                    resolveLinks={resolveLinks}
+                  />
+                }
               />
             ) : (
               <VenueUpcomingEvents
@@ -500,14 +514,26 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
             <div id="past-events" />
             {isMultiGenre && allSplits ? (
               <JazzFilterToggle
-                allEvents={allSplits.past}
-                jazzEvents={pastEvents}
-                artists={artists}
-                venueId={venue.id}
-                locale={locale}
-                t={t}
-                resolveLinks={resolveLinks}
-                section="past"
+                hiddenCount={allSplits.past.length - pastEvents.length}
+                jazzOnlyLabel={t('jazzOnlyFilter')}
+                jazzContent={
+                  <VenuePastEvents
+                    events={pastEvents}
+                    artists={artists}
+                    locale={locale}
+                    t={t}
+                    resolveLinks={resolveLinks}
+                  />
+                }
+                allContent={
+                  <VenuePastEvents
+                    events={allSplits.past}
+                    artists={artists}
+                    locale={locale}
+                    t={t}
+                    resolveLinks={resolveLinks}
+                  />
+                }
               />
             ) : (
               <VenuePastEvents

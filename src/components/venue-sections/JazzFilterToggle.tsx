@@ -1,42 +1,25 @@
 'use client';
 
-import { useState } from 'react';
-import type { Event as VenueEvent, Artist } from '@/lib/supabase';
-import VenueUpcomingEvents from './VenueUpcomingEvents';
-import VenuePastEvents from './VenuePastEvents';
-import VenueFeaturedEvent from './VenueFeaturedEvent';
+import { useState, type ReactNode } from 'react';
 
 interface JazzFilterToggleProps {
-  /** All events (unfiltered) at this venue, sorted by start_at desc */
-  allEvents: { id: string; fields: VenueEvent }[];
-  /** Jazz-only events (confirmed + likely) */
-  jazzEvents: { id: string; fields: VenueEvent }[];
-  artists: { id: string; fields: Artist }[];
-  venueId: string;
-  locale: string;
-  t: (key: string) => string;
-  resolveLinks: (ids: string[] | undefined, collection: { id: string; fields: Artist }[]) => { id: string; fields: Artist }[];
-  /** Which section: 'upcoming' | 'past' */
-  section: 'upcoming' | 'past';
-  sectionTitle?: string;
+  /** Pre-rendered content for jazz-only view */
+  jazzContent: ReactNode;
+  /** Pre-rendered content for all-events view */
+  allContent: ReactNode;
+  /** Number of non-jazz events hidden by the filter */
+  hiddenCount: number;
+  /** Translated label for the toggle */
+  jazzOnlyLabel: string;
 }
 
 export default function JazzFilterToggle({
-  allEvents,
-  jazzEvents,
-  artists,
-  venueId,
-  locale,
-  t,
-  resolveLinks,
-  section,
-  sectionTitle,
+  jazzContent,
+  allContent,
+  hiddenCount,
+  jazzOnlyLabel,
 }: JazzFilterToggleProps) {
   const [jazzOnly, setJazzOnly] = useState(true);
-  const events = jazzOnly ? jazzEvents : allEvents;
-  const hiddenCount = allEvents.length - jazzEvents.length;
-
-  if (allEvents.length === 0) return null;
 
   return (
     <div>
@@ -44,7 +27,7 @@ export default function JazzFilterToggle({
       {hiddenCount > 0 && (
         <div className="flex items-center justify-end mb-4 gap-2">
           <label className="relative inline-flex items-center cursor-pointer gap-2 text-xs text-[var(--muted-foreground)]">
-            <span>{t('jazzOnlyFilter')}</span>
+            <span>{jazzOnlyLabel}</span>
             <button
               type="button"
               role="switch"
@@ -66,27 +49,7 @@ export default function JazzFilterToggle({
         </div>
       )}
 
-      {section === 'upcoming' && (
-        <VenueUpcomingEvents
-          events={events}
-          artists={artists}
-          venueId={venueId}
-          locale={locale}
-          t={t}
-          resolveLinks={resolveLinks}
-          sectionTitle={sectionTitle}
-        />
-      )}
-
-      {section === 'past' && (
-        <VenuePastEvents
-          events={events}
-          artists={artists}
-          locale={locale}
-          t={t}
-          resolveLinks={resolveLinks}
-        />
-      )}
+      {jazzOnly ? jazzContent : allContent}
     </div>
   );
 }
