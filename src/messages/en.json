@@ -469,7 +469,16 @@
     "availableForHire": "Available for Hire",
     "hireCategories": "Service Categories",
     "hireDescription": "About Your Services",
-    "hireDescriptionPlaceholder": "Describe the types of events you perform at, your experience, and booking details..."
+    "hireDescriptionPlaceholder": "Describe the types of events you perform at, your experience, and booking details...",
+    "completionChecklist": "Profile Completion",
+    "completionPhoto": "Profile photo",
+    "completionBio": "Bio / About",
+    "completionSocialLinks": "Social links",
+    "completionInstruments": "Instruments",
+    "completionTeaching": "Teaching info",
+    "completionGear": "Gear",
+    "completionHintPage": "Edit on your artist page",
+    "completionHintBelow": "Edit below"
   },
   "venueDashboard": {
     "title": "Manage Venue Page",

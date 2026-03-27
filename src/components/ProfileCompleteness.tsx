@@ -2,9 +2,11 @@
 
 import { useAuth } from '@/components/AuthProvider';
 import { useTranslations } from 'next-intl';
+import Link from 'next/link';
 
 interface ProfileCompletenessProps {
   artistId: string;
+  artistSlug: string;
   hasPhoto: boolean;
   hasBio: boolean;
   hasSocialLinks: boolean;
@@ -15,6 +17,7 @@ interface ProfileCompletenessProps {
 
 export default function ProfileCompleteness({
   artistId,
+  artistSlug,
   hasPhoto,
   hasBio,
   hasSocialLinks,
@@ -57,9 +60,12 @@ export default function ProfileCompleteness({
         />
       </div>
       {firstMissing && (
-        <span className="text-[10px] text-gold font-semibold whitespace-nowrap cursor-pointer hover:text-gold-bright transition-colors">
+        <Link
+          href={`/profile/artist/${artistSlug}/edit`}
+          className="text-[10px] text-gold font-semibold whitespace-nowrap hover:text-gold-bright transition-colors"
+        >
           {t('addMissing')} ›
-        </span>
+        </Link>
       )}
     </div>
   );

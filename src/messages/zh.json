@@ -470,7 +470,16 @@
     "availableForHire": "開放邀約",
     "hireCategories": "服務類別",
     "hireDescription": "服務介紹",
-    "hireDescriptionPlaceholder": "描述你演出的活動類型、經驗及預約方式..."
+    "hireDescriptionPlaceholder": "描述你演出的活動類型、經驗及預約方式...",
+    "completionChecklist": "個人檔案完成度",
+    "completionPhoto": "個人照片",
+    "completionBio": "個人簡介",
+    "completionSocialLinks": "社群連結",
+    "completionInstruments": "演奏樂器",
+    "completionTeaching": "教學資訊",
+    "completionGear": "器材設備",
+    "completionHintPage": "在藝人頁面編輯",
+    "completionHintBelow": "在下方編輯"
   },
   "venueDashboard": {
     "title": "管理場地頁面",

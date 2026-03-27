@@ -469,7 +469,16 @@
     "availableForHire": "พร้อมรับงาน",
     "hireCategories": "ประเภทบริการ",
     "hireDescription": "เกี่ยวกับบริการ",
-    "hireDescriptionPlaceholder": "อธิบายประเภทงานที่คุณแสดง ประสบการณ์ และรายละเอียดการจอง..."
+    "hireDescriptionPlaceholder": "อธิบายประเภทงานที่คุณแสดง ประสบการณ์ และรายละเอียดการจอง...",
+    "completionChecklist": "ความสมบูรณ์ของโปรไฟล์",
+    "completionPhoto": "รูปโปรไฟล์",
+    "completionBio": "ประวัติ / เกี่ยวกับ",
+    "completionSocialLinks": "ลิงก์โซเชียล",
+    "completionInstruments": "เครื่องดนตรี",
+    "completionTeaching": "ข้อมูลการสอน",
+    "completionGear": "อุปกรณ์",
+    "completionHintPage": "แก้ไขที่หน้าศิลปิน",
+    "completionHintBelow": "แก้ไขด้านล่าง"
   },
   "venueDashboard": {
     "title": "จัดการหน้าสถานที่",

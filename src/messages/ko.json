@@ -469,7 +469,16 @@
     "availableForHire": "섭외 가능",
     "hireCategories": "서비스 카테고리",
     "hireDescription": "서비스 소개",
-    "hireDescriptionPlaceholder": "공연하는 행사 유형, 경험, 예약 방법 등을 설명해 주세요..."
+    "hireDescriptionPlaceholder": "공연하는 행사 유형, 경험, 예약 방법 등을 설명해 주세요...",
+    "completionChecklist": "프로필 완성도",
+    "completionPhoto": "프로필 사진",
+    "completionBio": "소개",
+    "completionSocialLinks": "소셜 링크",
+    "completionInstruments": "악기",
+    "completionTeaching": "레슨 정보",
+    "completionGear": "장비",
+    "completionHintPage": "아티스트 페이지에서 편집",
+    "completionHintBelow": "아래에서 편집"
   },
   "venueDashboard": {
     "title": "공연장 페이지 관리",

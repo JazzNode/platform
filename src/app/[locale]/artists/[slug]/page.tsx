@@ -641,6 +641,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
           {/* Profile completeness (owner only) */}
           <ProfileCompleteness
             artistId={artist.id}
+            artistSlug={artist.id}
             hasPhoto={!!photoUrl(f.photo_url)}
             hasBio={!!(bioFull || bioShort)}
             hasSocialLinks={!!(f.website_url || f.spotify_url || f.youtube_url || f.instagram || f.facebook_url)}

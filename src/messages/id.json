@@ -469,7 +469,16 @@
     "availableForHire": "Tersedia untuk Disewa",
     "hireCategories": "Kategori Layanan",
     "hireDescription": "Tentang Layanan",
-    "hireDescriptionPlaceholder": "Jelaskan jenis acara yang Anda tampil, pengalaman, dan detail pemesanan..."
+    "hireDescriptionPlaceholder": "Jelaskan jenis acara yang Anda tampil, pengalaman, dan detail pemesanan...",
+    "completionChecklist": "Kelengkapan Profil",
+    "completionPhoto": "Foto profil",
+    "completionBio": "Bio / Tentang",
+    "completionSocialLinks": "Tautan sosial",
+    "completionInstruments": "Instrumen",
+    "completionTeaching": "Info mengajar",
+    "completionGear": "Peralatan",
+    "completionHintPage": "Edit di halaman artis",
+    "completionHintBelow": "Edit di bawah"
   },
   "venueDashboard": {
     "title": "Kelola Halaman Venue",

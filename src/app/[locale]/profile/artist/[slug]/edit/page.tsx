@@ -6,12 +6,18 @@ import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
+import Link from 'next/link';
 
 interface ArtistData {
   artist_id: string;
   display_name: string | null;
   name_local: string | null;
   name_en: string | null;
+  photo_url: string | null;
+  bio: string | null;
+  bio_short: string | null;
+  primary_instrument: string | null;
+  instrument_list: string[] | null;
   website_url: string | null;
   spotify_url: string | null;
   youtube_url: string | null;
@@ -34,6 +40,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
   const [slug, setSlug] = useState('');
   const [artist, setArtist] = useState<ArtistData | null>(null);
+  const [gearCount, setGearCount] = useState(0);
   const [fetching, setFetching] = useState(true);
 
   const [websiteUrl, setWebsiteUrl] = useState('');
@@ -60,30 +67,36 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   useEffect(() => {
     if (!slug) return;
     const supabase = createClient();
-    supabase
-      .from('artists')
-      .select('artist_id, display_name, name_local, name_en, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
-      .eq('artist_id', slug)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setArtist(data);
-          setWebsiteUrl(data.website_url || '');
-          setSpotifyUrl(data.spotify_url || '');
-          setYoutubeUrl(data.youtube_url || '');
-          setInstagram(data.instagram || '');
-          setFacebookUrl(data.facebook_url || '');
-          setAka(data.aka || '');
-          setAcceptingStudents(data.accepting_students || false);
-          setTeachingStyles(data.teaching_styles || []);
-          setLessonPriceRange(data.lesson_price_range || '');
-          setTeachingDescription(data.teaching_description || '');
-          setAvailableForHire(data.available_for_hire || false);
-          setHireCategories(data.hire_categories || []);
-          setHireDescription(data.hire_description || '');
-        }
-        setFetching(false);
-      });
+    Promise.all([
+      supabase
+        .from('artists')
+        .select('artist_id, display_name, name_local, name_en, photo_url, bio, bio_short, primary_instrument, instrument_list, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
+        .eq('artist_id', slug)
+        .single(),
+      supabase
+        .from('artist_gear')
+        .select('id', { count: 'exact', head: true })
+        .eq('artist_id', slug),
+    ]).then(([{ data }, { count }]) => {
+      if (data) {
+        setArtist(data);
+        setWebsiteUrl(data.website_url || '');
+        setSpotifyUrl(data.spotify_url || '');
+        setYoutubeUrl(data.youtube_url || '');
+        setInstagram(data.instagram || '');
+        setFacebookUrl(data.facebook_url || '');
+        setAka(data.aka || '');
+        setAcceptingStudents(data.accepting_students || false);
+        setTeachingStyles(data.teaching_styles || []);
+        setLessonPriceRange(data.lesson_price_range || '');
+        setTeachingDescription(data.teaching_description || '');
+        setAvailableForHire(data.available_for_hire || false);
+        setHireCategories(data.hire_categories || []);
+        setHireDescription(data.hire_description || '');
+      }
+      setGearCount(count ?? 0);
+      setFetching(false);
+    });
   }, [slug]);
 
   const handleSave = useCallback(async () => {
@@ -149,11 +162,71 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
   const inputClass = 'w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors';
 
+  const hasSocialLinks = !!(websiteUrl || spotifyUrl || youtubeUrl || instagram || facebookUrl);
+  const completionFields = [
+    { key: 'completionPhoto' as const, done: !!artist.photo_url, editableHere: false },
+    { key: 'completionBio' as const, done: !!(artist.bio || artist.bio_short), editableHere: false },
+    { key: 'completionSocialLinks' as const, done: hasSocialLinks, editableHere: true },
+    { key: 'completionInstruments' as const, done: !!(artist.primary_instrument || (artist.instrument_list && artist.instrument_list.length > 0)), editableHere: false },
+    { key: 'completionTeaching' as const, done: acceptingStudents, editableHere: true },
+    { key: 'completionGear' as const, done: gearCount > 0, editableHere: false },
+  ];
+  const doneCount = completionFields.filter((f) => f.done).length;
+  const percentage = Math.round((doneCount / completionFields.length) * 100);
+
   return (
     <div className="space-y-6">
       <FadeUp>
         <h1 className="font-serif text-2xl sm:text-3xl font-bold">{t('title')}</h1>
       </FadeUp>
+
+      {/* Profile Completion Checklist */}
+      {percentage < 100 && (
+        <FadeUp>
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-5 sm:p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
+                {t('completionChecklist')}
+              </h2>
+              <span className="text-xs text-gold font-semibold">{percentage}%</span>
+            </div>
+            <div className="h-1 bg-[var(--border)] rounded-full overflow-hidden mb-4">
+              <div
+                className="h-full bg-gold rounded-full transition-all duration-500"
+                style={{ width: `${percentage}%` }}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {completionFields.map(({ key, done, editableHere }) => (
+                <div key={key} className="flex items-center gap-2.5 py-1">
+                  {done ? (
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="text-emerald-500 shrink-0">
+                      <path d="M20 6 9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <div className="w-4 h-4 rounded-full border-2 border-[var(--muted-foreground)]/30 shrink-0" />
+                  )}
+                  <span className={`text-sm ${done ? 'text-[var(--muted-foreground)] line-through' : 'text-[var(--foreground)]'}`}>
+                    {t(key)}
+                  </span>
+                  {!done && (
+                    editableHere ? (
+                      <span className="text-[10px] text-gold/60">↓ {t('completionHintBelow')}</span>
+                    ) : (
+                      <Link
+                        href={`/artists/${slug}`}
+                        className="text-[10px] text-gold/60 hover:text-gold transition-colors"
+                      >
+                        {t('completionHintPage')} →
+                      </Link>
+                    )
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </FadeUp>
+      )}
 
       <FadeUp>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 space-y-8">

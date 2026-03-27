@@ -469,7 +469,16 @@
     "availableForHire": "出演依頼を受付中",
     "hireCategories": "サービスカテゴリ",
     "hireDescription": "サービスについて",
-    "hireDescriptionPlaceholder": "出演するイベントの種類、経験、予約方法などを記入してください..."
+    "hireDescriptionPlaceholder": "出演するイベントの種類、経験、予約方法などを記入してください...",
+    "completionChecklist": "プロフィール完成度",
+    "completionPhoto": "プロフィール写真",
+    "completionBio": "自己紹介",
+    "completionSocialLinks": "SNSリンク",
+    "completionInstruments": "楽器",
+    "completionTeaching": "レッスン情報",
+    "completionGear": "機材",
+    "completionHintPage": "アーティストページで編集",
+    "completionHintBelow": "下記で編集"
   },
   "venueDashboard": {
     "title": "会場ページ管理",
