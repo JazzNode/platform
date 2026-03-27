@@ -85,7 +85,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     getArtists(), getEvents(), getVenues(), getBadges(), getLineups(), getCities(), getTags().catch(() => []),
   ]);
   // Support vanity slug: check custom_slug first, then fall back to artist_id
-  const artist = artists.find((a) => a.id === slug) || artists.find((a) => a.fields.custom_slug === slug);
+  const artist = artists.find((a) => a.id === slug) || artists.find((a) => (a.fields as Record<string, unknown>).custom_slug === slug);
 
   if (!artist) {
     notFound();
