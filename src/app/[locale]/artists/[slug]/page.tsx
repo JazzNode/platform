@@ -91,6 +91,11 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     notFound();
   }
 
+  // Extended fields (may not exist on Artist type yet — safe access)
+  const fx = artist.fields as Record<string, unknown>;
+  const customCtaUrl = fx.custom_cta_url as string | undefined;
+  const customCtaLabel = fx.custom_cta_label as string | undefined;
+
   // Fetch gear and follower count for this artist
   const [artistGear, followerCount] = await Promise.all([
     getArtistGear(artist.id),
@@ -596,14 +601,14 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
               <EpkDownloadButton artistId={artist.id} />
             </TierGate>
             {/* Custom CTA — Elite only */}
-            {(f as Record<string, unknown>).custom_cta_url && (f as Record<string, unknown>).custom_cta_label && (f.tier ?? 0) >= 3 && (
+            {customCtaUrl && customCtaLabel && (f.tier ?? 0) >= 3 && (
               <a
-                href={(f as Record<string, unknown>).custom_cta_url as string}
+                href={customCtaUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[var(--color-gold)]/40 text-[var(--color-gold)] text-xs font-semibold uppercase tracking-widest hover:bg-[var(--color-gold)]/10 transition-colors"
               >
-                🔗 {(f as Record<string, unknown>).custom_cta_label as string}
+                🔗 {customCtaLabel}
               </a>
             )}
             {/* Calendar Subscribe — Elite only */}
