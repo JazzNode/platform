@@ -278,12 +278,12 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
   // ── Brand customization: font CSS variables ──
   const fontPairId = isElite ? (f.brand_font_pair as string) || null : null;
-  const fontStyle: React.CSSProperties = {};
+  const fontStyle: Record<string, string> = {};
   if (fontPairId && fontPairId !== 'default') {
     const { getFontPair } = require('@/lib/brand-fonts');
     const pair = getFontPair(fontPairId);
-    fontStyle['--font-heading' as string] = pair.heading;
-    fontStyle['--font-body' as string] = pair.body;
+    fontStyle['--font-heading'] = pair.heading;
+    fontStyle['--font-body'] = pair.body;
   }
 
   return (
