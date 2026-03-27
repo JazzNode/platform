@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const [venues, cities] = await Promise.all([getVenues().catch(() => []), getCities().catch(() => [])]);
   const venue = venues.find((v) => v.id === slug);
   if (!venue) return { title: 'Venue' };
-  const f = venue.fields;
+  const f = venue.fields as typeof venue.fields & Record<string, unknown>;
   const name = displayName(f);
   const city = f.city_id?.[0] ? cities.find((c) => c.id === f.city_id![0]) : null;
   const cityLabel = city ? cityName(city.fields, locale) : '';
