@@ -378,7 +378,7 @@ function Toast({ message, onDone }: { message: string; onDone: () => void }) {
 // ═════════════════════════════════════════════════════════════════════
 export default function FinancialsPage() {
   const t = useTranslations('ownerHQ');
-  const { getFreshToken } = useAdmin();
+  const { token } = useAdmin();
   const { profile } = useAuth();
 
   // ─── State ───────────────────────────────────────────────────────
@@ -404,48 +404,43 @@ export default function FinancialsPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   // ─── Fetch helpers ───────────────────────────────────────────────
-  // Accept a pre-fetched token to avoid concurrent refreshSession() calls
-  // which invalidate each other's rotating refresh tokens.
-  const fetchExpenses = useCallback(async (tkn?: string) => {
-    const t2 = tkn || await getFreshToken();
-    if (!t2) return;
+  // Use token from useAdmin() (set via getSession()) — never call
+  // refreshSession() which races with the proxy middleware's token rotation.
+  const fetchExpenses = useCallback(async () => {
+    if (!token) return;
     const res = await fetch('/api/owner/expenses', {
-      headers: { Authorization: `Bearer ${t2}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     if (data.expenses) setExpenses(data.expenses);
-  }, [getFreshToken]);
+  }, [token]);
 
-  const fetchRevenue = useCallback(async (tkn?: string) => {
-    const t2 = tkn || await getFreshToken();
-    if (!t2) return;
+  const fetchRevenue = useCallback(async () => {
+    if (!token) return;
     const res = await fetch('/api/owner/revenue', {
-      headers: { Authorization: `Bearer ${t2}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     if (data.revenue) setRevenueList(data.revenue);
-  }, [getFreshToken]);
+  }, [token]);
 
-  const fetchFinancials = useCallback(async (months: string, tkn?: string) => {
-    const t2 = tkn || await getFreshToken();
-    if (!t2) return;
+  const fetchFinancials = useCallback(async (months: string) => {
+    if (!token) return;
     const param = months === 'all' ? '120' : months;
     const res = await fetch(`/api/owner/financials?months=${param}`, {
-      headers: { Authorization: `Bearer ${t2}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     const data = await res.json();
     if (data.months) setFinancials(data);
-  }, [getFreshToken]);
+  }, [token]);
 
   // ─── Initial load ────────────────────────────────────────────────
   useEffect(() => {
+    if (!token) return;
     let cancelled = false;
     (async () => {
       try {
-        // Get token ONCE, then share across all parallel fetches
-        const tkn = await getFreshToken();
-        if (!tkn) { if (!cancelled) setLoading(false); return; }
-        await Promise.all([fetchExpenses(tkn), fetchRevenue(tkn), fetchFinancials(trendRange, tkn)]);
+        await Promise.all([fetchExpenses(), fetchRevenue(), fetchFinancials(trendRange)]);
       } catch (err) {
         console.error('Failed to load financials:', err);
       }
@@ -453,7 +448,7 @@ export default function FinancialsPage() {
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]);
 
   // Refetch financials when range changes
   useEffect(() => {
@@ -488,10 +483,9 @@ export default function FinancialsPage() {
 
   // ─── CRUD handlers ──────────────────────────────────────────────
   const handleSaveExpense = async (data: Record<string, unknown>) => {
+    if (!token) return;
     setSaving(true);
     try {
-      const token = await getFreshToken();
-      if (!token) return;
       const isEdit = !!editingExpense;
       const url = isEdit ? `/api/owner/expenses/${editingExpense!.id}` : '/api/owner/expenses';
       const method = isEdit ? 'PATCH' : 'POST';
@@ -503,7 +497,7 @@ export default function FinancialsPage() {
       setShowExpenseForm(false);
       setEditingExpense(null);
       setToast(t('saved'));
-      await Promise.all([fetchExpenses(token), fetchFinancials(trendRange, token)]);
+      await Promise.all([fetchExpenses(), fetchFinancials(trendRange)]);
     } catch (err) {
       console.error(err);
     }
@@ -511,10 +505,9 @@ export default function FinancialsPage() {
   };
 
   const handleSaveRevenue = async (data: Record<string, unknown>) => {
+    if (!token) return;
     setSaving(true);
     try {
-      const token = await getFreshToken();
-      if (!token) return;
       const isEdit = !!editingRevenue;
       const url = isEdit ? `/api/owner/revenue/${editingRevenue!.id}` : '/api/owner/revenue';
       const method = isEdit ? 'PATCH' : 'POST';
@@ -526,7 +519,7 @@ export default function FinancialsPage() {
       setShowRevenueForm(false);
       setEditingRevenue(null);
       setToast(t('saved'));
-      await Promise.all([fetchRevenue(token), fetchFinancials(trendRange, token)]);
+      await Promise.all([fetchRevenue(), fetchFinancials(trendRange)]);
     } catch (err) {
       console.error(err);
     }
@@ -534,10 +527,8 @@ export default function FinancialsPage() {
   };
 
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || !token) return;
     try {
-      const token = await getFreshToken();
-      if (!token) return;
       const url = deleteTarget.type === 'expense'
         ? `/api/owner/expenses/${deleteTarget.id}`
         : `/api/owner/revenue/${deleteTarget.id}`;
@@ -547,7 +538,7 @@ export default function FinancialsPage() {
       });
       setDeleteTarget(null);
       setToast(t('deleted'));
-      await Promise.all([fetchExpenses(token), fetchRevenue(token), fetchFinancials(trendRange, token)]);
+      await Promise.all([fetchExpenses(), fetchRevenue(), fetchFinancials(trendRange)]);
     } catch (err) {
       console.error(err);
     }
