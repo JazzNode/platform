@@ -95,10 +95,10 @@ export default async function MagazineArticlePage({ params }: { params: Promise<
   const sameCategoryArticles = allArticles
     .filter((a) => a.category === article.category && a.id !== article.id);
 
-  const sameArtistArticles = (article.linked_artist_ids?.length > 0)
+  const sameArtistArticles = ((article.linked_artist_ids?.length ?? 0) > 0)
     ? allArticles.filter((a) =>
         a.id !== article.id &&
-        a.linked_artist_ids?.some((id: string) => article.linked_artist_ids.includes(id))
+        a.linked_artist_ids?.some((id: string) => article.linked_artist_ids?.includes(id))
       )
     : [];
 
