@@ -23,14 +23,28 @@ export async function GET(request: NextRequest) {
 
   // Enrich with user profiles
   const userIds = [...new Set(convos.map((c) => c.fan_user_id).filter(Boolean))];
-  let profileMap = new Map<string, { display_name: string | null; username: string | null; avatar_url: string | null }>();
+  let profileMap = new Map<string, { display_name: string | null; username: string | null; avatar_url: string | null; claimed_venue_ids: string[] | null }>();
 
   if (userIds.length > 0) {
     const { data: profiles } = await supabase
       .from('profiles')
-      .select('id, display_name, username, avatar_url')
+      .select('id, display_name, username, avatar_url, claimed_venue_ids')
       .in('id', userIds);
     profileMap = new Map((profiles || []).map((p) => [p.id, p]));
+  }
+
+  // Get tier info for all claimed venues (to identify VIP/Elite users)
+  const allClaimedVenueIds = [...new Set(
+    [...profileMap.values()].flatMap((p) => p.claimed_venue_ids || []),
+  )];
+  const vipVenueIds = new Set<string>();
+  if (allClaimedVenueIds.length > 0) {
+    const { data: venues } = await supabase
+      .from('venues')
+      .select('venue_id, tier')
+      .in('venue_id', allClaimedVenueIds)
+      .gte('tier', 3);
+    for (const v of venues ?? []) vipVenueIds.add(v.venue_id);
   }
 
   // Get unread counts per conversation (messages not sent by any admin)
@@ -52,16 +66,25 @@ export async function GET(request: NextRequest) {
         .single();
 
       const userProfile = profileMap.get(convo.fan_user_id);
+      const isVip = (userProfile?.claimed_venue_ids || []).some((vid) => vipVenueIds.has(vid));
       return {
         ...convo,
         user_display: userProfile?.display_name || userProfile?.username || null,
         user_avatar: userProfile?.avatar_url || null,
+        is_vip: isVip,
         unread_count: count || 0,
         last_message: lastMsg?.body || null,
         last_message_at: lastMsg?.created_at || convo.last_message_at,
       };
     })
   );
+
+  // Sort: VIP first, then by recency
+  enriched.sort((a, b) => {
+    if (a.is_vip && !b.is_vip) return -1;
+    if (!a.is_vip && b.is_vip) return 1;
+    return new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime();
+  });
 
   return NextResponse.json({ conversations: enriched });
 }

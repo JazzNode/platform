@@ -26,6 +26,7 @@ interface HQConversation {
   fan_user_id: string;
   user_display: string | null;
   user_avatar: string | null;
+  is_vip?: boolean;
   unread_count: number;
   last_message: string | null;
   last_message_at: string;
@@ -574,7 +575,14 @@ export default function AdminInboxPage() {
                           )}
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
-                              <p className="text-sm font-semibold truncate">{convo.user_display || 'Unknown'}</p>
+                              <div className="flex items-center gap-1.5 min-w-0">
+                                <p className="text-sm font-semibold truncate">{convo.user_display || 'Unknown'}</p>
+                                {convo.is_vip && (
+                                  <span className="shrink-0 text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-400/15 text-amber-400 border border-amber-400/25 uppercase tracking-wider">
+                                    VIP
+                                  </span>
+                                )}
+                              </div>
                               {convo.unread_count > 0 && (
                                 <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
                                   {convo.unread_count}
@@ -659,6 +667,11 @@ export default function AdminInboxPage() {
                         </div>
                       )}
                       <span className="text-sm font-semibold">{selectedConversation.user_display || 'Unknown'}</span>
+                      {selectedConversation.is_vip && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-400/15 text-amber-400 border border-amber-400/25 uppercase tracking-wider">
+                          VIP
+                        </span>
+                      )}
                     </div>
                   </div>
 

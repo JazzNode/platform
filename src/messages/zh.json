@@ -1054,6 +1054,8 @@
     "vf_monthlyAiSummaryDesc": "每月自動生成洞察：頁面趨勢、粉絲成長、演出表現與改進建議。",
     "vf_calendarFeed": "iCal 日曆訂閱",
     "vf_calendarFeedDesc": "粉絲可在 Google 日曆、Apple 日曆等訂閱你的活動排程。",
+    "vf_vipSupport": "VIP 優先客服",
+    "vf_vipSupportDesc": "你的訊息在我們的收件匣中會被標記為 VIP 並優先處理。",
     "vf_ticketing": "售票系統整合",
     "vf_ticketingDesc": "透過場地頁面直接售票，整合結帳流程。",
     "vf_broadcastsUnlimited": "粉絲廣播（無限制）",

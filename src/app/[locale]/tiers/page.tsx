@@ -40,7 +40,7 @@ const DEFAULT_VENUE: TierFeatures = {
   weekly_digest: 2,
   custom_domain: 3, custom_theme: 3, custom_slug: 3, custom_og: 3,
   seo_insights: 3, monthly_ai_summary: 3, calendar_feed: 3,
-  ticketing: 3, broadcasts_unlimited: 3,
+  vip_support: 3, ticketing: 3, broadcasts_unlimited: 3,
   revenue_analytics: 3, multi_location: 3,
 };
 const ALL_TIERS = [0, 1, 2, 3];

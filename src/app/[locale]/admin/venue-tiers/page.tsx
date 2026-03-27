@@ -47,6 +47,7 @@ const VENUE_FEATURES: FeatureKey[] = [
   { key: 'seo_insights', labelKey: 'vf_seoInsights', descKey: 'vf_seoInsightsDesc', categoryKey: 'vc_elite' },
   { key: 'monthly_ai_summary', labelKey: 'vf_monthlyAiSummary', descKey: 'vf_monthlyAiSummaryDesc', categoryKey: 'vc_elite' },
   { key: 'calendar_feed', labelKey: 'vf_calendarFeed', descKey: 'vf_calendarFeedDesc', categoryKey: 'vc_elite' },
+  { key: 'vip_support', labelKey: 'vf_vipSupport', descKey: 'vf_vipSupportDesc', categoryKey: 'vc_elite' },
   { key: 'ticketing', labelKey: 'vf_ticketing', descKey: 'vf_ticketingDesc', categoryKey: 'vc_elite' },
   { key: 'broadcasts_unlimited', labelKey: 'vf_broadcastsUnlimited', categoryKey: 'vc_elite' },
   { key: 'revenue_analytics', labelKey: 'vf_revenueAnalytics', descKey: 'vf_revenueAnalyticsDesc', categoryKey: 'vc_elite' },

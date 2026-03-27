@@ -1053,6 +1053,8 @@
     "vf_monthlyAiSummaryDesc": "Automated monthly insights: page trends, follower growth, event performance, and suggestions.",
     "vf_calendarFeed": "iCal calendar feed",
     "vf_calendarFeedDesc": "Fans can subscribe to your event schedule in Google Calendar, Apple Calendar, etc.",
+    "vf_vipSupport": "VIP priority support",
+    "vf_vipSupportDesc": "Your messages are prioritized in our inbox with VIP badge and faster response times.",
     "vf_ticketing": "Ticketing integration",
     "vf_ticketingDesc": "Sell tickets directly through your venue page with integrated checkout.",
     "vf_broadcastsUnlimited": "Broadcasts (unlimited)",
