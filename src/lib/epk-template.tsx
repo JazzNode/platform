@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { Document, Page as PdfPage, Text, View as PdfView, StyleSheet, Link } from '@react-pdf/renderer';
+import { Document, Page as PdfPage, Text, View as PdfView, StyleSheet, Link, Font } from '@react-pdf/renderer';
 import { localized } from '@/lib/helpers';
 
 // @react-pdf/renderer's types reject conditional JSX children (false | Element).
@@ -8,12 +8,29 @@ import { localized } from '@/lib/helpers';
 const Page = PdfPage as React.ComponentType<any>;
 const View = PdfView as React.ComponentType<any>;
 
+/* ------------------------------------------------------------------ */
+/*  Register Noto Sans TC for CJK support (zh, ja, ko)                */
+/*  @react-pdf/renderer supports .ttf, .otf, and .woff (not woff2)    */
+/* ------------------------------------------------------------------ */
+const NOTO_BASE = 'https://cdn.jsdelivr.net/npm/@fontsource/noto-sans-tc@latest/files';
+
+Font.register({
+  family: 'NotoSansCJK',
+  fonts: [
+    { src: `${NOTO_BASE}/noto-sans-tc-chinese-traditional-400-normal.woff`, fontWeight: 400 },
+    { src: `${NOTO_BASE}/noto-sans-tc-chinese-traditional-700-normal.woff`, fontWeight: 700 },
+  ],
+});
+
+// Disable hyphenation for CJK text
+Font.registerHyphenationCallback((word) => [word]);
+
 const gold = '#C8A84E';
 const dark = '#0A0A0A';
 const muted = '#999';
 
 const styles = StyleSheet.create({
-  page: { padding: 40, backgroundColor: '#FFFFFF', fontFamily: 'Helvetica' },
+  page: { padding: 40, backgroundColor: '#FFFFFF' },
   header: { marginBottom: 24, borderBottomWidth: 2, borderBottomColor: gold, paddingBottom: 16 },
   name: { fontSize: 28, fontWeight: 'bold', color: dark, marginBottom: 4 },
   subtitle: { fontSize: 12, color: muted },
@@ -129,10 +146,12 @@ export function buildEPKDocument({ artist, gear, events, tier, locale = 'en' }: 
   if (artist.instagram) socialLinks.push({ label: 'Instagram', url: `https://instagram.com/${artist.instagram}` });
 
   const dateLocale = dateLocaleMap[lang] || 'en-US';
+  const cjkLocales = ['zh', 'ja', 'ko'];
+  const fontFamily = cjkLocales.includes(lang) ? 'NotoSansCJK' : 'Helvetica';
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page size="A4" style={{ ...styles.page, fontFamily }}>
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.name}>{name}</Text>
