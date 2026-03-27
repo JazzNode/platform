@@ -48,7 +48,7 @@ function TagSummary() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ hideForm }: { hideForm?: boolean }) {
   const t = useTranslations('shoutouts');
   const { shoutoutCount, loading } = useArtistShoutouts();
 
@@ -57,7 +57,7 @@ function EmptyState() {
   return (
     <div className="text-center py-8 text-sm text-[var(--muted-foreground)]">
       <p>{t('noShoutouts')}</p>
-      <p className="mt-1 text-xs">{t('beFirst')}</p>
+      {!hideForm && <p className="mt-1 text-xs">{t('beFirst')}</p>}
     </div>
   );
 }
@@ -90,7 +90,7 @@ function ArtistShoutoutsInner({ artistId, hideForm }: { artistId: string; hideFo
       {!hideForm && <ArtistShoutoutForm artistId={artistId} />}
 
       {/* Empty state */}
-      <EmptyState />
+      <EmptyState hideForm={hideForm} />
 
       {/* List */}
       {shoutoutCount > 0 && <ArtistShoutoutList isOwner={isOwner} />}
