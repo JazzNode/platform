@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   if (bioSnippet) ogParams.set('bio', bioSnippet);
   const defaultOgUrl = `/api/og/artist?${ogParams.toString()}`;
   // Elite artists can override OG image
-  const ogUrl = artist?.fields.brand_og_image_url || defaultOgUrl;
+  const ogUrl = (artist?.fields as Record<string, unknown>).brand_og_image_url as string || defaultOgUrl;
   const description = bio ? bio.slice(0, 160) : undefined;
   return {
     title: name,
