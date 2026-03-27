@@ -170,7 +170,6 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     { key: 'completionBio' as const, done: !!(artist.bio_en || artist.bio_zh || artist.bio_short_en || artist.bio_short_zh), editableHere: false },
     { key: 'completionSocialLinks' as const, done: hasSocialLinks, editableHere: true },
     { key: 'completionInstruments' as const, done: !!(artist.primary_instrument || (artist.instrument_list && artist.instrument_list.length > 0)), editableHere: false },
-    { key: 'completionTeaching' as const, done: acceptingStudents, editableHere: true },
     { key: 'completionGear' as const, done: gearCount > 0, editableHere: false },
   ];
   const doneCount = completionFields.filter((f) => f.done).length;
