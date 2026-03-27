@@ -306,8 +306,6 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
         faviconUrl={f.brand_favicon_url as string}
         tier={f.tier}
       >
-      <FavoriteHighlight itemType="venue" itemId={venue.id}>
-
       {/* Status Banners */}
       {f.status === 'inactive' && (
         <div className="mb-6 flex items-center gap-3 px-5 py-4 rounded-2xl bg-amber-900/20 border border-amber-700/30 text-amber-400">
@@ -343,6 +341,9 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
           jazzFreqLabel={jazzFreqLabel}
           t={t}
         />
+
+        <FavoriteHighlight itemType="venue" itemId={venue.id}>
+        <div className="space-y-12">
 
         {/* ═══ 2. FEATURED EVENT (Today or Next Show) ═══ */}
         {featuredEvent && (
@@ -570,6 +571,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
       </div>
       </FavoriteHighlight>
+
+      </div>
       </VenueThemeScope>
     </div>
   );
