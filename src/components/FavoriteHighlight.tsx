@@ -20,9 +20,12 @@ export default function FavoriteHighlight({ itemType, itemId, children }: Favori
 
   return (
     <div
-      className="transition-all duration-500"
+      className={`transition-all duration-500 ${
+        active ? 'p-4 sm:p-6 -mx-4 sm:-mx-6 -my-4 sm:-my-6' : ''
+      }`}
       style={active ? {
-        background: 'linear-gradient(180deg, rgba(var(--theme-glow-rgb), 0.06) 0%, rgba(var(--theme-glow-rgb), 0.02) 40%, transparent 100%)',
+        background: 'rgba(var(--theme-glow-rgb), 0.04)',
+        border: '1px solid rgba(var(--theme-glow-rgb), 0.08)',
       } : undefined}
     >
       {children}
