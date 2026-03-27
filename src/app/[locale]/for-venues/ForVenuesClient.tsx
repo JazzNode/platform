@@ -2,7 +2,6 @@
 
 import { useLocale, useTranslations } from 'next-intl';
 import Link from 'next/link';
-import { useAuth } from '@/components/AuthProvider';
 import FadeUp from '@/components/animations/FadeUp';
 import FadeUpItem from '@/components/animations/FadeUpItem';
 import CountUp from '@/components/animations/CountUp';
@@ -81,12 +80,7 @@ export default function ForVenuesClient({
 }) {
   const t = useTranslations('forVenues');
   const locale = useLocale();
-  const { profile, loading } = useAuth();
-
-  // Owner-only gate
-  if (!loading && profile?.role !== 'owner' && profile?.role !== 'admin') {
-    return null;
-  }
+  // No role gate — any visitor (logged in or not) can view the landing page
 
   const features = [
     {

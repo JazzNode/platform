@@ -21,10 +21,7 @@ export default function ForVenuesApplyPage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
 
-  // Owner-only gate
-  if (!loading && profile && profile.role !== 'owner' && profile.role !== 'admin') {
-    return null;
-  }
+  // Any logged-in user can apply (they might be a manager creating another venue)
 
   // Pre-fill contact info from profile
   useEffect(() => {
