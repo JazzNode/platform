@@ -138,7 +138,6 @@ export default function AdminInboxPage() {
   const [loadingConvos, setLoadingConvos] = useState(true);
   const [guestContacts, setGuestContacts] = useState<GuestContact[]>([]);
   const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
   const isComposingRef = useRef(false);
 
   // Fetch notifications + Realtime subscription
@@ -230,59 +229,39 @@ export default function AdminInboxPage() {
     setGuestContacts((prev) => prev.map((g) => g.id === id ? { ...g, read_at: new Date().toISOString() } : g));
   }, [token]);
 
-  // Fetch messages for selected conversation
-  useEffect(() => {
-    if (!selectedConvo || !token) return;
-    let cancelled = false;
-    (async () => {
-      try {
-        // Use admin client to fetch messages directly
-        const res = await fetch(`/api/admin/conversations?convoId=${selectedConvo}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        // For now, we fetch all conversations and find messages via client
-        // TODO: Add dedicated messages endpoint if needed
-      } catch {}
-    })();
-    return () => { cancelled = true; };
-  }, [selectedConvo, token]);
-
-  // Fetch messages when selecting a conversation (using Supabase client directly won't work for admin)
-  // We'll use a simple approach: fetch via the conversations API
+  // Fetch messages for selected conversation via admin API
   const fetchMessages = useCallback(async (convoId: string) => {
     if (!token) return;
     try {
-      const { createClient } = await import('@/utils/supabase/client');
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', convoId)
-        .order('created_at', { ascending: true });
-
-      if (data) {
-        // Enrich with sender display names
-        const senderIds = [...new Set(data.map((m) => m.sender_id))];
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, display_name, username')
-          .in('id', senderIds);
-        const profileMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Unknown']));
-
-        setMessages(data.map((m) => ({
-          ...m,
-          sender_display: profileMap.get(m.sender_id) || 'Unknown',
-        })));
+      const res = await fetch(`/api/admin/conversations?convoId=${convoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (data.messages) {
+        setMessages(data.messages);
+        // Update unread count for this conversation
+        setConversations((prev) =>
+          prev.map((c) => c.id === convoId ? { ...c, unread_count: 0 } : c)
+        );
       }
-    } catch {}
+    } catch (err) {
+      console.error('Failed to fetch messages:', err);
+    }
   }, [token]);
 
   useEffect(() => {
-    if (selectedConvo) fetchMessages(selectedConvo);
+    if (selectedConvo) {
+      setMessages([]);
+      fetchMessages(selectedConvo);
+    }
   }, [selectedConvo, fetchMessages]);
 
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
   }, [messages]);
 
   // Mark all notifications as read
@@ -675,7 +654,7 @@ export default function AdminInboxPage() {
                     </div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3">
                     {messages.map((msg) => {
                       const isAdmin = msg.sender_role === 'admin';
                       return (
@@ -701,7 +680,7 @@ export default function AdminInboxPage() {
                         </div>
                       );
                     })}
-                    <div ref={messagesEndRef} />
+
                   </div>
 
                   <div className="p-3 border-t border-[var(--border)]">

@@ -13,6 +13,52 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient();
 
+  // If convoId is provided, return messages for that conversation
+  const convoId = request.nextUrl.searchParams.get('convoId');
+  if (convoId) {
+    // Verify conversation exists
+    const { data: convo } = await supabase
+      .from('conversations')
+      .select('id, type')
+      .eq('id', convoId)
+      .eq('type', 'member_hq')
+      .single();
+    if (!convo) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+    const { data: msgs, error: msgErr } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', convoId)
+      .order('created_at', { ascending: true });
+    if (msgErr) return NextResponse.json({ error: msgErr.message }, { status: 500 });
+
+    // Enrich with sender display names
+    const senderIds = [...new Set((msgs || []).map((m) => m.sender_id).filter(Boolean))];
+    let senderMap = new Map<string, string>();
+    if (senderIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name, username')
+        .in('id', senderIds);
+      senderMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Unknown']));
+    }
+
+    const enrichedMsgs = (msgs || []).map((m) => ({
+      ...m,
+      sender_display: senderMap.get(m.sender_id) || 'Unknown',
+    }));
+
+    // Mark unread member messages as read
+    await supabase
+      .from('messages')
+      .update({ read_at: new Date().toISOString() })
+      .eq('conversation_id', convoId)
+      .is('read_at', null)
+      .is('sender_role', null);
+
+    return NextResponse.json({ messages: enrichedMsgs });
+  }
+
   // Fetch all member_hq conversations
   const { data: convos, error } = await supabase
     .from('conversations')
