@@ -404,32 +404,34 @@ export default function FinancialsPage() {
   const [toast, setToast] = useState<string | null>(null);
 
   // ─── Fetch helpers ───────────────────────────────────────────────
-  const fetchExpenses = useCallback(async () => {
-    const token = await getFreshToken();
-    if (!token) return;
+  // Accept a pre-fetched token to avoid concurrent refreshSession() calls
+  // which invalidate each other's rotating refresh tokens.
+  const fetchExpenses = useCallback(async (tkn?: string) => {
+    const t2 = tkn || await getFreshToken();
+    if (!t2) return;
     const res = await fetch('/api/owner/expenses', {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${t2}` },
     });
     const data = await res.json();
     if (data.expenses) setExpenses(data.expenses);
   }, [getFreshToken]);
 
-  const fetchRevenue = useCallback(async () => {
-    const token = await getFreshToken();
-    if (!token) return;
+  const fetchRevenue = useCallback(async (tkn?: string) => {
+    const t2 = tkn || await getFreshToken();
+    if (!t2) return;
     const res = await fetch('/api/owner/revenue', {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${t2}` },
     });
     const data = await res.json();
     if (data.revenue) setRevenueList(data.revenue);
   }, [getFreshToken]);
 
-  const fetchFinancials = useCallback(async (months: string) => {
-    const token = await getFreshToken();
-    if (!token) return;
+  const fetchFinancials = useCallback(async (months: string, tkn?: string) => {
+    const t2 = tkn || await getFreshToken();
+    if (!t2) return;
     const param = months === 'all' ? '120' : months;
     const res = await fetch(`/api/owner/financials?months=${param}`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${t2}` },
     });
     const data = await res.json();
     if (data.months) setFinancials(data);
@@ -440,7 +442,10 @@ export default function FinancialsPage() {
     let cancelled = false;
     (async () => {
       try {
-        await Promise.all([fetchExpenses(), fetchRevenue(), fetchFinancials(trendRange)]);
+        // Get token ONCE, then share across all parallel fetches
+        const tkn = await getFreshToken();
+        if (!tkn) { if (!cancelled) setLoading(false); return; }
+        await Promise.all([fetchExpenses(tkn), fetchRevenue(tkn), fetchFinancials(trendRange, tkn)]);
       } catch (err) {
         console.error('Failed to load financials:', err);
       }
@@ -498,7 +503,7 @@ export default function FinancialsPage() {
       setShowExpenseForm(false);
       setEditingExpense(null);
       setToast(t('saved'));
-      await Promise.all([fetchExpenses(), fetchFinancials(trendRange)]);
+      await Promise.all([fetchExpenses(token), fetchFinancials(trendRange, token)]);
     } catch (err) {
       console.error(err);
     }
@@ -521,7 +526,7 @@ export default function FinancialsPage() {
       setShowRevenueForm(false);
       setEditingRevenue(null);
       setToast(t('saved'));
-      await Promise.all([fetchRevenue(), fetchFinancials(trendRange)]);
+      await Promise.all([fetchRevenue(token), fetchFinancials(trendRange, token)]);
     } catch (err) {
       console.error(err);
     }
@@ -542,7 +547,7 @@ export default function FinancialsPage() {
       });
       setDeleteTarget(null);
       setToast(t('deleted'));
-      await Promise.all([fetchExpenses(), fetchRevenue(), fetchFinancials(trendRange)]);
+      await Promise.all([fetchExpenses(token), fetchRevenue(token), fetchFinancials(trendRange, token)]);
     } catch (err) {
       console.error(err);
     }
