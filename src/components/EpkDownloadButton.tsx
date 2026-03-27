@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 
 interface EpkDownloadButtonProps {
@@ -18,6 +18,7 @@ const ROLE_OPTIONS = [
 
 export default function EpkDownloadButton({ artistId }: EpkDownloadButtonProps) {
   const t = useTranslations('common');
+  const locale = useLocale();
   const { user } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -27,7 +28,7 @@ export default function EpkDownloadButton({ artistId }: EpkDownloadButtonProps) 
 
   const triggerDownload = useCallback(() => {
     const link = document.createElement('a');
-    link.href = `/api/artist/epk/public?artistId=${artistId}`;
+    link.href = `/api/artist/epk/public?artistId=${artistId}&locale=${locale}`;
     link.download = '';
     document.body.appendChild(link);
     link.click();

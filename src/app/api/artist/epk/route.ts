@@ -6,6 +6,7 @@ import { buildEPKDocument } from '@/lib/epk-template';
 
 export async function GET(req: NextRequest) {
   const artistId = req.nextUrl.searchParams.get('artistId');
+  const locale = req.nextUrl.searchParams.get('locale') || 'en';
   if (!artistId) return NextResponse.json({ error: 'Missing artistId' }, { status: 400 });
 
   const { isAuthorized } = await verifyArtistClaimToken(
@@ -40,32 +41,16 @@ export async function GET(req: NextRequest) {
       .eq('artist_id', artistId);
 
     const eventIds = lineups?.map((l) => l.event_id).filter(Boolean) || [];
-    let events: { title_en: string; start_at: string; venue_id: string }[] = [];
+    let events: { title_en: string; title_local?: string; start_at: string; venue_id: string }[] = [];
     if (eventIds.length > 0) {
       const { data: eventData } = await supabase
         .from('events')
-        .select('title_en, start_at, venue_id')
+        .select('title_en, title_local, start_at, venue_id')
         .in('event_id', eventIds)
         .gte('start_at', new Date().toISOString())
         .order('start_at')
         .limit(10);
       events = eventData || [];
-    }
-
-    // Fetch badges
-    const { data: artistBadges } = await supabase
-      .from('artist_badges')
-      .select('badge_id')
-      .eq('artist_id', artistId);
-
-    let badgeNames: string[] = [];
-    if (artistBadges && artistBadges.length > 0) {
-      const badgeIds = artistBadges.map((b) => b.badge_id);
-      const { data: badges } = await supabase
-        .from('badges')
-        .select('name_en')
-        .in('badge_id', badgeIds);
-      badgeNames = badges?.map((b) => b.name_en).filter(Boolean) as string[] || [];
     }
 
     const tier = artist.tier ?? 0;
@@ -74,8 +59,8 @@ export async function GET(req: NextRequest) {
       artist,
       gear: gear || [],
       events,
-      badgeNames,
       tier,
+      locale,
     });
 
     const buffer = await renderToBuffer(doc);

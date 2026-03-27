@@ -19,6 +19,7 @@ interface EditableSocialLinksProps {
   entityId: string;
   artistName: string;
   fields: SocialFields;
+  claimed?: boolean;
 }
 
 const SOCIAL_CONFIGS = [
@@ -50,6 +51,7 @@ export default function EditableSocialLinks({
   entityId,
   artistName,
   fields,
+  claimed,
 }: EditableSocialLinksProps) {
   const { isAdmin, getFreshToken, handleUnauthorized } = useAdmin();
   const router = useRouter();
@@ -122,17 +124,20 @@ export default function EditableSocialLinks({
   }, [editing, saving, fields, handleSave]);
 
   if (!isAdmin) {
-    return hasAny ? (
-      <SocialIcons
-        websiteUrl={fields.website_url}
-        spotifyUrl={fields.spotify_url}
-        youtubeUrl={fields.youtube_url}
-        instagram={fields.instagram}
-        facebookUrl={fields.facebook_url}
-      />
-    ) : (
-      <SocialIconsPlaceholder artistName={artistName} />
-    );
+    if (hasAny) {
+      return (
+        <SocialIcons
+          websiteUrl={fields.website_url}
+          spotifyUrl={fields.spotify_url}
+          youtubeUrl={fields.youtube_url}
+          instagram={fields.instagram}
+          facebookUrl={fields.facebook_url}
+        />
+      );
+    }
+    // Already claimed but no social links — hide placeholder entirely
+    if (claimed) return null;
+    return <SocialIconsPlaceholder artistName={artistName} />;
   }
 
   if (editing) {
