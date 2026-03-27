@@ -81,7 +81,8 @@ export default async function VenueDetailPage({ params }: { params: Promise<{ lo
 
   const followerCount = await getFollowerCount('venue', slug);
 
-  const f = venue.fields;
+  // Cast to allow brand_* fields not yet in Venue type
+  const f = venue.fields as typeof venue.fields & Record<string, unknown>;
   const desc = localized(f as Record<string, unknown>, 'description', locale);
 
   // Lookup maps
