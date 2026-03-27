@@ -13,7 +13,7 @@ export default function ArtistShoutoutsPage({ params }: { params: Promise<{ slug
   if (!slug) return null;
   return (
     <div className="space-y-6">
-      <ArtistShoutoutsSection artistId={slug} />
+      <ArtistShoutoutsSection artistId={slug} hideForm />
     </div>
   );
 }

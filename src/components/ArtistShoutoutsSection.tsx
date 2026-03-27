@@ -62,7 +62,7 @@ function EmptyState() {
   );
 }
 
-function ArtistShoutoutsInner({ artistId }: { artistId: string }) {
+function ArtistShoutoutsInner({ artistId, hideForm }: { artistId: string; hideForm?: boolean }) {
   const t = useTranslations('shoutouts');
   const { shoutoutCount } = useArtistShoutouts();
   const { profile } = useAuth();
@@ -87,7 +87,7 @@ function ArtistShoutoutsInner({ artistId }: { artistId: string }) {
       </div>
 
       {/* Form */}
-      <ArtistShoutoutForm artistId={artistId} />
+      {!hideForm && <ArtistShoutoutForm artistId={artistId} />}
 
       {/* Empty state */}
       <EmptyState />
@@ -98,10 +98,10 @@ function ArtistShoutoutsInner({ artistId }: { artistId: string }) {
   );
 }
 
-export default function ArtistShoutoutsSection({ artistId }: { artistId: string }) {
+export default function ArtistShoutoutsSection({ artistId, hideForm }: { artistId: string; hideForm?: boolean }) {
   return (
     <ArtistShoutoutsProvider artistId={artistId}>
-      <ArtistShoutoutsInner artistId={artistId} />
+      <ArtistShoutoutsInner artistId={artistId} hideForm={hideForm} />
     </ArtistShoutoutsProvider>
   );
 }
