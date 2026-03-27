@@ -18,6 +18,7 @@ import BadgeDock from '@/components/BadgeDock';
 import HeroBadgeIcons from '@/components/HeroBadgeIcons';
 import BadgeCategorySection from '@/components/BadgeCategorySection';
 import type { BadgeProgress } from '@/lib/badges';
+import FavoriteHighlight from '@/components/FavoriteHighlight';
 import MessageArtistButton from '@/components/MessageArtistButton';
 import EditableContent from '@/components/EditableContent';
 import EditableName from '@/components/EditableName';
@@ -440,6 +441,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
     <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <FavoriteHighlight itemType="artist" itemId={artist.id}>
       <Link href={`/${locale}/artists`} className="mb-8 inline-block text-sm text-[var(--muted-foreground)] hover:text-gold transition-colors link-lift">
         {t('backToList')}
       </Link>
@@ -1163,6 +1165,7 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
         nextLabel={t('nextArtist')}
       />
       </div>
+      </FavoriteHighlight>
     </div>
   );
 }
