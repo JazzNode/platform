@@ -18,23 +18,35 @@ interface VenueBasic {
 }
 
 const NAV_ITEMS = [
-  { key: 'overview', icon: 'chart', path: '' },
-  { key: 'schedule', icon: 'calendar', path: '/schedule' },
-  { key: 'badges', icon: 'badges', path: '/badges' },
-  { key: 'photos', icon: 'images', path: '/photos' },
-  { key: 'inbox', icon: 'inbox', path: '/inbox' },
-  { key: 'comments', icon: 'comments', path: '/comments' },
-  { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
-  { key: 'announcements', icon: 'announcement', path: '/announcements' },
-  { key: 'merchandise', icon: 'shopping', path: '/merchandise' },
-  { key: 'backline', icon: 'backline', path: '/backline' },
-  { key: 'analytics', icon: 'analytics', path: '/analytics' },
-  { key: 'embed', icon: 'code', path: '/embed' },
-  { key: 'branding', icon: 'palette', path: '/branding' },
-  { key: 'team', icon: 'team', path: '/team' },
-  { key: 'domain', icon: 'globe', path: '/domain' },
-  { key: 'edit', icon: 'edit', path: '/edit' },
+  // Tier 0 — Free
+  { key: 'overview', icon: 'chart', path: '', tier: 0 },
+  { key: 'badges', icon: 'badges', path: '/badges', tier: 0 },
+  // Tier 1 — Claimed
+  { key: 'photos', icon: 'images', path: '/photos', tier: 1 },
+  { key: 'inbox', icon: 'inbox', path: '/inbox', tier: 1 },
+  { key: 'comments', icon: 'comments', path: '/comments', tier: 1 },
+  { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
+  // Tier 2 — Premium
+  { key: 'schedule', icon: 'calendar', path: '/schedule', tier: 2 },
+  { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
+  { key: 'announcements', icon: 'announcement', path: '/announcements', tier: 2 },
+  { key: 'merchandise', icon: 'shopping', path: '/merchandise', tier: 2 },
+  { key: 'backline', icon: 'backline', path: '/backline', tier: 2 },
+  { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 2 }, // analytics_basic=2, analytics_advanced=2
+  { key: 'embed', icon: 'code', path: '/embed', tier: 2 },
+  { key: 'team', icon: 'team', path: '/team', tier: 2 },
+  // Tier 3 — Elite
+  { key: 'branding', icon: 'palette', path: '/branding', tier: 3 },
+  { key: 'domain', icon: 'globe', path: '/domain', tier: 3 },
 ] as const;
+
+const TIER_LABELS: Record<number, string> = { 0: 'Free', 1: 'Claimed', 2: 'Premium', 3: 'Elite' };
+const TIER_COLORS: Record<number, string> = {
+  0: 'text-[var(--muted-foreground)]',
+  1: 'text-[var(--muted-foreground)]',
+  2: 'text-[var(--color-gold)]',
+  3: 'text-amber-400',
+};
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
   const c = className || 'w-5 h-5';
@@ -300,6 +312,11 @@ export default function VenueDashboardLayout({
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
+                  {item.tier >= 2 && (
+                    <span className={`ml-auto text-[10px] font-medium opacity-60 ${TIER_COLORS[item.tier]}`}>
+                      {TIER_LABELS[item.tier]}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -352,6 +369,11 @@ export default function VenueDashboardLayout({
                   {item.key === 'inbox' && unreadCount > 0 && (
                     <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                       {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                  {item.tier >= 2 && (
+                    <span className={`text-[9px] font-medium opacity-60 ${TIER_COLORS[item.tier]}`}>
+                      {TIER_LABELS[item.tier]}
                     </span>
                   )}
                 </Link>

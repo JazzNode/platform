@@ -18,21 +18,32 @@ interface ArtistBasic {
 }
 
 const NAV_ITEMS = [
-  { key: 'overview', icon: 'chart', path: '' },
-  { key: 'badges', icon: 'badges', path: '/badges' },
-  { key: 'inbox', icon: 'inbox', path: '/inbox' },
-  { key: 'comments', icon: 'comments', path: '/comments' },
-  { key: 'shoutouts', icon: 'shoutouts', path: '/shoutouts' },
-  // { key: 'bookings', icon: 'calendar', path: '/bookings' }, // Deprecated: use messaging with intent_type instead
-  { key: 'featuredWall', icon: 'star', path: '/featured-wall' },
-  { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts' },
-  { key: 'gear', icon: 'guitar', path: '/gear' },
-  { key: 'analytics', icon: 'analytics', path: '/analytics' },
-  { key: 'fans', icon: 'fans', path: '/fans' },
-  { key: 'collaborations', icon: 'network', path: '/collaborations' },
-  { key: 'branding', icon: 'palette', path: '/branding' },
-  { key: 'edit', icon: 'edit', path: '/edit' },
+  // Tier 0 — Free
+  { key: 'overview', icon: 'chart', path: '', tier: 0 },
+  { key: 'badges', icon: 'badges', path: '/badges', tier: 0 },
+  // Tier 1 — Claimed
+  { key: 'inbox', icon: 'inbox', path: '/inbox', tier: 1 },
+  { key: 'comments', icon: 'comments', path: '/comments', tier: 1 },
+  { key: 'shoutouts', icon: 'shoutouts', path: '/shoutouts', tier: 1 },
+  { key: 'gear', icon: 'guitar', path: '/gear', tier: 1 },           // gear_showcase=1, gear_unlimited=2
+  { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 1 }, // analytics_basic=1, analytics_advanced=3
+  { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
+  // Tier 2 — Premium
+  { key: 'featuredWall', icon: 'star', path: '/featured-wall', tier: 2 },
+  { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
+  // Tier 3 — Elite
+  { key: 'fans', icon: 'fans', path: '/fans', tier: 3 },
+  { key: 'collaborations', icon: 'network', path: '/collaborations', tier: 3 },
+  { key: 'branding', icon: 'palette', path: '/branding', tier: 3 },
 ] as const;
+
+const TIER_LABELS: Record<number, string> = { 0: 'Free', 1: 'Claimed', 2: 'Premium', 3: 'Elite' };
+const TIER_COLORS: Record<number, string> = {
+  0: 'text-[var(--muted-foreground)]',
+  1: 'text-[var(--muted-foreground)]',
+  2: 'text-[var(--color-gold)]',
+  3: 'text-amber-400',
+};
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
   const c = className || 'w-5 h-5';
@@ -282,6 +293,11 @@ export default function ArtistDashboardLayout({
                       {unreadCount > 99 ? '99+' : unreadCount}
                     </span>
                   )}
+                  {item.tier >= 2 && (
+                    <span className={`ml-auto text-[10px] font-medium opacity-60 ${TIER_COLORS[item.tier]}`}>
+                      {TIER_LABELS[item.tier]}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -334,6 +350,11 @@ export default function ArtistDashboardLayout({
                   {item.key === 'inbox' && unreadCount > 0 && (
                     <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                       {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                  {item.tier >= 2 && (
+                    <span className={`text-[9px] font-medium opacity-60 ${TIER_COLORS[item.tier]}`}>
+                      {TIER_LABELS[item.tier]}
                     </span>
                   )}
                 </Link>
