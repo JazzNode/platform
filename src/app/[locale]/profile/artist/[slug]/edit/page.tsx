@@ -14,8 +14,10 @@ interface ArtistData {
   name_local: string | null;
   name_en: string | null;
   photo_url: string | null;
-  bio: string | null;
-  bio_short: string | null;
+  bio_en: string | null;
+  bio_zh: string | null;
+  bio_short_en: string | null;
+  bio_short_zh: string | null;
   primary_instrument: string | null;
   instrument_list: string[] | null;
   website_url: string | null;
@@ -70,7 +72,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     Promise.all([
       supabase
         .from('artists')
-        .select('artist_id, display_name, name_local, name_en, photo_url, bio, bio_short, primary_instrument, instrument_list, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
+        .select('artist_id, display_name, name_local, name_en, photo_url, bio_en, bio_zh, bio_short_en, bio_short_zh, primary_instrument, instrument_list, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
         .eq('artist_id', slug)
         .single(),
       supabase
@@ -165,7 +167,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   const hasSocialLinks = !!(websiteUrl || spotifyUrl || youtubeUrl || instagram || facebookUrl);
   const completionFields = [
     { key: 'completionPhoto' as const, done: !!artist.photo_url, editableHere: false },
-    { key: 'completionBio' as const, done: !!(artist.bio || artist.bio_short), editableHere: false },
+    { key: 'completionBio' as const, done: !!(artist.bio_en || artist.bio_zh || artist.bio_short_en || artist.bio_short_zh), editableHere: false },
     { key: 'completionSocialLinks' as const, done: hasSocialLinks, editableHere: true },
     { key: 'completionInstruments' as const, done: !!(artist.primary_instrument || (artist.instrument_list && artist.instrument_list.length > 0)), editableHere: false },
     { key: 'completionTeaching' as const, done: acceptingStudents, editableHere: true },
