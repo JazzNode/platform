@@ -506,21 +506,20 @@ interface JunctionData {
   eventPromoters: { event_id: string; promoter_id: string }[];
 }
 
+// NOTE: No unstable_cache here — getJunctionData is always called from within
+// another unstable_cache callback (getVenues, getArtists, getEvents).
+// Nesting unstable_cache causes "incrementalCache missing" errors during ISR revalidation.
 const getJunctionData = cache(
-  unstable_cache(
-    async (): Promise<JunctionData> => {
-      const [artistBadges, venueBadges, artistTags, eventTags, eventPromoters] = await Promise.all([
-        fetchAll<{ artist_id: string; badge_id: string; earned_at: string | null }>('artist_badges'),
-        fetchAll<{ venue_id: string; badge_id: string; earned_at: string | null }>('venue_badges'),
-        fetchAll<{ artist_id: string; tag_id: string }>('artist_tags'),
-        fetchAll<{ event_id: string; tag_id: string }>('event_tags'),
-        fetchAll<{ event_id: string; promoter_id: string }>('event_promoters'),
-      ]);
-      return { artistBadges, venueBadges, artistTags, eventTags, eventPromoters };
-    },
-    ['supabase-junctions'],
-    { revalidate: REVALIDATE.events, tags: ['artists', 'venues', 'events'] },
-  ),
+  async (): Promise<JunctionData> => {
+    const [artistBadges, venueBadges, artistTags, eventTags, eventPromoters] = await Promise.all([
+      fetchAll<{ artist_id: string; badge_id: string; earned_at: string | null }>('artist_badges'),
+      fetchAll<{ venue_id: string; badge_id: string; earned_at: string | null }>('venue_badges'),
+      fetchAll<{ artist_id: string; tag_id: string }>('artist_tags'),
+      fetchAll<{ event_id: string; tag_id: string }>('event_tags'),
+      fetchAll<{ event_id: string; promoter_id: string }>('event_promoters'),
+    ]);
+    return { artistBadges, venueBadges, artistTags, eventTags, eventPromoters };
+  },
 );
 
 // ----- Public fetchers -----
