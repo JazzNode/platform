@@ -33,6 +33,7 @@ const NAV_ITEMS = [
   { key: 'merchandise', icon: 'shopping', path: '/merchandise', tier: 2 },
   { key: 'backline', icon: 'backline', path: '/backline', tier: 2 },
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 2 }, // analytics_basic=2, analytics_advanced=2
+  { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'embed', icon: 'code', path: '/embed', tier: 2 },
   { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 3 — Elite
@@ -91,6 +92,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" />
           <path d="M7 14l4-4 4 4 6-6" />
+        </svg>
+      );
+    case 'brain':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9.5 2a2.5 2.5 0 0 1 2.45 2H13a4 4 0 0 1 4 4v.5a2.5 2.5 0 0 1 0 5V14a4 4 0 0 1-4 4h-1.05A2.5 2.5 0 0 1 7 20H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h.5A2.5 2.5 0 0 1 9.5 2z" />
+          <path d="M9 12h6M12 9v6" />
         </svg>
       );
     case 'badges':

@@ -1,31 +1,22 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAdmin } from '@/components/AdminProvider';
 
-interface KpiMetric {
-  current: number;
-  previous: number;
-  change: number;
-  approved?: number;
-}
+interface KpiMetric { current: number; previous: number; change: number; approved?: number; }
 
 interface ReportData {
-  kpis: {
-    views: KpiMetric;
-    users: KpiMetric;
-    follows: KpiMetric;
-    events: KpiMetric;
-    claims: KpiMetric;
-    newSubs: number;
-    totals: { artists: number; venues: number; events: number };
-  };
-  topArtists: { name: string; views: number }[];
-  topVenues: { name: string; views: number }[];
-  topCities: { city: string; views: number }[];
+  kpis: Record<string, unknown>;
   report: string;
   generatedAt: string;
-  monthLabel: string;
+  monthLabel?: string;
+  cached?: boolean;
+}
+
+interface HistoryItem {
+  id: string;
+  generated_at: string;
+  preview: string;
 }
 
 function ChangeChip({ change }: { change: number }) {
@@ -37,13 +28,13 @@ function ChangeChip({ change }: { change: number }) {
   );
 }
 
-function KpiCard({ label, value, change, sub }: { label: string; value: number; change: number; sub?: string }) {
+function KpiCard({ label, value, change, sub }: { label: string; value: number; change?: number; sub?: string }) {
   return (
     <div className="bg-[var(--muted)] rounded-xl p-4 flex flex-col gap-2">
       <p className="text-xs text-[var(--muted-foreground)]">{label}</p>
       <p className="text-2xl font-bold tabular-nums">{value.toLocaleString()}</p>
       <div className="flex items-center gap-2">
-        <ChangeChip change={change} />
+        {change !== undefined && <ChangeChip change={change} />}
         {sub && <span className="text-xs text-[var(--muted-foreground)]">{sub}</span>}
       </div>
     </div>
@@ -51,13 +42,11 @@ function KpiCard({ label, value, change, sub }: { label: string; value: number; 
 }
 
 function ReportText({ text }: { text: string }) {
-  // Render **bold** and line breaks
   const lines = text.split('\n');
   return (
     <div className="space-y-3 text-sm leading-relaxed text-[var(--foreground)]">
       {lines.map((line, i) => {
         if (!line.trim()) return <div key={i} className="h-1" />;
-        // Bold headings (**text**)
         const parts = line.split(/(\*\*[^*]+\*\*)/g);
         return (
           <p key={i}>
@@ -76,17 +65,18 @@ function ReportText({ text }: { text: string }) {
 export default function OwnerAIReportPage() {
   const { token } = useAdmin();
   const [data, setData] = useState<ReportData | null>(null);
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHistory, setShowHistory] = useState(false);
 
-  const generate = useCallback(async () => {
+  const fetchReport = useCallback(async (id?: string) => {
     if (!token) return;
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/owner/ai-report', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const url = id ? `/api/owner/ai-report?id=${id}` : '/api/owner/ai-report';
+      const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Failed');
       setData(json);
@@ -96,6 +86,25 @@ export default function OwnerAIReportPage() {
       setLoading(false);
     }
   }, [token]);
+
+  const fetchHistory = useCallback(async () => {
+    if (!token) return;
+    try {
+      const res = await fetch('/api/owner/ai-report?history=true', { headers: { Authorization: `Bearer ${token}` } });
+      const json = await res.json();
+      if (res.ok) setHistory(json.reports || []);
+    } catch {}
+  }, [token]);
+
+  // Auto-load today's report + history on mount
+  useEffect(() => {
+    if (token) {
+      fetchReport();
+      fetchHistory();
+    }
+  }, [token, fetchReport, fetchHistory]);
+
+  const kpis = data?.kpis as Record<string, KpiMetric & { topArtists?: { name: string; views: number }[]; topVenues?: { name: string; views: number }[]; topCities?: { city: string; views: number }[] }> | null;
 
   return (
     <div className="max-w-4xl">
@@ -107,32 +116,55 @@ export default function OwnerAIReportPage() {
             平台過去 30 天營運數據摘要與 AI 分析建議
           </p>
         </div>
-        <button
-          onClick={generate}
-          disabled={loading}
-          className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? (
-            <>
-              <span className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
-              分析中…
-            </>
-          ) : (
-            <>
+        <div className="flex items-center gap-2 shrink-0">
+          {history.length > 0 && (
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)] transition-colors"
+            >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" />
+                <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
               </svg>
-              {data ? '重新生成' : '生成報告'}
-            </>
+              歷史
+            </button>
           )}
-        </button>
+          <button
+            onClick={() => { fetchReport(); fetchHistory(); }}
+            disabled={loading || data?.cached === true}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              <>
+                <span className="w-4 h-4 border-2 border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                分析中…
+              </>
+            ) : data?.cached ? '今日已生成' : data ? '重新生成' : '生成報告'}
+          </button>
+        </div>
       </div>
+
+      {/* History dropdown */}
+      {showHistory && history.length > 0 && (
+        <div className="mb-6 bg-[var(--muted)] rounded-xl p-3 space-y-1">
+          <p className="text-xs text-[var(--muted-foreground)] font-semibold mb-2">歷史報告</p>
+          {history.map((h) => (
+            <button
+              key={h.id}
+              onClick={() => { fetchReport(h.id); setShowHistory(false); }}
+              className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-[rgba(240,237,230,0.06)] transition-colors"
+            >
+              <span className="text-xs text-[var(--muted-foreground)]">
+                {new Date(h.generated_at).toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', year: 'numeric' })}
+              </span>
+              <p className="text-[var(--foreground)] truncate mt-0.5">{h.preview}</p>
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Error */}
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
-        </div>
+        <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">{error}</div>
       )}
 
       {/* Empty state */}
@@ -141,107 +173,26 @@ export default function OwnerAIReportPage() {
           <svg className="w-12 h-12 mx-auto mb-4 opacity-30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4" />
           </svg>
-          <p className="text-sm">點擊「生成報告」以分析本月平台數據</p>
+          <p className="text-sm">載入中…</p>
         </div>
       )}
 
-      {/* Data */}
+      {/* Report */}
       {data && (
         <div className="space-y-8">
           {/* KPI Grid */}
-          <section>
-            <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">關鍵指標（過去 30 天）</h2>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              <KpiCard label="頁面瀏覽" value={data.kpis.views.current} change={data.kpis.views.change} />
-              <KpiCard label="新增用戶" value={data.kpis.users.current} change={data.kpis.users.change} />
-              <KpiCard label="新增追蹤" value={data.kpis.follows.current} change={data.kpis.follows.change} />
-              <KpiCard label="新增活動" value={data.kpis.events.current} change={data.kpis.events.change} />
-              <KpiCard
-                label="認領申請"
-                value={data.kpis.claims.current}
-                change={data.kpis.claims.change}
-                sub={`已核准 ${data.kpis.claims.approved}`}
-              />
-              <KpiCard label="新增訂閱" value={data.kpis.newSubs} change={0} />
-            </div>
-          </section>
-
-          {/* Totals */}
-          <section>
-            <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">平台規模</h2>
-            <div className="grid grid-cols-3 gap-3">
-              {[
-                { label: '藝人總數', value: data.kpis.totals.artists },
-                { label: '場地總數', value: data.kpis.totals.venues },
-                { label: '活動總數', value: data.kpis.totals.events },
-              ].map(({ label, value }) => (
-                <div key={label} className="bg-[var(--muted)] rounded-xl p-4 text-center">
-                  <p className="text-2xl font-bold tabular-nums">{value.toLocaleString()}</p>
-                  <p className="text-xs text-[var(--muted-foreground)] mt-1">{label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Top lists */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Top Artists */}
-            <section className="bg-[var(--muted)] rounded-xl p-4">
-              <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">熱門藝人</h2>
-              {data.topArtists.length === 0
-                ? <p className="text-xs text-[var(--muted-foreground)]">無數據</p>
-                : <ol className="space-y-2">
-                  {data.topArtists.map((a, i) => (
-                    <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-[var(--muted-foreground)] w-4 shrink-0">{i + 1}</span>
-                        <span className="truncate">{a.name}</span>
-                      </span>
-                      <span className="text-xs text-[var(--muted-foreground)] shrink-0">{a.views.toLocaleString()}</span>
-                    </li>
-                  ))}
-                </ol>
-              }
+          {kpis?.views && (
+            <section>
+              <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">關鍵指標（過去 30 天）</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                {kpis.views && <KpiCard label="頁面瀏覽" value={(kpis.views as KpiMetric).current} change={(kpis.views as KpiMetric).change} />}
+                {kpis.users && <KpiCard label="新增用戶" value={(kpis.users as KpiMetric).current} change={(kpis.users as KpiMetric).change} />}
+                {kpis.follows && <KpiCard label="新增追蹤" value={(kpis.follows as KpiMetric).current} change={(kpis.follows as KpiMetric).change} />}
+                {kpis.events && <KpiCard label="新增活動" value={(kpis.events as KpiMetric).current} change={(kpis.events as KpiMetric).change} />}
+                {kpis.claims && <KpiCard label="認領申請" value={(kpis.claims as KpiMetric).current} change={(kpis.claims as KpiMetric).change} sub={`已核准 ${(kpis.claims as KpiMetric).approved}`} />}
+              </div>
             </section>
-
-            {/* Top Venues */}
-            <section className="bg-[var(--muted)] rounded-xl p-4">
-              <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">熱門場地</h2>
-              {data.topVenues.length === 0
-                ? <p className="text-xs text-[var(--muted-foreground)]">無數據</p>
-                : <ol className="space-y-2">
-                  {data.topVenues.map((v, i) => (
-                    <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-[var(--muted-foreground)] w-4 shrink-0">{i + 1}</span>
-                        <span className="truncate">{v.name}</span>
-                      </span>
-                      <span className="text-xs text-[var(--muted-foreground)] shrink-0">{v.views.toLocaleString()}</span>
-                    </li>
-                  ))}
-                </ol>
-              }
-            </section>
-
-            {/* Top Cities */}
-            <section className="bg-[var(--muted)] rounded-xl p-4">
-              <h2 className="text-xs font-semibold text-[var(--muted-foreground)] uppercase tracking-wider mb-3">主要城市</h2>
-              {data.topCities.length === 0
-                ? <p className="text-xs text-[var(--muted-foreground)]">無 GeoIP 數據</p>
-                : <ol className="space-y-2">
-                  {data.topCities.map((c, i) => (
-                    <li key={i} className="flex items-center justify-between gap-2 text-sm">
-                      <span className="flex items-center gap-2 min-w-0">
-                        <span className="text-xs text-[var(--muted-foreground)] w-4 shrink-0">{i + 1}</span>
-                        <span className="truncate">{c.city}</span>
-                      </span>
-                      <span className="text-xs text-[var(--muted-foreground)] shrink-0">{c.views.toLocaleString()}</span>
-                    </li>
-                  ))}
-                </ol>
-              }
-            </section>
-          </div>
+          )}
 
           {/* AI Report */}
           <section>

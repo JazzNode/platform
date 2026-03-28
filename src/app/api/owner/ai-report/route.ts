@@ -7,23 +7,93 @@ const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 /**
  * GET /api/owner/ai-report
  * Owner-only: fetch 30-day platform analytics + generate AI narrative report.
+ *
+ * Query params:
+ *   ?history=true  — return list of past reports
+ *   ?id=<uuid>     — return a specific archived report
+ *   (none)         — generate new report or return today's cached report
  */
 export async function GET(request: NextRequest) {
-  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  const { isHQ, role, userId } = await verifyHQToken(request.headers.get('authorization'));
   if (!isHQ || !hasPermission(role, ['owner'])) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
+  const supabase = createAdminClient();
+  const params = request.nextUrl.searchParams;
+
+  // ── History mode ────────────────────────────────────────────────────────
+  if (params.get('history') === 'true') {
+    const { data: reports } = await supabase
+      .from('ai_reports')
+      .select('id, generated_at, report')
+      .eq('entity_type', 'platform')
+      .is('entity_id', null)
+      .order('generated_at', { ascending: false })
+      .limit(30);
+
+    return NextResponse.json({
+      reports: (reports || []).map((r) => ({
+        id: r.id,
+        generated_at: r.generated_at,
+        preview: r.report.slice(0, 120),
+      })),
+    });
+  }
+
+  // ── Load specific archived report ───────────────────────────────────────
+  const reportId = params.get('id');
+  if (reportId) {
+    const { data: archived } = await supabase
+      .from('ai_reports')
+      .select('*')
+      .eq('id', reportId)
+      .eq('entity_type', 'platform')
+      .single();
+
+    if (!archived) return NextResponse.json({ error: 'Report not found' }, { status: 404 });
+    return NextResponse.json({
+      kpis: archived.kpis,
+      report: archived.report,
+      generatedAt: archived.generated_at,
+      monthLabel: '',
+      archived: true,
+    });
+  }
+
+  // ── Rate limit: check if already generated today ────────────────────────
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const { data: todayReport } = await supabase
+    .from('ai_reports')
+    .select('*')
+    .eq('entity_type', 'platform')
+    .is('entity_id', null)
+    .gte('generated_at', todayStart.toISOString())
+    .order('generated_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (todayReport) {
+    return NextResponse.json({
+      kpis: todayReport.kpis,
+      report: todayReport.report,
+      generatedAt: todayReport.generated_at,
+      monthLabel: '',
+      cached: true,
+    });
+  }
+
+  // ── Generate new report ─────────────────────────────────────────────────
   if (!GEMINI_API_KEY) {
     return NextResponse.json({ error: 'GEMINI_API_KEY not configured' }, { status: 500 });
   }
 
-  const supabase = createAdminClient();
   const now = new Date();
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000).toISOString();
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 86400000).toISOString();
 
-  // ── Fetch all data in parallel ──────────────────────────────────────────
   const [
     artistViewsCurr, artistViewsPrev,
     venueViewsCurr, venueViewsPrev,
@@ -64,7 +134,6 @@ export async function GET(request: NextRequest) {
   const vViews = (venueViewsCurr.data || []).length;
   const totalViews = aViews + vViews;
   const prevViews = (artistViewsPrev.data || []).length + (venueViewsPrev.data || []).length;
-
   const newUsers = (usersCurr.data || []).length;
   const prevUsers = (usersPrev.data || []).length;
   const newFollows = (followsCurr.data || []).length;
@@ -78,30 +147,22 @@ export async function GET(request: NextRequest) {
 
   // Top artists
   const artistCountMap: Record<string, number> = {};
-  for (const v of (topArtistViews.data || [])) {
-    artistCountMap[v.artist_id] = (artistCountMap[v.artist_id] || 0) + 1;
-  }
+  for (const v of (topArtistViews.data || [])) artistCountMap[v.artist_id] = (artistCountMap[v.artist_id] || 0) + 1;
   const topArtistIds = Object.entries(artistCountMap).sort(([, a], [, b]) => b - a).slice(0, 5);
   let topArtists: { name: string; views: number }[] = [];
   if (topArtistIds.length > 0) {
-    const { data: names } = await supabase
-      .from('artists').select('artist_id, display_name, name_en')
-      .in('artist_id', topArtistIds.map(([id]) => id));
+    const { data: names } = await supabase.from('artists').select('artist_id, display_name, name_en').in('artist_id', topArtistIds.map(([id]) => id));
     const nameMap = new Map((names || []).map((a) => [a.artist_id, a.display_name || a.name_en || a.artist_id]));
     topArtists = topArtistIds.map(([id, views]) => ({ name: nameMap.get(id) || id, views }));
   }
 
   // Top venues
   const venueCountMap: Record<string, number> = {};
-  for (const v of (topVenueViews.data || [])) {
-    venueCountMap[v.venue_id] = (venueCountMap[v.venue_id] || 0) + 1;
-  }
+  for (const v of (topVenueViews.data || [])) venueCountMap[v.venue_id] = (venueCountMap[v.venue_id] || 0) + 1;
   const topVenueIds = Object.entries(venueCountMap).sort(([, a], [, b]) => b - a).slice(0, 5);
   let topVenues: { name: string; views: number }[] = [];
   if (topVenueIds.length > 0) {
-    const { data: names } = await supabase
-      .from('venues').select('venue_id, display_name')
-      .in('venue_id', topVenueIds.map(([id]) => id));
+    const { data: names } = await supabase.from('venues').select('venue_id, display_name').in('venue_id', topVenueIds.map(([id]) => id));
     const nameMap = new Map((names || []).map((v) => [v.venue_id, v.display_name || v.venue_id]));
     topVenues = topVenueIds.map(([id, views]) => ({ name: nameMap.get(id) || id, views }));
   }
@@ -111,8 +172,7 @@ export async function GET(request: NextRequest) {
   for (const v of [...(artistViewsCurr.data || []), ...(venueViewsCurr.data || [])]) {
     if (v.city) cityMap[v.city] = (cityMap[v.city] || 0) + 1;
   }
-  const topCities = Object.entries(cityMap).sort(([, a], [, b]) => b - a).slice(0, 5)
-    .map(([city, views]) => ({ city, views }));
+  const topCities = Object.entries(cityMap).sort(([, a], [, b]) => b - a).slice(0, 5).map(([city, views]) => ({ city, views }));
 
   const kpis = {
     views: { current: totalViews, previous: prevViews, change: pct(totalViews, prevViews) },
@@ -121,14 +181,12 @@ export async function GET(request: NextRequest) {
     events: { current: newEvents, previous: prevEvents, change: pct(newEvents, prevEvents) },
     claims: { current: newClaims, previous: prevClaims, change: pct(newClaims, prevClaims), approved: approvedClaims },
     newSubs,
-    totals: {
-      artists: totalArtists.count ?? 0,
-      venues: totalVenues.count ?? 0,
-      events: totalEvents.count ?? 0,
-    },
+    totals: { artists: totalArtists.count ?? 0, venues: totalVenues.count ?? 0, events: totalEvents.count ?? 0 },
+    topArtists,
+    topVenues,
+    topCities,
   };
 
-  // ── Build Claude prompt ─────────────────────────────────────────────────
   const monthLabel = now.toLocaleDateString('zh-TW', { year: 'numeric', month: 'long' });
 
   const dataContext = `
@@ -137,8 +195,7 @@ export async function GET(request: NextRequest) {
 
 【關鍵指標（與前30天比較）】
 - 總頁面瀏覽：${totalViews} 次（${kpis.views.change >= 0 ? '+' : ''}${kpis.views.change}%）
-  - 藝人頁面：${aViews} 次
-  - 場地頁面：${vViews} 次
+  - 藝人頁面：${aViews} 次 / 場地頁面：${vViews} 次
 - 新增用戶：${newUsers} 人（${kpis.users.change >= 0 ? '+' : ''}${kpis.users.change}%）
 - 新增追蹤：${newFollows} 次（${kpis.follows.change >= 0 ? '+' : ''}${kpis.follows.change}%）
 - 新增活動：${newEvents} 場（${kpis.events.change >= 0 ? '+' : ''}${kpis.events.change}%）
@@ -146,18 +203,13 @@ export async function GET(request: NextRequest) {
 - 新增訂閱：${newSubs} 筆
 
 【平台累計規模】
-- 藝人總數：${kpis.totals.artists}
-- 場地總數：${kpis.totals.venues}
-- 活動總數：${kpis.totals.events}
+- 藝人 ${kpis.totals.artists} / 場地 ${kpis.totals.venues} / 活動 ${kpis.totals.events}
 
-【本月最熱門藝人（頁面瀏覽）】
-${topArtists.map((a, i) => `${i + 1}. ${a.name}：${a.views} 次`).join('\n') || '（無數據）'}
+【熱門藝人】${topArtists.map((a, i) => `\n${i + 1}. ${a.name}：${a.views} 次`).join('') || '\n（無數據）'}
 
-【本月最熱門場地（頁面瀏覽）】
-${topVenues.map((v, i) => `${i + 1}. ${v.name}：${v.views} 次`).join('\n') || '（無數據）'}
+【熱門場地】${topVenues.map((v, i) => `\n${i + 1}. ${v.name}：${v.views} 次`).join('') || '\n（無數據）'}
 
-【主要流量城市】
-${topCities.map((c, i) => `${i + 1}. ${c.city}：${c.views} 次`).join('\n') || '（無 GeoIP 數據）'}
+【主要城市】${topCities.map((c, i) => `\n${i + 1}. ${c.city}：${c.views} 次`).join('') || '\n（無 GeoIP 數據）'}
 `.trim();
 
   const prompt = `你是 JazzNode 平台的 AI 分析師，負責為平台創辦人（Shark）撰寫月度經營報告。
@@ -200,19 +252,18 @@ ${dataContext}
     const data = await res.json();
     const report = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
-    return NextResponse.json({
+    // Save to archive
+    await supabase.from('ai_reports').insert({
+      entity_type: 'platform',
+      entity_id: null,
+      user_id: userId,
       kpis,
-      topArtists,
-      topVenues,
-      topCities,
       report,
-      generatedAt: now.toISOString(),
-      monthLabel,
+      locale: 'zh',
     });
+
+    return NextResponse.json({ kpis, report, generatedAt: now.toISOString(), monthLabel });
   } catch (err) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : 'Report generation failed' },
-      { status: 502 },
-    );
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Report generation failed' }, { status: 502 });
   }
 }

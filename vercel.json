@@ -19,10 +19,6 @@
     {
       "path": "/api/cron/gsc-sync",
       "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/digest/monthly-ai",
-      "schedule": "0 10 1 * *"
     }
   ]
 }
