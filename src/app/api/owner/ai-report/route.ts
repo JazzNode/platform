@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyHQToken, hasPermission } from '@/lib/admin-auth';
 import { createAdminClient } from '@/utils/supabase/admin';
 
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY;
 
 /**
  * GET /api/owner/ai-report
@@ -14,8 +14,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  if (!ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured' }, { status: 500 });
+  if (!GOOGLE_AI_API_KEY) {
+    return NextResponse.json({ error: 'GOOGLE_AI_API_KEY not configured' }, { status: 500 });
   }
 
   const supabase = createAdminClient();
@@ -179,28 +179,26 @@ ${dataContext}
 語氣：直接、專業，像顧問報告，不要廢話。數字要具體引用。`;
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GOOGLE_AI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { maxOutputTokens: 2000 },
+        }),
+        signal: AbortSignal.timeout(60000),
       },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6-20250514',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-      signal: AbortSignal.timeout(60000),
-    });
+    );
 
     if (!res.ok) {
       const errText = (await res.text()).slice(0, 500);
-      return NextResponse.json({ error: `Claude API error ${res.status}: ${errText}` }, { status: 502 });
+      return NextResponse.json({ error: `Gemini API error ${res.status}: ${errText}` }, { status: 502 });
     }
 
     const data = await res.json();
-    const report = data.content?.[0]?.text || '';
+    const report = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
 
     return NextResponse.json({
       kpis,
