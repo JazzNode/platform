@@ -34,7 +34,7 @@ const NAV_ITEMS = [
   { key: 'backline', icon: 'backline', path: '/backline', tier: 2 },
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 2 }, // analytics_basic=2, analytics_advanced=2
   { key: 'embed', icon: 'code', path: '/embed', tier: 2 },
-  { key: 'team', icon: 'team', path: '/team', tier: 2 },
+  { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 3 — Elite
   { key: 'branding', icon: 'palette', path: '/branding', tier: 3 },
   { key: 'domain', icon: 'globe', path: '/domain', tier: 3 },
@@ -199,15 +199,28 @@ export default function VenueDashboardLayout({
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  // Auth + permission check
+  // Auth + permission check (claimed_venue_ids OR team_members)
   useEffect(() => {
     if (!loading && !user) {
       router.push('/');
       return;
     }
     if (!loading && profile && slug) {
-      if (!profile.claimed_venue_ids?.includes(slug) && !['admin', 'owner', 'editor'].includes(profile.role || '')) {
-        router.push(`/${locale}/profile`);
+      const isPlatformAdmin = ['admin', 'owner', 'editor'].includes(profile.role || '');
+      const isClaimed = profile.claimed_venue_ids?.includes(slug);
+      if (!isClaimed && !isPlatformAdmin) {
+        const supabase = createClient();
+        supabase
+          .from('team_members')
+          .select('id')
+          .eq('entity_type', 'venue')
+          .eq('entity_id', slug)
+          .eq('user_id', user!.id)
+          .eq('status', 'accepted')
+          .single()
+          .then(({ data }) => {
+            if (!data) router.push(`/${locale}/profile`);
+          });
       }
     }
   }, [loading, user, profile, slug, locale, router]);

@@ -1,21 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { useAuth } from '@/components/AuthProvider';
 import { useAdmin } from '@/components/AdminProvider';
-import { useTierConfig } from '@/components/TierConfigProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import TeamManagementPanel from '@/components/team/TeamManagementPanel';
 
-export default function VenueTeamPage({ params }: { params: Promise<{ slug: string }> }) {
-  const t = useTranslations('venueDashboard');
-  const locale = useLocale();
+export default function ArtistTeamPage({ params }: { params: Promise<{ slug: string }> }) {
+  const t = useTranslations('artistStudio');
   const { user, loading } = useAuth();
-  const { previewVenueTier, adminModeEnabled } = useAdmin();
-  const { isUnlocked } = useTierConfig();
+  const { previewArtistTier, adminModeEnabled } = useAdmin();
 
   const [slug, setSlug] = useState('');
   const [tier, setTier] = useState(0);
@@ -27,7 +23,7 @@ export default function VenueTeamPage({ params }: { params: Promise<{ slug: stri
   useEffect(() => {
     if (!slug || !user) return;
     const supabase = createClient();
-    supabase.from('venues').select('tier').eq('venue_id', slug).single()
+    supabase.from('artists').select('tier').eq('artist_id', slug).single()
       .then(({ data }) => { if (data) setTier(data.tier); });
   }, [slug, user]);
 
@@ -39,7 +35,7 @@ export default function VenueTeamPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  const effectiveTier = previewVenueTier ?? tier;
+  const effectiveTier = previewArtistTier ?? tier;
 
   // Tier 1+ required (claimed)
   if (effectiveTier < 1 && !adminModeEnabled) {
@@ -56,5 +52,5 @@ export default function VenueTeamPage({ params }: { params: Promise<{ slug: stri
     );
   }
 
-  return <TeamManagementPanel entityType="venue" entityId={slug} t={t} />;
+  return <TeamManagementPanel entityType="artist" entityId={slug} t={t} />;
 }

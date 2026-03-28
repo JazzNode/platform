@@ -28,6 +28,7 @@ const NAV_ITEMS = [
   { key: 'gear', icon: 'guitar', path: '/gear', tier: 1 },           // gear_showcase=1, gear_unlimited=2
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 1 }, // analytics_basic=1, analytics_advanced=3
   { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
+  { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 2 — Premium
   { key: 'featuredWall', icon: 'star', path: '/featured-wall', tier: 2 },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
@@ -150,6 +151,15 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
         </svg>
       );
+    case 'team':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
     default:
       return null;
   }
@@ -179,15 +189,29 @@ export default function ArtistDashboardLayout({
     params.then((p) => setSlug(decodeURIComponent(p.slug)));
   }, [params]);
 
-  // Auth + permission check
+  // Auth + permission check (claimed_artist_ids OR team_members)
   useEffect(() => {
     if (!loading && !user) {
       router.push('/');
       return;
     }
     if (!loading && profile && slug) {
-      if (!profile.claimed_artist_ids?.includes(slug) && profile.role !== 'admin' && profile.role !== 'owner') {
-        router.push(`/${locale}/profile`);
+      const isPlatformAdmin = profile.role === 'admin' || profile.role === 'owner';
+      const isClaimed = profile.claimed_artist_ids?.includes(slug);
+      if (!isClaimed && !isPlatformAdmin) {
+        // Fallback: check team_members
+        const supabase = createClient();
+        supabase
+          .from('team_members')
+          .select('id')
+          .eq('entity_type', 'artist')
+          .eq('entity_id', slug)
+          .eq('user_id', user!.id)
+          .eq('status', 'accepted')
+          .single()
+          .then(({ data }) => {
+            if (!data) router.push(`/${locale}/profile`);
+          });
       }
     }
   }, [loading, user, profile, slug, locale, router]);

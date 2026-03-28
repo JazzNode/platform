@@ -3,12 +3,12 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 
 /**
- * GET /api/venue/team?venueId=xxx
- * List all team members for a venue.
+ * GET /api/artist/team?artistId=xxx
+ * List all team members for an artist.
  */
 export async function GET(request: NextRequest) {
-  const venueId = request.nextUrl.searchParams.get('venueId');
-  if (!venueId) return NextResponse.json({ error: 'Missing venueId' }, { status: 400 });
+  const artistId = request.nextUrl.searchParams.get('artistId');
+  if (!artistId) return NextResponse.json({ error: 'Missing artistId' }, { status: 400 });
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -16,22 +16,22 @@ export async function GET(request: NextRequest) {
 
   const adminClient = createAdminClient();
 
-  // Verify caller has access (claimed_venue_ids OR team_members OR platform admin)
+  // Verify caller has access
   const { data: profile } = await supabase
     .from('profiles')
-    .select('claimed_venue_ids, role')
+    .select('claimed_artist_ids, role')
     .eq('id', user.id)
     .single();
 
-  const isPlatformAdmin = ['admin', 'owner', 'editor'].includes(profile?.role || '');
-  const isClaimed = profile?.claimed_venue_ids?.includes(venueId);
+  const isPlatformAdmin = ['admin', 'owner'].includes(profile?.role || '');
+  const isClaimed = profile?.claimed_artist_ids?.includes(artistId);
 
   if (!isClaimed && !isPlatformAdmin) {
     const { data: membership } = await adminClient
       .from('team_members')
       .select('id')
-      .eq('entity_type', 'venue')
-      .eq('entity_id', venueId)
+      .eq('entity_type', 'artist')
+      .eq('entity_id', artistId)
       .eq('user_id', user.id)
       .eq('status', 'accepted')
       .single();
@@ -42,16 +42,16 @@ export async function GET(request: NextRequest) {
   const { data: members } = await adminClient
     .from('team_members')
     .select('id, user_id, role, status, created_at')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .neq('status', 'removed')
     .order('created_at', { ascending: true });
 
   // Get billing_user_id
-  const { data: venue } = await adminClient
-    .from('venues')
+  const { data: artist } = await adminClient
+    .from('artists')
     .select('billing_user_id')
-    .eq('venue_id', venueId)
+    .eq('artist_id', artistId)
     .single();
 
   // Enrich with profile data
@@ -72,26 +72,26 @@ export async function GET(request: NextRequest) {
         username: memberProfile?.username,
         avatar_url: memberProfile?.avatar_url,
         email: authUser?.user?.email || null,
-        is_billing: m.user_id === venue?.billing_user_id,
+        is_billing: m.user_id === artist?.billing_user_id,
       };
     }),
   );
 
-  return NextResponse.json({ members: enriched, billing_user_id: venue?.billing_user_id });
+  return NextResponse.json({ members: enriched, billing_user_id: artist?.billing_user_id });
 }
 
 /**
- * POST /api/venue/team
+ * POST /api/artist/team
  * Invite a team member by email.
- * Body: { venueId, email, role }
+ * Body: { artistId, email, role }
  */
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { venueId, email, role = 'editor' } = await request.json();
-  if (!venueId || !email?.trim()) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  const { artistId, email, role = 'editor' } = await request.json();
+  if (!artistId || !email?.trim()) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   if (!['admin', 'editor', 'viewer'].includes(role)) {
     return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
   }
@@ -102,8 +102,8 @@ export async function POST(request: NextRequest) {
   const { data: callerMember } = await adminClient
     .from('team_members')
     .select('role')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', user.id)
     .eq('status', 'accepted')
     .single();
@@ -130,8 +130,8 @@ export async function POST(request: NextRequest) {
   const { data: existing } = await adminClient
     .from('team_members')
     .select('id, status')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', targetUser.id)
     .single();
 
@@ -149,8 +149,8 @@ export async function POST(request: NextRequest) {
     await adminClient
       .from('team_members')
       .insert({
-        entity_type: 'venue',
-        entity_id: venueId,
+        entity_type: 'artist',
+        entity_id: artistId,
         user_id: targetUser.id,
         role,
         status: 'accepted',
@@ -158,19 +158,19 @@ export async function POST(request: NextRequest) {
       });
   }
 
-  // Backward compat: add to claimed_venue_ids
+  // Backward compat: add to claimed_artist_ids
   const { data: targetProfile } = await adminClient
     .from('profiles')
-    .select('claimed_venue_ids, role')
+    .select('claimed_artist_ids, role')
     .eq('id', targetUser.id)
     .single();
 
-  const currentIds = targetProfile?.claimed_venue_ids || [];
-  if (!currentIds.includes(venueId)) {
-    const newRole = targetProfile?.role === 'member' ? 'venue_manager' : targetProfile?.role;
+  const currentIds = targetProfile?.claimed_artist_ids || [];
+  if (!currentIds.includes(artistId)) {
+    const newRole = targetProfile?.role === 'member' ? 'artist_manager' : targetProfile?.role;
     await adminClient
       .from('profiles')
-      .update({ claimed_venue_ids: [...currentIds, venueId], role: newRole })
+      .update({ claimed_artist_ids: [...currentIds, artistId], role: newRole })
       .eq('id', targetUser.id);
   }
 
@@ -178,29 +178,28 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * PATCH /api/venue/team
+ * PATCH /api/artist/team
  * Change a member's role.
- * Body: { venueId, userId, role }
+ * Body: { artistId, userId, role }
  */
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { venueId, userId: targetUserId, role: newRole } = await request.json();
-  if (!venueId || !targetUserId || !newRole) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  const { artistId, userId: targetUserId, role: newRole } = await request.json();
+  if (!artistId || !targetUserId || !newRole) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   if (!['admin', 'editor', 'viewer'].includes(newRole)) {
     return NextResponse.json({ error: 'Invalid role. Cannot assign owner via role change.' }, { status: 400 });
   }
 
   const adminClient = createAdminClient();
 
-  // Verify caller
   const { data: callerMember } = await adminClient
     .from('team_members')
     .select('role')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', user.id)
     .eq('status', 'accepted')
     .single();
@@ -211,12 +210,11 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // Can't change owner's role
   const { data: targetMember } = await adminClient
     .from('team_members')
     .select('role')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', targetUserId)
     .eq('status', 'accepted')
     .single();
@@ -224,7 +222,6 @@ export async function PATCH(request: NextRequest) {
   if (!targetMember) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
   if (targetMember.role === 'owner') return NextResponse.json({ error: 'Cannot change owner role. Use transfer ownership instead.' }, { status: 400 });
 
-  // Admin can't promote to admin
   if (newRole === 'admin' && callerMember?.role !== 'owner' && !isPlatformAdmin) {
     return NextResponse.json({ error: 'Only the owner can promote to admin.' }, { status: 403 });
   }
@@ -232,8 +229,8 @@ export async function PATCH(request: NextRequest) {
   await adminClient
     .from('team_members')
     .update({ role: newRole, updated_at: new Date().toISOString() })
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', targetUserId)
     .eq('status', 'accepted');
 
@@ -241,17 +238,17 @@ export async function PATCH(request: NextRequest) {
 }
 
 /**
- * DELETE /api/venue/team
+ * DELETE /api/artist/team
  * Remove a team member.
- * Body: { venueId, userId }
+ * Body: { artistId, userId }
  */
 export async function DELETE(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { venueId, userId: targetUserId } = await request.json();
-  if (!venueId || !targetUserId) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  const { artistId, userId: targetUserId } = await request.json();
+  if (!artistId || !targetUserId) return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
 
   if (targetUserId === user.id) {
     return NextResponse.json({ error: 'You cannot remove yourself.' }, { status: 400 });
@@ -259,12 +256,11 @@ export async function DELETE(request: NextRequest) {
 
   const adminClient = createAdminClient();
 
-  // Verify caller is owner or admin
   const { data: callerMember } = await adminClient
     .from('team_members')
     .select('role')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', user.id)
     .eq('status', 'accepted')
     .single();
@@ -275,12 +271,11 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  // Can't remove owner
   const { data: targetMember } = await adminClient
     .from('team_members')
     .select('role')
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', targetUserId)
     .eq('status', 'accepted')
     .single();
@@ -288,30 +283,28 @@ export async function DELETE(request: NextRequest) {
   if (!targetMember) return NextResponse.json({ error: 'Member not found' }, { status: 404 });
   if (targetMember.role === 'owner') return NextResponse.json({ error: 'Cannot remove the owner. Transfer ownership first.' }, { status: 400 });
 
-  // Admin can't remove another admin (only owner can)
   if (targetMember.role === 'admin' && callerMember?.role !== 'owner' && !isPlatformAdmin) {
     return NextResponse.json({ error: 'Only the owner can remove admins.' }, { status: 403 });
   }
 
-  // Mark as removed
   await adminClient
     .from('team_members')
     .update({ status: 'removed', updated_at: new Date().toISOString() })
-    .eq('entity_type', 'venue')
-    .eq('entity_id', venueId)
+    .eq('entity_type', 'artist')
+    .eq('entity_id', artistId)
     .eq('user_id', targetUserId);
 
-  // Backward compat: remove from claimed_venue_ids
+  // Backward compat: remove from claimed_artist_ids
   const { data: targetProfile } = await adminClient
     .from('profiles')
-    .select('claimed_venue_ids')
+    .select('claimed_artist_ids')
     .eq('id', targetUserId)
     .single();
 
-  const updated = (targetProfile?.claimed_venue_ids || []).filter((id: string) => id !== venueId);
+  const updated = (targetProfile?.claimed_artist_ids || []).filter((id: string) => id !== artistId);
   await adminClient
     .from('profiles')
-    .update({ claimed_venue_ids: updated })
+    .update({ claimed_artist_ids: updated })
     .eq('id', targetUserId);
 
   return NextResponse.json({ success: true });
