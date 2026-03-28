@@ -1,10 +1,51 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/components/AuthProvider';
+import { createClient } from '@/utils/supabase/client';
+import BillingPanel from '@/components/billing/BillingPanel';
 import FadeUp from '@/components/animations/FadeUp';
 
-export default function ArtistBillingPage() {
+export default function ArtistBillingPage({ params }: { params: Promise<{ slug: string }> }) {
   const t = useTranslations('artistStudio');
+  const { user } = useAuth();
+  const [slug, setSlug] = useState('');
+  const [role, setRole] = useState<string | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    params.then((p) => setSlug(decodeURIComponent(p.slug)));
+  }, [params]);
+
+  useEffect(() => {
+    if (!slug || !user) return;
+    const supabase = createClient();
+    supabase
+      .from('team_members')
+      .select('role')
+      .eq('entity_type', 'artist')
+      .eq('entity_id', slug)
+      .eq('user_id', user.id)
+      .eq('status', 'accepted')
+      .single()
+      .then(({ data }) => {
+        setRole(data?.role ?? null);
+        setChecking(false);
+      });
+  }, [slug, user]);
+
+  if (!slug || checking) {
+    return (
+      <div className="py-24 text-center">
+        <div className="w-6 h-6 border-2 border-[var(--color-gold)]/30 border-t-[var(--color-gold)] rounded-full animate-spin mx-auto" />
+      </div>
+    );
+  }
+
+  if (role === 'owner' || role === 'admin') {
+    return <BillingPanel entityType="artist" entityId={slug} t={t} />;
+  }
 
   return (
     <div className="space-y-6">
