@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -25,7 +25,10 @@ const NAV_ITEMS = [
   { key: 'reports', icon: 'flag', path: '/reports' },
   { key: 'financials', icon: 'dollar', path: '/financials' },
   { key: 'subscriptions', icon: 'credit', path: '/subscriptions' },
-] as const;
+];
+
+const NAV_STORAGE_KEY = 'shark-hq-nav-order';
+const DEFAULT_NAV_ORDER = NAV_ITEMS.map((i) => i.key);
 
 function NavIcon({ icon, className }: { icon: string; className?: string }) {
   const c = className || 'w-5 h-5';
@@ -165,6 +168,52 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
   const { user, profile, loading } = useAuth();
   const { token } = useAdmin();
   const [unreadCount, setUnreadCount] = useState(0);
+  const [navOrder, setNavOrder] = useState<string[]>(DEFAULT_NAV_ORDER);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const dragItem = useRef<number | null>(null);
+  const dragOverItem = useRef<number | null>(null);
+
+  // Load saved nav order from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(NAV_STORAGE_KEY);
+      if (!saved) return;
+      const parsed: string[] = JSON.parse(saved);
+      const merged = parsed.filter((k) => DEFAULT_NAV_ORDER.includes(k));
+      for (const k of DEFAULT_NAV_ORDER) {
+        if (!merged.includes(k)) merged.push(k);
+      }
+      setNavOrder(merged);
+    } catch {}
+  }, []);
+
+  const orderedNavItems = navOrder
+    .map((key) => NAV_ITEMS.find((i) => i.key === key))
+    .filter(Boolean) as typeof NAV_ITEMS[number][];
+
+  const handleDragStart = (index: number) => {
+    dragItem.current = index;
+    setDragIndex(index);
+  };
+
+  const handleDragEnter = (index: number) => {
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    const from = dragItem.current;
+    const to = dragOverItem.current;
+    if (from !== null && to !== null && from !== to) {
+      const newOrder = [...navOrder];
+      const [moved] = newOrder.splice(from, 1);
+      newOrder.splice(to, 0, moved);
+      setNavOrder(newOrder);
+      localStorage.setItem(NAV_STORAGE_KEY, JSON.stringify(newOrder));
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+    setDragIndex(null);
+  };
 
   // Redirect non-owner users
   useEffect(() => {
@@ -230,26 +279,44 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
 
           {/* Navigation */}
           <nav className="space-y-1">
-            {NAV_ITEMS.map((item) => {
+            {orderedNavItems.map((item, i) => {
               const active = isActive(item.path);
+              const isDragging = dragIndex === i;
               return (
-                <Link
+                <div
                   key={item.key}
-                  href={basePath + item.path}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
-                    active
-                      ? 'bg-red-400/10 text-red-400 font-semibold'
-                      : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
-                  }`}
+                  draggable
+                  onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; handleDragStart(i); }}
+                  onDragEnter={() => handleDragEnter(i)}
+                  onDragEnd={handleDragEnd}
+                  onDragOver={(e) => e.preventDefault()}
+                  className={`group relative transition-opacity ${isDragging ? 'opacity-30' : ''}`}
                 >
-                  <NavIcon icon={item.icon} />
-                  <span>{t(item.key)}</span>
-                  {item.key === 'inbox' && unreadCount > 0 && (
-                    <span className="ml-auto bg-red-400 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                      {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                  )}
-                </Link>
+                  {/* Grip handle */}
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 opacity-0 group-hover:opacity-25 transition-opacity cursor-grab pointer-events-none">
+                    <svg className="w-2.5 h-3.5" viewBox="0 0 6 14" fill="currentColor">
+                      <circle cx="1.5" cy="2" r="1.2"/><circle cx="4.5" cy="2" r="1.2"/>
+                      <circle cx="1.5" cy="7" r="1.2"/><circle cx="4.5" cy="7" r="1.2"/>
+                      <circle cx="1.5" cy="12" r="1.2"/><circle cx="4.5" cy="12" r="1.2"/>
+                    </svg>
+                  </span>
+                  <Link
+                    href={basePath + item.path}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all ${
+                      active
+                        ? 'bg-red-400/10 text-red-400 font-semibold'
+                        : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[var(--muted)]'
+                    }`}
+                  >
+                    <NavIcon icon={item.icon} />
+                    <span>{t(item.key)}</span>
+                    {item.key === 'inbox' && unreadCount > 0 && (
+                      <span className="ml-auto bg-red-400 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                        {unreadCount > 99 ? '99+' : unreadCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
               );
             })}
           </nav>
@@ -265,7 +332,7 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
             </p>
           </div>
           <div className="flex items-center gap-2 px-4 py-1.5 overflow-x-auto no-scrollbar">
-            {NAV_ITEMS.map((item) => {
+            {orderedNavItems.map((item) => {
               const active = isActive(item.path);
               return (
                 <Link
