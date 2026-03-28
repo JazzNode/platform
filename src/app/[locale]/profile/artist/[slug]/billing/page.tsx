@@ -22,7 +22,7 @@ export default function ArtistBillingPage({ params }: { params: Promise<{ slug: 
     if (!slug || !user) return;
     const supabase = createClient();
 
-    // Check team_members first, then fallback to claimed_artist_ids / platform admin
+    // team_members first
     supabase
       .from('team_members')
       .select('role')
@@ -32,22 +32,19 @@ export default function ArtistBillingPage({ params }: { params: Promise<{ slug: 
       .eq('status', 'accepted')
       .single()
       .then(async ({ data: membership }) => {
-        if (membership?.role) {
-          setRole(membership.role);
+        if (membership?.role === 'owner') {
+          setRole('owner');
           setChecking(false);
           return;
         }
-        // Fallback: claimed_artist_ids or platform admin
+        // Fallback: claimed_artist_ids
         const { data: profile } = await supabase
           .from('profiles')
-          .select('claimed_artist_ids, role')
+          .select('claimed_artist_ids')
           .eq('id', user.id)
           .single();
 
-        const isPlatformAdmin = ['admin', 'owner'].includes(profile?.role ?? '');
-        const isClaimed = profile?.claimed_artist_ids?.includes(slug);
-
-        setRole(isPlatformAdmin || isClaimed ? 'owner' : null);
+        setRole(profile?.claimed_artist_ids?.includes(slug) ? 'owner' : null);
         setChecking(false);
       });
   }, [slug, user]);
