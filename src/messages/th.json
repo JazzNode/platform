@@ -883,7 +883,7 @@
     "vf_bookingManagement": "แดชบอร์ดจัดการการจอง",
     "vf_revenueAnalytics": "วิเคราะห์รายได้",
     "vf_multiLocation": "จัดการหลายสาขา",
-    "vf_icalApi": "ส่งออก iCal / API",
+    "vf_calendarFeed": "สมัครสมาชิกปฏิทิน iCal",
     "inbox": "กล่องข้อความ",
     "members": "สมาชิก",
     "inboxTitle": "กล่องข้อความ HQ",
@@ -1004,7 +1004,7 @@
     "vf_eventPromoCustomDesc": "หน้าโปรโมทแบบมีแบรนด์เต็มรูปแบบพร้อมข้อความกำหนดเอง อัปโหลดโปสเตอร์ และลิงก์ตั๋ว",
     "vf_revenueAnalyticsDesc": "ติดตามยอดขายตั๋ว รายรับหน้าประตู และรายได้ต่อการแสดง",
     "vf_multiLocationDesc": "จัดการหลายสาขาจากแดชบอร์ดเดียว",
-    "vf_icalApiDesc": "ซิงค์ตารางกับปฏิทินภายนอกและเครื่องมือของบุคคลที่สาม"
+    "vf_calendarFeedDesc": "แฟนๆ สามารถสมัครสมาชิกตารางกิจกรรมของคุณใน Google Calendar, Apple Calendar ฯลฯ"
   },
   "claim": {
     "claimPage": "ยืนยันตัวตน",
@@ -1346,7 +1346,7 @@
     "venueBookingManagement": "แดชบอร์ดจัดการการจอง",
     "venueRevenueAnalytics": "วิเคราะห์รายได้",
     "venueMultiLocation": "จัดการหลายสาขา",
-    "venueIcalApi": "ส่งออก iCal / API",
+    "venueCalendarFeed": "สมัครสมาชิกปฏิทิน iCal",
     "ctaTitle": "พร้อมอัปเลเวลหรือยัง?",
     "ctaDesc": "เคลมหน้าศิลปินหรือสถานที่ของคุณฟรี และอัปเกรดเมื่อไหร่ก็ได้เพื่อปลดล็อกเครื่องมือทั้งหมด",
     "ctaButton": "สำรวจศิลปิน",
@@ -1410,7 +1410,7 @@
     "venueBookingManagementDesc": "จัดการการจองศิลปิน สัญญา และตารางงานในที่เดียว",
     "venueRevenueAnalyticsDesc": "ติดตามยอดขายตั๋ว รายรับหน้าประตู และรายได้ต่อการแสดง",
     "venueMultiLocationDesc": "จัดการหลายสาขาจากแดชบอร์ดเดียว",
-    "venueIcalApiDesc": "ซิงค์ตารางกับปฏิทินภายนอกและเครื่องมือของบุคคลที่สาม"
+    "venueCalendarFeedDesc": "แฟนๆ สามารถสมัครสมาชิกตารางกิจกรรมของคุณใน Google Calendar, Apple Calendar ฯลฯ"
   },
   "dashboardComments": {
     "title": "ความคิดเห็น",

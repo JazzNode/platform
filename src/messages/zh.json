@@ -1546,8 +1546,8 @@
     "venueRevenueAnalyticsDesc": "追蹤售票、門票收入與單場演出營收。",
     "venueMultiLocation": "多據點管理",
     "venueMultiLocationDesc": "從單一儀表板管理多個場地據點。",
-    "venueIcalApi": "iCal / API 匯出",
-    "venueIcalApiDesc": "與外部行事曆和第三方工具同步你的排程。",
+    "venueCalendarFeed": "iCal 日曆訂閱",
+    "venueCalendarFeedDesc": "粉絲可在 Google 日曆、Apple 日曆等訂閱你的活動排程。",
     "ctaTitle": "準備好升級了嗎？",
     "ctaDesc": "免費認領你的藝人或場地頁面，隨時升級解鎖完整工具套件。",
     "ctaButton": "探索藝人"

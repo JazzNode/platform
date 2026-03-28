@@ -258,7 +258,7 @@ function buildVenueSection(
           { name: t('venueTicketing'), desc: t('venueTicketingDesc'), tiers: tierRow(features, 'ticketing', visible) },
           { name: t('venueRevenueAnalytics'), desc: t('venueRevenueAnalyticsDesc'), tiers: tierRow(features, 'revenue_analytics', visible) },
           { name: t('venueMultiLocation'), desc: t('venueMultiLocationDesc'), tiers: tierRow(features, 'multi_location', visible) },
-          { name: t('venueIcalApi'), desc: t('venueIcalApiDesc'), tiers: tierRow(features, 'ical_api', visible) },
+          { name: t('venueCalendarFeed'), desc: t('venueCalendarFeedDesc'), tiers: tierRow(features, 'calendar_feed', visible) },
         ],
       },
     ],

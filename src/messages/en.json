@@ -1545,8 +1545,8 @@
     "venueRevenueAnalyticsDesc": "Track ticket sales, door revenue, and performance-level earnings.",
     "venueMultiLocation": "Multi-location management",
     "venueMultiLocationDesc": "Manage multiple venue locations from a single dashboard.",
-    "venueIcalApi": "iCal / API export",
-    "venueIcalApiDesc": "Sync your schedule with external calendars and third-party tools.",
+    "venueCalendarFeed": "iCal calendar feed",
+    "venueCalendarFeedDesc": "Fans can subscribe to your event schedule in Google Calendar, Apple Calendar, etc.",
     "ctaTitle": "Ready to Level Up?",
     "ctaDesc": "Claim your artist or venue page for free, and upgrade anytime to unlock the full suite of tools.",
     "ctaButton": "Explore Artists"

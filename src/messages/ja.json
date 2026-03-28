@@ -883,7 +883,7 @@
     "vf_bookingManagement": "ブッキング管理ダッシュボード",
     "vf_revenueAnalytics": "収益分析",
     "vf_multiLocation": "マルチロケーション管理",
-    "vf_icalApi": "iCal / APIエクスポート",
+    "vf_calendarFeed": "iCalカレンダー購読",
     "inbox": "受信トレイ",
     "members": "メンバー",
     "inboxTitle": "HQ 受信トレイ",
@@ -1004,7 +1004,7 @@
     "vf_eventPromoCustomDesc": "カスタムコピー、ポスターアップロード、チケットリンク連携付きのフルブランドプロモページ。",
     "vf_revenueAnalyticsDesc": "チケット販売、入場収益、公演別収益を追跡できます。",
     "vf_multiLocationDesc": "単一のダッシュボードから複数の会場を管理できます。",
-    "vf_icalApiDesc": "外部カレンダーやサードパーティツールとスケジュールを同期できます。"
+    "vf_calendarFeedDesc": "ファンがGoogleカレンダーやAppleカレンダーなどでイベントスケジュールを購読できます。"
   },
   "claim": {
     "claimPage": "認証申請",
@@ -1346,7 +1346,7 @@
     "venueBookingManagement": "予約管理ダッシュボード",
     "venueRevenueAnalytics": "収益分析",
     "venueMultiLocation": "マルチロケーション管理",
-    "venueIcalApi": "iCal / APIエクスポート",
+    "venueCalendarFeed": "iCalカレンダー購読",
     "ctaTitle": "レベルアップしませんか？",
     "ctaDesc": "アーティストや会場ページを無料でクレームし、いつでもアップグレードしてすべてのツールを解放できます。",
     "ctaButton": "アーティストを探す",
@@ -1410,7 +1410,7 @@
     "venueBookingManagementDesc": "アーティストのブッキング、契約、スケジュールを一元管理できます。",
     "venueRevenueAnalyticsDesc": "チケット販売、入場収益、公演別収益を追跡できます。",
     "venueMultiLocationDesc": "単一のダッシュボードから複数の会場を管理できます。",
-    "venueIcalApiDesc": "外部カレンダーやサードパーティツールとスケジュールを同期できます。"
+    "venueCalendarFeedDesc": "ファンがGoogleカレンダーやAppleカレンダーなどでイベントスケジュールを購読できます。"
   },
   "dashboardComments": {
     "title": "コメント",

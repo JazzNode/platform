@@ -883,7 +883,7 @@
     "vf_bookingManagement": "Dasbor manajemen booking",
     "vf_revenueAnalytics": "Analitik pendapatan",
     "vf_multiLocation": "Manajemen multi-lokasi",
-    "vf_icalApi": "Ekspor iCal / API",
+    "vf_calendarFeed": "Langganan kalender iCal",
     "inbox": "Kotak Masuk",
     "members": "Anggota",
     "inboxTitle": "Kotak Masuk HQ",
@@ -1004,7 +1004,7 @@
     "vf_eventPromoCustomDesc": "Halaman promo bermerek penuh dengan teks kustom, unggah poster, dan integrasi tautan tiket.",
     "vf_revenueAnalyticsDesc": "Pantau penjualan tiket, pendapatan pintu masuk, dan penghasilan per pertunjukan.",
     "vf_multiLocationDesc": "Kelola beberapa lokasi venue dari satu dasbor.",
-    "vf_icalApiDesc": "Sinkronkan jadwal Anda dengan kalender eksternal dan alat pihak ketiga."
+    "vf_calendarFeedDesc": "Penggemar dapat berlangganan jadwal acara Anda di Google Calendar, Apple Calendar, dll."
   },
   "claim": {
     "claimPage": "Klaim",
@@ -1346,7 +1346,7 @@
     "venueBookingManagement": "Dasbor manajemen booking",
     "venueRevenueAnalytics": "Analitik pendapatan",
     "venueMultiLocation": "Manajemen multi-lokasi",
-    "venueIcalApi": "Ekspor iCal / API",
+    "venueCalendarFeed": "Langganan kalender iCal",
     "ctaTitle": "Siap Naik Level?",
     "ctaDesc": "Klaim halaman artis atau tempat Anda secara gratis, dan upgrade kapan saja untuk membuka semua fitur.",
     "ctaButton": "Jelajahi Artis",
@@ -1410,7 +1410,7 @@
     "venueBookingManagementDesc": "Kelola booking artis, kontrak, dan penjadwalan dalam satu tempat.",
     "venueRevenueAnalyticsDesc": "Pantau penjualan tiket, pendapatan pintu masuk, dan penghasilan per pertunjukan.",
     "venueMultiLocationDesc": "Kelola beberapa lokasi venue dari satu dasbor.",
-    "venueIcalApiDesc": "Sinkronkan jadwal Anda dengan kalender eksternal dan alat pihak ketiga."
+    "venueCalendarFeedDesc": "Penggemar dapat berlangganan jadwal acara Anda di Google Calendar, Apple Calendar, dll."
   },
   "dashboardComments": {
     "title": "Komentar",
