@@ -265,6 +265,18 @@ export default function Header() {
         )}
         {profile?.role && ['editor', 'moderator', 'marketing', 'admin', 'owner'].includes(profile.role) && (
           <div className="border-t border-[var(--border)] py-1">
+            {profile?.role === 'owner' && (
+              <button
+                onClick={() => { router.push(`/${locale}/owner`); setUserMenuOpen(false); }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-red-400 hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+              >
+                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 12c1-3 4-7 10-7 2 0 3.5.5 5 1.5L22 4l-2 5c1 1.5 1.5 3 1 5-1 3-4 5-8 5-3 0-5.5-1-7-3l-2 1 1-3C3.5 13 2.5 12.5 2 12z" />
+                  <circle cx="17" cy="9" r="1" fill="currentColor" />
+                </svg>
+                <span className="flex-1">SHARK HQ</span>
+              </button>
+            )}
             <button
               onClick={() => { router.push(`/${locale}/admin`); setUserMenuOpen(false); }}
               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
@@ -281,17 +293,6 @@ export default function Header() {
                 </span>
               )}
             </button>
-            {profile?.role === 'owner' && (
-              <button
-                onClick={() => { router.push(`/${locale}/owner`); setUserMenuOpen(false); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-red-400 hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
-              >
-                <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                <span className="flex-1">SHARK HQ</span>
-              </button>
-            )}
           </div>
         )}
         <div className={hasClaimed ? 'border-t border-[var(--border)]' : ''}>

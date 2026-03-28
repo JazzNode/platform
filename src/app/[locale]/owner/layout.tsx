@@ -209,7 +209,8 @@ export default function OwnerLayout({ children }: { children: React.ReactNode })
             <div className="flex items-center gap-3 mb-1">
               <div className="w-10 h-10 rounded-full bg-red-500/15 flex items-center justify-center">
                 <svg className="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  <path d="M2 12c1-3 4-7 10-7 2 0 3.5.5 5 1.5L22 4l-2 5c1 1.5 1.5 3 1 5-1 3-4 5-8 5-3 0-5.5-1-7-3l-2 1 1-3C3.5 13 2.5 12.5 2 12z" />
+                  <circle cx="17" cy="9" r="1" fill="currentColor" />
                 </svg>
               </div>
               <div className="min-w-0">
