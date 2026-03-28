@@ -9,6 +9,8 @@ const LANG_INSTRUCTIONS: Record<string, string> = {
   en: 'Write the report in English.',
   ja: '日本語でレポートを作成してください。です/ます体で。',
   ko: '한국어로 보고서를 작성해주세요. 합니다체로.',
+  th: 'กรุณาเขียนรายงานเป็นภาษาไทย ใช้ภาษาเขียนที่เป็นทางการ',
+  id: 'Tulis laporan dalam Bahasa Indonesia.',
 };
 
 /**
@@ -155,13 +157,9 @@ export async function GET(req: NextRequest) {
 
   // Detect locale: prefer artist's locale, fallback to Accept-Language
   const acceptLang = req.headers.get('accept-language') || '';
-  const locale = artist.locale?.startsWith('ja') ? 'ja'
-    : artist.locale?.startsWith('ko') ? 'ko'
-    : artist.locale?.startsWith('en') ? 'en'
-    : acceptLang.startsWith('ja') ? 'ja'
-    : acceptLang.startsWith('ko') ? 'ko'
-    : acceptLang.startsWith('en') ? 'en'
-    : 'zh';
+  const detectLocale = (lang: string | null | undefined) =>
+    lang?.startsWith('ja') ? 'ja' : lang?.startsWith('ko') ? 'ko' : lang?.startsWith('th') ? 'th' : lang?.startsWith('id') ? 'id' : lang?.startsWith('en') ? 'en' : null;
+  const locale = detectLocale(artist.locale) || detectLocale(acceptLang) || 'zh';
   const langInstruction = LANG_INSTRUCTIONS[locale] || LANG_INSTRUCTIONS.zh;
 
   const artistName = artist.display_name || artist.name_local || artist.name_en || artistId;
