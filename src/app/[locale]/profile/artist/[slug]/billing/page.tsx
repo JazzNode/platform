@@ -21,6 +21,8 @@ export default function ArtistBillingPage({ params }: { params: Promise<{ slug: 
   useEffect(() => {
     if (!slug || !user) return;
     const supabase = createClient();
+
+    // Check team_members first, then fallback to claimed_artist_ids / platform admin
     supabase
       .from('team_members')
       .select('role')
@@ -29,8 +31,23 @@ export default function ArtistBillingPage({ params }: { params: Promise<{ slug: 
       .eq('user_id', user.id)
       .eq('status', 'accepted')
       .single()
-      .then(({ data }) => {
-        setRole(data?.role ?? null);
+      .then(async ({ data: membership }) => {
+        if (membership?.role) {
+          setRole(membership.role);
+          setChecking(false);
+          return;
+        }
+        // Fallback: claimed_artist_ids or platform admin
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('claimed_artist_ids, role')
+          .eq('id', user.id)
+          .single();
+
+        const isPlatformAdmin = ['admin', 'owner'].includes(profile?.role ?? '');
+        const isClaimed = profile?.claimed_artist_ids?.includes(slug);
+
+        setRole(isPlatformAdmin || isClaimed ? 'owner' : null);
         setChecking(false);
       });
   }, [slug, user]);
