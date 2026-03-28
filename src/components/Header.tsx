@@ -209,7 +209,7 @@ export default function Header() {
         </div>
         <button
           onClick={() => { router.push(`/${locale}/profile`); setUserMenuOpen(false); }}
-          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+          className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <circle cx="12" cy="8" r="4" />
@@ -228,7 +228,7 @@ export default function Header() {
               <button
                 key={a.id}
                 onClick={() => { router.push(`/${locale}/profile/artist/${encodeURIComponent(a.id)}`); setUserMenuOpen(false); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
               >
                 <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 18V5l12-2v13" />
@@ -247,7 +247,7 @@ export default function Header() {
               <button
                 key={v.id}
                 onClick={() => { router.push(`/${locale}/profile/venue/${encodeURIComponent(v.id)}`); setUserMenuOpen(false); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
               >
                 <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -268,7 +268,7 @@ export default function Header() {
             {profile?.role === 'owner' && (
               <button
                 onClick={() => { router.push(`/${locale}/owner`); setUserMenuOpen(false); }}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-red-400 hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-[var(--muted-foreground)] hover:text-red-400 hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
               >
                 <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M2 12c1-3 4-7 10-7 2 0 3.5.5 5 1.5L22 4l-2 5c1 1.5 1.5 3 1 5-1 3-4 5-8 5-3 0-5.5-1-7-3l-2 1 1-3C3.5 13 2.5 12.5 2 12z" />
@@ -279,7 +279,7 @@ export default function Header() {
             )}
             <button
               onClick={() => { router.push(`/${locale}/admin`); setUserMenuOpen(false); }}
-              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-left text-[var(--muted-foreground)] hover:text-[var(--color-gold)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
             >
               <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
@@ -298,7 +298,7 @@ export default function Header() {
         <div className={hasClaimed ? 'border-t border-[var(--border)]' : ''}>
           <button
             onClick={() => { signOut(); setUserMenuOpen(false); }}
-            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
+            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left text-[var(--muted-foreground)] hover:text-[var(--foreground)] hover:bg-[rgba(240,237,230,0.06)] transition-colors duration-200"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
