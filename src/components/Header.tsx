@@ -401,7 +401,7 @@ export default function Header() {
           })()}
         </button>
         {userMenuOpen && !mobile && (
-          <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+          <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50 text-left">
             {renderUserMenuContent()}
           </div>
         )}
@@ -507,7 +507,7 @@ export default function Header() {
               {renderUserButton(true)}
               {/* Mobile user menu — rendered here so ref catches outside clicks */}
               {user && userMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
+                <div className="absolute right-0 top-full mt-2 min-w-[200px] rounded-xl bg-[var(--card)] border border-[var(--border)] shadow-xl py-2 animate-in fade-in slide-in-from-top-2 duration-200 z-50 text-left">
                   {renderUserMenuContent()}
                 </div>
               )}
