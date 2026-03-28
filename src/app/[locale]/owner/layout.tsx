@@ -10,6 +10,7 @@ import { useAdmin } from '@/components/AdminProvider';
 const NAV_ITEMS = [
   { key: 'overview', icon: 'chart', path: '' },
   { key: 'analytics', icon: 'trend', path: '/analytics' },
+  { key: 'aiReport', icon: 'brain', path: '/ai-report' },
   { key: 'seo', icon: 'search', path: '/seo' },
   { key: 'newEvents', icon: 'sparkle', path: '/new-events' },
   { key: 'inbox', icon: 'bell', path: '/inbox' },
@@ -39,6 +40,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
       return (
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      );
+    case 'brain':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9.5 2a2.5 2.5 0 0 1 2.45 2H13a4 4 0 0 1 4 4v.5a2.5 2.5 0 0 1 0 5V14a4 4 0 0 1-4 4h-1.05A2.5 2.5 0 0 1 7 20H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4h.5A2.5 2.5 0 0 1 9.5 2z" />
+          <path d="M9 12h6M12 9v6" />
         </svg>
       );
     case 'search':
