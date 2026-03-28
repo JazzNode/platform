@@ -21,6 +21,8 @@ interface Notification {
   created_at: string;
 }
 
+type HQStatus = 'pending' | 'replied' | null;
+
 interface HQConversation {
   id: string;
   fan_user_id: string;
@@ -30,6 +32,7 @@ interface HQConversation {
   unread_count: number;
   last_message: string | null;
   last_message_at: string;
+  hq_status: HQStatus;
 }
 
 interface GuestContact {
@@ -256,6 +259,28 @@ export default function AdminInboxPage() {
     }
   }, [selectedConvo, fetchMessages]);
 
+  // Update conversation hq_status
+  const updateConvoStatus = useCallback(async (convoId: string, hq_status: HQStatus) => {
+    if (!token) return;
+    // Optimistic update
+    setConversations((prev) => prev.map((c) => c.id === convoId ? { ...c, hq_status } : c));
+    try {
+      await fetch('/api/admin/conversations', {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ conversationId: convoId, hq_status }),
+      });
+    } catch (err) {
+      console.error('Failed to update status:', err);
+    }
+  }, [token]);
+
+  // Cycle status: null → pending → replied → null
+  const cycleStatus = useCallback((convoId: string, current: HQStatus) => {
+    const next: HQStatus = current === null ? 'pending' : current === 'pending' ? 'replied' : null;
+    updateConvoStatus(convoId, next);
+  }, [updateConvoStatus]);
+
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -346,6 +371,10 @@ export default function AdminInboxPage() {
       if (data.message) {
         setMessages((prev) => [...prev, { ...data.message, sender_display: 'You' }]);
         setNewMessage('');
+        // Auto-mark conversation as replied
+        if (selectedConvo) {
+          setConversations((prev) => prev.map((c) => c.id === selectedConvo ? { ...c, hq_status: 'replied' as HQStatus } : c));
+        }
       } else {
         console.error('Send message failed:', data);
         alert('Failed to send message');
@@ -536,43 +565,71 @@ export default function AdminInboxPage() {
                       </button>
                     ))}
                     {/* Member HQ conversations */}
-                    {conversations.map((convo) => (
-                      <button
-                        key={convo.id}
-                        onClick={() => { setSelectedConvo(convo.id); setSelectedGuest(null); }}
-                        className={`w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${
-                          selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          {convo.user_avatar ? (
-                            <Image src={convo.user_avatar} alt="" width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                          ) : (
-                            <div className="w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0">
-                              {(convo.user_display || '?').charAt(0)}
-                            </div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5 min-w-0">
-                                <p className="text-sm font-semibold truncate">{convo.user_display || 'Unknown'}</p>
-                                {convo.is_vip && (
-                                  <span className="shrink-0 text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-400/15 text-amber-400 border border-amber-400/25 uppercase tracking-wider">
-                                    VIP
-                                  </span>
-                                )}
+                    {conversations.map((convo) => {
+                      const isRead = convo.unread_count === 0 && !convo.hq_status;
+                      return (
+                        <button
+                          key={convo.id}
+                          onClick={() => { setSelectedConvo(convo.id); setSelectedGuest(null); }}
+                          className={`group w-full text-left px-4 py-3 border-b border-[var(--border)] hover:bg-[var(--muted)] transition-colors ${
+                            selectedConvo === convo.id ? 'bg-[var(--muted)]' : ''
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {convo.user_avatar ? (
+                              <Image src={convo.user_avatar} alt="" width={36} height={36} className={`w-9 h-9 rounded-full object-cover shrink-0 ${isRead ? 'opacity-60' : ''}`} />
+                            ) : (
+                              <div className={`w-9 h-9 rounded-full bg-[var(--background)] flex items-center justify-center text-xs text-[var(--muted-foreground)] shrink-0 ${isRead ? 'opacity-60' : ''}`}>
+                                {(convo.user_display || '?').charAt(0)}
                               </div>
-                              {convo.unread_count > 0 && (
-                                <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
-                                  {convo.unread_count}
-                                </span>
-                              )}
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  <p className={`text-sm font-semibold truncate ${isRead ? 'opacity-50' : ''}`}>{convo.user_display || 'Unknown'}</p>
+                                  {convo.is_vip && (
+                                    <span className="shrink-0 text-[9px] px-1.5 py-0.5 rounded font-bold bg-amber-400/15 text-amber-400 border border-amber-400/25 uppercase tracking-wider">
+                                      VIP
+                                    </span>
+                                  )}
+                                </div>
+                                {/* Status badge */}
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); cycleStatus(convo.id, convo.hq_status); }}
+                                  title="切換狀態"
+                                  className="shrink-0"
+                                >
+                                  {convo.unread_count > 0 && !convo.hq_status ? (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-[var(--color-gold)]/10 text-[var(--color-gold)] border-[var(--color-gold)]/30 hover:bg-[var(--color-gold)]/20 transition-colors">
+                                      未讀
+                                    </span>
+                                  ) : convo.hq_status === 'pending' ? (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-amber-400/10 text-amber-400 border-amber-400/30 hover:bg-amber-400/20 transition-colors">
+                                      待處理
+                                    </span>
+                                  ) : convo.hq_status === 'replied' ? (
+                                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-emerald-400/10 text-emerald-400 border-emerald-400/30 hover:bg-emerald-400/20 transition-colors">
+                                      已回覆
+                                    </span>
+                                  ) : (
+                                    /* Read + no status: show faint tag icon on hover */
+                                    <span className="opacity-0 group-hover:opacity-40 transition-opacity text-[var(--muted-foreground)]">
+                                      <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                                        <line x1="7" y1="7" x2="7.01" y2="7"/>
+                                      </svg>
+                                    </span>
+                                  )}
+                                </button>
+                              </div>
+                              <p className={`text-xs truncate mt-0.5 ${isRead ? 'text-[var(--muted-foreground)]/40' : 'text-[var(--muted-foreground)]'}`}>
+                                {convo.last_message || '...'}
+                              </p>
                             </div>
-                            <p className="text-xs text-[var(--muted-foreground)] truncate">{convo.last_message || '...'}</p>
                           </div>
-                        </div>
-                      </button>
-                    ))}
+                        </button>
+                      );
+                    })}
                   </>
                 )}
               </div>

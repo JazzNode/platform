@@ -138,6 +138,34 @@ export async function GET(request: NextRequest) {
 }
 
 /**
+ * PATCH /api/admin/conversations — Update hq_status for a conversation
+ */
+export async function PATCH(request: NextRequest) {
+  const { isHQ, role } = await verifyHQToken(request.headers.get('authorization'));
+  if (!isHQ || !hasPermission(role, ['admin', 'editor', 'moderator', 'owner'])) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const { conversationId, hq_status } = await request.json();
+  if (!conversationId) {
+    return NextResponse.json({ error: 'Missing conversationId' }, { status: 400 });
+  }
+  if (hq_status !== null && hq_status !== 'pending' && hq_status !== 'replied') {
+    return NextResponse.json({ error: 'Invalid hq_status' }, { status: 400 });
+  }
+
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from('conversations')
+    .update({ hq_status: hq_status ?? null })
+    .eq('id', conversationId)
+    .eq('type', 'member_hq');
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}
+
+/**
  * POST /api/admin/conversations/:id/messages — Admin sends a message in a member_hq conversation
  * (Using POST on the conversations route with conversation_id in body)
  */
@@ -179,10 +207,10 @@ export async function POST(request: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Update conversation last_message_at
+  // Update conversation last_message_at + auto-mark as replied
   await supabase
     .from('conversations')
-    .update({ last_message_at: new Date().toISOString() })
+    .update({ last_message_at: new Date().toISOString(), hq_status: 'replied' })
     .eq('id', conversationId);
 
   return NextResponse.json({ message: msg });
