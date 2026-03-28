@@ -26,6 +26,7 @@ const NAV_ITEMS = [
   { key: 'inbox', icon: 'inbox', path: '/inbox', tier: 1 },
   { key: 'comments', icon: 'comments', path: '/comments', tier: 1 },
   { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
+  { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 2 — Premium
   { key: 'schedule', icon: 'calendar', path: '/schedule', tier: 2 },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
@@ -33,10 +34,9 @@ const NAV_ITEMS = [
   { key: 'merchandise', icon: 'shopping', path: '/merchandise', tier: 2 },
   { key: 'backline', icon: 'backline', path: '/backline', tier: 2 },
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 2 }, // analytics_basic=2, analytics_advanced=2
-  { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'embed', icon: 'code', path: '/embed', tier: 2 },
-  { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 3 — Elite
+  { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'branding', icon: 'palette', path: '/branding', tier: 3 },
   { key: 'domain', icon: 'globe', path: '/domain', tier: 3 },
 ] as const;

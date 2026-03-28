@@ -27,13 +27,13 @@ const NAV_ITEMS = [
   { key: 'shoutouts', icon: 'shoutouts', path: '/shoutouts', tier: 1 },
   { key: 'gear', icon: 'guitar', path: '/gear', tier: 1 },           // gear_showcase=1, gear_unlimited=2
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 1 }, // analytics_basic=1, analytics_advanced=3
-  { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
   { key: 'team', icon: 'team', path: '/team', tier: 1 },
   // Tier 2 — Premium
   { key: 'featuredWall', icon: 'star', path: '/featured-wall', tier: 2 },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
   // Tier 3 — Elite
+  { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'fans', icon: 'fans', path: '/fans', tier: 3 },
   { key: 'collaborations', icon: 'network', path: '/collaborations', tier: 3 },
   { key: 'branding', icon: 'palette', path: '/branding', tier: 3 },
