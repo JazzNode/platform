@@ -29,6 +29,7 @@ const NAV_ITEMS = [
   { key: 'analytics', icon: 'analytics', path: '/analytics', tier: 1 }, // analytics_basic=1, analytics_advanced=3
   { key: 'edit', icon: 'edit', path: '/edit', tier: 1 },
   { key: 'team', icon: 'team', path: '/team', tier: 1 },
+  { key: 'billing', icon: 'billing', path: '/billing', tier: 1 },
   // Tier 2 — Premium
   { key: 'featuredWall', icon: 'star', path: '/featured-wall', tier: 2 },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
@@ -166,6 +167,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
           <circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
           <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      );
+    case 'billing':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+          <line x1="1" y1="10" x2="23" y2="10" />
         </svg>
       );
     default:

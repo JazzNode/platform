@@ -134,8 +134,9 @@ async function handlePaymentFailed(
   supabase: ReturnType<typeof createAdminClient>,
   invoice: Stripe.Invoice,
 ) {
-  const sub = invoice.subscription
-    ? await stripe.subscriptions.retrieve(invoice.subscription as string)
+  const subscriptionId = (invoice as any).subscription as string | null;
+  const sub = subscriptionId
+    ? await stripe.subscriptions.retrieve(subscriptionId)
     : null;
 
   const { entityType, entityId } = sub?.metadata ?? {};
