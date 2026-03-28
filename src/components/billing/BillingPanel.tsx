@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
 import FadeUp from '@/components/animations/FadeUp';
 import { createClient } from '@/utils/supabase/client';
@@ -46,6 +47,7 @@ const PRODUCT_TIER: Record<string, number> = {
 
 export default function BillingPanel({ entityType, entityId, t }: BillingPanelProps) {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
 
   const [entity, setEntity] = useState<EntityBilling | null>(null);
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -54,6 +56,14 @@ export default function BillingPanel({ entityType, entityId, t }: BillingPanelPr
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const [portaling, setPortaling] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState(() => {
+    if (typeof window === 'undefined') return '';
+    const p = new URLSearchParams(window.location.search);
+    if (p.get('success') === '1') return 'Subscription activated! Welcome to your new plan.';
+    if (p.get('canceled') === '1') return '';
+    return '';
+  });
+  const wasCanceled = searchParams.get('canceled') === '1';
 
   const isOwner = entity?.billing_user_id === user?.id;
 
@@ -147,6 +157,16 @@ export default function BillingPanel({ entityType, entityId, t }: BillingPanelPr
         <p className="text-sm text-[var(--muted-foreground)] mt-2">{t('billingDescription')}</p>
       </FadeUp>
 
+      {successMsg && (
+        <FadeUp>
+          <div className="bg-emerald-400/10 border border-emerald-400/20 rounded-xl px-4 py-3 text-xs text-emerald-400">{successMsg}</div>
+        </FadeUp>
+      )}
+      {wasCanceled && !successMsg && (
+        <FadeUp>
+          <div className="bg-zinc-400/10 border border-zinc-400/20 rounded-xl px-4 py-3 text-xs text-[var(--muted-foreground)]">Checkout was canceled. No changes were made.</div>
+        </FadeUp>
+      )}
       {error && (
         <FadeUp>
           <div className="bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3 text-xs text-red-400">{error}</div>
