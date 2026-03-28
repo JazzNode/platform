@@ -38,20 +38,17 @@ const TierConfigContext = createContext<TierConfigContextType | null>(null);
 const DEFAULT_ARTIST: TierFeatures = {
   // Tier 0 — full public presence, zero gating
   public_profile: 0, search_listing: 0, event_association: 0,
-  collaboration_graph: 0, follower_count_display: 0, tags_badges: 0, performance_history: 0,
-  social_links: 0,
+  collaboration_graph: 0, follower_count_display: 0, tags_badges: 0,
+  performance_history: 0, social_links: 0,
   // Tier 1 (Claimed) — edit rights + identity + inbox
   edit_profile: 1, verified_badge: 1, custom_bio: 1,
   teaching_section: 1, gear_showcase: 1, epk_basic: 1, analytics_basic: 1, inbox: 1,
-  // Tier 2 (Pro) — reach + basic analytics + AI translation
-  broadcasts: 2, featured_wall: 2, available_for_hire: 2,
-  epk_full: 2, gear_unlimited: 2, ai_translation: 2,
-  // Tier 3 (Elite) — deep insights + brand customization
-  analytics_advanced: 3, fan_insights: 3, post_show_recap: 3, weekly_digest: 3,
-  fan_crm: 3, collaboration_insights: 3, seo_insights: 3,
-  custom_domain: 3, custom_theme: 3, brand_theme: 3,
-  custom_cta: 3, custom_slug: 3, custom_og: 3, calendar_feed: 3,
-  broadcasts_unlimited: 3, monthly_ai_summary: 3,
+  // Tier 2 (Premium) — proactive reach
+  broadcasts: 2, featured_wall: 2, available_for_hire: 2, analytics_advanced: 2,
+  epk_full: 2, gear_unlimited: 2, priority_search: 2,
+  fan_insights: 2, post_show_recap: 2, weekly_digest: 2,
+  // Tier 3 (Elite) — brand independence
+  custom_domain: 3, custom_theme: 3, broadcasts_unlimited: 3, booking_requests: 3,
   epk_branded_pdf: 3, spotlight: 3, data_export: 3,
 };
 
@@ -64,10 +61,10 @@ const DEFAULT_VENUE: TierFeatures = {
   schedule_manager: 2, backline: 2, analytics_basic: 2, analytics_advanced: 2,
   broadcasts: 2, announcements: 2, merchandise: 2, embed_calendar: 2, priority_search: 2,
   fan_insights: 2, post_show_recap: 2, artist_recommendations: 2,
-  weekly_digest: 2,
+  weekly_digest: 2, calendar_feed: 2,
   // Tier 3 (Elite) — business engine + brand customization
   custom_domain: 3, custom_theme: 3, custom_slug: 3, custom_og: 3,
-  seo_insights: 3, monthly_ai_summary: 3, calendar_feed: 3,
+  seo_insights: 3, monthly_ai_summary: 3,
   vip_support: 3, ticketing: 3, broadcasts_unlimited: 3,
   revenue_analytics: 3, multi_location: 3,
 };

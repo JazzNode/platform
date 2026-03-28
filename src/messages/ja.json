@@ -736,6 +736,7 @@
     "magazineTitle": "マガジン管理",
     "magazineDesc": "JazzNode マガジン記事の作成と管理。",
     "released": "リリース",
+    "reports": "通報管理",
     "releasedTitle": "リリースノート",
     "releasedDesc": "Notionから同期された内部リリースノート。",
     "magRecommendedArtists": "おすすめアーティスト",

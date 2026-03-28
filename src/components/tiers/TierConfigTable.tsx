@@ -26,6 +26,12 @@ export interface FeatureKey {
   categoryKey: string;
 }
 
+/** Maps tier index → category key per entity type. Used to dynamically re-categorize features by their current tier value. */
+const TIER_CATEGORY_KEYS: Record<string, string[]> = {
+  artist: ['ac_fanFacing', 'ac_claimed', 'ac_premium', 'ac_elite'],
+  venue: ['vc_fanFacing', 'vc_claimed', 'vc_premium', 'vc_elite'],
+};
+
 interface TierConfigTableProps {
   entityType: 'artist' | 'venue';
   features: FeatureKey[];
@@ -139,7 +145,16 @@ export default function TierConfigTable({
     );
   }
 
-  const categories = [...new Set(FEATURES.map((f) => f.categoryKey))];
+  // Dynamically compute category for each feature based on current tier value
+  const tierCats = TIER_CATEGORY_KEYS[entityType] ?? [];
+  const getDynamicCategory = (feat: FeatureKey): string => {
+    const tier = features[feat.key];
+    if (tier === undefined || tier < 0) return feat.categoryKey; // disabled / unknown → keep original
+    return tierCats[tier] ?? feat.categoryKey;
+  };
+  const categories = tierCats.length > 0
+    ? tierCats.filter((cat) => FEATURES.some((f) => getDynamicCategory(f) === cat))
+    : [...new Set(FEATURES.map((f) => f.categoryKey))];
 
   return (
     <div className="space-y-8 pb-16">
@@ -226,7 +241,7 @@ export default function TierConfigTable({
                     {t(cat)}
                   </td>
                 </tr>
-                {FEATURES.filter((f) => f.categoryKey === cat).map((feat, fi) => {
+                {FEATURES.filter((f) => getDynamicCategory(f) === cat).map((feat, fi) => {
                   const minTier = features[feat.key] ?? 0;
                   const disabled = minTier < 0;
                   const notImpl = NOT_IMPLEMENTED.has(feat.key);

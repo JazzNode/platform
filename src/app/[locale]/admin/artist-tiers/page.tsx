@@ -27,7 +27,7 @@ const ARTIST_FEATURES: FeatureKey[] = [
   { key: 'edit_profile', labelKey: 'af_editProfile', descKey: 'af_editProfileDesc', categoryKey: 'ac_claimed' },
   { key: 'verified_badge', labelKey: 'af_verifiedBadge', descKey: 'af_verifiedBadgeDesc', categoryKey: 'ac_claimed' },
   { key: 'custom_bio', labelKey: 'af_customBio', categoryKey: 'ac_claimed' },
-  { key: 'social_links', labelKey: 'af_socialLinks', categoryKey: 'ac_claimed' },
+  { key: 'social_links', labelKey: 'af_socialLinks', categoryKey: 'ac_fanFacing' },
   { key: 'teaching_section', labelKey: 'af_teachingSection', descKey: 'af_teachingSectionDesc', categoryKey: 'ac_claimed' },
   { key: 'gear_showcase', labelKey: 'af_gearLimited', categoryKey: 'ac_claimed' },
   { key: 'epk_basic', labelKey: 'af_epkBasic', categoryKey: 'ac_claimed' },
