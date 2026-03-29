@@ -61,14 +61,23 @@ export async function POST(req: NextRequest) {
 
   const supabase = createAdminClient();
 
-  // Verify tier >= 3 (Elite)
+  // Verify tier >= 2 (Premium) for custom_slug, tier >= 3 (Elite) for other branding
   const { data: artist } = await supabase
     .from('artists')
     .select('tier')
     .eq('artist_id', artistId)
     .single();
 
-  if (!artist || artist.tier < 3) {
+  if (!artist) {
+    return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
+  }
+
+  // custom_slug only needs Premium (tier 2); everything else needs Elite (tier 3)
+  const slugOnly = Object.keys(fields).length === 1 && 'custom_slug' in fields;
+  if (slugOnly && artist.tier < 2) {
+    return NextResponse.json({ error: 'Premium tier required' }, { status: 403 });
+  }
+  if (!slugOnly && artist.tier < 3) {
     return NextResponse.json({ error: 'Elite tier required' }, { status: 403 });
   }
 

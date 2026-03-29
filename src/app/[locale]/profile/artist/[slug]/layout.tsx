@@ -33,6 +33,7 @@ const NAV_ITEMS = [
   // Tier 2 — Premium
   { key: 'featuredWall', icon: 'star', path: '/featured-wall', tier: 2 },
   { key: 'broadcasts', icon: 'megaphone', path: '/broadcasts', tier: 2 }, // broadcasts=2, broadcasts_unlimited=3
+  { key: 'customSlug', icon: 'link', path: '/custom-slug', tier: 2 },
   // Tier 3 — Elite
   { key: 'aiReport', icon: 'brain', path: '/ai-report', tier: 3 },
   { key: 'fans', icon: 'fans', path: '/fans', tier: 3 },
@@ -174,6 +175,13 @@ function NavIcon({ icon, className }: { icon: string; className?: string }) {
         <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
           <line x1="1" y1="10" x2="23" y2="10" />
+        </svg>
+      );
+    case 'link':
+      return (
+        <svg className={c} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
         </svg>
       );
     default:

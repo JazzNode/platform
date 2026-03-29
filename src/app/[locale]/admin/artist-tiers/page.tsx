@@ -44,6 +44,7 @@ const ARTIST_FEATURES: FeatureKey[] = [
   { key: 'fan_insights', labelKey: 'af_fanInsights', descKey: 'af_fanInsightsDesc', categoryKey: 'ac_premium' },
   { key: 'post_show_recap', labelKey: 'af_postShowRecap', descKey: 'af_postShowRecapDesc', categoryKey: 'ac_premium' },
   { key: 'weekly_digest', labelKey: 'af_weeklyDigest', descKey: 'af_weeklyDigestDesc', categoryKey: 'ac_premium' },
+  { key: 'custom_slug', labelKey: 'af_customSlug', descKey: 'af_customSlugDesc', categoryKey: 'ac_premium' },
   // Tier 3 — Elite (brand independence)
   { key: 'custom_domain', labelKey: 'af_customDomain', descKey: 'af_customDomainDesc', categoryKey: 'ac_elite' },
   { key: 'custom_theme', labelKey: 'af_customTheme', descKey: 'af_customThemeDesc', categoryKey: 'ac_elite' },

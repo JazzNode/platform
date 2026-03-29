@@ -46,7 +46,7 @@ const DEFAULT_ARTIST: TierFeatures = {
   // Tier 2 (Premium) — proactive reach
   broadcasts: 2, featured_wall: 2, available_for_hire: 2, analytics_advanced: 2,
   epk_full: 2, gear_unlimited: 2, priority_search: 2,
-  fan_insights: 2, post_show_recap: 2, weekly_digest: 2,
+  fan_insights: 2, post_show_recap: 2, weekly_digest: 2, custom_slug: 2,
   // Tier 3 (Elite) — brand independence
   custom_domain: 3, custom_theme: 3, broadcasts_unlimited: 3, booking_requests: 3,
   epk_branded_pdf: 3, spotlight: 3, data_export: 3,
@@ -62,8 +62,10 @@ const DEFAULT_VENUE: TierFeatures = {
   broadcasts: 2, announcements: 2, merchandise: 2, embed_calendar: 2, priority_search: 2,
   fan_insights: 2, post_show_recap: 2, artist_recommendations: 2,
   weekly_digest: 2, calendar_feed: 2,
+  // Tier 2 (Premium) — operational tools (continued)
+  custom_slug: 2,
   // Tier 3 (Elite) — business engine + brand customization
-  custom_domain: 3, custom_theme: 3, custom_slug: 3, custom_og: 3,
+  custom_domain: 3, custom_theme: 3, custom_og: 3,
   seo_insights: 3, monthly_ai_summary: 3,
   vip_support: 3, ticketing: 3, broadcasts_unlimited: 3,
   revenue_analytics: 3, multi_location: 3,
