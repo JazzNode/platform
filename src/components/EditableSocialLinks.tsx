@@ -12,6 +12,12 @@ interface SocialFields {
   youtube_url?: string;
   instagram?: string;
   facebook_url?: string;
+  soundcloud_url?: string;
+  bandcamp_url?: string;
+  apple_music_url?: string;
+  tiktok?: string;
+  twitter_url?: string;
+  threads?: string;
 }
 
 interface EditableSocialLinksProps {
@@ -23,11 +29,17 @@ interface EditableSocialLinksProps {
 }
 
 const SOCIAL_CONFIGS = [
-  { key: 'website_url' as const, label: 'Website', placeholder: 'https://example.com', defaultPrefix: 'https://' },
   { key: 'spotify_url' as const, label: 'Spotify', placeholder: 'https://open.spotify.com/artist/...', defaultPrefix: 'https://' },
+  { key: 'apple_music_url' as const, label: 'Apple Music', placeholder: 'https://music.apple.com/artist/...', defaultPrefix: 'https://' },
   { key: 'youtube_url' as const, label: 'YouTube', placeholder: 'https://youtube.com/...', defaultPrefix: 'https://' },
+  { key: 'soundcloud_url' as const, label: 'SoundCloud', placeholder: 'https://soundcloud.com/...', defaultPrefix: 'https://' },
+  { key: 'bandcamp_url' as const, label: 'Bandcamp', placeholder: 'https://yourname.bandcamp.com', defaultPrefix: 'https://' },
   { key: 'instagram' as const, label: 'Instagram', placeholder: '@username', defaultPrefix: '@' },
+  { key: 'tiktok' as const, label: 'TikTok', placeholder: '@username', defaultPrefix: '@' },
+  { key: 'threads' as const, label: 'Threads', placeholder: '@username', defaultPrefix: '@' },
   { key: 'facebook_url' as const, label: 'Facebook', placeholder: 'https://facebook.com/...', defaultPrefix: 'https://' },
+  { key: 'twitter_url' as const, label: 'X / Twitter', placeholder: 'https://x.com/...', defaultPrefix: 'https://' },
+  { key: 'website_url' as const, label: 'Website', placeholder: 'https://example.com', defaultPrefix: 'https://' },
 ] as const;
 
 function withDefaults(fields: SocialFields): SocialFields {
@@ -61,7 +73,7 @@ export default function EditableSocialLinks({
   const [error, setError] = useState<string | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
 
-  const hasAny = fields.website_url || fields.spotify_url || fields.youtube_url || fields.instagram || fields.facebook_url;
+  const hasAny = fields.website_url || fields.spotify_url || fields.youtube_url || fields.instagram || fields.facebook_url || fields.soundcloud_url || fields.bandcamp_url || fields.apple_music_url || fields.tiktok || fields.twitter_url || fields.threads;
 
   const handleSave = useCallback(async () => {
     setSaving(true);
@@ -81,13 +93,11 @@ export default function EditableSocialLinks({
           entityId,
           fields: (() => {
             const clean = stripDefaults(draft);
-            return {
-              website_url: clean.website_url || null,
-              spotify_url: clean.spotify_url || null,
-              youtube_url: clean.youtube_url || null,
-              instagram: clean.instagram || null,
-              facebook_url: clean.facebook_url || null,
-            };
+            const result: Record<string, string | null> = {};
+            for (const { key } of SOCIAL_CONFIGS) {
+              result[key] = clean[key] || null;
+            }
+            return result;
           })(),
         }),
       });
@@ -132,6 +142,12 @@ export default function EditableSocialLinks({
           youtubeUrl={fields.youtube_url}
           instagram={fields.instagram}
           facebookUrl={fields.facebook_url}
+          soundcloudUrl={fields.soundcloud_url}
+          bandcampUrl={fields.bandcamp_url}
+          appleMusicUrl={fields.apple_music_url}
+          tiktok={fields.tiktok}
+          twitterUrl={fields.twitter_url}
+          threads={fields.threads}
         />
       );
     }
@@ -187,6 +203,12 @@ export default function EditableSocialLinks({
           youtubeUrl={fields.youtube_url}
           instagram={fields.instagram}
           facebookUrl={fields.facebook_url}
+          soundcloudUrl={fields.soundcloud_url}
+          bandcampUrl={fields.bandcamp_url}
+          appleMusicUrl={fields.apple_music_url}
+          tiktok={fields.tiktok}
+          twitterUrl={fields.twitter_url}
+          threads={fields.threads}
         />
       ) : (
         <SocialIconsPlaceholder artistName={artistName} />
