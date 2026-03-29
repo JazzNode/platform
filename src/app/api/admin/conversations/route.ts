@@ -38,9 +38,9 @@ export async function GET(request: NextRequest) {
     if (senderIds.length > 0) {
       const { data: profiles } = await supabase
         .from('profiles')
-        .select('id, display_name, username')
+        .select('id, display_name')
         .in('id', senderIds);
-      senderMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Unknown']));
+      senderMap = new Map((profiles || []).map((p) => [p.id, p.display_name || 'Unknown']));
     }
 
     const enrichedMsgs = (msgs || []).map((m) => ({
@@ -117,7 +117,7 @@ export async function GET(request: NextRequest) {
       const isVip = (userProfile?.claimed_venue_ids || []).some((vid) => vipVenueIds.has(vid));
       return {
         ...convo,
-        user_display: userProfile?.display_name || userProfile?.username || null,
+        user_display: userProfile?.display_name || null,
         user_avatar: userProfile?.avatar_url || null,
         is_vip: isVip,
         unread_count: count || 0,

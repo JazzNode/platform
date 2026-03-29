@@ -7,6 +7,18 @@ import { useAdmin } from '@/components/AdminProvider';
 import { createClient } from '@/utils/supabase/client';
 import FadeUp from '@/components/animations/FadeUp';
 import Link from 'next/link';
+import { ACTIVE_COUNTRY_CODES } from '@/lib/regions';
+
+const REGION_LABELS: Record<string, string> = {
+  TW: '台灣',
+  JP: '日本',
+  HK: '香港',
+  SG: 'Singapore',
+  MY: 'Malaysia',
+  KR: '한국',
+  TH: 'ไทย',
+  ID: 'Indonesia',
+};
 
 interface ArtistData {
   artist_id: string;
@@ -20,11 +32,18 @@ interface ArtistData {
   bio_short_zh: string | null;
   primary_instrument: string | null;
   instrument_list: string[] | null;
+  country_code: string | null;
   website_url: string | null;
   spotify_url: string | null;
   youtube_url: string | null;
   instagram: string | null;
   facebook_url: string | null;
+  soundcloud_url: string | null;
+  bandcamp_url: string | null;
+  apple_music_url: string | null;
+  tiktok: string | null;
+  twitter_url: string | null;
+  threads: string | null;
   aka: string | null;
   accepting_students: boolean;
   teaching_styles: string[] | null;
@@ -45,19 +64,37 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   const [gearCount, setGearCount] = useState(0);
   const [fetching, setFetching] = useState(true);
 
+  // Basic info
+  const [countryCode, setCountryCode] = useState('');
+
+  // Social links
   const [websiteUrl, setWebsiteUrl] = useState('');
   const [spotifyUrl, setSpotifyUrl] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [instagram, setInstagram] = useState('');
   const [facebookUrl, setFacebookUrl] = useState('');
+  const [appleMusicUrl, setAppleMusicUrl] = useState('');
+  const [soundcloudUrl, setSoundcloudUrl] = useState('');
+  const [bandcampUrl, setBandcampUrl] = useState('');
+  const [tiktok, setTiktok] = useState('');
+  const [twitterUrl, setTwitterUrl] = useState('');
+  const [threads, setThreads] = useState('');
+
+  // Aka
   const [aka, setAka] = useState('');
+
+  // Teaching
   const [acceptingStudents, setAcceptingStudents] = useState(false);
   const [teachingStyles, setTeachingStyles] = useState<string[]>([]);
   const [lessonPriceRange, setLessonPriceRange] = useState('');
   const [teachingDescription, setTeachingDescription] = useState('');
+
+  // Hire
   const [availableForHire, setAvailableForHire] = useState(false);
   const [hireCategories, setHireCategories] = useState<string[]>([]);
   const [hireDescription, setHireDescription] = useState('');
+
+  // UI state
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +109,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     Promise.all([
       supabase
         .from('artists')
-        .select('artist_id, display_name, name_local, name_en, photo_url, bio_en, bio_zh, bio_short_en, bio_short_zh, primary_instrument, instrument_list, website_url, spotify_url, youtube_url, instagram, facebook_url, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
+        .select('artist_id, display_name, name_local, name_en, photo_url, bio_en, bio_zh, bio_short_en, bio_short_zh, primary_instrument, instrument_list, country_code, website_url, spotify_url, youtube_url, instagram, facebook_url, soundcloud_url, bandcamp_url, apple_music_url, tiktok, twitter_url, threads, aka, accepting_students, teaching_styles, lesson_price_range, teaching_description, available_for_hire, hire_categories, hire_description')
         .eq('artist_id', slug)
         .single(),
       supabase
@@ -82,11 +119,18 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     ]).then(([{ data }, { count }]) => {
       if (data) {
         setArtist(data);
+        setCountryCode(data.country_code || '');
         setWebsiteUrl(data.website_url || '');
         setSpotifyUrl(data.spotify_url || '');
         setYoutubeUrl(data.youtube_url || '');
         setInstagram(data.instagram || '');
         setFacebookUrl(data.facebook_url || '');
+        setSoundcloudUrl(data.soundcloud_url || '');
+        setBandcampUrl(data.bandcamp_url || '');
+        setAppleMusicUrl(data.apple_music_url || '');
+        setTiktok(data.tiktok || '');
+        setTwitterUrl(data.twitter_url || '');
+        setThreads(data.threads || '');
         setAka(data.aka || '');
         setAcceptingStudents(data.accepting_students || false);
         setTeachingStyles(data.teaching_styles || []);
@@ -117,17 +161,26 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
         body: JSON.stringify({
           artistId: slug,
           fields: {
+            country_code: countryCode,
             website_url: websiteUrl,
             spotify_url: spotifyUrl,
             youtube_url: youtubeUrl,
             instagram,
             facebook_url: facebookUrl,
+            soundcloud_url: soundcloudUrl,
+            bandcamp_url: bandcampUrl,
+            apple_music_url: appleMusicUrl,
+            tiktok,
+            twitter_url: twitterUrl,
+            threads,
             aka,
             accepting_students: acceptingStudents,
             teaching_styles: teachingStyles,
             lesson_price_range: lessonPriceRange,
+            teaching_description: teachingDescription,
             available_for_hire: availableForHire,
             hire_categories: hireCategories,
+            hire_description: hireDescription,
           },
         }),
       });
@@ -144,7 +197,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
     } finally {
       setSaving(false);
     }
-  }, [token, slug, websiteUrl, spotifyUrl, youtubeUrl, instagram, facebookUrl, aka, acceptingStudents, teachingStyles, lessonPriceRange, availableForHire, hireCategories, t]);
+  }, [token, slug, countryCode, websiteUrl, spotifyUrl, youtubeUrl, instagram, facebookUrl, soundcloudUrl, bandcampUrl, appleMusicUrl, tiktok, twitterUrl, threads, aka, acceptingStudents, teachingStyles, lessonPriceRange, teachingDescription, availableForHire, hireCategories, hireDescription, t]);
 
   if (loading || fetching) {
     return (
@@ -164,7 +217,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
   const inputClass = 'w-full bg-[var(--background)] border border-[var(--border)] rounded-xl px-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors';
 
-  const hasSocialLinks = !!(websiteUrl || spotifyUrl || youtubeUrl || instagram || facebookUrl);
+  const hasSocialLinks = !!(websiteUrl || spotifyUrl || youtubeUrl || instagram || facebookUrl || soundcloudUrl || bandcampUrl || appleMusicUrl || tiktok || twitterUrl || threads);
   const completionFields = [
     { key: 'completionPhoto' as const, done: !!artist.photo_url, editableHere: false },
     { key: 'completionBio' as const, done: !!(artist.bio_en || artist.bio_zh || artist.bio_short_en || artist.bio_short_zh), editableHere: false },
@@ -174,6 +227,23 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
   ];
   const doneCount = completionFields.filter((f) => f.done).length;
   const percentage = Math.round((doneCount / completionFields.length) * 100);
+
+  const urlFields: { label: string; value: string; setter: (v: string) => void; placeholder: string }[] = [
+    { label: 'Spotify', value: spotifyUrl, setter: setSpotifyUrl, placeholder: 'https://open.spotify.com/artist/...' },
+    { label: 'Apple Music', value: appleMusicUrl, setter: setAppleMusicUrl, placeholder: 'https://music.apple.com/artist/...' },
+    { label: 'YouTube', value: youtubeUrl, setter: setYoutubeUrl, placeholder: 'https://youtube.com/@...' },
+    { label: 'SoundCloud', value: soundcloudUrl, setter: setSoundcloudUrl, placeholder: 'https://soundcloud.com/...' },
+    { label: 'Bandcamp', value: bandcampUrl, setter: setBandcampUrl, placeholder: 'https://yourname.bandcamp.com' },
+    { label: 'Facebook', value: facebookUrl, setter: setFacebookUrl, placeholder: 'https://facebook.com/...' },
+    { label: 'X / Twitter', value: twitterUrl, setter: setTwitterUrl, placeholder: 'https://x.com/...' },
+    { label: 'Website', value: websiteUrl, setter: setWebsiteUrl, placeholder: 'https://' },
+  ];
+
+  const usernameFields: { label: string; value: string; setter: (v: string) => void; placeholder: string }[] = [
+    { label: 'Instagram', value: instagram, setter: setInstagram, placeholder: 'username' },
+    { label: 'TikTok', value: tiktok, setter: setTiktok, placeholder: 'username' },
+    { label: 'Threads', value: threads, setter: setThreads, placeholder: 'username' },
+  ];
 
   return (
     <div className="space-y-6">
@@ -231,17 +301,46 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
       <FadeUp>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 space-y-8">
+
+          {/* ── Section: Basic Info ── */}
+          <div className="space-y-5">
+            <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
+              {t('basicInfo')}
+            </h2>
+
+            <div>
+              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-3">
+                {t('region')}
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {ACTIVE_COUNTRY_CODES.map((code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    onClick={() => setCountryCode(countryCode === code ? '' : code)}
+                    className={`px-3.5 py-1.5 rounded-full text-xs border transition-colors ${
+                      countryCode === code
+                        ? 'bg-[var(--color-gold)]/15 text-[var(--color-gold)] border-[var(--color-gold)]/30'
+                        : 'border-[var(--border)] text-[var(--muted-foreground)] hover:border-[var(--color-gold)]/20'
+                    }`}
+                  >
+                    {REGION_LABELS[code] || code}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-[var(--border)]" />
+
+          {/* ── Section: Social Links ── */}
           <div className="space-y-5">
             <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
               {t('socialLinks')}
             </h2>
 
-            {[
-              { label: 'Spotify', value: spotifyUrl, setter: setSpotifyUrl, placeholder: 'https://open.spotify.com/artist/...' },
-              { label: 'YouTube', value: youtubeUrl, setter: setYoutubeUrl, placeholder: 'https://youtube.com/@...' },
-              { label: 'Facebook', value: facebookUrl, setter: setFacebookUrl, placeholder: 'https://facebook.com/...' },
-              { label: 'Website', value: websiteUrl, setter: setWebsiteUrl, placeholder: 'https://' },
-            ].map(({ label, value, setter, placeholder }) => (
+            {/* URL-based platforms */}
+            {urlFields.map(({ label, value, setter, placeholder }) => (
               <div key={label}>
                 <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
                   {label}
@@ -256,25 +355,29 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
               </div>
             ))}
 
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                Instagram
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60">@</span>
-                <input
-                  type="text"
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value.replace(/^@/, ''))}
-                  className={`${inputClass} pl-9`}
-                  placeholder="username"
-                />
+            {/* Username-based platforms */}
+            {usernameFields.map(({ label, value, setter, placeholder }) => (
+              <div key={label}>
+                <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
+                  {label}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60">@</span>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setter(e.target.value.replace(/^@/, ''))}
+                    className={`${inputClass} pl-9`}
+                    placeholder={placeholder}
+                  />
+                </div>
               </div>
-            </div>
+            ))}
           </div>
 
           <div className="border-t border-[var(--border)]" />
 
+          {/* ── Section: Also Known As ── */}
           <div>
             <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
               {t('aka')}
@@ -290,7 +393,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
           <div className="border-t border-[var(--border)]" />
 
-          {/* Teaching Section */}
+          {/* ── Section: Teaching ── */}
           <div className="space-y-5">
             <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
               {t('teaching')}
@@ -362,7 +465,7 @@ export default function ArtistEditPage({ params }: { params: Promise<{ slug: str
 
           <div className="border-t border-[var(--border)]" />
 
-          {/* Hire Me Section */}
+          {/* ── Section: Hire Me ── */}
           <div className="space-y-5">
             <h2 className="text-xs uppercase tracking-widest text-[var(--muted-foreground)] font-bold">
               {t('hireMe')}

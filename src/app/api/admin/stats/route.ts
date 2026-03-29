@@ -75,11 +75,11 @@ export async function GET(request: NextRequest) {
     },
     recentClaims: (recentClaims || []).map((c) => ({
       ...c,
-      user_display: profileMap.get(c.user_id)?.display_name || profileMap.get(c.user_id)?.username || null,
+      user_display: profileMap.get(c.user_id)?.display_name || null,
     })),
     recentAuditLogs: (recentAuditLogs || []).map((l) => ({
       ...l,
-      admin_display: profileMap.get(l.admin_user_id)?.display_name || profileMap.get(l.admin_user_id)?.username || null,
+      admin_display: profileMap.get(l.admin_user_id)?.display_name || null,
     })),
   });
 }

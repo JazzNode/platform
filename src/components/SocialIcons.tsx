@@ -6,6 +6,12 @@ interface SocialIconsProps {
   youtubeUrl?: string;
   instagram?: string;
   facebookUrl?: string;
+  soundcloudUrl?: string;
+  bandcampUrl?: string;
+  appleMusicUrl?: string;
+  tiktok?: string;
+  twitterUrl?: string;
+  threads?: string;
 }
 
 function IconLink({ href, title, children }: { href: string; title: string; children: React.ReactNode }) {

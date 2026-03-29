@@ -42,7 +42,6 @@ export interface SearchableCity {
 
 export interface SearchableMember {
   id: string;
-  username: string | null;
   displayName: string | null;
   avatarUrl: string | null;
   bio: string | null;
@@ -142,7 +141,6 @@ export function search(
     for (const m of data.members) {
       const score = Math.max(
         matchScore(q, m.displayName) * 1.5,
-        matchScore(q, m.username) * 1.2,
         matchScore(q, m.bio) * 0.4,
       );
       if (score > 0) results.push({ type: 'member', id: m.id, score, data: m });

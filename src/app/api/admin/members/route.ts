@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
   // Build query
   let query = supabase
     .from('profiles')
-    .select('id, display_name, username, handle, avatar_url, role, bio, website, social_links, claimed_artist_ids, claimed_venue_ids, created_at', { count: 'exact' });
+    .select('id, display_name, avatar_url, role, bio, website, social_links, claimed_artist_ids, claimed_venue_ids, created_at', { count: 'exact' });
 
   if (role && role !== 'all') {
     query = query.eq('role', role);
   }
 
   if (search) {
-    query = query.or(`display_name.ilike.%${search}%,username.ilike.%${search}%,handle.ilike.%${search}%`);
+    query = query.ilike('display_name', `%${search}%`);
   }
 
   query = query.order('created_at', { ascending: false }).range(offset, offset + limit - 1);

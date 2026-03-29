@@ -224,7 +224,7 @@ export default function FanInboxPage() {
           .in('id', [...profileIds]);
         profileMap = new Map(
           profiles?.map((p) => [p.id, {
-            name: p.display_name || p.username || 'Unknown',
+            name: p.display_name || 'Unknown',
             avatar: p.avatar_url,
           }]) || []
         );
@@ -333,7 +333,7 @@ export default function FanInboxPage() {
                 .select('display_name, username, avatar_url')
                 .eq('id', peerId)
                 .maybeSingle();
-              peer_name = peer?.display_name || peer?.username || 'Unknown';
+              peer_name = peer?.display_name || 'Unknown';
               peer_avatar = peer?.avatar_url || null;
             }
           }
@@ -379,7 +379,7 @@ export default function FanInboxPage() {
             .from('profiles')
             .select('id, display_name, username')
             .in('id', adminIds);
-          adminMap = new Map((profiles || []).map((p) => [p.id, p.display_name || p.username || 'Admin']));
+          adminMap = new Map((profiles || []).map((p) => [p.id, p.display_name || 'Admin']));
         }
         setMessages(data.map((m) => ({ ...m, sender_display: adminMap.get(m.sender_id) })));
       });
@@ -544,7 +544,6 @@ export default function FanInboxPage() {
         ...(profiles || []).map((p) => ({
           id: p.id,
           display_name: p.display_name,
-          username: p.username,
           avatar_url: p.avatar_url,
           _type: 'profile' as const,
         })),
@@ -939,16 +938,16 @@ export default function FanInboxPage() {
                         className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-3 py-2 text-xs text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-emerald-400/50"
                       />
                       {dmSearch.trim() && dmSearchResults.map((u) => (
-                        <button key={`${u._type || 'profile'}-${u.id}`} onClick={() => startDM(u.id, u.display_name || u.username || 'Unknown', u.avatar_url, u._type)}
+                        <button key={`${u._type || 'profile'}-${u.id}`} onClick={() => startDM(u.id, u.display_name || 'Unknown', u.avatar_url, u._type)}
                           className="w-full text-left flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[var(--muted)] transition-colors">
                           {u.avatar_url ? (
                             <Image src={u.avatar_url} alt="" width={28} height={28} className="w-7 h-7 rounded-full object-cover" />
                           ) : (
                             <div className="w-7 h-7 rounded-full bg-[var(--muted)] flex items-center justify-center text-xs">
-                              {(u.display_name || u.username || '?').charAt(0)}
+                              {(u.display_name || '?').charAt(0)}
                             </div>
                           )}
-                          <span className="text-xs font-medium truncate">{u.display_name || u.username}</span>
+                          <span className="text-xs font-medium truncate">{u.display_name || 'Unknown'}</span>
                           {u._type === 'artist' && (
                             <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-400/15 text-emerald-400 shrink-0">{t('filterArtist')}</span>
                           )}

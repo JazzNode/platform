@@ -461,7 +461,7 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-semibold truncate">
-                                {convo.fan_profile?.display_name || convo.fan_profile?.username || tInbox('anonymous')}
+                                {convo.fan_profile?.display_name || tInbox('anonymous')}
                               </p>
                               {convo.unread_count > 0 && (
                                 <span className="bg-emerald-400 text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
@@ -495,9 +495,7 @@ export default function VenueInboxPage({ params }: { params: Promise<{ slug: str
                         </svg>
                       </button>
                       <p className="text-sm font-semibold flex-1">
-                        {selectedConversation.fan_profile?.display_name ||
-                          selectedConversation.fan_profile?.username ||
-                          tInbox('anonymous')}
+                        {selectedConversation.fan_profile?.display_name || tInbox('anonymous')}
                       </p>
                       {/* Archive button */}
                       <button

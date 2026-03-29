@@ -50,7 +50,7 @@ export default function AdminEditedByBadge({ updatedBy }: AdminEditedByBadgeProp
 
   if (!isAdmin || !updatedBy || !editor) return null;
 
-  const name = editor.display_name || editor.username || editor.email || updatedBy;
+  const name = editor.display_name || editor.email || updatedBy;
   const roleLabel = editor.role ? (ROLE_LABELS[editor.role] ?? editor.role) : null;
 
   return (

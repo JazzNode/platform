@@ -2,8 +2,6 @@ import { createClient } from '@/utils/supabase/server';
 
 export interface Profile {
   id: string;
-  username: string | null;
-  handle: string | null;
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
@@ -27,7 +25,6 @@ export async function getPublicFollows(userId: string): Promise<{ target_type: s
 
 export interface SearchableProfile {
   id: string;
-  username: string | null;
   display_name: string | null;
   avatar_url: string | null;
   bio: string | null;
@@ -35,12 +32,11 @@ export interface SearchableProfile {
 
 export async function getSearchableProfiles(): Promise<SearchableProfile[]> {
   const supabase = await createClient();
-  // Fetch profiles that have display_name or username set
   const { data } = await supabase
     .from('profiles')
-    .select('id, username, display_name, avatar_url, bio')
+    .select('id, display_name, avatar_url, bio')
     .eq('is_public', true)
-    .or('display_name.not.is.null,username.not.is.null');
+    .not('display_name', 'is', null);
   return (data || []) as SearchableProfile[];
 }
 
@@ -82,14 +78,3 @@ export async function getUserReviews(userId: string, publicOnly = false): Promis
   return (data || []) as UserReview[];
 }
 
-export async function getProfileByUsername(username: string): Promise<Profile | null> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('username', username)
-    .single();
-
-  if (error || !data) return null;
-  return data as Profile;
-}

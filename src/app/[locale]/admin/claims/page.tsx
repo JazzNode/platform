@@ -183,11 +183,8 @@ export default function AdminClaimsPage() {
                   )}
                   <div>
                     <p className="font-medium text-sm">
-                      {claim.user_profile?.display_name || claim.user_profile?.username || 'Unknown'}
+                      {claim.user_profile?.display_name || 'Unknown'}
                     </p>
-                    {claim.user_profile?.username && (
-                      <p className="text-xs text-[var(--muted-foreground)]">@{claim.user_profile.username}</p>
-                    )}
                   </div>
                 </div>
 

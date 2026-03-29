@@ -445,7 +445,7 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center justify-between">
                               <p className="text-sm font-semibold truncate">
-                                {convo.fan_profile?.display_name || convo.fan_profile?.username || t('anonymous')}
+                                {convo.fan_profile?.display_name || t('anonymous')}
                               </p>
                               {convo.unread_count > 0 && (
                                 <span className="bg-[var(--color-gold)] text-[#0A0A0A] text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center shrink-0">
@@ -479,9 +479,7 @@ export default function InboxPage({ params }: { params: Promise<{ slug: string }
                         </svg>
                       </button>
                       <p className="text-sm font-semibold">
-                        {selectedConversation.fan_profile?.display_name ||
-                          selectedConversation.fan_profile?.username ||
-                          t('anonymous')}
+                        {selectedConversation.fan_profile?.display_name || t('anonymous')}
                       </p>
                     </div>
 

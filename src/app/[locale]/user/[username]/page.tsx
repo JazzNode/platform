@@ -1,17 +1,10 @@
-import { redirect, notFound } from 'next/navigation';
-import { getProfileByUsername } from '@/lib/profile';
+import { notFound } from 'next/navigation';
 
 /**
- * Legacy route: /user/[username] → redirects to /u/[id]
- * Kept for backwards compatibility with existing shared links.
+ * Legacy route: /user/[username]
+ * Members no longer have custom slugs — all profiles use /u/[uuid].
+ * This route always returns 404.
  */
-export default async function LegacyUsernameRedirect({ params }: { params: Promise<{ locale: string; username: string }> }) {
-  const { locale, username } = await params;
-  const profile = await getProfileByUsername(username);
-
-  if (!profile) {
-    notFound();
-  }
-
-  redirect(`/${locale}/u/${profile.id}`);
+export default function LegacyUsernameRedirect() {
+  notFound();
 }

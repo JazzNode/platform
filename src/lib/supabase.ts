@@ -178,6 +178,13 @@ export interface Artist {
   hire_description_ko?: string;
   hire_description_th?: string;
   hire_description_id?: string;
+  // Additional social platforms
+  soundcloud_url?: string;
+  bandcamp_url?: string;
+  apple_music_url?: string;
+  tiktok?: string;
+  twitter_url?: string;
+  threads?: string;
   // Tier
   tier?: number;
   // Data lineage

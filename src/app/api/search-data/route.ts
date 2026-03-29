@@ -71,7 +71,6 @@ export async function GET(request: NextRequest) {
       })),
     members: profiles.map((p) => ({
       id: p.id,
-      username: p.username,
       displayName: p.display_name,
       avatarUrl: p.avatar_url,
       bio: p.bio,

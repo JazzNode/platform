@@ -6,12 +6,32 @@ import { createAdminClient } from '@/utils/supabase/admin';
 
 /** Whitelist of fields a claimed venue owner can directly update */
 const ALLOWED_FIELDS = new Set([
+  // Basic info (Claimed+)
+  'display_name',
+  'description_en',
+  'description_zh',
+  'description_ja',
+  'description_short_en',
+  'description_short_zh',
+  'description_short_ja',
   'website_url',
   'instagram',
   'facebook_url',
   'phone',
   'contact_email',
   'business_hour',
+  'address_local',
+  'address_en',
+  'capacity',
+  'venue_type',
+  'payment_method',
+  'friendly_en',
+  'friendly_zh',
+  'friendly_ja',
+  'friendly_ko',
+  'friendly_th',
+  'friendly_id',
+  // Premium+ (managed by dedicated pages)
   'brand_theme_id',
   'brand_accent_color',
   'brand_font_pair',

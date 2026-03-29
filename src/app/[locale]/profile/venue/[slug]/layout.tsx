@@ -378,14 +378,25 @@ export default function VenueDashboardLayout({
         {/* ─── Mobile Top Bar ─── */}
         <div className="lg:hidden fixed left-0 right-0 z-30 bg-[var(--background)]/95 backdrop-blur-md border-b border-[var(--border)]" style={{ top: 'calc(env(safe-area-inset-top, 0px) + 60px)' }}>
           {/* Identity row — fixed, not scrollable */}
-          <div className="px-4 pt-2 pb-1">
-            <p className="text-xs text-[var(--muted-foreground)] truncate">
+          <div className="flex items-center justify-between px-4 pt-2 pb-1">
+            <p className="text-xs text-[var(--muted-foreground)] truncate min-w-0">
               <span className="font-semibold text-[var(--foreground)]">{venueName}</span>
               <span className="mx-1.5 opacity-40">·</span>
               <span className={TIER_COLORS[effectiveTier]}>
                 {TIER_LABELS[effectiveTier] ?? 'Free'}
               </span>
             </p>
+            <Link
+              href={`/${locale}/venues/${slug}`}
+              className="shrink-0 ml-2 p-1 rounded-md text-[var(--muted-foreground)] hover:text-[var(--foreground)] transition-colors"
+              title={t('viewVenuePage')}
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </Link>
           </div>
           {/* Tab row — horizontally scrollable */}
           <div className="flex items-center gap-2 px-4 py-1.5 overflow-x-auto no-scrollbar">

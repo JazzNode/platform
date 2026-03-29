@@ -26,7 +26,6 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     id: userId,
     display_name: profile?.display_name ?? null,
-    username: profile?.username ?? null,
     role: profile?.role ?? null,
     email: authUser?.email ?? null,
   });

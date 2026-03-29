@@ -12,8 +12,6 @@ import FadeUp from '@/components/animations/FadeUp';
 interface Member {
   id: string;
   display_name: string | null;
-  username: string | null;
-  handle: string | null;
   avatar_url: string | null;
   role: string;
   bio: string | null;
@@ -264,7 +262,7 @@ export default function OwnerMembersPage() {
                         <Image src={member.avatar_url} alt="" width={40} height={40} className="w-10 h-10 rounded-full object-cover shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-[var(--muted)] flex items-center justify-center text-sm text-[var(--muted-foreground)] shrink-0">
-                          {(member.display_name || member.username || '?').charAt(0).toUpperCase()}
+                          {(member.display_name || '?').charAt(0).toUpperCase()}
                         </div>
                       )}
 
@@ -272,7 +270,7 @@ export default function OwnerMembersPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold truncate">
-                            {member.display_name || member.username || 'Unnamed'}
+                            {member.display_name || 'Unnamed'}
                           </p>
                           <span className={`text-[10px] px-2 py-0.5 rounded-md font-medium border ${ROLE_STYLES[member.role] || ROLE_STYLES.member}`}>
                             {member.role}
@@ -282,9 +280,6 @@ export default function OwnerMembersPage() {
                           )}
                         </div>
                         <div className="flex items-center gap-3 mt-0.5">
-                          {member.username && (
-                            <p className="text-xs text-[var(--muted-foreground)]">@{member.username}</p>
-                          )}
                           {member.email && (
                             <p className="text-xs text-[var(--muted-foreground)]">{member.email}</p>
                           )}

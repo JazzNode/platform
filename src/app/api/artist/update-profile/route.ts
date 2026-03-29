@@ -6,19 +6,31 @@ import { createAdminClient } from '@/utils/supabase/admin';
 
 /** Whitelist of fields a claimed artist can directly update */
 const ALLOWED_FIELDS = new Set([
+  // Basic info
+  'country_code',
+  // Social links
   'website_url',
   'spotify_url',
   'youtube_url',
   'instagram',
   'facebook_url',
+  'soundcloud_url',
+  'bandcamp_url',
+  'apple_music_url',
+  'tiktok',
+  'twitter_url',
+  'threads',
+  // Also known as
   'aka',
   // Teaching
   'accepting_students',
   'teaching_styles',
   'lesson_price_range',
+  'teaching_description',
   // Hire
   'available_for_hire',
   'hire_categories',
+  'hire_description',
 ]);
 
 export async function POST(req: NextRequest) {

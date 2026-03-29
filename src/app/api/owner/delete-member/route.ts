@@ -77,7 +77,6 @@ export async function DELETE(request: NextRequest) {
     entityType: 'profile',
     entityId: userId,
     details: {
-      deletedUsername: targetProfile.username,
       deletedDisplayName: targetProfile.display_name,
       deletedEmail: targetEmail,
       deletedRole: targetProfile.role,

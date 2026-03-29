@@ -255,7 +255,7 @@ export default function SearchOverlay() {
       }
       case 'member': {
         const m = result.data as SearchableMember;
-        const label = m.displayName || m.username || 'Member';
+        const label = m.displayName || 'Member';
         return (
           <button
             key={`m-${result.id}`}
@@ -266,7 +266,7 @@ export default function SearchOverlay() {
             }`}
           >
             {m.avatarUrl ? (
-              <Image src={m.avatarUrl} alt={m.displayName || m.username || ''} width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
+              <Image src={m.avatarUrl} alt={m.displayName || ''} width={36} height={36} className="w-9 h-9 rounded-full object-cover shrink-0 border border-[var(--border)]" sizes="36px" />
             ) : (
               <div className="w-9 h-9 rounded-full bg-[#1A1A1A] flex items-center justify-center text-sm font-bold shrink-0 border border-[var(--border)] text-[var(--muted-foreground)]">
                 {label.charAt(0).toUpperCase()}
@@ -274,9 +274,6 @@ export default function SearchOverlay() {
             )}
             <div className="min-w-0 flex-1">
               <p className="font-serif text-sm font-bold truncate text-[var(--foreground)]">{label}</p>
-              {m.displayName && m.username && (
-                <p className="text-xs text-[var(--muted-foreground)] truncate">@{m.username}</p>
-              )}
             </div>
           </button>
         );

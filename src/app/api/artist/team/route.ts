@@ -69,7 +69,6 @@ export async function GET(request: NextRequest) {
         role: m.role,
         status: m.status,
         display_name: memberProfile?.display_name,
-        username: memberProfile?.username,
         avatar_url: memberProfile?.avatar_url,
         email: authUser?.user?.email || null,
         is_billing: m.user_id === artist?.billing_user_id,

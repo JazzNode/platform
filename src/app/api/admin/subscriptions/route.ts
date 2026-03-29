@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
   const enriched = (data || []).map((sub) => ({
     ...sub,
-    user_display: profileMap.get(sub.user_id)?.display_name || profileMap.get(sub.user_id)?.username || null,
+    user_display: profileMap.get(sub.user_id)?.display_name || null,
     user_avatar: profileMap.get(sub.user_id)?.avatar_url || null,
   }));
 

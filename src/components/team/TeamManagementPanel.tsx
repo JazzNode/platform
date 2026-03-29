@@ -242,7 +242,7 @@ export default function TeamManagementPanel({ entityType, entityId, t }: TeamMan
                   {/* Name + email */}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold truncate">
-                      {m.display_name || m.username || 'Unknown'}
+                      {m.display_name || 'Unknown'}
                       {isMe && <span className="ml-1.5 text-[var(--muted-foreground)] font-normal">({t('you')})</span>}
                     </p>
                     {m.email && <p className="text-xs text-[var(--muted-foreground)] truncate">{m.email}</p>}
@@ -329,7 +329,7 @@ export default function TeamManagementPanel({ entityType, entityId, t }: TeamMan
                   .filter((m) => m.user_id !== user?.id && m.status === 'accepted')
                   .map((m) => (
                     <option key={m.user_id} value={m.user_id}>
-                      {m.display_name || m.username || m.email || m.user_id}
+                      {m.display_name || m.email || m.user_id}
                     </option>
                   ))}
               </select>
