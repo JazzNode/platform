@@ -18,12 +18,10 @@ export default function ProfilePage() {
   const { user, profile, loading, refreshProfile } = useAuth();
 
   const [displayName, setDisplayName] = useState('');
-  const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
   const [website, setWebsite] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [usernameError, setUsernameError] = useState<string | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -36,7 +34,6 @@ export default function ProfilePage() {
   useEffect(() => {
     if (profile) {
       setDisplayName(profile.display_name || '');
-      setUsername(profile.username || '');
       setBio(profile.bio || '');
       setWebsite(profile.website || '');
       setIsPublic(profile.is_public ?? true);
@@ -44,29 +41,17 @@ export default function ProfilePage() {
   }, [profile]);
 
   // Layout already handles auth redirect
-  const validateUsername = (value: string) => {
-    if (!value) return true; // username is optional
-    return /^[a-z0-9_]{3,30}$/.test(value);
-  };
-
   const handleSave = useCallback(async () => {
     if (!user) return;
 
-    if (username && !validateUsername(username)) {
-      setUsernameError(t('usernameInvalid'));
-      return;
-    }
-
     setSaving(true);
     setSaved(false);
-    setUsernameError(null);
 
     const supabase = createClient();
     const { error } = await supabase
       .from('profiles')
       .update({
         display_name: displayName || null,
-        username: username || null,
         bio: bio || null,
         website: website || null,
         is_public: isPublic,
@@ -74,18 +59,14 @@ export default function ProfilePage() {
       })
       .eq('id', user.id);
 
-    if (error) {
-      if (error.code === '23505') {
-        setUsernameError(t('usernameTaken'));
-      }
-    } else {
+    if (!error) {
       setSaved(true);
       await refreshProfile();
       setTimeout(() => setSaved(false), 2000);
     }
 
     setSaving(false);
-  }, [user, displayName, username, bio, website, isPublic, refreshProfile, t]);
+  }, [user, displayName, bio, website, isPublic, refreshProfile]);
 
   const handleAvatarClick = useCallback(() => {
     if (!uploading) fileInputRef.current?.click();
@@ -232,31 +213,6 @@ export default function ProfilePage() {
               />
             </div>
 
-            {/* Username */}
-            <div>
-              <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
-                {t('username')}
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--muted-foreground)]/60">@</span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => {
-                    setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''));
-                    setUsernameError(null);
-                  }}
-                  maxLength={30}
-                  className="w-full bg-[var(--background)] border border-[var(--border)] rounded-xl pl-9 pr-4 py-3 text-[var(--foreground)] placeholder:text-[var(--muted-foreground)]/40 focus:outline-none focus:border-[var(--color-gold)]/50 transition-colors"
-                  placeholder={t('usernamePlaceholder')}
-                />
-              </div>
-              {usernameError && (
-                <p className="text-xs text-red-400 mt-1.5">{usernameError}</p>
-              )}
-              <p className="text-xs text-[var(--muted-foreground)]/60 mt-1.5">{t('usernameHint')}</p>
-            </div>
-
             {/* Bio */}
             <div>
               <label className="block text-xs uppercase tracking-widest text-[var(--muted-foreground)] mb-2">
@@ -329,14 +285,12 @@ export default function ProfilePage() {
               )}
             </button>
 
-            {profile?.username && (
-              <a
-                href={`/${locale}/user/${profile.username}`}
-                className="text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors link-lift"
-              >
-                {t('viewPublicProfile')} →
-              </a>
-            )}
+            <a
+              href={`/${locale}/u/${user.id}`}
+              className="text-sm text-[var(--muted-foreground)] hover:text-[var(--color-gold)] transition-colors link-lift"
+            >
+              {t('viewPublicProfile')} →
+            </a>
           </div>
         </div>
       </FadeUp>

@@ -259,14 +259,12 @@ export default function AdminMembersPage() {
                       </div>
                     </div>
                   )}
-                  {member.username && (
-                    <Link
-                      href={`/${locale}/user/${member.username}`}
-                      className="inline-block text-xs text-[var(--color-gold)] hover:underline uppercase tracking-widest"
-                    >
-                      {t('viewProfile')} &rarr;
-                    </Link>
-                  )}
+                  <Link
+                    href={`/${locale}/u/${member.id}`}
+                    className="inline-block text-xs text-[var(--color-gold)] hover:underline uppercase tracking-widest"
+                  >
+                    {t('viewProfile')} &rarr;
+                  </Link>
                 </div>
               )}
             </div>

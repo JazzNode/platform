@@ -19,7 +19,7 @@ interface Props {
 
 export default async function PublicProfileContent({ profile, locale, t, tInst }: Props) {
   const instLabel = (key: string) => { const k = normalizeInstrumentKey(key); try { return tInst(k as never); } catch { return k; } };
-  const username = profile.username || profile.id;
+  const profileSlug = profile.id;
 
   const memberSince = new Date(profile.created_at).toLocaleDateString(
     locale === 'zh' ? 'zh-TW' : locale === 'ja' ? 'ja-JP' : locale === 'ko' ? 'ko-KR' : 'en-US',
@@ -61,7 +61,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
             {profile.avatar_url ? (
               <Image
                 src={profile.avatar_url}
-                alt={profile.display_name || username}
+                alt={profile.display_name || profileSlug}
                 width={192}
                 height={192}
                 className="object-cover w-full h-full"
@@ -69,7 +69,7 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
               />
             ) : (
               <div className="w-full h-full bg-[var(--card)] flex items-center justify-center text-6xl text-[var(--muted-foreground)]">
-                {(profile.display_name || username).charAt(0).toUpperCase()}
+                {(profile.display_name || profileSlug).charAt(0).toUpperCase()}
               </div>
             )}
           </div>
@@ -78,11 +78,8 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
             {/* Name */}
             <div>
               <h1 className="font-serif text-4xl sm:text-5xl font-bold">
-                {profile.display_name || `@${username}`}
+                {profile.display_name || t('member')}
               </h1>
-              {profile.display_name && profile.username && (
-                <p className="mt-1 text-xl text-[var(--muted-foreground)]">@{profile.username}</p>
-              )}
             </div>
 
             {/* Tags + Action Buttons */}
@@ -94,10 +91,10 @@ export default async function PublicProfileContent({ profile, locale, t, tInst }
               <DMButton targetUserId={profile.id} />
               <FollowButton itemType={"user" as "artist"} itemId={profile.id} variant="full" />
               <ShareButton
-                title={profile.display_name || `@${username}`}
-                url={`/${locale}/user/${username}`}
+                title={profile.display_name || t('member')}
+                url={`/${locale}/u/${profileSlug}`}
                 text={[
-                  `${profile.display_name || username}${profile.username ? ` (@${profile.username})` : ''}`,
+                  profile.display_name || t('member'),
                   'via JazzNode — The Jazz Scene, Connected.',
                 ].join('\n')}
                 variant="compact"

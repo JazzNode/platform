@@ -6,7 +6,7 @@ const LOCALES = ['en', 'zh', 'ja', 'ko', 'th', 'id'];
 
 export default function robots(): MetadataRoute.Robots {
   // Generate locale-prefixed disallow rules for private routes
-  const privateRoutes = ['/admin/', '/profile/', '/user/'];
+  const privateRoutes = ['/admin/', '/profile/', '/user/', '/u/'];
   const disallow = [
     '/api/',
     '/_next/',

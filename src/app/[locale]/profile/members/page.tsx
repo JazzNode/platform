@@ -434,14 +434,12 @@ export default function OwnerMembersPage() {
                         </div>
                       )}
 
-                      {member.username && (
-                        <Link
-                          href={`/${locale}/user/${member.username}`}
-                          className="inline-block text-xs text-[var(--color-gold)] hover:underline uppercase tracking-widest"
-                        >
-                          {tHQ('viewProfile')} &rarr;
-                        </Link>
-                      )}
+                      <Link
+                        href={`/${locale}/u/${member.id}`}
+                        className="inline-block text-xs text-[var(--color-gold)] hover:underline uppercase tracking-widest"
+                      >
+                        {tHQ('viewProfile')} &rarr;
+                      </Link>
                     </div>
                   )}
                 </div>

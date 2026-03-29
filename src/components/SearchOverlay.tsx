@@ -133,8 +133,7 @@ export default function SearchOverlay() {
         router.push(`${base}/cities`);
         break;
       case 'member': {
-        const m = result.data as SearchableMember;
-        router.push(m.username ? `${base}/user/${m.username}` : `${base}/user/id/${result.id}`);
+        router.push(`${base}/u/${result.id}`);
         break;
       }
     }
@@ -256,7 +255,7 @@ export default function SearchOverlay() {
       }
       case 'member': {
         const m = result.data as SearchableMember;
-        const label = m.displayName || `@${m.username}`;
+        const label = m.displayName || m.username || 'Member';
         return (
           <button
             key={`m-${result.id}`}
