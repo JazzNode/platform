@@ -447,6 +447,8 @@
   },
   "artistDashboard": {
     "title": "จัดการหน้าศิลปิน",
+    "basicInfo": "ข้อมูลพื้นฐาน",
+    "region": "ภูมิภาค",
     "socialLinks": "ลิงก์โซเชียล",
     "aka": "ชื่ออื่น",
     "akaPlaceholder": "เช่น ชื่อเวที, นามแฝง...",

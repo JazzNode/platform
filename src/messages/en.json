@@ -447,6 +447,8 @@
   },
   "artistDashboard": {
     "title": "Manage Artist Page",
+    "basicInfo": "Basic Info",
+    "region": "Region",
     "socialLinks": "Social Links",
     "aka": "Also Known As",
     "akaPlaceholder": "e.g. stage name, alias...",

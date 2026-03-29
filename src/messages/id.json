@@ -447,6 +447,8 @@
   },
   "artistDashboard": {
     "title": "Kelola Halaman Artis",
+    "basicInfo": "Info Dasar",
+    "region": "Wilayah",
     "socialLinks": "Tautan Sosial",
     "aka": "Nama Lain",
     "akaPlaceholder": "Contoh: nama panggung, alias...",

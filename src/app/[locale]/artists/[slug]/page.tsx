@@ -704,6 +704,12 @@ export default async function ArtistDetailPage({ params }: { params: Promise<{ l
                   youtube_url: f.youtube_url,
                   instagram: f.instagram,
                   facebook_url: f.facebook_url,
+                  soundcloud_url: (fx.soundcloud_url as string) || undefined,
+                  bandcamp_url: (fx.bandcamp_url as string) || undefined,
+                  apple_music_url: (fx.apple_music_url as string) || undefined,
+                  tiktok: (fx.tiktok as string) || undefined,
+                  twitter_url: (fx.twitter_url as string) || undefined,
+                  threads: (fx.threads as string) || undefined,
                 }}
               />
             </div>

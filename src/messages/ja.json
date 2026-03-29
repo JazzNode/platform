@@ -447,6 +447,8 @@
   },
   "artistDashboard": {
     "title": "アーティストページ管理",
+    "basicInfo": "基本情報",
+    "region": "地域",
     "socialLinks": "ソーシャルリンク",
     "aka": "別名",
     "akaPlaceholder": "例：芸名、ニックネーム...",

@@ -448,6 +448,8 @@
   },
   "artistDashboard": {
     "title": "管理藝人頁面",
+    "basicInfo": "基本資料",
+    "region": "所在地區",
     "socialLinks": "社群連結",
     "aka": "別名",
     "akaPlaceholder": "例：藝名、暱稱...",

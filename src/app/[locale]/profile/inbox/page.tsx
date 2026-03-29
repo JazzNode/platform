@@ -544,6 +544,7 @@ export default function FanInboxPage() {
         ...(profiles || []).map((p) => ({
           id: p.id,
           display_name: p.display_name,
+          username: p.username,
           avatar_url: p.avatar_url,
           _type: 'profile' as const,
         })),
