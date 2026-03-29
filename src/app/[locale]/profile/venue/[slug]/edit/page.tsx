@@ -128,7 +128,7 @@ export default function VenueEditPage({ params }: { params: Promise<{ slug: stri
       .single()
       .then(({ data }) => {
         if (data) {
-          const v = data as VenueData;
+          const v = data as unknown as VenueData;
           setVenue(v);
           setDisplayName(v.display_name || '');
           setDescriptionEn(v.description_en || '');
